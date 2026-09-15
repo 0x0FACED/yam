@@ -1,0 +1,11 @@
+{
+  "@@locale": "en",
+  "appName": "YAM",
+  "@appName": {
+    "description": "Application name"
+  },
+  "startupLoadingLabel": "YAM is starting",
+  "@startupLoadingLabel": {
+    "description": "Screen reader label for the animated startup screen"
+  }
+}
