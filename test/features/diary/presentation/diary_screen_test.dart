@@ -15,18 +15,18 @@ void main() {
 
     expect(find.text('Сегодня'), findsOneWidget);
     expect(find.text('Завтрак'), findsOneWidget);
-    expect(find.text('Яйца'), findsOneWidget);
+    expect(find.text('Яйца куриные вареные'), findsOneWidget);
 
     await tester.tap(find.byTooltip('Следующий день'));
     await tester.pump();
 
-    expect(find.text('Яйца'), findsNothing);
+    expect(find.text('Яйца куриные вареные'), findsNothing);
     expect(find.text('Пока ничего нет'), findsWidgets);
 
     await tester.tap(find.text('Вернуться к сегодняшнему дню'));
     await tester.pump();
 
-    expect(find.text('Яйца'), findsOneWidget);
+    expect(find.text('Яйца куриные вареные'), findsOneWidget);
   });
 
   testWidgets('add food action opens a task screen above navigation', (
@@ -69,6 +69,47 @@ void main() {
     expect(find.text('Breakfast'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('renders the wide approved hierarchy in dark theme', (
+    tester,
+  ) async {
+    await _setWindowSize(tester, const Size(1280, 900));
+    await tester.pumpWidget(
+      _DiaryTestApp(locale: const Locale('en'), theme: AppTheme.dark),
+    );
+
+    expect(find.text('YAM'), findsOneWidget);
+    expect(find.text('Consumed'), findsOneWidget);
+    expect(find.text('Buckwheat porridge'), findsOneWidget);
+    expect(find.text('Water'), findsNothing);
+    expect(find.byIcon(Icons.person), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('diary rows expose a visible pressed selection state', (
+    tester,
+  ) async {
+    await _setWindowSize(tester, const Size(390, 844));
+    await tester.pumpWidget(const _DiaryTestApp(locale: Locale('en')));
+
+    final entry = find.text('Boiled eggs');
+    await tester.scrollUntilVisible(
+      entry,
+      200,
+      scrollable: find.descendant(
+        of: find.byKey(const ValueKey('diary-scroll-view')),
+        matching: find.byType(Scrollable),
+      ),
+    );
+    await tester.tap(entry);
+    await tester.pump();
+
+    final highlighted = tester.widget<AnimatedContainer>(
+      find.ancestor(of: entry, matching: find.byType(AnimatedContainer)).first,
+    );
+    final decoration = highlighted.decoration! as BoxDecoration;
+    expect(decoration.color, AppTheme.light.colorScheme.primaryContainer);
+  });
 }
 
 class _DiaryRouterTestApp extends StatelessWidget {
@@ -90,16 +131,17 @@ class _DiaryRouterTestApp extends StatelessWidget {
 }
 
 class _DiaryTestApp extends StatelessWidget {
-  const _DiaryTestApp({required this.locale, this.textScaler});
+  const _DiaryTestApp({required this.locale, this.textScaler, this.theme});
 
   final Locale locale;
   final TextScaler? textScaler;
+  final ThemeData? theme;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       locale: locale,
-      theme: AppTheme.light,
+      theme: theme ?? AppTheme.light,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       builder: (context, child) {

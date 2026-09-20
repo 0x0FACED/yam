@@ -34,9 +34,20 @@
       }
     }
   },
+  "diaryCaloriesOverTarget": "{excess} kcal over",
+  "@diaryCaloriesOverTarget": {
+    "placeholders": {
+      "excess": {
+        "type": "String"
+      }
+    }
+  },
   "macroProtein": "Protein",
   "macroFat": "Fat",
   "macroCarbs": "Carbs",
+  "macroProteinShort": "P",
+  "macroFatShort": "F",
+  "macroCarbsShort": "C",
   "macroGramsProgress": "{consumed} / {target} g",
   "@macroGramsProgress": {
     "placeholders": {
@@ -72,7 +83,7 @@
   "diaryAddFoodPrototypeMessage": "Food search will open here in the next prototype.",
   "diaryNoFoods": "No foods yet",
   "foodSearchTitle": "Add food",
-  "foodSearchHint": "Search foods",
+  "foodSearchHint": "Search foods or dishes",
   "foodSearchBack": "Back to diary",
   "foodSearchClear": "Clear search",
   "foodSearchChooseMeal": "Choose meal",
@@ -87,13 +98,29 @@
   "foodSearchSelectMealTitle": "Where should this food go?",
   "foodSearchMealRequired": "Choose a meal first",
   "foodSearchCreateFood": "Create food",
-  "foodSearchCreateFoodPlaceholder": "Custom food creation will be available in the functional version.",
+  "createProductBack": "Back to food search",
+  "createProductStubMessage": "Product creation will be implemented in a later slice.",
+  "foodSearchForYou": "For you",
   "foodSearchFrequent": "Frequently added",
+  "foodSearchFrequentForMeal": "Frequent for {meal}",
+  "@foodSearchFrequentForMeal": {
+    "placeholders": {
+      "meal": {
+        "type": "String"
+      }
+    }
+  },
   "foodSearchRecent": "Recent",
+  "foodSearchMyDishes": "My dishes",
   "foodSearchFavorites": "Favorites",
   "foodSearchResults": "Search results",
   "foodSearchNoResultsTitle": "Nothing found",
   "foodSearchNoResultsMessage": "Try another name or create your own food.",
+  "foodSearchTabEmptyTitle": "Nothing here yet",
+  "foodSearchTabEmptyMessage": "Foods matching this filter will appear here.",
+  "foodSearchLoading": "Loading foods",
+  "foodSearchErrorTitle": "Foods could not be loaded",
+  "foodSearchErrorMessage": "Try loading the local catalog again.",
   "foodSearchVerified": "Verified food",
   "foodSearchSourceLocal": "Local catalog",
   "foodSearchSourceUser": "Your food",
@@ -104,20 +131,6 @@
         "type": "String"
       },
       "quantity": {
-        "type": "String"
-      }
-    }
-  },
-  "foodSearchMacrosSummary": "P {protein} · F {fat} · C {carbs}",
-  "@foodSearchMacrosSummary": {
-    "placeholders": {
-      "protein": {
-        "type": "String"
-      },
-      "fat": {
-        "type": "String"
-      },
-      "carbs": {
         "type": "String"
       }
     }
@@ -162,6 +175,7 @@
     }
   },
   "actionUndo": "Undo",
+  "actionRetry": "Retry",
   "unitGrams": "g",
   "unitMilliliters": "ml",
   "unitPieces": "pcs",
@@ -216,16 +230,22 @@
       }
     }
   },
-  "demoEggs": "Eggs",
-  "demoBread": "Bread",
-  "demoMilk": "Milk 2.5%",
-  "demoChickenBreast": "Chicken breast",
+  "demoEggs": "Boiled eggs",
+  "demoBread": "Whole-grain bread",
+  "demoMilk": "Pasteurized milk 2.5%",
+  "demoChickenBreast": "Grilled chicken breast",
   "demoRice": "Rice",
   "demoCottageCheese": "Cottage cheese",
   "demoBanana": "Banana",
-  "demoYogurt": "Greek yogurt",
+  "demoYogurt": "Natural Greek yogurt 2%",
   "demoProtein": "Protein powder",
-  "demoApple": "Apple",
+  "demoApple": "Green apple",
+  "diaryDemoBuckwheat": "Buckwheat porridge",
+  "diaryDemoVegetableSalad": "Fresh vegetable salad",
+  "diaryDemoOliveOil": "Extra virgin olive oil",
+  "diaryDemoSteamedSalmon": "Steamed salmon fillet",
+  "diaryDemoSteamedVegetables": "Steamed broccoli and carrots",
+  "diaryDemoAvocado": "Hass avocado",
   "statisticsTitle": "Statistics",
   "statisticsPrototypeMessage": "Nutrition and weight trends will appear here.",
   "settingsTitle": "Settings",

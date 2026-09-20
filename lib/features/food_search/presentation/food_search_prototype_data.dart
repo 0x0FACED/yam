@@ -11,6 +11,8 @@ enum FoodSearchPrototypeUnit {
 
 enum FoodSearchPrototypeSource { localCatalog, userCreated }
 
+enum FoodSearchPrototypeCatalogState { ready, loading, error }
+
 @immutable
 class FoodSearchPrototypeNutrition {
   const FoodSearchPrototypeNutrition({
@@ -104,9 +106,13 @@ class FoodSearchPrototypeFood {
 
 @immutable
 class FoodSearchPrototypeArguments {
-  const FoodSearchPrototypeArguments({this.initialMealId});
+  const FoodSearchPrototypeArguments({
+    this.initialMealId,
+    this.initialCatalogState = FoodSearchPrototypeCatalogState.ready,
+  });
 
   final String? initialMealId;
+  final FoodSearchPrototypeCatalogState initialCatalogState;
 }
 
 @immutable
@@ -368,6 +374,8 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
       lastServingId: 'grams',
       lastAmount: 180,
       frequentMealIds: {'breakfast', 'dinner'},
+      source: FoodSearchPrototypeSource.userCreated,
+      verified: false,
     ),
     FoodSearchPrototypeFood(
       id: 'eggs',

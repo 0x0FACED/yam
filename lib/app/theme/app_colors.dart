@@ -14,6 +14,11 @@ abstract final class AppColors {
   static const lightBorder = Color(0xFFDED8CE);
   static const lightPrimaryContainer = Color(0xFFEEE7FF);
   static const lightError = Color(0xFFC83D4A);
+  static const lightSuccess = Color(0xFF16803A);
+  static const lightWarning = Color(0xFFB85D00);
+  static const lightGoalWithin = Color(0xFF16803A);
+  static const lightGoalBelow = Color(0xFFDED8CE);
+  static const lightGoalAbove = Color(0xFFB85D00);
 
   static const darkBackground = Color(0xFF111015);
   static const darkSurface = Color(0xFF1A1820);
@@ -24,4 +29,9 @@ abstract final class AppColors {
   static const darkPrimary = Color(0xFF9867FF);
   static const darkPrimaryContainer = Color(0xFF35245C);
   static const darkError = Color(0xFFFF7B84);
+  static const darkSuccess = Color(0xFF64D78A);
+  static const darkWarning = Color(0xFFFFC45C);
+  static const darkGoalWithin = Color(0xFF64D78A);
+  static const darkGoalBelow = Color(0xFF37323F);
+  static const darkGoalAbove = Color(0xFFFFC45C);
 }

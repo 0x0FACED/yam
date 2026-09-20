@@ -55,6 +55,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String diaryCaloriesOverTarget(String excess) {
+    return '$excess kcal over';
+  }
+
+  @override
   String get macroProtein => 'Protein';
 
   @override
@@ -62,6 +67,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get macroCarbs => 'Carbs';
+
+  @override
+  String get macroProteinShort => 'P';
+
+  @override
+  String get macroFatShort => 'F';
+
+  @override
+  String get macroCarbsShort => 'C';
 
   @override
   String macroGramsProgress(String consumed, String target) {
@@ -104,7 +118,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get foodSearchTitle => 'Add food';
 
   @override
-  String get foodSearchHint => 'Search foods';
+  String get foodSearchHint => 'Search foods or dishes';
 
   @override
   String get foodSearchBack => 'Back to diary';
@@ -130,14 +144,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get foodSearchCreateFood => 'Create food';
 
   @override
-  String get foodSearchCreateFoodPlaceholder =>
-      'Custom food creation will be available in the functional version.';
+  String get createProductBack => 'Back to food search';
+
+  @override
+  String get createProductStubMessage =>
+      'Product creation will be implemented in a later slice.';
+
+  @override
+  String get foodSearchForYou => 'For you';
 
   @override
   String get foodSearchFrequent => 'Frequently added';
 
   @override
+  String foodSearchFrequentForMeal(String meal) {
+    return 'Frequent for $meal';
+  }
+
+  @override
   String get foodSearchRecent => 'Recent';
+
+  @override
+  String get foodSearchMyDishes => 'My dishes';
 
   @override
   String get foodSearchFavorites => 'Favorites';
@@ -153,6 +181,22 @@ class AppLocalizationsEn extends AppLocalizations {
       'Try another name or create your own food.';
 
   @override
+  String get foodSearchTabEmptyTitle => 'Nothing here yet';
+
+  @override
+  String get foodSearchTabEmptyMessage =>
+      'Foods matching this filter will appear here.';
+
+  @override
+  String get foodSearchLoading => 'Loading foods';
+
+  @override
+  String get foodSearchErrorTitle => 'Foods could not be loaded';
+
+  @override
+  String get foodSearchErrorMessage => 'Try loading the local catalog again.';
+
+  @override
   String get foodSearchVerified => 'Verified food';
 
   @override
@@ -164,11 +208,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String foodSearchCaloriesPerReference(String calories, String quantity) {
     return '$calories kcal / $quantity';
-  }
-
-  @override
-  String foodSearchMacrosSummary(String protein, String fat, String carbs) {
-    return 'P $protein · F $fat · C $carbs';
   }
 
   @override
@@ -215,6 +254,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get actionUndo => 'Undo';
+
+  @override
+  String get actionRetry => 'Retry';
 
   @override
   String get unitGrams => 'g';
@@ -289,16 +331,16 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get demoEggs => 'Eggs';
+  String get demoEggs => 'Boiled eggs';
 
   @override
-  String get demoBread => 'Bread';
+  String get demoBread => 'Whole-grain bread';
 
   @override
-  String get demoMilk => 'Milk 2.5%';
+  String get demoMilk => 'Pasteurized milk 2.5%';
 
   @override
-  String get demoChickenBreast => 'Chicken breast';
+  String get demoChickenBreast => 'Grilled chicken breast';
 
   @override
   String get demoRice => 'Rice';
@@ -310,13 +352,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get demoBanana => 'Banana';
 
   @override
-  String get demoYogurt => 'Greek yogurt';
+  String get demoYogurt => 'Natural Greek yogurt 2%';
 
   @override
   String get demoProtein => 'Protein powder';
 
   @override
-  String get demoApple => 'Apple';
+  String get demoApple => 'Green apple';
+
+  @override
+  String get diaryDemoBuckwheat => 'Buckwheat porridge';
+
+  @override
+  String get diaryDemoVegetableSalad => 'Fresh vegetable salad';
+
+  @override
+  String get diaryDemoOliveOil => 'Extra virgin olive oil';
+
+  @override
+  String get diaryDemoSteamedSalmon => 'Steamed salmon fillet';
+
+  @override
+  String get diaryDemoSteamedVegetables => 'Steamed broccoli and carrots';
+
+  @override
+  String get diaryDemoAvocado => 'Hass avocado';
 
   @override
   String get statisticsTitle => 'Statistics';

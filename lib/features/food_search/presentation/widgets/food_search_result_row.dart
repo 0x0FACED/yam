@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yam/app/theme/app_semantic_colors.dart';
 import 'package:yam/app/theme/app_spacing.dart';
 import 'package:yam/features/food_search/presentation/food_search_format.dart';
 import 'package:yam/features/food_search/presentation/food_search_prototype_data.dart';
@@ -31,138 +32,194 @@ class FoodSearchResultRow extends StatelessWidget {
       food.referenceAmount,
     );
     final calories = formatFoodSearchNumber(context, food.nutrition.calories);
-    final macros = l10n.foodSearchMacrosSummary(
-      formatFoodSearchNumber(context, food.nutrition.protein),
-      formatFoodSearchNumber(context, food.nutrition.fat),
-      formatFoodSearchNumber(context, food.nutrition.carbs),
-    );
-    final source = switch (food.source) {
-      FoodSearchPrototypeSource.localCatalog => l10n.foodSearchSourceLocal,
-      FoodSearchPrototypeSource.userCreated => l10n.foodSearchSourceUser,
-    };
+    final semanticColors = AppSemanticColors.of(context);
+    final metadata =
+        food.brand ??
+        switch (food.source) {
+          FoodSearchPrototypeSource.localCatalog => l10n.foodSearchSourceLocal,
+          FoodSearchPrototypeSource.userCreated => l10n.foodSearchSourceUser,
+        };
 
     return LayoutBuilder(
       builder: (context, constraints) {
         final stackAction =
             constraints.maxWidth < 420 ||
             MediaQuery.textScalerOf(context).scale(14) > 19;
-        final quickAdd = Semantics(
+        final quickAddButton = Semantics(
           button: true,
           label: l10n.foodSearchQuickAddSemantics(food.name, lastQuantity),
           excludeSemantics: true,
           child: OutlinedButton(
             key: ValueKey('food-quick-add-${food.id}'),
             onPressed: onQuickAdd,
+            style: OutlinedButton.styleFrom(
+              foregroundColor: theme.colorScheme.onSurface,
+              backgroundColor: theme.colorScheme.surfaceContainer,
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+            ),
             child: Text(l10n.foodSearchQuickAdd(lastQuantity)),
           ),
         );
 
         return Column(
           children: [
-            InkWell(
-              key: ValueKey('food-result-${food.id}'),
-              onTap: onOpen,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md,
-                  vertical: AppSpacing.sm,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Flexible(
-                                    child: Text(
-                                      food.name,
-                                      style: theme.textTheme.titleMedium
-                                          ?.copyWith(
-                                            fontWeight: FontWeight.w700,
-                                          ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Semantics(
+                    button: true,
+                    child: InkWell(
+                      key: ValueKey('food-result-${food.id}'),
+                      onTap: onOpen,
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(
+                          AppSpacing.md,
+                          AppSpacing.sm,
+                          AppSpacing.sm,
+                          AppSpacing.sm,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    food.name,
+                                    style: theme.textTheme.bodyLarge?.copyWith(
+                                      fontWeight: FontWeight.w600,
                                     ),
-                                  ),
-                                  if (food.verified) ...[
-                                    const SizedBox(width: AppSpacing.xs),
-                                    Tooltip(
-                                      message: l10n.foodSearchVerified,
-                                      child: Icon(
-                                        Icons.verified_rounded,
-                                        size: 18,
-                                        color: theme.colorScheme.primary,
-                                      ),
-                                    ),
-                                  ],
-                                ],
-                              ),
-                              if (food.brand case final brand?) ...[
-                                const SizedBox(height: AppSpacing.xxs),
-                                Text(
-                                  brand,
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    color: theme.colorScheme.onSurfaceVariant,
                                   ),
                                 ),
+                                if (food.verified) ...[
+                                  const SizedBox(width: AppSpacing.xs),
+                                  Tooltip(
+                                    message: l10n.foodSearchVerified,
+                                    child: Icon(
+                                      Icons.verified_rounded,
+                                      size: 16,
+                                      color: theme.colorScheme.primary,
+                                    ),
+                                  ),
+                                ],
                               ],
-                            ],
-                          ),
+                            ),
+                            const SizedBox(height: AppSpacing.xxs),
+                            Text(
+                              metadata,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                            const SizedBox(height: AppSpacing.xs),
+                            Wrap(
+                              spacing: AppSpacing.xs,
+                              runSpacing: AppSpacing.xxs,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                Text(
+                                  l10n.foodSearchCaloriesPerReference(
+                                    calories,
+                                    referenceQuantity,
+                                  ),
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                    fontWeight: FontWeight.w600,
+                                    fontFeatures: const [
+                                      FontFeature.tabularFigures(),
+                                    ],
+                                  ),
+                                ),
+                                _MacroValue(
+                                  label: l10n.macroProteinShort,
+                                  value: formatFoodSearchNumber(
+                                    context,
+                                    food.nutrition.protein,
+                                  ),
+                                  color: semanticColors.protein,
+                                ),
+                                _MacroValue(
+                                  label: l10n.macroFatShort,
+                                  value: formatFoodSearchNumber(
+                                    context,
+                                    food.nutrition.fat,
+                                  ),
+                                  color: semanticColors.fat,
+                                ),
+                                _MacroValue(
+                                  label: l10n.macroCarbsShort,
+                                  value: formatFoodSearchNumber(
+                                    context,
+                                    food.nutrition.carbs,
+                                  ),
+                                  color: semanticColors.carbs,
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
-                        if (!stackAction) ...[
-                          const SizedBox(width: AppSpacing.sm),
-                          quickAdd,
-                        ],
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      l10n.foodSearchCaloriesPerReference(
-                        calories,
-                        referenceQuantity,
                       ),
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        fontFeatures: const [FontFeature.tabularFigures()],
-                      ),
                     ),
-                    const SizedBox(height: AppSpacing.xxs),
-                    Wrap(
-                      spacing: AppSpacing.sm,
-                      runSpacing: AppSpacing.xxs,
-                      children: [
-                        Text(
-                          macros,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                            fontFeatures: const [FontFeature.tabularFigures()],
-                          ),
-                        ),
-                        Text(
-                          source,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.primary,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                    if (stackAction) ...[
-                      const SizedBox(height: AppSpacing.sm),
-                      Align(alignment: Alignment.centerRight, child: quickAdd),
-                    ],
-                  ],
+                  ),
+                ),
+                if (!stackAction)
+                  Padding(
+                    padding: const EdgeInsets.only(right: AppSpacing.md),
+                    child: quickAddButton,
+                  ),
+              ],
+            ),
+            if (stackAction)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.md,
+                  0,
+                  AppSpacing.md,
+                  AppSpacing.sm,
+                ),
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: quickAddButton,
                 ),
               ),
-            ),
-            const Divider(),
+            const Divider(indent: AppSpacing.md, endIndent: AppSpacing.md),
           ],
         );
       },
+    );
+  }
+}
+
+class _MacroValue extends StatelessWidget {
+  const _MacroValue({
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+
+  final String label;
+  final String value;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    final style = Theme.of(context).textTheme.bodySmall;
+    return Text.rich(
+      TextSpan(
+        children: [
+          TextSpan(
+            text: '$label ',
+            style: style?.copyWith(color: color, fontWeight: FontWeight.w700),
+          ),
+          TextSpan(
+            text: value,
+            style: style?.copyWith(
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

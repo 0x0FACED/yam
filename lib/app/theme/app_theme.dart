@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:yam/app/theme/app_colors.dart';
 import 'package:yam/app/theme/app_radius.dart';
+import 'package:yam/app/theme/app_semantic_colors.dart';
 import 'package:yam/app/theme/app_spacing.dart';
+import 'package:yam/app/theme/app_typography.dart';
 
 abstract final class AppTheme {
   static final light = _build(
@@ -21,7 +23,18 @@ abstract final class AppTheme {
           onSurfaceVariant: AppColors.lightTextSecondary,
           surfaceContainer: AppColors.lightSurfaceSecondary,
           outline: AppColors.lightBorder,
+          outlineVariant: AppColors.lightBorder.withValues(alpha: 0.65),
         ),
+    semanticColors: const AppSemanticColors(
+      protein: AppColors.protein,
+      fat: AppColors.fat,
+      carbs: AppColors.carbs,
+      success: AppColors.lightSuccess,
+      warning: AppColors.lightWarning,
+      goalWithin: AppColors.lightGoalWithin,
+      goalBelow: AppColors.lightGoalBelow,
+      goalAbove: AppColors.lightGoalAbove,
+    ),
   );
 
   static final dark = _build(
@@ -41,13 +54,25 @@ abstract final class AppTheme {
           onSurfaceVariant: AppColors.darkTextSecondary,
           surfaceContainer: AppColors.darkSurfaceSecondary,
           outline: AppColors.darkBorder,
+          outlineVariant: AppColors.darkBorder.withValues(alpha: 0.72),
         ),
+    semanticColors: const AppSemanticColors(
+      protein: AppColors.protein,
+      fat: AppColors.fat,
+      carbs: AppColors.carbs,
+      success: AppColors.darkSuccess,
+      warning: AppColors.darkWarning,
+      goalWithin: AppColors.darkGoalWithin,
+      goalBelow: AppColors.darkGoalBelow,
+      goalAbove: AppColors.darkGoalAbove,
+    ),
   );
 
   static ThemeData _build({
     required Brightness brightness,
     required Color scaffoldBackground,
     required ColorScheme colorScheme,
+    required AppSemanticColors semanticColors,
   }) {
     final base = ThemeData(
       useMaterial3: true,
@@ -55,8 +80,9 @@ abstract final class AppTheme {
       scaffoldBackgroundColor: scaffoldBackground,
       colorScheme: colorScheme,
     );
+    final textTheme = AppTypography.build(base.textTheme);
     final navigationLabelStyle = WidgetStateProperty.resolveWith<TextStyle?>(
-      (states) => base.textTheme.labelMedium?.copyWith(
+      (states) => textTheme.labelMedium?.copyWith(
         color: states.contains(WidgetState.selected)
             ? colorScheme.primary
             : colorScheme.onSurfaceVariant,
@@ -67,6 +93,8 @@ abstract final class AppTheme {
     );
 
     return base.copyWith(
+      textTheme: textTheme,
+      extensions: [semanticColors],
       appBarTheme: AppBarTheme(
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -132,8 +160,12 @@ abstract final class AppTheme {
         thickness: 1,
         space: 1,
       ),
+      progressIndicatorTheme: ProgressIndicatorThemeData(
+        color: colorScheme.primary,
+        linearTrackColor: colorScheme.surfaceContainer,
+      ),
       navigationBarTheme: NavigationBarThemeData(
-        height: 72,
+        height: 64,
         elevation: 0,
         backgroundColor: colorScheme.surface,
         indicatorColor: colorScheme.primaryContainer,
@@ -145,11 +177,11 @@ abstract final class AppTheme {
         indicatorColor: colorScheme.primaryContainer,
         selectedIconTheme: IconThemeData(color: colorScheme.primary),
         unselectedIconTheme: IconThemeData(color: colorScheme.onSurfaceVariant),
-        selectedLabelTextStyle: base.textTheme.labelMedium?.copyWith(
+        selectedLabelTextStyle: textTheme.labelMedium?.copyWith(
           color: colorScheme.primary,
           fontWeight: FontWeight.w700,
         ),
-        unselectedLabelTextStyle: base.textTheme.labelMedium?.copyWith(
+        unselectedLabelTextStyle: textTheme.labelMedium?.copyWith(
           color: colorScheme.onSurfaceVariant,
           fontWeight: FontWeight.w500,
         ),

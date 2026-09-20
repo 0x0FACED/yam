@@ -182,6 +182,12 @@ abstract class AppLocalizations {
   /// **'{remaining} kcal left'**
   String diaryCaloriesRemaining(String remaining);
 
+  /// No description provided for @diaryCaloriesOverTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'{excess} kcal over'**
+  String diaryCaloriesOverTarget(String excess);
+
   /// No description provided for @macroProtein.
   ///
   /// In en, this message translates to:
@@ -199,6 +205,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Carbs'**
   String get macroCarbs;
+
+  /// No description provided for @macroProteinShort.
+  ///
+  /// In en, this message translates to:
+  /// **'P'**
+  String get macroProteinShort;
+
+  /// No description provided for @macroFatShort.
+  ///
+  /// In en, this message translates to:
+  /// **'F'**
+  String get macroFatShort;
+
+  /// No description provided for @macroCarbsShort.
+  ///
+  /// In en, this message translates to:
+  /// **'C'**
+  String get macroCarbsShort;
 
   /// No description provided for @macroGramsProgress.
   ///
@@ -269,7 +293,7 @@ abstract class AppLocalizations {
   /// No description provided for @foodSearchHint.
   ///
   /// In en, this message translates to:
-  /// **'Search foods'**
+  /// **'Search foods or dishes'**
   String get foodSearchHint;
 
   /// No description provided for @foodSearchBack.
@@ -314,11 +338,23 @@ abstract class AppLocalizations {
   /// **'Create food'**
   String get foodSearchCreateFood;
 
-  /// No description provided for @foodSearchCreateFoodPlaceholder.
+  /// No description provided for @createProductBack.
   ///
   /// In en, this message translates to:
-  /// **'Custom food creation will be available in the functional version.'**
-  String get foodSearchCreateFoodPlaceholder;
+  /// **'Back to food search'**
+  String get createProductBack;
+
+  /// No description provided for @createProductStubMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Product creation will be implemented in a later slice.'**
+  String get createProductStubMessage;
+
+  /// No description provided for @foodSearchForYou.
+  ///
+  /// In en, this message translates to:
+  /// **'For you'**
+  String get foodSearchForYou;
 
   /// No description provided for @foodSearchFrequent.
   ///
@@ -326,11 +362,23 @@ abstract class AppLocalizations {
   /// **'Frequently added'**
   String get foodSearchFrequent;
 
+  /// No description provided for @foodSearchFrequentForMeal.
+  ///
+  /// In en, this message translates to:
+  /// **'Frequent for {meal}'**
+  String foodSearchFrequentForMeal(String meal);
+
   /// No description provided for @foodSearchRecent.
   ///
   /// In en, this message translates to:
   /// **'Recent'**
   String get foodSearchRecent;
+
+  /// No description provided for @foodSearchMyDishes.
+  ///
+  /// In en, this message translates to:
+  /// **'My dishes'**
+  String get foodSearchMyDishes;
 
   /// No description provided for @foodSearchFavorites.
   ///
@@ -356,6 +404,36 @@ abstract class AppLocalizations {
   /// **'Try another name or create your own food.'**
   String get foodSearchNoResultsMessage;
 
+  /// No description provided for @foodSearchTabEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing here yet'**
+  String get foodSearchTabEmptyTitle;
+
+  /// No description provided for @foodSearchTabEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Foods matching this filter will appear here.'**
+  String get foodSearchTabEmptyMessage;
+
+  /// No description provided for @foodSearchLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading foods'**
+  String get foodSearchLoading;
+
+  /// No description provided for @foodSearchErrorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Foods could not be loaded'**
+  String get foodSearchErrorTitle;
+
+  /// No description provided for @foodSearchErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Try loading the local catalog again.'**
+  String get foodSearchErrorMessage;
+
   /// No description provided for @foodSearchVerified.
   ///
   /// In en, this message translates to:
@@ -379,12 +457,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{calories} kcal / {quantity}'**
   String foodSearchCaloriesPerReference(String calories, String quantity);
-
-  /// No description provided for @foodSearchMacrosSummary.
-  ///
-  /// In en, this message translates to:
-  /// **'P {protein} · F {fat} · C {carbs}'**
-  String foodSearchMacrosSummary(String protein, String fat, String carbs);
 
   /// No description provided for @foodSearchQuickAdd.
   ///
@@ -464,6 +536,12 @@ abstract class AppLocalizations {
   /// **'Undo'**
   String get actionUndo;
 
+  /// No description provided for @actionRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get actionRetry;
+
   /// No description provided for @unitGrams.
   ///
   /// In en, this message translates to:
@@ -539,25 +617,25 @@ abstract class AppLocalizations {
   /// No description provided for @demoEggs.
   ///
   /// In en, this message translates to:
-  /// **'Eggs'**
+  /// **'Boiled eggs'**
   String get demoEggs;
 
   /// No description provided for @demoBread.
   ///
   /// In en, this message translates to:
-  /// **'Bread'**
+  /// **'Whole-grain bread'**
   String get demoBread;
 
   /// No description provided for @demoMilk.
   ///
   /// In en, this message translates to:
-  /// **'Milk 2.5%'**
+  /// **'Pasteurized milk 2.5%'**
   String get demoMilk;
 
   /// No description provided for @demoChickenBreast.
   ///
   /// In en, this message translates to:
-  /// **'Chicken breast'**
+  /// **'Grilled chicken breast'**
   String get demoChickenBreast;
 
   /// No description provided for @demoRice.
@@ -581,7 +659,7 @@ abstract class AppLocalizations {
   /// No description provided for @demoYogurt.
   ///
   /// In en, this message translates to:
-  /// **'Greek yogurt'**
+  /// **'Natural Greek yogurt 2%'**
   String get demoYogurt;
 
   /// No description provided for @demoProtein.
@@ -593,8 +671,44 @@ abstract class AppLocalizations {
   /// No description provided for @demoApple.
   ///
   /// In en, this message translates to:
-  /// **'Apple'**
+  /// **'Green apple'**
   String get demoApple;
+
+  /// No description provided for @diaryDemoBuckwheat.
+  ///
+  /// In en, this message translates to:
+  /// **'Buckwheat porridge'**
+  String get diaryDemoBuckwheat;
+
+  /// No description provided for @diaryDemoVegetableSalad.
+  ///
+  /// In en, this message translates to:
+  /// **'Fresh vegetable salad'**
+  String get diaryDemoVegetableSalad;
+
+  /// No description provided for @diaryDemoOliveOil.
+  ///
+  /// In en, this message translates to:
+  /// **'Extra virgin olive oil'**
+  String get diaryDemoOliveOil;
+
+  /// No description provided for @diaryDemoSteamedSalmon.
+  ///
+  /// In en, this message translates to:
+  /// **'Steamed salmon fillet'**
+  String get diaryDemoSteamedSalmon;
+
+  /// No description provided for @diaryDemoSteamedVegetables.
+  ///
+  /// In en, this message translates to:
+  /// **'Steamed broccoli and carrots'**
+  String get diaryDemoSteamedVegetables;
+
+  /// No description provided for @diaryDemoAvocado.
+  ///
+  /// In en, this message translates to:
+  /// **'Hass avocado'**
+  String get diaryDemoAvocado;
 
   /// No description provided for @statisticsTitle.
   ///

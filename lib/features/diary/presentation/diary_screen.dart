@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:yam/app/theme/app_breakpoints.dart';
 import 'package:yam/app/theme/app_motion.dart';
 import 'package:yam/app/theme/app_spacing.dart';
+import 'package:yam/app/theme/app_typography.dart';
+import 'package:yam/core/ui/feedback/yam_undo_snack_bar.dart';
 import 'package:yam/features/diary/presentation/diary_prototype_data.dart';
 import 'package:yam/features/diary/presentation/widgets/daily_nutrition_summary.dart';
 import 'package:yam/features/diary/presentation/widgets/diary_day_selector.dart';
@@ -14,7 +16,9 @@ import 'package:yam/features/food_search/presentation/food_search_prototype_data
 import 'package:yam/l10n/generated/app_localizations.dart';
 
 class DiaryScreen extends StatefulWidget {
-  const DiaryScreen({super.key});
+  const DiaryScreen({this.today, super.key});
+
+  final DateTime? today;
 
   @override
   State<DiaryScreen> createState() => _DiaryScreenState();
@@ -35,7 +39,7 @@ class _DiaryScreenState extends State<DiaryScreen> {
   @override
   void initState() {
     super.initState();
-    final now = DateTime.now();
+    final now = widget.today ?? DateTime.now();
     _today = DateTime(now.year, now.month, now.day);
     _selectedDay = _today;
   }
@@ -57,12 +61,11 @@ class _DiaryScreenState extends State<DiaryScreen> {
     );
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: FloatingActionButton(
         key: const ValueKey('diary-add-food'),
         onPressed: _openFoodSearch,
-        icon: const Icon(Icons.add_rounded),
-        label: Text(l10n.diaryAddFood),
+        tooltip: l10n.diaryAddFood,
+        child: const Icon(Icons.add_rounded),
       ),
       body: SafeArea(
         bottom: false,
@@ -76,11 +79,52 @@ class _DiaryScreenState extends State<DiaryScreen> {
             return CustomScrollView(
               key: const ValueKey('diary-scroll-view'),
               controller: _scrollController,
-              slivers: constraints.maxWidth >= AppBreakpoints.wideDiary
-                  ? _buildWideSlivers(day, horizontalPadding)
-                  : _buildCompactSlivers(day, horizontalPadding),
+              slivers: [
+                _buildHeaderSliver(horizontalPadding),
+                if (constraints.maxWidth >= AppBreakpoints.wideDiary)
+                  ..._buildWideSlivers(day, horizontalPadding)
+                else
+                  ..._buildCompactSlivers(day, horizontalPadding),
+              ],
             );
           },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeaderSliver(double horizontalPadding) {
+    final theme = Theme.of(context);
+    return SliverAppBar(
+      pinned: true,
+      primary: false,
+      toolbarHeight: 48,
+      automaticallyImplyLeading: false,
+      titleSpacing: 0,
+      elevation: 0,
+      scrolledUnderElevation: 0,
+      backgroundColor: theme.scaffoldBackgroundColor,
+      surfaceTintColor: Colors.transparent,
+      shape: Border(
+        bottom: BorderSide(color: theme.colorScheme.outlineVariant),
+      ),
+      title: Padding(
+        padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+        child: _ConstrainedDiaryContent(
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Semantics(
+              header: true,
+              child: Text(
+                AppLocalizations.of(context).appName,
+                style: AppTypography.sectionTitle.copyWith(
+                  color: theme.colorScheme.onSurface,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.2,
+                ),
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -96,7 +140,7 @@ class _DiaryScreenState extends State<DiaryScreen> {
       SliverPadding(
         padding: EdgeInsets.fromLTRB(
           horizontalPadding,
-          AppSpacing.md,
+          AppSpacing.sm,
           horizontalPadding,
           0,
         ),
@@ -109,7 +153,7 @@ class _DiaryScreenState extends State<DiaryScreen> {
       SliverPadding(
         padding: EdgeInsets.fromLTRB(
           horizontalPadding,
-          AppSpacing.lg,
+          AppSpacing.sm,
           horizontalPadding,
           0,
         ),
@@ -122,7 +166,7 @@ class _DiaryScreenState extends State<DiaryScreen> {
         ),
       ),
       SliverPadding(
-        padding: contentPadding.copyWith(top: AppSpacing.xl),
+        padding: contentPadding.copyWith(top: AppSpacing.md),
         sliver: SliverList.builder(
           itemCount: day.meals.length,
           itemBuilder: (context, index) {
@@ -132,6 +176,7 @@ class _DiaryScreenState extends State<DiaryScreen> {
                 key: ValueKey(meal.id),
                 meal: meal,
                 onAddFood: () => _openFoodSearch(mealId: meal.id),
+                onEntryPressed: _previewEntrySelection,
                 highlightedEntryId: _highlightedEntryId,
                 highlightedEntryKey: _highlightedEntryKey,
               ),
@@ -151,7 +196,7 @@ class _DiaryScreenState extends State<DiaryScreen> {
       SliverPadding(
         padding: EdgeInsets.fromLTRB(
           horizontalPadding,
-          AppSpacing.md,
+          AppSpacing.sm,
           horizontalPadding,
           96,
         ),
@@ -174,6 +219,7 @@ class _DiaryScreenState extends State<DiaryScreen> {
                       child: _MealList(
                         day: day,
                         onAddFood: (mealId) => _openFoodSearch(mealId: mealId),
+                        onEntryPressed: _previewEntrySelection,
                         highlightedEntryId: _highlightedEntryId,
                         highlightedEntryKey: _highlightedEntryKey,
                       ),
@@ -189,11 +235,16 @@ class _DiaryScreenState extends State<DiaryScreen> {
   }
 
   Widget _buildDaySelector() {
-    return DiaryDaySelector(
-      selectedDay: _selectedDay,
-      today: _today,
-      onDaySelected: _selectDay,
-      onCalendarPressed: _openCalendar,
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 640),
+        child: DiaryDaySelector(
+          selectedDay: _selectedDay,
+          today: _today,
+          onDaySelected: _selectDay,
+          onCalendarPressed: _openCalendar,
+        ),
+      ),
     );
   }
 
@@ -249,6 +300,37 @@ class _DiaryScreenState extends State<DiaryScreen> {
       _highlightedEntryKey = entryKey;
     });
 
+    _scheduleHighlightClear(entryId);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _revealAddedEntry(entryKey);
+    });
+
+    final l10n = AppLocalizations.of(context);
+    showYamUndoSnackBar(
+      context: context,
+      message: l10n.foodAdded(
+        result.name,
+        foodSearchPrototypeMealName(l10n, result.mealId),
+      ),
+      undoLabel: l10n.actionUndo,
+      onUndo: () => _undoPrototypeAddition(
+        day: targetDay,
+        mealId: result.mealId,
+        entryId: entryId,
+      ),
+    );
+  }
+
+  void _previewEntrySelection(DiaryPrototypeEntry entry) {
+    setState(() {
+      _highlightedEntryId = entry.id;
+      _highlightedEntryKey = null;
+    });
+    _scheduleHighlightClear(entry.id);
+  }
+
+  void _scheduleHighlightClear(String entryId) {
     _highlightTimer?.cancel();
     _highlightTimer = Timer(AppMotion.diaryEntryHighlight, () {
       if (mounted && _highlightedEntryId == entryId) {
@@ -258,35 +340,6 @@ class _DiaryScreenState extends State<DiaryScreen> {
         });
       }
     });
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _revealAddedEntry(entryKey);
-    });
-
-    final messenger = ScaffoldMessenger.of(context);
-    messenger
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(
-            AppLocalizations.of(context).foodAdded(
-              result.name,
-              foodSearchPrototypeMealName(
-                AppLocalizations.of(context),
-                result.mealId,
-              ),
-            ),
-          ),
-          action: SnackBarAction(
-            label: AppLocalizations.of(context).actionUndo,
-            onPressed: () => _undoPrototypeAddition(
-              day: targetDay,
-              mealId: result.mealId,
-              entryId: entryId,
-            ),
-          ),
-        ),
-      );
   }
 
   Future<void> _revealAddedEntry(GlobalKey entryKey) async {
@@ -364,12 +417,14 @@ class _MealList extends StatelessWidget {
   const _MealList({
     required this.day,
     required this.onAddFood,
+    required this.onEntryPressed,
     required this.highlightedEntryId,
     required this.highlightedEntryKey,
   });
 
   final DiaryPrototypeDay day;
   final ValueChanged<String> onAddFood;
+  final ValueChanged<DiaryPrototypeEntry> onEntryPressed;
   final String? highlightedEntryId;
   final GlobalKey? highlightedEntryKey;
 
@@ -382,6 +437,7 @@ class _MealList extends StatelessWidget {
             key: ValueKey(meal.id),
             meal: meal,
             onAddFood: () => onAddFood(meal.id),
+            onEntryPressed: onEntryPressed,
             highlightedEntryId: highlightedEntryId,
             highlightedEntryKey: highlightedEntryKey,
           ),

@@ -3,11 +3,12 @@ import 'package:go_router/go_router.dart';
 import 'package:yam/app/navigation/adaptive_navigation_shell.dart';
 import 'package:yam/app/theme/app_spacing.dart';
 import 'package:yam/features/diary/presentation/diary_screen.dart';
+import 'package:yam/features/food_search/presentation/create_product_stub_screen.dart';
 import 'package:yam/features/food_search/presentation/food_search_prototype_data.dart';
 import 'package:yam/features/food_search/presentation/food_search_screen.dart';
 import 'package:yam/l10n/generated/app_localizations.dart';
 
-GoRouter createAppRouter() {
+GoRouter createAppRouter({DateTime? diaryToday}) {
   return GoRouter(
     initialLocation: '/diary',
     routes: [
@@ -20,7 +21,7 @@ GoRouter createAppRouter() {
             routes: [
               GoRoute(
                 path: '/diary',
-                builder: (context, state) => const DiaryScreen(),
+                builder: (context, state) => DiaryScreen(today: diaryToday),
               ),
             ],
           ),
@@ -64,6 +65,12 @@ GoRouter createAppRouter() {
               : const FoodSearchPrototypeArguments();
           return FoodSearchScreen(arguments: arguments);
         },
+        routes: [
+          GoRoute(
+            path: 'create',
+            builder: (context, state) => const CreateProductStubScreen(),
+          ),
+        ],
       ),
     ],
   );

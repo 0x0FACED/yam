@@ -55,6 +55,11 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String diaryCaloriesOverTarget(String excess) {
+    return 'Сверх цели на $excess ккал';
+  }
+
+  @override
   String get macroProtein => 'Белки';
 
   @override
@@ -62,6 +67,15 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get macroCarbs => 'Углеводы';
+
+  @override
+  String get macroProteinShort => 'Б';
+
+  @override
+  String get macroFatShort => 'Ж';
+
+  @override
+  String get macroCarbsShort => 'У';
 
   @override
   String macroGramsProgress(String consumed, String target) {
@@ -78,7 +92,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get mealDinner => 'Ужин';
 
   @override
-  String get mealSnacks => 'Перекусы';
+  String get mealSnacks => 'Перекус';
 
   @override
   String mealCalories(String calories) {
@@ -104,7 +118,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get foodSearchTitle => 'Добавить еду';
 
   @override
-  String get foodSearchHint => 'Найти продукт';
+  String get foodSearchHint => 'Найти продукт или блюдо';
 
   @override
   String get foodSearchBack => 'Назад в дневник';
@@ -130,14 +144,28 @@ class AppLocalizationsRu extends AppLocalizations {
   String get foodSearchCreateFood => 'Создать продукт';
 
   @override
-  String get foodSearchCreateFoodPlaceholder =>
-      'Создание своего продукта появится в функциональной версии.';
+  String get createProductBack => 'Назад к поиску еды';
+
+  @override
+  String get createProductStubMessage =>
+      'Создание продукта будет реализовано в следующем этапе.';
+
+  @override
+  String get foodSearchForYou => 'Для вас';
 
   @override
   String get foodSearchFrequent => 'Часто добавляют';
 
   @override
+  String foodSearchFrequentForMeal(String meal) {
+    return 'Часто добавляют: $meal';
+  }
+
+  @override
   String get foodSearchRecent => 'Недавние';
+
+  @override
+  String get foodSearchMyDishes => 'Мои блюда';
 
   @override
   String get foodSearchFavorites => 'Избранное';
@@ -153,6 +181,23 @@ class AppLocalizationsRu extends AppLocalizations {
       'Попробуйте другое название или создайте свой продукт.';
 
   @override
+  String get foodSearchTabEmptyTitle => 'Здесь пока пусто';
+
+  @override
+  String get foodSearchTabEmptyMessage =>
+      'Здесь появятся продукты из выбранного раздела.';
+
+  @override
+  String get foodSearchLoading => 'Загрузка продуктов';
+
+  @override
+  String get foodSearchErrorTitle => 'Не удалось загрузить продукты';
+
+  @override
+  String get foodSearchErrorMessage =>
+      'Попробуйте снова загрузить локальный каталог.';
+
+  @override
   String get foodSearchVerified => 'Проверенный продукт';
 
   @override
@@ -164,11 +209,6 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String foodSearchCaloriesPerReference(String calories, String quantity) {
     return '$calories ккал / $quantity';
-  }
-
-  @override
-  String foodSearchMacrosSummary(String protein, String fat, String carbs) {
-    return 'Б $protein · Ж $fat · У $carbs';
   }
 
   @override
@@ -215,6 +255,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get actionUndo => 'Отменить';
+
+  @override
+  String get actionRetry => 'Повторить';
 
   @override
   String get unitGrams => 'г';
@@ -297,16 +340,16 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get demoEggs => 'Яйца';
+  String get demoEggs => 'Яйца куриные вареные';
 
   @override
-  String get demoBread => 'Хлеб';
+  String get demoBread => 'Хлеб цельнозерновой';
 
   @override
-  String get demoMilk => 'Молоко 2,5%';
+  String get demoMilk => 'Молоко пастеризованное 2,5%';
 
   @override
-  String get demoChickenBreast => 'Куриная грудка';
+  String get demoChickenBreast => 'Куриное филе гриль';
 
   @override
   String get demoRice => 'Рис';
@@ -318,13 +361,31 @@ class AppLocalizationsRu extends AppLocalizations {
   String get demoBanana => 'Банан';
 
   @override
-  String get demoYogurt => 'Греческий йогурт';
+  String get demoYogurt => 'Греческий йогурт натуральный 2%';
 
   @override
   String get demoProtein => 'Протеин';
 
   @override
-  String get demoApple => 'Яблоко';
+  String get demoApple => 'Яблоко зеленое';
+
+  @override
+  String get diaryDemoBuckwheat => 'Гречневая каша рассыпчатая';
+
+  @override
+  String get diaryDemoVegetableSalad => 'Салат со свежими овощами';
+
+  @override
+  String get diaryDemoOliveOil => 'Оливковое масло Extra Virgin';
+
+  @override
+  String get diaryDemoSteamedSalmon => 'Филе лосося на пару';
+
+  @override
+  String get diaryDemoSteamedVegetables => 'Овощи на пару (брокколи, морковь)';
+
+  @override
+  String get diaryDemoAvocado => 'Авокадо Хасс';
 
   @override
   String get statisticsTitle => 'Статистика';
