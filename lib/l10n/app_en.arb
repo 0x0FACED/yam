@@ -7,5 +7,227 @@
   "startupLoadingLabel": "YAM is starting",
   "@startupLoadingLabel": {
     "description": "Screen reader label for the animated startup screen"
-  }
+  },
+  "navigationDiary": "Diary",
+  "navigationStatistics": "Stats",
+  "navigationSettings": "Settings",
+  "diaryTitle": "Diary",
+  "diaryToday": "Today",
+  "diaryPreviousDay": "Previous day",
+  "diaryNextDay": "Next day",
+  "diaryOpenCalendar": "Open calendar",
+  "diaryReturnToToday": "Return to today",
+  "diaryConsumed": "Consumed",
+  "diaryCalorieGoalSuffix": "/ {target} kcal",
+  "@diaryCalorieGoalSuffix": {
+    "placeholders": {
+      "target": {
+        "type": "String"
+      }
+    }
+  },
+  "diaryCaloriesRemaining": "{remaining} kcal left",
+  "@diaryCaloriesRemaining": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "macroProtein": "Protein",
+  "macroFat": "Fat",
+  "macroCarbs": "Carbs",
+  "macroGramsProgress": "{consumed} / {target} g",
+  "@macroGramsProgress": {
+    "placeholders": {
+      "consumed": {
+        "type": "String"
+      },
+      "target": {
+        "type": "String"
+      }
+    }
+  },
+  "mealBreakfast": "Breakfast",
+  "mealLunch": "Lunch",
+  "mealDinner": "Dinner",
+  "mealSnacks": "Snacks",
+  "mealCalories": "{calories} kcal",
+  "@mealCalories": {
+    "placeholders": {
+      "calories": {
+        "type": "String"
+      }
+    }
+  },
+  "diaryAddFood": "Add food",
+  "diaryAddFoodToMeal": "Add food to {meal}",
+  "@diaryAddFoodToMeal": {
+    "placeholders": {
+      "meal": {
+        "type": "String"
+      }
+    }
+  },
+  "diaryAddFoodPrototypeMessage": "Food search will open here in the next prototype.",
+  "diaryNoFoods": "No foods yet",
+  "foodSearchTitle": "Add food",
+  "foodSearchHint": "Search foods",
+  "foodSearchBack": "Back to diary",
+  "foodSearchClear": "Clear search",
+  "foodSearchChooseMeal": "Choose meal",
+  "foodSearchSelectedMeal": "Meal: {meal}",
+  "@foodSearchSelectedMeal": {
+    "placeholders": {
+      "meal": {
+        "type": "String"
+      }
+    }
+  },
+  "foodSearchSelectMealTitle": "Where should this food go?",
+  "foodSearchMealRequired": "Choose a meal first",
+  "foodSearchCreateFood": "Create food",
+  "foodSearchCreateFoodPlaceholder": "Custom food creation will be available in the functional version.",
+  "foodSearchFrequent": "Frequently added",
+  "foodSearchRecent": "Recent",
+  "foodSearchFavorites": "Favorites",
+  "foodSearchResults": "Search results",
+  "foodSearchNoResultsTitle": "Nothing found",
+  "foodSearchNoResultsMessage": "Try another name or create your own food.",
+  "foodSearchVerified": "Verified food",
+  "foodSearchSourceLocal": "Local catalog",
+  "foodSearchSourceUser": "Your food",
+  "foodSearchCaloriesPerReference": "{calories} kcal / {quantity}",
+  "@foodSearchCaloriesPerReference": {
+    "placeholders": {
+      "calories": {
+        "type": "String"
+      },
+      "quantity": {
+        "type": "String"
+      }
+    }
+  },
+  "foodSearchMacrosSummary": "P {protein} · F {fat} · C {carbs}",
+  "@foodSearchMacrosSummary": {
+    "placeholders": {
+      "protein": {
+        "type": "String"
+      },
+      "fat": {
+        "type": "String"
+      },
+      "carbs": {
+        "type": "String"
+      }
+    }
+  },
+  "foodSearchQuickAdd": "+ {quantity}",
+  "@foodSearchQuickAdd": {
+    "placeholders": {
+      "quantity": {
+        "type": "String"
+      }
+    }
+  },
+  "foodSearchQuickAddSemantics": "Add {food}, {quantity}",
+  "@foodSearchQuickAddSemantics": {
+    "placeholders": {
+      "food": {
+        "type": "String"
+      },
+      "quantity": {
+        "type": "String"
+      }
+    }
+  },
+  "quickAddTitle": "Add to diary",
+  "quickAddQuantity": "Quantity",
+  "quickAddUnit": "Unit",
+  "quickAddMeal": "Meal",
+  "quickAddNutrition": "For this amount",
+  "quickAddDecrease": "Decrease quantity",
+  "quickAddIncrease": "Increase quantity",
+  "quickAddAmountInvalid": "Enter a quantity greater than zero",
+  "quickAddAdd": "Add",
+  "foodAdded": "{food} added to {meal}",
+  "@foodAdded": {
+    "placeholders": {
+      "food": {
+        "type": "String"
+      },
+      "meal": {
+        "type": "String"
+      }
+    }
+  },
+  "actionUndo": "Undo",
+  "unitGrams": "g",
+  "unitMilliliters": "ml",
+  "unitPieces": "pcs",
+  "unitServings": "serving",
+  "unitScoops": "scoop",
+  "unitGlasses": "glass",
+  "quantityServings": "{value, plural, =1{1 serving} other{{value} servings}}",
+  "@quantityServings": {
+    "placeholders": {
+      "value": {
+        "type": "num"
+      }
+    }
+  },
+  "quantityScoops": "{value, plural, =1{1 scoop} other{{value} scoops}}",
+  "@quantityScoops": {
+    "placeholders": {
+      "value": {
+        "type": "num"
+      }
+    }
+  },
+  "quantityGlasses": "{value, plural, =1{1 glass} other{{value} glasses}}",
+  "@quantityGlasses": {
+    "placeholders": {
+      "value": {
+        "type": "num"
+      }
+    }
+  },
+  "quantityGrams": "{value} g",
+  "@quantityGrams": {
+    "placeholders": {
+      "value": {
+        "type": "num"
+      }
+    }
+  },
+  "quantityMilliliters": "{value} ml",
+  "@quantityMilliliters": {
+    "placeholders": {
+      "value": {
+        "type": "num"
+      }
+    }
+  },
+  "quantityPieces": "{value, plural, =1{1 pc} other{{value} pcs}}",
+  "@quantityPieces": {
+    "placeholders": {
+      "value": {
+        "type": "num"
+      }
+    }
+  },
+  "demoEggs": "Eggs",
+  "demoBread": "Bread",
+  "demoMilk": "Milk 2.5%",
+  "demoChickenBreast": "Chicken breast",
+  "demoRice": "Rice",
+  "demoCottageCheese": "Cottage cheese",
+  "demoBanana": "Banana",
+  "demoYogurt": "Greek yogurt",
+  "demoProtein": "Protein powder",
+  "demoApple": "Apple",
+  "statisticsTitle": "Statistics",
+  "statisticsPrototypeMessage": "Nutrition and weight trends will appear here.",
+  "settingsTitle": "Settings",
+  "settingsPrototypeMessage": "Goals, units and appearance will be configured here."
 }

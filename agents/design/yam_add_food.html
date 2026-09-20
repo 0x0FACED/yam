@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+        name="viewport" />
+    <title>YAM — Овсяные хлопья</title>
+    <!-- Tailwind CSS CDN with forms and container queries -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        yam: {
+                            bg: '#121115',
+                            surface: '#1c1a21',
+                            card: '#24222b',
+                            cardHover: '#2d2b36',
+                            purple: '#8b5cf6',
+                            purpleLight: '#a78bfa',
+                            purpleDark: '#7c3aed',
+                            protein: '#f97316', // Б - Белки (оранжевый)
+                            fat: '#84cc16',     // Ж - Жиры (лайм)
+                            carb: '#06b6d4',    // У - Углеводы (голубой)
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Phosphor Icons for crisp modern UI icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style data-purpose="base-setup">
+        /* Disable default touch callouts and setup dark background */
+        * {
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        body {
+            background-color: #0b0a0d;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        /* Smooth scroll for preset chips horizontal rail */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+
+<body class="flex justify-center items-center min-h-screen p-0 sm:p-4 text-white overflow-hidden antialiased">
+    <!-- BEGIN: MobileDeviceFrame -->
+    <div
+        class="relative w-full max-w-[420px] h-[915px] max-h-screen bg-[#121115] sm:rounded-[44px] overflow-hidden shadow-2xl flex flex-col border border-white/5">
+        <!-- BEGIN: BackgroundScreen (Dimmed search screen behind modal) -->
+        <div
+            class="absolute inset-0 z-0 flex flex-col bg-[#121115] select-none pointer-events-none opacity-40 blur-[1px]">
+            <!-- Top Status Bar Mockup -->
+            <div class="flex justify-between items-center px-6 pt-3 text-xs text-neutral-400 font-medium">
+                <span>11:25</span>
+                <div class="flex items-center space-x-1.5 text-neutral-300">
+                    <i class="ph-bold ph-airplane text-xs"></i>
+                    <i class="ph-bold ph-wifi-high text-xs"></i>
+                    <i class="ph-bold ph-battery-charging text-xs"></i>
+                    <span class="text-[11px] font-semibold">42%</span>
+                </div>
+            </div>
+            <!-- Dimmed App Header & Search Bar -->
+            <div class="p-4 space-y-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-neutral-400">
+                        <i class="ph-bold ph-arrow-left text-lg"></i>
+                    </div>
+                    <div
+                        class="flex-1 bg-[#1a1820] border border-white/10 rounded-2xl h-11 flex items-center px-3.5 gap-2 text-neutral-400">
+                        <i class="ph-bold ph-magnifying-glass text-lg"></i>
+                        <span class="text-sm">Поиск продукта или блюда</span>
+                    </div>
+                    <div
+                        class="w-8 h-8 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-xs">
+                        <i class="ph-fill ph-sparkle"></i>
+                    </div>
+                </div>
+                <!-- Meal pill and tabs behind modal -->
+                <div class="flex gap-2">
+                    <div
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-yellow-500/10 text-yellow-400 text-xs font-medium border border-yellow-500/20">
+                        <i class="ph-bold ph-sun"></i> Завтрак
+                    </div>
+                    <div class="px-3 py-1.5 rounded-full bg-[#1e1c24] text-neutral-400 text-xs font-medium">Часто</div>
+                    <div class="px-3 py-1.5 rounded-full bg-[#1e1c24] text-neutral-400 text-xs font-medium">Недавние
+                    </div>
+                </div>
+                <!-- Dimmed product rows -->
+                <div class="mt-4 space-y-3">
+                    <div class="p-3 bg-[#19171f] rounded-xl flex justify-between items-center border border-white/5">
+                        <div>
+                            <div class="font-medium text-sm">Овсяные хлопья</div>
+                            <div class="text-xs text-neutral-400">YAM Basics • 366 ккал / 100 г</div>
+                        </div>
+                        <div class="px-3 py-1.5 rounded-xl bg-purple-600/30 text-purple-300 text-xs font-bold">+ 80 г
+                        </div>
+                    </div>
+                    <div class="p-3 bg-[#19171f] rounded-xl flex justify-between items-center border border-white/5">
+                        <div>
+                            <div class="font-medium text-sm">Молоко 2,5%</div>
+                            <div class="text-xs text-neutral-400">Домик в деревне • 52 ккал / 100 мл</div>
+                        </div>
+                        <div class="px-3 py-1.5 rounded-xl bg-white/5 text-neutral-400 text-xs">+ 150 мл</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END: BackgroundScreen -->
+        <!-- Backdrop Dimmer Overlay -->
+        <div class="absolute inset-0 bg-black/60 z-10 backdrop-blur-[2px] transition-opacity"></div>
+        <!-- BEGIN: BottomSheetModal -->
+        <div class="relative mt-auto z-20 w-full bg-[#18161d] rounded-t-[32px] border-t border-purple-500/20 shadow-[0_-12px_36px_rgba(0,0,0,0.6)] flex flex-col pt-3 pb-6 px-5 transition-transform duration-300"
+            data-purpose="bottom-sheet">
+            <!-- Top Drag Handle & Quick Dismiss Bar -->
+            <div class="w-12 h-1.5 bg-neutral-600/70 rounded-full mx-auto mb-3"></div>
+            <!-- BEGIN: ModalHeader -->
+            <header class="flex items-start justify-between mb-4">
+                <div>
+                    <!-- Quick Meal Switcher Dropdown Chip -->
+                    <div
+                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-purple-500/10 border border-purple-500/25 text-purple-300 text-xs font-medium mb-1.5 active:bg-purple-500/20 cursor-pointer">
+                        <i class="ph-bold ph-sun text-yellow-400 text-xs"></i>
+                        <span>В Завтрак</span>
+                        <i class="ph-bold ph-caret-down text-[10px] opacity-70"></i>
+                    </div>
+                    <!-- Product Title & Database Badge -->
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-2xl font-bold text-white tracking-tight">Овсяные хлопья</h1>
+                        <i class="ph-fill ph-check-circle text-purple-400 text-base" title="Верифицировано"></i>
+                    </div>
+                    <p class="text-xs text-neutral-400 font-medium mt-0.5">
+                        YAM Basics <span class="text-neutral-600">•</span> 366 ккал / 100 г
+                    </p>
+                </div>
+                <!-- Dismiss / Close Icon Button -->
+                <button aria-label="Закрыть"
+                    class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 active:scale-95 flex items-center justify-center text-neutral-400 hover:text-white transition">
+                    <i class="ph-bold ph-x text-base"></i>
+                </button>
+            </header>
+            <!-- END: ModalHeader -->
+            <!-- BEGIN: QuantityDialControl -->
+            <section class="bg-[#201d27] border border-white/5 rounded-2xl p-3.5 mb-3.5 shadow-inner"
+                data-purpose="quantity-counter">
+                <div class="flex items-center justify-between px-2 py-1"><button aria-label="Уменьшить количество"
+                        class="w-12 h-12 rounded-full bg-[#292633] active:scale-95 flex items-center justify-center text-purple-300 text-xl border border-white/5 hover:bg-[#322e3e] transition shadow-sm"><i
+                            class="ph-bold ph-minus"></i></button>
+                    <div class="flex items-center gap-2"><span
+                            class="text-4xl font-extrabold text-white tracking-tight tabular-nums cursor-pointer hover:text-purple-200 transition"
+                            id="amount-display" title="Нажмите для ввода">80</span><button
+                            class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-purple-500/10 border border-purple-500/25 text-purple-300 hover:bg-purple-500/20 active:scale-95 transition text-sm font-semibold cursor-pointer"
+                            title="Выбрать единицу измерения"><span>г</span><i
+                                class="ph-bold ph-caret-down text-[10px] text-purple-400"></i></button></div><button
+                        aria-label="Увеличить количество"
+                        class="w-12 h-12 rounded-full bg-[#292633] active:scale-95 flex items-center justify-center text-purple-300 text-xl border border-white/5 hover:bg-[#322e3e] transition shadow-sm"><i
+                            class="ph-bold ph-plus"></i></button>
+                </div>
+            </section>
+            <!-- END: QuantityDialControl -->
+            <!-- BEGIN: QuickPresetsRow -->
+            <section class="mb-4" data-purpose="quick-presets">
+                <div class="flex items-center justify-between text-xs text-neutral-400 font-medium mb-2 px-1">
+                    <span>Быстрый выбор</span><span class="text-neutral-500 text-[11px]">Обычно: 80 г</span></div>
+                <div class="flex items-center gap-2 overflow-x-auto hide-scrollbar pb-1">
+                    <!-- Preset: 40 г -->
+                    <button
+                        class="flex-1 min-w-[58px] py-2 px-2.5 rounded-xl bg-[#22202a] text-neutral-300 text-xs font-semibold border border-white/5 active:scale-95 hover:bg-[#2a2735] transition text-center">
+                        40 г
+                    </button>
+                    <!-- Preset: 50 г -->
+                    <button
+                        class="flex-1 min-w-[58px] py-2 px-2.5 rounded-xl bg-[#22202a] text-neutral-300 text-xs font-semibold border border-white/5 active:scale-95 hover:bg-[#2a2735] transition text-center">
+                        50 г
+                    </button>
+                    <!-- Preset: 80 г (ACTIVE) -->
+                    <button
+                        class="flex-1 min-w-[68px] py-2 px-3 rounded-xl bg-purple-600 text-white text-xs font-bold shadow-lg shadow-purple-600/30 active:scale-95 flex items-center justify-center gap-1 border border-purple-400/40">
+                        <i class="ph-bold ph-check text-xs"></i>
+                        <span>80 г</span>
+                    </button>
+                    <!-- Preset: 100 г -->
+                    <button
+                        class="flex-1 min-w-[58px] py-2 px-2.5 rounded-xl bg-[#22202a] text-neutral-300 text-xs font-semibold border border-white/5 active:scale-95 hover:bg-[#2a2735] transition text-center">
+                        100 г
+                    </button>
+                    <!-- Preset: 150 г -->
+                    <button
+                        class="flex-1 min-w-[58px] py-2 px-2.5 rounded-xl bg-[#22202a] text-neutral-300 text-xs font-semibold border border-white/5 active:scale-95 hover:bg-[#2a2735] transition text-center">
+                        150 г
+                    </button>
+                </div>
+            </section>
+            <!-- END: QuickPresetsRow -->
+            <!-- BEGIN: NutritionSummaryCard -->
+            <div
+                class="flex items-center justify-between px-2 py-2 mb-4 bg-[#1f1c26]/60 border border-white/5 rounded-xl text-xs">
+                <div class="flex items-center gap-1.5"><span
+                        class="text-lg font-bold text-white tracking-tight">293</span><span
+                        class="text-neutral-400 text-xs font-medium">ккал</span></div>
+                <div class="flex items-center gap-2.5 text-[11px] text-neutral-300 font-medium"><span
+                        class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-yam-protein"></span>Б
+                        9,8 г</span><span class="flex items-center gap-1"><span
+                            class="w-1.5 h-1.5 rounded-full bg-yam-fat"></span>Ж 4,9 г</span><span
+                        class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-yam-carb"></span>У 47,6
+                        г</span></div>
+            </div>
+            <!-- END: NutritionSummaryCard -->
+            <!-- BEGIN: PrimaryActionCTA -->
+            <div class="space-y-3" data-purpose="cta-actions"><button
+                    class="w-full h-12 bg-[#a78bfa] hover:bg-[#906ef8] text-[#121115] rounded-2xl font-bold text-base flex items-center justify-center gap-2 active:scale-[0.98] transition shadow-sm"><span>Добавить
+                        в Завтрак · 293 ккал</span></button>
+                <div class="flex items-center justify-center pt-1"><button
+                        class="text-[11px] text-neutral-500 hover:text-neutral-400 transition flex items-center gap-1"><span>Изменить
+                            БЖУ или название</span></button></div>
+            </div>
+            <!-- END: PrimaryActionCTA -->
+            <!-- iOS Home Indicator -->
+            <div class="w-32 h-1 bg-neutral-600/60 rounded-full mx-auto mt-4 mb-0.5"></div>
+        </div>
+        <!-- END: BottomSheetModal -->
+    </div>
+    <!-- END: MobileDeviceFrame -->
+</body>
+
+</html>

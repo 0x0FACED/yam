@@ -123,8 +123,8 @@ class _IntroScene extends StatelessWidget {
             final entrance = _curvedInterval(value, 0, 0.16);
             final exit = 1 - _curvedInterval(value, 0.94, 1);
             final chew = math.max(
-              _pulse(value, 0.38, 0.035),
-              math.max(_pulse(value, 0.58, 0.035), _pulse(value, 0.78, 0.035)),
+              _pulse(value, 0.16, 0.035),
+              math.max(_pulse(value, 0.36, 0.035), _pulse(value, 0.56, 0.035)),
             );
             final mascotScale = lerpDouble(0.88, 1, entrance)! + chew * 0.025;
             final mouthOpen = _mouthOpenAmount(value);
@@ -136,7 +136,7 @@ class _IntroScene extends StatelessWidget {
                 children: [
                   Positioned(
                     left: 45,
-                    top: 75,
+                    top: 87,
                     width: 210,
                     height: 250,
                     child: Transform.scale(
@@ -175,9 +175,9 @@ class _IntroScene extends StatelessWidget {
                     asset: StartupArtwork.letterY,
                     picture: artwork?.pictureFor(StartupArtwork.letterY),
                     width: 78,
-                    start: const Offset(12, -4),
+                    start: const Offset(124, 179),
                     control: const Offset(48, 98),
-                    target: const Offset(124, 176),
+                    target: const Offset(8, 0),
                     initialAngle: -0.10,
                     begin: 0.16,
                     end: 0.38,
@@ -187,9 +187,9 @@ class _IntroScene extends StatelessWidget {
                     asset: StartupArtwork.letterA,
                     picture: artwork?.pictureFor(StartupArtwork.letterA),
                     width: 79,
-                    start: const Offset(108, -22),
+                    start: const Offset(124, 179),
                     control: const Offset(150, 76),
-                    target: const Offset(124, 176),
+                    target: const Offset(100, 0),
                     initialAngle: 0.08,
                     begin: 0.36,
                     end: 0.58,
@@ -199,9 +199,9 @@ class _IntroScene extends StatelessWidget {
                     asset: StartupArtwork.letterM,
                     picture: artwork?.pictureFor(StartupArtwork.letterM),
                     width: 110,
-                    start: const Offset(190, -2),
+                    start: const Offset(108, 179),
                     control: const Offset(218, 98),
-                    target: const Offset(108, 176),
+                    target: const Offset(184, 0),
                     initialAngle: -0.07,
                     begin: 0.56,
                     end: 0.78,
@@ -246,11 +246,10 @@ class _AnimatedLetter extends StatelessWidget {
   Widget build(BuildContext context) {
     final travel = _curvedInterval(progress, begin, end);
     final position = _quadraticBezier(start, control, target, travel);
-    final shrink = _curvedInterval(travel, 0.38, 1);
-    final scale = lerpDouble(1, 0.08, shrink)!;
+    final emerge = _curvedInterval(travel, 0, 0.62);
+    final scale = lerpDouble(0.08, 1, emerge)!;
     final angle = lerpDouble(initialAngle, 0, travel)!;
-    final opacity =
-        _interval(travel, 0, 0.08) * (1 - _curvedInterval(travel, 0.78, 1));
+    final opacity = _curvedInterval(travel, 0, 0.12);
 
     return Positioned(
       left: start.dx,

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html class="dark" lang="ru">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+        name="viewport">
+    <title>YAM — Создать продукт</title>
+    <!-- Tailwind CSS CDN with forms -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" type="text/css"
+        href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css">
+    <link rel="stylesheet" type="text/css"
+        href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/thin/style.css">
+    <link rel="stylesheet" type="text/css"
+        href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/light/style.css">
+    <link rel="stylesheet" type="text/css"
+        href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/bold/style.css">
+    <link rel="stylesheet" type="text/css"
+        href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/fill/style.css">
+    <link rel="stylesheet" type="text/css"
+        href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/duotone/style.css">
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+    <style>
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #111013;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: #ffffff;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Hide native number spin buttons */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
+</head>
+
+<body class="bg-[#111013] text-white flex justify-center min-h-screen">
+    <!-- Mobile screen container -->
+    <div class="w-full max-w-md min-h-screen flex flex-col bg-[#111013] relative px-5 pb-8">
+        <!-- 1. Native Status Bar Mockup -->
+        <div class="flex justify-between items-center pt-3 pb-2 text-xs text-neutral-400 font-medium select-none">
+            <span class="">11:25</span>
+            <div class="flex items-center space-x-1.5 text-neutral-300">
+                <i class="ph-bold ph-wifi-high text-xs"></i>
+                <i class="ph-bold ph-battery-charging text-xs"></i>
+                <span class="text-[11px] font-semibold">94%</span>
+            </div>
+        </div>
+        <!-- Top Bar -->
+        <header class="flex items-center gap-2 pt-1 pb-4">
+            <button aria-label="Назад"
+                class="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-neutral-300 hover:text-white hover:bg-white/5 active:scale-95 transition"
+                type="button">
+                <i class="ph-bold ph-arrow-left text-xl"></i>
+            </button>
+            <h1 class="text-lg font-semibold text-white tracking-tight">Создать продукт</h1>
+        </header>
+        <!-- Main Content Form Area -->
+        <main class="flex-1 flex flex-col space-y-5">
+            <!-- 2. Product Identity (Clean spacing, no outer card container) -->
+            <section class="space-y-3.5">
+                <div>
+                    <label class="block text-xs font-medium text-neutral-400 mb-1.5" for="product-name">
+                        Название продукта <span class="text-purple-400">*</span>
+                    </label>
+                    <input
+                        class="w-full bg-[#1c1b1f] border border-[#27252b] rounded-xl px-3.5 py-3 text-white font-medium placeholder:text-neutral-500 text-sm focus:outline-none focus:border-[#a78bfa] transition"
+                        id="product-name" placeholder="Например, Овсяные хлопья" type="text" value="Овсяные хлопья">
+                </div>
+                <div>
+                    <div class="flex items-center gap-1 mb-1.5">
+                        <label class="text-xs font-medium text-neutral-400" for="product-brand">
+                            Бренд
+                        </label>
+                        <span class="text-xs font-normal text-neutral-500">· необязательно</span>
+                    </div>
+                    <input
+                        class="w-full bg-[#1c1b1f] border border-[#27252b] rounded-xl px-3.5 py-3 text-white font-medium placeholder:text-neutral-500 text-sm focus:outline-none focus:border-[#a78bfa] transition"
+                        id="product-brand" placeholder="Например, Nordic или Мистраль" type="text" value="YAM Basics">
+                </div>
+            </section>
+            <div class="h-px bg-[#27252b]/70 my-1"></div>
+            <!-- 3. Nutrition Basis ('Пищевая ценность') -->
+            <section class="space-y-3.5">
+                <!-- Basis Selector Header -->
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-medium text-neutral-400">Значения указаны на</span>
+                    <div class="relative inline-flex items-center"><select
+                            class="appearance-none bg-[#1c1b1f] border border-[#27252b] rounded-lg pl-3 pr-7 py-1.5 text-xs text-white font-medium focus:outline-none focus:border-[#a78bfa] cursor-pointer"
+                            style="background-image: none !important;">
+                            <option selected="" value="100g">100 г</option>
+                            <option value="100ml">100 мл</option>
+                            <option value="1serv">1 порцию</option>
+                        </select><i
+                            class="ph-bold ph-caret-down text-sm text-neutral-400 absolute right-2 pointer-events-none"></i>
+                    </div>
+                </div>
+                <!-- Calories Row -->
+                <div
+                    class="flex items-center justify-between bg-[#1c1b1f] border border-[#27252b] rounded-xl px-3.5 py-2.5">
+                    <label class="text-sm font-medium text-white flex items-center gap-2" for="calories-val">
+                        <span class="">Калории</span>
+                    </label>
+                    <div class="flex items-center gap-1.5">
+                        <input
+                            class="w-16 bg-transparent border-0 p-0 text-right font-semibold text-base text-white focus:ring-0 focus:outline-none"
+                            id="calories-val" type="number" value="366">
+                        <span class="text-xs text-neutral-400 font-medium">ккал</span>
+                    </div>
+                </div>
+                <!-- 3-Column Macro Input Row -->
+                <div class="grid grid-cols-3 gap-2.5">
+                    <!-- Protein -->
+                    <div class="bg-[#1c1b1f] border border-[#27252b] rounded-xl p-3 flex flex-col justify-between">
+                        <div class="flex items-center gap-1.5 mb-2">
+                            <span class="w-2 h-2 rounded-full bg-[#fb923c] shrink-0"></span>
+                            <span class="text-xs font-medium text-neutral-300 truncate">Белки</span>
+                        </div>
+                        <div class="flex items-baseline justify-end gap-1">
+                            <input
+                                class="w-full bg-transparent border-0 p-0 text-right font-semibold text-sm text-white focus:ring-0 focus:outline-none"
+                                type="text" value="12,3">
+                            <span class="text-xs text-neutral-500">г</span>
+                        </div>
+                    </div>
+                    <!-- Fat -->
+                    <div class="bg-[#1c1b1f] border border-[#27252b] rounded-xl p-3 flex flex-col justify-between">
+                        <div class="flex items-center gap-1.5 mb-2">
+                            <span class="w-2 h-2 rounded-full bg-[#a3e635] shrink-0"></span>
+                            <span class="text-xs font-medium text-neutral-300 truncate">Жиры</span>
+                        </div>
+                        <div class="flex items-baseline justify-end gap-1">
+                            <input
+                                class="w-full bg-transparent border-0 p-0 text-right font-semibold text-sm text-white focus:ring-0 focus:outline-none"
+                                type="text" value="6,1">
+                            <span class="text-xs text-neutral-500">г</span>
+                        </div>
+                    </div>
+                    <!-- Carbs -->
+                    <div class="bg-[#1c1b1f] border border-[#27252b] rounded-xl p-3 flex flex-col justify-between">
+                        <div class="flex items-center gap-1.5 mb-2">
+                            <span class="w-2 h-2 rounded-full bg-[#38bdf8] shrink-0"></span>
+                            <span class="text-xs font-medium text-neutral-300 truncate">Углеводы</span>
+                        </div>
+                        <div class="flex items-baseline justify-end gap-1">
+                            <input
+                                class="w-full bg-transparent border-0 p-0 text-right font-semibold text-sm text-white focus:ring-0 focus:outline-none"
+                                type="text" value="59,5">
+                            <span class="text-xs text-neutral-500">г</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <div class="h-px bg-[#27252b]/70 my-1"></div>
+            <!-- 4. Optional Serving ('Порция · необязательно') -->
+            <section class="space-y-2">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-1">
+                        <span class="text-xs font-medium text-neutral-400">Порция</span>
+                        <span class="text-xs font-normal text-neutral-500">· необязательно</span>
+                    </div>
+                </div>
+                <div class="space-y-1.5">
+                    <div class="grid grid-cols-5 gap-2">
+                        <!-- Serving Name -->
+                        <div class="col-span-3">
+                            <input
+                                class="w-full bg-[#1c1b1f] border border-[#27252b] rounded-xl px-3 py-2.5 text-xs text-white font-medium placeholder:text-neutral-500 focus:outline-none focus:border-[#a78bfa] transition"
+                                placeholder="Название (напр. тарелка)" type="text" value="бутылка">
+                        </div>
+                        <!-- Serving Amount + Unit -->
+                        <div
+                            class="col-span-2 flex items-center bg-[#1c1b1f] border border-[#27252b] rounded-xl px-2.5 py-1.5">
+                            <input
+                                class="w-full bg-transparent border-0 p-0 text-right font-semibold text-xs text-white focus:ring-0 focus:outline-none"
+                                type="number" value="250">
+                            <div class="relative flex items-center ml-1"><select
+                                    class="appearance-none bg-transparent border-0 p-0 pr-5 text-xs text-purple-400 font-medium focus:ring-0 focus:outline-none cursor-pointer"
+                                    style="background-image: none !important;">
+                                    <option selected="" value="ml">мл</option>
+                                    <option value="g">г</option>
+                                    <option value="pcs">шт</option>
+                                </select><i
+                                    class="ph-bold ph-caret-down text-xs text-purple-400 absolute right-0 pointer-events-none"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-[11px] text-neutral-500 pl-1">
+                        1 бутылка = 250 мл
+                    </p>
+                </div>
+            </section>
+            <div class="h-px bg-[#27252b]/70 my-1"></div>
+            <!-- 5. Barcode ('Штрихкод · необязательно') -->
+            <section class="space-y-1.5">
+                <div class="flex items-center gap-1">
+                    <label class="text-xs font-medium text-neutral-400" for="product-barcode">
+                        Штрихкод
+                    </label>
+                    <span class="text-xs font-normal text-neutral-500">· необязательно</span>
+                </div>
+                <div class="relative flex items-center">
+                    <input
+                        class="w-full bg-[#1c1b1f] border border-[#27252b] rounded-xl pl-3.5 pr-10 py-2.5 text-xs text-neutral-300 font-mono focus:outline-none focus:border-[#a78bfa] tracking-wider transition"
+                        id="product-barcode" placeholder="Сканировать или ввести код" type="text" value="4607001928412">
+                    <button aria-label="Сканировать штрихкод"
+                        class="absolute right-2.5 w-7 h-7 flex items-center justify-center text-neutral-400 hover:text-white active:scale-95 transition"
+                        type="button">
+                        <i class="ph-bold ph-barcode text-lg"></i>
+                    </button>
+                </div>
+            </section>
+        </main>
+        <!-- 6. Primary Action Button -->
+        <footer class="pt-6 mt-auto">
+            <button
+                class="w-full bg-[#a78bfa] hover:bg-[#9674f9] active:opacity-90 text-[#111013] font-semibold text-sm py-3.5 rounded-xl transition duration-150 flex items-center justify-center shadow-none select-none"
+                type="button">
+                Сохранить продукт
+            </button>
+            <!-- iOS Home Indicator bar -->
+            <div class="w-32 h-1 bg-white/20 rounded-full mx-auto mt-4"></div>
+        </footer>
+    </div>
+
+
+</body>
+
+</html>

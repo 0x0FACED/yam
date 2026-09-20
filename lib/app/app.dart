@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:yam/app/router.dart';
+import 'package:yam/app/theme/app_scroll_behavior.dart';
 import 'package:yam/app/theme/app_theme.dart';
 import 'package:yam/features/startup/presentation/startup_artwork.dart';
 import 'package:yam/features/startup/presentation/startup_screen.dart';
@@ -14,35 +17,47 @@ class YamApp extends StatefulWidget {
 }
 
 class _YamAppState extends State<YamApp> {
+  late final GoRouter _router;
   bool _startupComplete = false;
 
   @override
+  void initState() {
+    super.initState();
+    _router = createAppRouter();
+  }
+
+  @override
   void dispose() {
+    _router.dispose();
     widget.startupArtwork?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       onGenerateTitle: (context) => AppLocalizations.of(context).appName,
       debugShowCheckedModeBanner: false,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
-      home: _startupComplete
-          ? const _AppPlaceholder(key: ValueKey('app-content'))
-          : Builder(
-              builder: (context) => StartupScreen(
-                key: const ValueKey('startup-screen'),
-                semanticsLabel: AppLocalizations.of(
-                  context,
-                ).startupLoadingLabel,
-                artwork: widget.startupArtwork,
-                onFinished: _finishStartup,
-              ),
-            ),
+      scrollBehavior: const AppScrollBehavior(),
+      routerConfig: _router,
+      builder: (context, child) {
+        if (!_startupComplete) {
+          return StartupScreen(
+            key: const ValueKey('startup-screen'),
+            semanticsLabel: AppLocalizations.of(context).startupLoadingLabel,
+            artwork: widget.startupArtwork,
+            onFinished: _finishStartup,
+          );
+        }
+        return KeyedSubtree(
+          key: const ValueKey('app-content'),
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
     );
   }
 
@@ -50,21 +65,5 @@ class _YamAppState extends State<YamApp> {
     if (mounted) {
       setState(() => _startupComplete = true);
     }
-  }
-}
-
-class _AppPlaceholder extends StatelessWidget {
-  const _AppPlaceholder({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Text(
-          AppLocalizations.of(context).appName,
-          style: Theme.of(context).textTheme.headlineLarge,
-        ),
-      ),
-    );
   }
 }

@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "dev.yam" "\0"
-            VALUE "FileDescription", "yam" "\0"
+            VALUE "FileDescription", "YAM" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "yam" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2026 dev.yam. All rights reserved." "\0"
             VALUE "OriginalFilename", "yam.exe" "\0"
-            VALUE "ProductName", "yam" "\0"
+            VALUE "ProductName", "YAM" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

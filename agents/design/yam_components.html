@@ -1,0 +1,1950 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YAM Design System — Flutter UI Reference</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        yam: {
+                            bg: '#141316',
+                            surface: '#1c1b1f',
+                            elevated: '#232227',
+                            border: '#27252b',
+                            borderLight: '#323038',
+                            primary: '#a78bfa',
+                            primaryStrong: '#8b5cf6',
+                            primaryDark: '#7c3aed',
+                            textPrimary: '#f4f4f5',
+                            textSecondary: '#a1a1aa',
+                            textMuted: '#71717a',
+                            // Macro canonical colors
+                            protein: '#fb923c', // orange
+                            fat: '#a3e635',     // lime
+                            carbs: '#38bdf8',   // cyan
+                            // Semantic
+                            success: '#4ade80',
+                            warning: '#fbbf24',
+                            error: '#f87171',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #141316;
+            color: #f4f4f5;
+            font-family: 'Inter', system-ui, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Custom scrollbar for showroom */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #141316;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #27252b;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3a3842;
+        }
+
+        .spec-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: #232227;
+            color: #a78bfa;
+            border: 1px solid #27252b;
+        }
+    </style>
+</head>
+
+<body class="selection:bg-purple-900/40 selection:text-purple-200">
+
+    <!-- TOP STICKY BAR: DESIGN SYSTEM NAVIGATION -->
+    <header class="sticky top-0 z-50 bg-[#141316]/95 backdrop-blur-md border-b border-yam-border">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-7 h-7 rounded-lg bg-yam-primary flex items-center justify-center font-bold text-xs text-black shadow-sm">
+                    Y
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="font-bold text-sm tracking-tight text-yam-textPrimary">YAM Design System</span>
+                    <span class="spec-badge">Flutter v1.0</span>
+                </div>
+            </div>
+            <nav class="hidden md:flex items-center space-x-1 text-xs text-yam-textSecondary overflow-x-auto py-1">
+                <a href="#foundations"
+                    class="px-2.5 py-1 rounded hover:text-yam-textPrimary hover:bg-yam-elevated transition">1.
+                    Foundations</a>
+                <a href="#buttons"
+                    class="px-2.5 py-1 rounded hover:text-yam-textPrimary hover:bg-yam-elevated transition">2.
+                    Buttons</a>
+                <a href="#inputs"
+                    class="px-2.5 py-1 rounded hover:text-yam-textPrimary hover:bg-yam-elevated transition">3.
+                    Inputs</a>
+                <a href="#selection"
+                    class="px-2.5 py-1 rounded hover:text-yam-textPrimary hover:bg-yam-elevated transition">4.
+                    Selection</a>
+                <a href="#navigation"
+                    class="px-2.5 py-1 rounded hover:text-yam-textPrimary hover:bg-yam-elevated transition">5.
+                    Navigation</a>
+                <a href="#food"
+                    class="px-2.5 py-1 rounded hover:text-yam-textPrimary hover:bg-yam-elevated transition">6. Food &
+                    Macros</a>
+                <a href="#diary"
+                    class="px-2.5 py-1 rounded hover:text-yam-textPrimary hover:bg-yam-elevated transition">7. Diary</a>
+                <a href="#feedback"
+                    class="px-2.5 py-1 rounded hover:text-yam-textPrimary hover:bg-yam-elevated transition">8.
+                    Feedback</a>
+                <a href="#bottomsheet"
+                    class="px-2.5 py-1 rounded hover:text-yam-textPrimary hover:bg-yam-elevated transition">9. Bottom
+                    Sheet</a>
+                <a href="#statistics"
+                    class="px-2.5 py-1 rounded hover:text-yam-textPrimary hover:bg-yam-elevated transition">10.
+                    Statistics</a>
+                <a href="#matrix"
+                    class="px-2.5 py-1 rounded hover:text-yam-textPrimary hover:bg-yam-elevated transition">11. State
+                    Matrix</a>
+            </nav>
+            <div class="flex items-center gap-2 text-xs text-yam-textMuted">
+                <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                <span class="hidden sm:inline">Canonical Dark</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- INTRO HEADER -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-6 border-b border-yam-border">
+        <div class="max-w-3xl">
+            <div class="flex items-center gap-2 mb-2">
+                <span class="text-xs font-mono uppercase text-yam-primary tracking-wider">Internal Reference</span>
+                <span class="text-xs text-yam-textMuted">•</span>
+                <span class="text-xs text-yam-textMuted">Production Flutter Component Library</span>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-yam-textPrimary mb-3">
+                YAM Visual Component Library & Tokens
+            </h1>
+            <p class="text-sm text-yam-textSecondary leading-relaxed">
+                Canonical source of truth for all YAM UI widgets in Flutter. Screens must strictly compose these widgets
+                without introducing local variations, gradients, glassmorphism, or non-canonical nutrition colors.
+            </p>
+        </div>
+    </div>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16">
+
+        <!-- ========================================================================= -->
+        <!-- 1. FOUNDATIONS -->
+        <!-- ========================================================================= -->
+        <section id="foundations" class="scroll-mt-20">
+            <div class="flex items-baseline justify-between border-b border-yam-border pb-3 mb-6">
+                <div>
+                    <h2 class="text-lg font-bold text-yam-textPrimary flex items-center gap-2">
+                        <span>1. Foundations & Tokens</span>
+                        <span class="spec-badge">Tokens</span>
+                    </h2>
+                    <p class="text-xs text-yam-textMuted mt-0.5">Color palette, typography scale, spacing and corner
+                        radii.</p>
+                </div>
+            </div>
+
+            <!-- Color Swatches Grid -->
+            <div class="mb-8">
+                <h3 class="text-xs font-semibold text-yam-textSecondary uppercase tracking-wider mb-3">Color System</h3>
+                <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
+                    <!-- Background -->
+                    <div class="bg-yam-surface border border-yam-border rounded-lg p-3">
+                        <div class="w-full h-10 rounded bg-[#141316] border border-yam-border mb-2"></div>
+                        <div class="text-xs font-medium text-yam-textPrimary">App Background</div>
+                        <div class="font-mono text-[11px] text-yam-textMuted">#141316</div>
+                        <div class="text-[10px] text-yam-primary mt-1 font-mono">YamColors.bg</div>
+                    </div>
+                    <!-- Surface -->
+                    <div class="bg-yam-surface border border-yam-border rounded-lg p-3">
+                        <div class="w-full h-10 rounded bg-[#1c1b1f] border border-yam-border mb-2"></div>
+                        <div class="text-xs font-medium text-yam-textPrimary">Surface</div>
+                        <div class="font-mono text-[11px] text-yam-textMuted">#1c1b1f</div>
+                        <div class="text-[10px] text-yam-primary mt-1 font-mono">YamColors.surface</div>
+                    </div>
+                    <!-- Elevated Surface -->
+                    <div class="bg-yam-surface border border-yam-border rounded-lg p-3">
+                        <div class="w-full h-10 rounded bg-[#232227] border border-yam-border mb-2"></div>
+                        <div class="text-xs font-medium text-yam-textPrimary">Elevated Surface</div>
+                        <div class="font-mono text-[11px] text-yam-textMuted">#232227</div>
+                        <div class="text-[10px] text-yam-primary mt-1 font-mono">YamColors.elevated</div>
+                    </div>
+                    <!-- Border -->
+                    <div class="bg-yam-surface border border-yam-border rounded-lg p-3">
+                        <div class="w-full h-10 rounded bg-[#27252b] mb-2"></div>
+                        <div class="text-xs font-medium text-yam-textPrimary">Border</div>
+                        <div class="font-mono text-[11px] text-yam-textMuted">#27252b</div>
+                        <div class="text-[10px] text-yam-primary mt-1 font-mono">YamColors.border</div>
+                    </div>
+                    <!-- Primary Purple -->
+                    <div class="bg-yam-surface border border-yam-border rounded-lg p-3">
+                        <div class="w-full h-10 rounded bg-[#a78bfa] mb-2"></div>
+                        <div class="text-xs font-medium text-yam-textPrimary">Primary Purple</div>
+                        <div class="font-mono text-[11px] text-yam-textMuted">#a78bfa</div>
+                        <div class="text-[10px] text-yam-primary mt-1 font-mono">YamColors.primary</div>
+                    </div>
+                    <!-- Primary Pressed / Strong -->
+                    <div class="bg-yam-surface border border-yam-border rounded-lg p-3">
+                        <div class="w-full h-10 rounded bg-[#8b5cf6] mb-2"></div>
+                        <div class="text-xs font-medium text-yam-textPrimary">Primary Strong</div>
+                        <div class="font-mono text-[11px] text-yam-textMuted">#8b5cf6</div>
+                        <div class="text-[10px] text-yam-primary mt-1 font-mono">YamColors.primaryStrong</div>
+                    </div>
+                    <!-- Text Primary -->
+                    <div class="bg-yam-surface border border-yam-border rounded-lg p-3">
+                        <div class="w-full h-10 rounded bg-[#f4f4f5] mb-2"></div>
+                        <div class="text-xs font-medium text-yam-textPrimary">Text Primary</div>
+                        <div class="font-mono text-[11px] text-yam-textMuted">#f4f4f5</div>
+                        <div class="text-[10px] text-yam-primary mt-1 font-mono">YamColors.textPrimary</div>
+                    </div>
+                    <!-- Text Secondary -->
+                    <div class="bg-yam-surface border border-yam-border rounded-lg p-3">
+                        <div class="w-full h-10 rounded bg-[#a1a1aa] mb-2"></div>
+                        <div class="text-xs font-medium text-yam-textPrimary">Text Secondary</div>
+                        <div class="font-mono text-[11px] text-yam-textMuted">#a1a1aa</div>
+                        <div class="text-[10px] text-yam-primary mt-1 font-mono">YamColors.textSecondary</div>
+                    </div>
+                    <!-- Text Muted -->
+                    <div class="bg-yam-surface border border-yam-border rounded-lg p-3">
+                        <div class="w-full h-10 rounded bg-[#71717a] mb-2"></div>
+                        <div class="text-xs font-medium text-yam-textPrimary">Text Muted</div>
+                        <div class="font-mono text-[11px] text-yam-textMuted">#71717a</div>
+                        <div class="text-[10px] text-yam-primary mt-1 font-mono">YamColors.textMuted</div>
+                    </div>
+                    <!-- Protein (Orange) -->
+                    <div class="bg-yam-surface border border-yam-border rounded-lg p-3">
+                        <div class="w-full h-10 rounded bg-[#fb923c] mb-2"></div>
+                        <div class="text-xs font-medium text-yam-textPrimary">Protein (Orange)</div>
+                        <div class="font-mono text-[11px] text-yam-textMuted">#fb923c</div>
+                        <div class="text-[10px] text-yam-primary mt-1 font-mono">YamColors.protein</div>
+                    </div>
+                    <!-- Fat (Lime) -->
+                    <div class="bg-yam-surface border border-yam-border rounded-lg p-3">
+                        <div class="w-full h-10 rounded bg-[#a3e635] mb-2"></div>
+                        <div class="text-xs font-medium text-yam-textPrimary">Fat (Lime)</div>
+                        <div class="font-mono text-[11px] text-yam-textMuted">#a3e635</div>
+                        <div class="text-[10px] text-yam-primary mt-1 font-mono">YamColors.fat</div>
+                    </div>
+                    <!-- Carbs (Cyan) -->
+                    <div class="bg-yam-surface border border-yam-border rounded-lg p-3">
+                        <div class="w-full h-10 rounded bg-[#38bdf8] mb-2"></div>
+                        <div class="text-xs font-medium text-yam-textPrimary">Carbohydrates (Cyan)</div>
+                        <div class="font-mono text-[11px] text-yam-textMuted">#38bdf8</div>
+                        <div class="text-[10px] text-yam-primary mt-1 font-mono">YamColors.carbs</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Typography Scale -->
+            <div class="mb-8">
+                <h3 class="text-xs font-semibold text-yam-textSecondary uppercase tracking-wider mb-3">Typography
+                    (Inter)</h3>
+                <div class="bg-yam-surface border border-yam-border rounded-xl divide-y divide-yam-border">
+                    <div class="p-4 flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
+                        <div class="w-48 text-xs font-mono text-yam-textMuted">screenTitle · 20px / Bold</div>
+                        <div class="text-xl font-bold text-yam-textPrimary">Создать продукт · Дневник питания</div>
+                        <div class="text-[11px] font-mono text-yam-primary">YamTypography.screenTitle</div>
+                    </div>
+                    <div class="p-4 flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
+                        <div class="w-48 text-xs font-mono text-yam-textMuted">sectionTitle · 16px / SemiBold</div>
+                        <div class="text-base font-semibold text-yam-textPrimary">Пищевая ценность · Часто в рационе
+                        </div>
+                        <div class="text-[11px] font-mono text-yam-primary">YamTypography.sectionTitle</div>
+                    </div>
+                    <div class="p-4 flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
+                        <div class="w-48 text-xs font-mono text-yam-textMuted">prominentMetric · 28px / Bold</div>
+                        <div class="text-2xl font-bold tracking-tight text-yam-textPrimary">1 840 <span
+                                class="text-xs font-normal text-yam-textSecondary">/ 2 200 ккал</span></div>
+                        <div class="text-[11px] font-mono text-yam-primary">YamTypography.prominentMetric</div>
+                    </div>
+                    <div class="p-4 flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
+                        <div class="w-48 text-xs font-mono text-yam-textMuted">productTitle · 14px / Medium</div>
+                        <div class="text-sm font-medium text-yam-textPrimary">Овсяные хлопья · Творог 5%</div>
+                        <div class="text-[11px] font-mono text-yam-primary">YamTypography.productTitle</div>
+                    </div>
+                    <div class="p-4 flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
+                        <div class="w-48 text-xs font-mono text-yam-textMuted">body · 13px / Regular</div>
+                        <div class="text-[13px] text-yam-textSecondary">При добавлении в дневник вы сможете записывать
+                            продукт в граммах или порциях.</div>
+                        <div class="text-[11px] font-mono text-yam-primary">YamTypography.body</div>
+                    </div>
+                    <div class="p-4 flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
+                        <div class="w-48 text-xs font-mono text-yam-textMuted">label · 12px / Medium</div>
+                        <div class="text-xs font-medium text-yam-textSecondary uppercase tracking-wider">Название
+                            продукта *</div>
+                        <div class="text-[11px] font-mono text-yam-primary">YamTypography.label</div>
+                    </div>
+                    <div class="p-4 flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
+                        <div class="w-48 text-xs font-mono text-yam-textMuted">caption · 11px / Regular</div>
+                        <div class="text-[11px] text-yam-textMuted">366 ккал / 100 г • Локальный каталог</div>
+                        <div class="text-[11px] font-mono text-yam-primary">YamTypography.caption</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Spacing and Radius Scale -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-yam-surface border border-yam-border rounded-xl p-4">
+                    <h3 class="text-xs font-semibold text-yam-textSecondary uppercase tracking-wider mb-3">Spacing Scale
+                    </h3>
+                    <div class="space-y-2 text-xs font-mono text-yam-textSecondary">
+                        <div class="flex items-center gap-3"><span class="w-16">space4 (4px)</span>
+                            <div class="h-2 w-1 bg-yam-primary rounded"></div>
+                        </div>
+                        <div class="flex items-center gap-3"><span class="w-16">space8 (8px)</span>
+                            <div class="h-2 w-2 bg-yam-primary rounded"></div>
+                        </div>
+                        <div class="flex items-center gap-3"><span class="w-16">space12 (12px)</span>
+                            <div class="h-2 w-3 bg-yam-primary rounded"></div>
+                        </div>
+                        <div class="flex items-center gap-3"><span class="w-16">space16 (16px)</span>
+                            <div class="h-2 w-4 bg-yam-primary rounded"></div>
+                        </div>
+                        <div class="flex items-center gap-3"><span class="w-16">space24 (24px)</span>
+                            <div class="h-2 w-6 bg-yam-primary rounded"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-yam-surface border border-yam-border rounded-xl p-4">
+                    <h3 class="text-xs font-semibold text-yam-textSecondary uppercase tracking-wider mb-3">Corner Radius
+                        Scale</h3>
+                    <div class="grid grid-cols-3 gap-3 text-center text-xs">
+                        <div class="p-3 bg-yam-elevated border border-yam-border rounded-md">
+                            <span class="font-mono text-yam-textPrimary block">r6 / r8</span>
+                            <span class="text-[10px] text-yam-textMuted">Buttons, Inputs</span>
+                        </div>
+                        <div class="p-3 bg-yam-elevated border border-yam-border rounded-xl">
+                            <span class="font-mono text-yam-textPrimary block">r12 / r16</span>
+                            <span class="text-[10px] text-yam-textMuted">Cards, Blocks</span>
+                        </div>
+                        <div class="p-3 bg-yam-elevated border border-yam-border rounded-2xl">
+                            <span class="font-mono text-yam-textPrimary block">r24 / r28</span>
+                            <span class="text-[10px] text-yam-textMuted">Bottom Sheet Top</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- 2. BUTTONS -->
+        <!-- ========================================================================= -->
+        <section id="buttons" class="scroll-mt-20">
+            <div class="flex items-baseline justify-between border-b border-yam-border pb-3 mb-6">
+                <div>
+                    <h2 class="text-lg font-bold text-yam-textPrimary flex items-center gap-2">
+                        <span>2. Buttons</span>
+                        <span class="spec-badge">YamButton Family</span>
+                    </h2>
+                    <p class="text-xs text-yam-textMuted mt-0.5">Primary solid purple (never gradient), secondary
+                        outlines, text and icon buttons.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- YamPrimaryButton -->
+                <div class="bg-yam-surface border border-yam-border rounded-xl p-5 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-sm font-semibold text-yam-textPrimary font-mono">YamPrimaryButton</h3>
+                        <span class="text-xs text-yam-textMuted">Solid #a78bfa • Height 48px</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <div class="text-[11px] text-yam-textMuted mb-1 font-mono">variant: default</div>
+                            <button
+                                class="w-full h-12 bg-yam-primary hover:bg-yam-primaryStrong text-black font-semibold text-sm rounded-xl flex items-center justify-center transition active:scale-[0.99]">
+                                Сохранить продукт
+                            </button>
+                        </div>
+                        <div>
+                            <div class="text-[11px] text-yam-textMuted mb-1 font-mono">state: pressed / active</div>
+                            <button
+                                class="w-full h-12 bg-yam-primaryStrong text-black font-semibold text-sm rounded-xl flex items-center justify-center">
+                                Сохранить продукт
+                            </button>
+                        </div>
+                        <div>
+                            <div class="text-[11px] text-yam-textMuted mb-1 font-mono">state: disabled</div>
+                            <button disabled
+                                class="w-full h-12 bg-yam-elevated text-yam-textMuted border border-yam-border font-semibold text-sm rounded-xl flex items-center justify-center cursor-not-allowed">
+                                Сохранить продукт
+                            </button>
+                        </div>
+                        <div>
+                            <div class="text-[11px] text-yam-textMuted mb-1 font-mono">state: loading</div>
+                            <button
+                                class="w-full h-12 bg-yam-primary text-black font-semibold text-sm rounded-xl flex items-center justify-center gap-2 opacity-90">
+                                <svg class="animate-spin h-4 w-4 text-black" viewBox="0 0 24 24" fill="none">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                        stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor"
+                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                                </svg>
+                                <span>Сохранение...</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="text-[11px] text-yam-textMuted mb-1 font-mono">variant: leading icon + secondary
+                            meta</div>
+                        <button
+                            class="w-full h-12 bg-yam-primary text-black font-semibold text-sm rounded-xl flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                    d="M12 4v16m8-8H4" />
+                            </svg>
+                            <span>Добавить в Завтрак · 293 ккал</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- YamSecondaryButton & YamTextButton -->
+                <div class="bg-yam-surface border border-yam-border rounded-xl p-5 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-sm font-semibold text-yam-textPrimary font-mono">YamSecondaryButton & TextButton
+                        </h3>
+                        <span class="text-xs text-yam-textMuted">Muted surface / flat actions</span>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div>
+                            <div class="text-[11px] text-yam-textMuted mb-1 font-mono">YamSecondaryButton (default /
+                                pressed)</div>
+                            <div class="flex gap-2">
+                                <button
+                                    class="flex-1 h-11 bg-yam-elevated hover:bg-yam-border border border-yam-border text-yam-textPrimary font-medium text-xs rounded-xl flex items-center justify-center transition">
+                                    Отменить
+                                </button>
+                                <button
+                                    class="flex-1 h-11 bg-yam-border text-yam-textPrimary font-medium text-xs rounded-xl flex items-center justify-center">
+                                    Установить 358
+                                </button>
+                                <button disabled
+                                    class="flex-1 h-11 bg-yam-bg border border-yam-border text-yam-textMuted font-medium text-xs rounded-xl flex items-center justify-center opacity-50 cursor-not-allowed">
+                                    Недоступно
+                                </button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="text-[11px] text-yam-textMuted mb-1 font-mono">YamTextButton (normal &
+                                destructive)</div>
+                            <div
+                                class="flex items-center justify-between p-3 bg-yam-bg border border-yam-border rounded-lg">
+                                <button
+                                    class="text-xs font-medium text-yam-textSecondary hover:text-yam-textPrimary transition">
+                                    Очистить
+                                </button>
+                                <button class="text-xs font-medium text-yam-primary hover:underline">
+                                    Изменить БЖУ или название
+                                </button>
+                                <button class="text-xs font-medium text-yam-error hover:text-red-400">
+                                    Удалить продукт
+                                </button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="text-[11px] text-yam-textMuted mb-1 font-mono">YamIconButton (40x40 touch
+                                target)</div>
+                            <div class="flex items-center gap-3">
+                                <button
+                                    class="w-10 h-10 rounded-lg bg-yam-elevated hover:bg-yam-border border border-yam-border flex items-center justify-center text-yam-textPrimary transition"
+                                    title="Back">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 19l-7-7 7-7" />
+                                    </svg>
+                                </button>
+                                <button
+                                    class="w-10 h-10 rounded-lg bg-yam-elevated hover:bg-yam-border border border-yam-border flex items-center justify-center text-yam-textPrimary transition"
+                                    title="Close">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                                <button
+                                    class="w-10 h-10 rounded-lg bg-yam-primary/20 text-yam-primary border border-yam-primary/40 flex items-center justify-center"
+                                    title="Selected">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </button>
+                                <button disabled
+                                    class="w-10 h-10 rounded-lg bg-yam-bg border border-yam-border flex items-center justify-center text-yam-textMuted opacity-50 cursor-not-allowed">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 4v16m8-8H4" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- 3. INPUTS -->
+        <!-- ========================================================================= -->
+        <section id="inputs" class="scroll-mt-20">
+            <div class="flex items-baseline justify-between border-b border-yam-border pb-3 mb-6">
+                <div>
+                    <h2 class="text-lg font-bold text-yam-textPrimary flex items-center gap-2">
+                        <span>3. Input Components</span>
+                        <span class="spec-badge">YamInput Family</span>
+                    </h2>
+                    <p class="text-xs text-yam-textMuted mt-0.5">Text, numeric calorie/weight inputs, food search bar,
+                        and unit selectors.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                <!-- YamTextField states -->
+                <div class="bg-yam-surface border border-yam-border rounded-xl p-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="font-mono text-xs font-semibold text-yam-textPrimary">YamTextField</span>
+                        <span class="text-[10px] font-mono text-yam-textMuted">Regular input</span>
+                    </div>
+
+                    <!-- Empty -->
+                    <div>
+                        <label class="block text-[11px] font-medium text-yam-textSecondary mb-1">Название продукта
+                            *</label>
+                        <div class="relative">
+                            <input type="text" placeholder="Например, Овсяные хлопья"
+                                class="w-full h-11 px-3 bg-yam-bg border border-yam-border rounded-lg text-xs text-yam-textPrimary placeholder:text-yam-textMuted focus:outline-none focus:border-yam-primary">
+                        </div>
+                    </div>
+
+                    <!-- Filled & Focused -->
+                    <div>
+                        <label class="block text-[11px] font-medium text-yam-textSecondary mb-1">Бренд /
+                            производитель</label>
+                        <div class="relative">
+                            <input type="text" value="Neo High Protein"
+                                class="w-full h-11 px-3 bg-yam-bg border border-yam-primary rounded-lg text-xs text-yam-textPrimary focus:outline-none ring-1 ring-yam-primary/30">
+                        </div>
+                    </div>
+
+                    <!-- Error state -->
+                    <div>
+                        <label class="block text-[11px] font-medium text-yam-error mb-1">Название продукта *</label>
+                        <input type="text" value="" placeholder="Поле обязательно для заполнения"
+                            class="w-full h-11 px-3 bg-yam-bg border border-yam-error rounded-lg text-xs text-yam-textPrimary placeholder:text-red-400/60 focus:outline-none">
+                        <span class="text-[10px] text-yam-error mt-1 block">Укажите наименование продукта</span>
+                    </div>
+                </div>
+
+                <!-- YamSearchField -->
+                <div class="bg-yam-surface border border-yam-border rounded-xl p-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="font-mono text-xs font-semibold text-yam-textPrimary">YamSearchField</span>
+                        <span class="text-[10px] font-mono text-yam-textMuted">Food catalog search</span>
+                    </div>
+
+                    <!-- Empty search -->
+                    <div>
+                        <div class="text-[10px] text-yam-textMuted mb-1 font-mono">state: empty</div>
+                        <div class="h-11 px-3 bg-yam-bg border border-yam-border rounded-xl flex items-center gap-2.5">
+                            <svg class="w-4 h-4 text-yam-textMuted" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                            <input type="text" placeholder="Найти продукт или блюдо"
+                                class="bg-transparent text-xs text-yam-textPrimary placeholder:text-yam-textMuted flex-1 focus:outline-none">
+                            <button class="text-yam-textMuted hover:text-yam-textPrimary">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                                        d="M12 4v1m6 11h2m-6 0a2 2 0 100-4 2 2 0 000 4zm-8-3a2 2 0 100-4 2 2 0 000 4zm0 0v6a2 2 0 002 2h8a2 2 0 002-2v-6" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Active search with query and clear -->
+                    <div>
+                        <div class="text-[10px] text-yam-textMuted mb-1 font-mono">state: query entered + clear button
+                        </div>
+                        <div
+                            class="h-11 px-3 bg-yam-bg border border-yam-primary rounded-xl flex items-center gap-2.5 ring-1 ring-yam-primary/30">
+                            <svg class="w-4 h-4 text-yam-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                            <input type="text" value="Овсянка"
+                                class="bg-transparent text-xs text-yam-textPrimary flex-1 focus:outline-none">
+                            <button
+                                class="w-5 h-5 rounded-full bg-yam-elevated text-yam-textSecondary flex items-center justify-center hover:text-yam-textPrimary">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Barcode scanner input button -->
+                    <div class="pt-1">
+                        <div
+                            class="h-11 px-3 bg-yam-bg border border-yam-border rounded-xl flex items-center justify-between">
+                            <span class="text-xs font-mono text-yam-textSecondary">4607001928412</span>
+                            <button class="text-yam-primary text-xs flex items-center gap-1 font-medium">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                                        d="M3 7V5a2 2 0 012-2h2m10 0h2a2 2 0 012 2v2m0 10v2a2 2 0 01-2 2h-2m-10 0H5a2 2 0 01-2-2v-2" />
+                                </svg>
+                                <span>Скан</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- YamNumberField & YamSelect -->
+                <div class="bg-yam-surface border border-yam-border rounded-xl p-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="font-mono text-xs font-semibold text-yam-textPrimary">YamNumberField &
+                            YamSelect</span>
+                        <span class="text-[10px] font-mono text-yam-textMuted">Units & Numeric</span>
+                    </div>
+
+                    <!-- Number input with inline unit -->
+                    <div>
+                        <label class="block text-[11px] font-medium text-yam-textSecondary mb-1">Калорийность *</label>
+                        <div
+                            class="h-11 px-3 bg-yam-bg border border-yam-border rounded-lg flex items-center justify-between">
+                            <input type="number" value="180"
+                                class="bg-transparent text-sm font-bold text-yam-textPrimary w-24 focus:outline-none">
+                            <span class="text-xs text-yam-textMuted">ккал</span>
+                        </div>
+                    </div>
+
+                    <!-- Compact unit select -->
+                    <div>
+                        <label class="block text-[11px] font-medium text-yam-textSecondary mb-1">Единица
+                            измерения</label>
+                        <div
+                            class="h-11 px-3 bg-yam-bg border border-yam-border rounded-lg flex items-center justify-between cursor-pointer hover:border-yam-borderLight">
+                            <span class="text-xs font-medium text-yam-textPrimary">Граммы (г)</span>
+                            <svg class="w-4 h-4 text-yam-textMuted" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Textarea optional -->
+                    <div>
+                        <label class="block text-[11px] font-medium text-yam-textMuted mb-1">Заметка к блюду
+                            (опционально)</label>
+                        <textarea rows="2" placeholder="Например, варить на овсяном молоке..."
+                            class="w-full p-2.5 bg-yam-bg border border-yam-border rounded-lg text-xs text-yam-textPrimary placeholder:text-yam-textMuted focus:outline-none resize-none"></textarea>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- 4. SELECTION CONTROLS -->
+        <!-- ========================================================================= -->
+        <section id="selection" class="scroll-mt-20">
+            <div class="flex items-baseline justify-between border-b border-yam-border pb-3 mb-6">
+                <div>
+                    <h2 class="text-lg font-bold text-yam-textPrimary flex items-center gap-2">
+                        <span>4. Selection Controls</span>
+                        <span class="spec-badge">YamChips & Toggles</span>
+                    </h2>
+                    <p class="text-xs text-yam-textMuted mt-0.5">Chips, filter tabs, period segmented controls, meal
+                        chips and switch.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- YamChip & YamFilterChip -->
+                <div class="bg-yam-surface border border-yam-border rounded-xl p-5 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="font-mono text-xs font-semibold text-yam-textPrimary">YamChip &
+                            YamFilterChip</span>
+                        <span class="text-[10px] font-mono text-yam-textMuted">States: default, selected,
+                            disabled</span>
+                    </div>
+
+                    <div>
+                        <div class="text-[11px] text-yam-textMuted mb-2 font-mono">Catalog Filter Chips</div>
+                        <div class="flex flex-wrap gap-2">
+                            <button
+                                class="px-3.5 py-1.5 rounded-lg bg-yam-primary text-black font-semibold text-xs transition shadow-sm">
+                                Для вас
+                            </button>
+                            <button
+                                class="px-3.5 py-1.5 rounded-lg bg-yam-elevated hover:bg-yam-border text-yam-textSecondary hover:text-yam-textPrimary font-medium text-xs border border-yam-border transition">
+                                Недавние
+                            </button>
+                            <button
+                                class="px-3.5 py-1.5 rounded-lg bg-yam-elevated hover:bg-yam-border text-yam-textSecondary hover:text-yam-textPrimary font-medium text-xs border border-yam-border transition">
+                                Мои блюда
+                            </button>
+                            <button
+                                class="px-3.5 py-1.5 rounded-lg bg-yam-elevated hover:bg-yam-border text-yam-textSecondary hover:text-yam-textPrimary font-medium text-xs border border-yam-border transition">
+                                Избранное
+                            </button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="text-[11px] text-yam-textMuted mb-2 font-mono">Base Serving Measure Selector
+                            (Создать продукт)</div>
+                        <div class="grid grid-cols-3 gap-2">
+                            <div class="p-2.5 bg-yam-bg border border-yam-border rounded-lg text-center cursor-pointer">
+                                <span class="text-xs font-medium text-yam-textSecondary block">100 г</span>
+                            </div>
+                            <div class="p-2.5 bg-yam-bg border border-yam-border rounded-lg text-center cursor-pointer">
+                                <span class="text-xs font-medium text-yam-textSecondary block">100 мл</span>
+                            </div>
+                            <div
+                                class="p-2.5 bg-yam-primary/10 border border-yam-primary rounded-lg text-center cursor-pointer">
+                                <span class="text-xs font-semibold text-yam-primary block">✓ 1 порция / шт</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="text-[11px] text-yam-textMuted mb-2 font-mono">YamSwitch (Только для меня)</div>
+                        <div
+                            class="flex items-center justify-between p-3 bg-yam-bg border border-yam-border rounded-lg">
+                            <div>
+                                <div class="text-xs font-medium text-yam-textPrimary">Только для меня</div>
+                                <div class="text-[10px] text-yam-textMuted">Не публиковать в общий каталог YAM</div>
+                            </div>
+                            <!-- Switch Active -->
+                            <div
+                                class="w-11 h-6 bg-yam-primary rounded-full p-0.5 flex items-center justify-end cursor-pointer">
+                                <div class="w-5 h-5 bg-black rounded-full shadow"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Segmented Control & Meal Chips -->
+                <div class="bg-yam-surface border border-yam-border rounded-xl p-5 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="font-mono text-xs font-semibold text-yam-textPrimary">YamSegmentedControl &
+                            YamMealChip</span>
+                        <span class="text-[10px] font-mono text-yam-textMuted">Periods & Meal Categories</span>
+                    </div>
+
+                    <div>
+                        <div class="text-[11px] text-yam-textMuted mb-2 font-mono">Period Segmented Control (Статистика)
+                        </div>
+                        <div
+                            class="p-1 bg-yam-bg border border-yam-border rounded-xl grid grid-cols-5 gap-1 text-center">
+                            <button
+                                class="py-1.5 text-xs font-medium text-yam-textMuted hover:text-yam-textPrimary rounded-lg transition">7Д</button>
+                            <button
+                                class="py-1.5 text-xs font-semibold text-black bg-yam-primary rounded-lg shadow-sm">30Д</button>
+                            <button
+                                class="py-1.5 text-xs font-medium text-yam-textMuted hover:text-yam-textPrimary rounded-lg transition">3М</button>
+                            <button
+                                class="py-1.5 text-xs font-medium text-yam-textMuted hover:text-yam-textPrimary rounded-lg transition">1Г</button>
+                            <button
+                                class="py-1.5 text-xs font-medium text-yam-textMuted hover:text-yam-textPrimary rounded-lg transition">Всё</button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="text-[11px] text-yam-textMuted mb-2 font-mono">YamMealChip (Active selector dropdown
+                            / pill)</div>
+                        <div class="flex flex-wrap gap-2">
+                            <!-- Breakfast active -->
+                            <div
+                                class="h-8 px-3 rounded-lg bg-yam-elevated border border-yam-primary/40 text-yam-textPrimary flex items-center gap-2 text-xs font-medium">
+                                <span class="text-amber-400">☀️</span>
+                                <span>В Завтрак</span>
+                                <svg class="w-3.5 h-3.5 text-yam-textMuted" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </div>
+                            <!-- Lunch -->
+                            <div
+                                class="h-8 px-3 rounded-lg bg-yam-bg border border-yam-border text-yam-textSecondary flex items-center gap-2 text-xs font-medium">
+                                <span class="text-yellow-500">🍲</span>
+                                <span>Обед</span>
+                            </div>
+                            <!-- Dinner -->
+                            <div
+                                class="h-8 px-3 rounded-lg bg-yam-bg border border-yam-border text-yam-textSecondary flex items-center gap-2 text-xs font-medium">
+                                <span class="text-indigo-400">🌙</span>
+                                <span>Ужин</span>
+                            </div>
+                            <!-- Snack -->
+                            <div
+                                class="h-8 px-3 rounded-lg bg-yam-bg border border-yam-border text-yam-textSecondary flex items-center gap-2 text-xs font-medium">
+                                <span class="text-purple-400">🥪</span>
+                                <span>Перекус</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- 5. NAVIGATION -->
+        <!-- ========================================================================= -->
+        <section id="navigation" class="scroll-mt-20">
+            <div class="flex items-baseline justify-between border-b border-yam-border pb-3 mb-6">
+                <div>
+                    <h2 class="text-lg font-bold text-yam-textPrimary flex items-center gap-2">
+                        <span>5. Navigation Components</span>
+                        <span class="spec-badge">YamNavigation</span>
+                    </h2>
+                    <p class="text-xs text-yam-textMuted mt-0.5">Bottom tab bar (Diary, Statistics, Settings), top bars,
+                        and the weekly date strip.</p>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <!-- YamBottomNavigation (3 states) -->
+                <div class="bg-yam-surface border border-yam-border rounded-xl p-5">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="font-mono text-xs font-semibold text-yam-textPrimary">YamBottomNavigation</span>
+                        <span class="text-[10px] font-mono text-yam-textMuted">Fixed 3 tabs: Дневник, Статистика,
+                            Настройки</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- State 1: Diary Active -->
+                        <div class="bg-yam-bg border border-yam-border rounded-xl p-3">
+                            <div class="text-[10px] font-mono text-yam-textMuted mb-2">State: Diary Active</div>
+                            <div class="h-14 flex items-center justify-around border-t border-yam-border pt-1">
+                                <div class="flex flex-col items-center gap-1 text-yam-primary cursor-pointer">
+                                    <div
+                                        class="w-10 h-7 rounded-full bg-yam-primary/15 flex items-center justify-center">
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                            <path
+                                                d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z" />
+                                        </svg>
+                                    </div>
+                                    <span class="text-[10px] font-medium">Дневник</span>
+                                </div>
+                                <div
+                                    class="flex flex-col items-center gap-1 text-yam-textMuted cursor-pointer hover:text-yam-textSecondary">
+                                    <svg class="w-5 h-5 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                    </svg>
+                                    <span class="text-[10px] font-medium">Статистика</span>
+                                </div>
+                                <div
+                                    class="flex flex-col items-center gap-1 text-yam-textMuted cursor-pointer hover:text-yam-textSecondary">
+                                    <svg class="w-5 h-5 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    <span class="text-[10px] font-medium">Настройки</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- State 2: Statistics Active -->
+                        <div class="bg-yam-bg border border-yam-border rounded-xl p-3">
+                            <div class="text-[10px] font-mono text-yam-textMuted mb-2">State: Statistics Active</div>
+                            <div class="h-14 flex items-center justify-around border-t border-yam-border pt-1">
+                                <div class="flex flex-col items-center gap-1 text-yam-textMuted cursor-pointer">
+                                    <svg class="w-5 h-5 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                    </svg>
+                                    <span class="text-[10px] font-medium">Дневник</span>
+                                </div>
+                                <div class="flex flex-col items-center gap-1 text-yam-primary cursor-pointer">
+                                    <div
+                                        class="w-10 h-7 rounded-full bg-yam-primary/15 flex items-center justify-center">
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M4 19h4V9H4v10zm6 0h4V5h-4v14zm6 0h4v-7h-4v7z" />
+                                        </svg>
+                                    </div>
+                                    <span class="text-[10px] font-medium">Статистика</span>
+                                </div>
+                                <div class="flex flex-col items-center gap-1 text-yam-textMuted cursor-pointer">
+                                    <svg class="w-5 h-5 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    <span class="text-[10px] font-medium">Настройки</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- State 3: Settings Active -->
+                        <div class="bg-yam-bg border border-yam-border rounded-xl p-3">
+                            <div class="text-[10px] font-mono text-yam-textMuted mb-2">State: Settings Active</div>
+                            <div class="h-14 flex items-center justify-around border-t border-yam-border pt-1">
+                                <div class="flex flex-col items-center gap-1 text-yam-textMuted cursor-pointer">
+                                    <svg class="w-5 h-5 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                    </svg>
+                                    <span class="text-[10px] font-medium">Дневник</span>
+                                </div>
+                                <div class="flex flex-col items-center gap-1 text-yam-textMuted cursor-pointer">
+                                    <svg class="w-5 h-5 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                    </svg>
+                                    <span class="text-[10px] font-medium">Статистика</span>
+                                </div>
+                                <div class="flex flex-col items-center gap-1 text-yam-primary cursor-pointer">
+                                    <div
+                                        class="w-10 h-7 rounded-full bg-yam-primary/15 flex items-center justify-center">
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                            <path
+                                                d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z" />
+                                        </svg>
+                                    </div>
+                                    <span class="text-[10px] font-medium">Настройки</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- YamTopBar & YamDateStrip -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- TopBar variants -->
+                    <div class="bg-yam-surface border border-yam-border rounded-xl p-4 space-y-3">
+                        <span class="font-mono text-xs font-semibold text-yam-textPrimary block">YamTopBar
+                            Variants</span>
+
+                        <div
+                            class="p-3 bg-yam-bg border border-yam-border rounded-lg flex items-center justify-between">
+                            <span class="text-sm font-bold text-yam-textPrimary">Статистика</span>
+                            <span class="text-xs text-yam-textMuted">19 авг — 19 сен</span>
+                        </div>
+
+                        <div
+                            class="p-3 bg-yam-bg border border-yam-border rounded-lg flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <button class="text-yam-textPrimary"><svg class="w-4 h-4" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 19l-7-7 7-7" />
+                                    </svg></button>
+                                <span class="text-sm font-bold text-yam-textPrimary">Создать продукт</span>
+                            </div>
+                            <button class="text-xs text-yam-textMuted hover:text-yam-textPrimary">Очистить</button>
+                        </div>
+                    </div>
+
+                    <!-- YamDateStrip -->
+                    <div class="bg-yam-surface border border-yam-border rounded-xl p-4 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="font-mono text-xs font-semibold text-yam-textPrimary">YamDateStrip</span>
+                            <span class="text-[10px] font-mono text-yam-textMuted">Weekly selector</span>
+                        </div>
+
+                        <div class="flex items-center justify-between mb-2">
+                            <button class="text-yam-textMuted hover:text-yam-textPrimary"><svg class="w-4 h-4"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 19l-7-7 7-7" />
+                                </svg></button>
+                            <div class="text-center">
+                                <span class="text-xs font-bold text-yam-textPrimary block">Сегодня</span>
+                                <span class="text-[10px] text-yam-textMuted">19 сентября</span>
+                            </div>
+                            <button class="text-yam-textMuted hover:text-yam-textPrimary"><svg class="w-4 h-4"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 5l7 7-7 7" />
+                                </svg></button>
+                        </div>
+
+                        <!-- 7 Days Strip -->
+                        <div class="grid grid-cols-7 gap-1 text-center">
+                            <div class="py-2 rounded-lg hover:bg-yam-elevated cursor-pointer">
+                                <span class="text-[9px] text-yam-textMuted uppercase block">Пн</span>
+                                <span class="text-xs font-medium text-yam-textSecondary">14</span>
+                            </div>
+                            <div class="py-2 rounded-lg hover:bg-yam-elevated cursor-pointer">
+                                <span class="text-[9px] text-yam-textMuted uppercase block">Вт</span>
+                                <span class="text-xs font-medium text-yam-textSecondary">15</span>
+                            </div>
+                            <div class="py-2 rounded-lg hover:bg-yam-elevated cursor-pointer">
+                                <span class="text-[9px] text-yam-textMuted uppercase block">Ср</span>
+                                <span class="text-xs font-medium text-yam-textSecondary">16</span>
+                            </div>
+                            <div class="py-2 rounded-lg hover:bg-yam-elevated cursor-pointer">
+                                <span class="text-[9px] text-yam-textMuted uppercase block">Чт</span>
+                                <span class="text-xs font-medium text-yam-textSecondary">17</span>
+                            </div>
+                            <div class="py-2 rounded-lg hover:bg-yam-elevated cursor-pointer">
+                                <span class="text-[9px] text-yam-textMuted uppercase block">Пт</span>
+                                <span class="text-xs font-medium text-yam-textSecondary">18</span>
+                            </div>
+                            <!-- Selected / Today -->
+                            <div
+                                class="py-2 rounded-xl bg-yam-primary text-black font-semibold shadow-sm cursor-pointer">
+                                <span class="text-[9px] uppercase block opacity-80">Сб</span>
+                                <span class="text-xs font-bold">19</span>
+                            </div>
+                            <div class="py-2 rounded-lg text-yam-textMuted opacity-50 cursor-not-allowed">
+                                <span class="text-[9px] uppercase block">Вс</span>
+                                <span class="text-xs">20</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- 6. FOOD-SPECIFIC COMPONENTS -->
+        <!-- ========================================================================= -->
+        <section id="food" class="scroll-mt-20">
+            <div class="flex items-baseline justify-between border-b border-yam-border pb-3 mb-6">
+                <div>
+                    <h2 class="text-lg font-bold text-yam-textPrimary flex items-center gap-2">
+                        <span>6. Food-Specific Components & Macros</span>
+                        <span class="spec-badge">Core Widgets</span>
+                    </h2>
+                    <p class="text-xs text-yam-textMuted mt-0.5">Product rows, logged entries, nutrition summaries, and
+                        canonical quantity control.</p>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <!-- YamProductRow variants (Search & Catalog) -->
+                <div class="bg-yam-surface border border-yam-border rounded-xl p-5 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="font-mono text-xs font-semibold text-yam-textPrimary">YamProductRow (Food Catalog &
+                            Search)</span>
+                        <span class="text-[10px] font-mono text-yam-textMuted">Dense layout: Title, brand/metadata,
+                            macros, quick-add</span>
+                    </div>
+
+                    <div class="divide-y divide-yam-border bg-yam-bg border border-yam-border rounded-xl">
+                        <!-- Row 1: Verified basic -->
+                        <div class="p-3.5 flex items-center justify-between hover:bg-yam-elevated/40 transition">
+                            <div class="space-y-0.5">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-xs font-semibold text-yam-textPrimary">Овсяные хлопья</span>
+                                    <svg class="w-3.5 h-3.5 text-yam-primary fill-current" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd"
+                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div class="text-[11px] text-yam-textMuted">YAM Basics</div>
+                                <div class="flex items-center gap-2 text-[11px]">
+                                    <span class="font-medium text-yam-textSecondary">366 ккал / 100 г</span>
+                                    <span class="text-yam-border">•</span>
+                                    <span class="text-yam-textMuted">Б 12,3 · Ж 6,1 · У 59,5</span>
+                                </div>
+                            </div>
+                            <button
+                                class="h-8 px-3 rounded-lg bg-yam-elevated hover:bg-yam-border border border-yam-border text-xs font-semibold text-yam-textPrimary flex items-center gap-1">
+                                + 80 г
+                            </button>
+                        </div>
+
+                        <!-- Row 2: Brand & serving metadata -->
+                        <div class="p-3.5 flex items-center justify-between hover:bg-yam-elevated/40 transition">
+                            <div class="space-y-0.5">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-xs font-semibold text-yam-textPrimary">Молоко 2,5%</span>
+                                    <svg class="w-3.5 h-3.5 text-yam-primary fill-current" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd"
+                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div class="text-[11px] text-yam-textMuted">Домик в деревне</div>
+                                <div class="flex items-center gap-2 text-[11px]">
+                                    <span class="font-medium text-yam-textSecondary">52 ккал / 100 мл</span>
+                                    <span class="text-yam-border">•</span>
+                                    <span class="text-yam-textMuted">Б 2,8 · Ж 2,5 · У 4,7</span>
+                                </div>
+                            </div>
+                            <button
+                                class="h-8 px-3 rounded-lg bg-yam-elevated hover:bg-yam-border border border-yam-border text-xs font-semibold text-yam-textPrimary flex items-center gap-1">
+                                + 150 мл
+                            </button>
+                        </div>
+
+                        <!-- Row 3: High Protein with piece metadata -->
+                        <div class="p-3.5 flex items-center justify-between hover:bg-yam-elevated/40 transition">
+                            <div class="space-y-0.5 max-w-[70%]">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-xs font-semibold text-yam-textPrimary truncate">Сывороточный
+                                        протеин Neo High Protein Ваниль</span>
+                                </div>
+                                <div class="text-[11px] text-yam-textMuted">Neo · 1 порция = 30 г</div>
+                                <div class="flex items-center gap-2 text-[11px]">
+                                    <span class="font-medium text-yam-textSecondary">112 ккал / 30 г</span>
+                                    <span class="text-yam-border">•</span>
+                                    <span class="text-yam-protein">Б 23</span>
+                                    <span class="text-yam-fat">Ж 1,6</span>
+                                    <span class="text-yam-carbs">У 2,4</span>
+                                </div>
+                            </div>
+                            <button
+                                class="h-8 px-3 rounded-lg bg-yam-elevated hover:bg-yam-border border border-yam-border text-xs font-semibold text-yam-textPrimary flex items-center gap-1">
+                                + 1 порц
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- YamDiaryFoodRow & YamMealSectionHeader -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-yam-surface border border-yam-border rounded-xl p-5 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span
+                                class="font-mono text-xs font-semibold text-yam-textPrimary">YamMealSectionHeader</span>
+                            <span class="text-[10px] font-mono text-yam-textMuted">Meal category header</span>
+                        </div>
+
+                        <!-- Meal Header Component -->
+                        <div
+                            class="p-3 bg-yam-bg border border-yam-border rounded-xl flex items-center justify-between">
+                            <div>
+                                <span class="text-sm font-bold text-yam-textPrimary">Завтрак</span>
+                                <span class="text-xs text-yam-textSecondary ml-2">482 ккал</span>
+                            </div>
+                            <button
+                                class="w-7 h-7 rounded-lg bg-yam-elevated hover:bg-yam-border border border-yam-border flex items-center justify-center text-yam-textPrimary">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                        d="M12 4v16m8-8H4" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        <span class="font-mono text-xs font-semibold text-yam-textPrimary block pt-2">YamDiaryFoodRow
+                            (Logged Item)</span>
+                        <div class="divide-y divide-yam-border bg-yam-bg border border-yam-border rounded-xl">
+                            <div class="p-3 flex items-center justify-between">
+                                <div>
+                                    <div class="text-xs font-medium text-yam-textPrimary">Яйца куриные С1</div>
+                                    <div class="text-[11px] text-yam-textMuted">3 шт. · 165 г</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-xs font-bold text-yam-textPrimary">216 ккал</div>
+                                    <div class="text-[10px] text-yam-textMuted">Б 19 · Ж 15 · У 1</div>
+                                </div>
+                            </div>
+                            <div class="p-3 flex items-center justify-between">
+                                <div>
+                                    <div class="text-xs font-medium text-yam-textPrimary">Хлеб цельнозерновой</div>
+                                    <div class="text-[11px] text-yam-textMuted">80 г</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-xs font-bold text-yam-textPrimary">190 ккал</div>
+                                    <div class="text-[10px] text-yam-textMuted">Б 7 · Ж 2 · У 36</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- YamQuantityControl (CANONICAL) -->
+                    <div class="bg-yam-surface border border-yam-border rounded-xl p-5 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="font-mono text-xs font-semibold text-yam-textPrimary">YamQuantityControl</span>
+                            <span class="text-[10px] font-mono text-yam-textMuted">Single Unit Selector •
+                                Steppers</span>
+                        </div>
+
+                        <div
+                            class="bg-yam-bg border border-yam-border rounded-2xl p-4 flex items-center justify-between">
+                            <!-- Stepper Minus -->
+                            <button
+                                class="w-12 h-12 rounded-xl bg-yam-elevated hover:bg-yam-border text-yam-textPrimary text-xl font-bold flex items-center justify-center transition active:scale-95">
+                                −
+                            </button>
+                            <!-- Center editable number + integrated single unit selector -->
+                            <div class="flex items-baseline gap-2">
+                                <span class="text-3xl font-extrabold text-yam-textPrimary tracking-tight">80</span>
+                                <div
+                                    class="px-2.5 py-1 rounded-lg bg-yam-elevated border border-yam-border text-xs font-semibold text-yam-textPrimary flex items-center gap-1 cursor-pointer">
+                                    <span>г</span>
+                                    <svg class="w-3 h-3 text-yam-textMuted" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <!-- Stepper Plus -->
+                            <button
+                                class="w-12 h-12 rounded-xl bg-yam-elevated hover:bg-yam-border text-yam-textPrimary text-xl font-bold flex items-center justify-center transition active:scale-95">
+                                +
+                            </button>
+                        </div>
+
+                        <!-- YamQuickAmountPresets -->
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-medium text-yam-textSecondary">Быстрый выбор</span>
+                                <span class="text-[11px] text-yam-textMuted font-mono">Обычно: 80 г</span>
+                            </div>
+                            <div class="grid grid-cols-5 gap-1.5">
+                                <button
+                                    class="py-2 rounded-lg bg-yam-bg border border-yam-border text-xs font-medium text-yam-textSecondary hover:text-yam-textPrimary">40
+                                    г</button>
+                                <button
+                                    class="py-2 rounded-lg bg-yam-bg border border-yam-border text-xs font-medium text-yam-textSecondary hover:text-yam-textPrimary">50
+                                    г</button>
+                                <button class="py-2 rounded-lg bg-yam-primary text-black text-xs font-bold shadow-sm">✓
+                                    80 г</button>
+                                <button
+                                    class="py-2 rounded-lg bg-yam-bg border border-yam-border text-xs font-medium text-yam-textSecondary hover:text-yam-textPrimary">100
+                                    г</button>
+                                <button
+                                    class="py-2 rounded-lg bg-yam-bg border border-yam-border text-xs font-medium text-yam-textSecondary hover:text-yam-textPrimary">150
+                                    г</button>
+                            </div>
+                        </div>
+
+                        <!-- YamNutritionSummary (Flat one-row, no nested cards) -->
+                        <div
+                            class="p-3 bg-yam-bg border border-yam-border rounded-xl flex items-center justify-between">
+                            <div class="text-sm font-bold text-yam-textPrimary">
+                                293 <span class="text-xs font-normal text-yam-textSecondary">ккал</span>
+                            </div>
+                            <div class="flex items-center gap-3 text-xs">
+                                <span class="flex items-center gap-1 text-yam-protein font-medium">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-yam-protein"></span>Б 9,8 г
+                                </span>
+                                <span class="flex items-center gap-1 text-yam-fat font-medium">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-yam-fat"></span>Ж 4,9 г
+                                </span>
+                                <span class="flex items-center gap-1 text-yam-carbs font-medium">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-yam-carbs"></span>У 47,6 г
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- 7. DIARY COMPONENTS -->
+        <!-- ========================================================================= -->
+        <section id="diary" class="scroll-mt-20">
+            <div class="flex items-baseline justify-between border-b border-yam-border pb-3 mb-6">
+                <div>
+                    <h2 class="text-lg font-bold text-yam-textPrimary flex items-center gap-2">
+                        <span>7. Diary Components</span>
+                        <span class="spec-badge">YamDiary</span>
+                    </h2>
+                    <p class="text-xs text-yam-textMuted mt-0.5">Energy summaries, daily target progress, and optional
+                        hydration tracker.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- YamDailyEnergySummary -->
+                <div class="bg-yam-surface border border-yam-border rounded-xl p-5 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="font-mono text-xs font-semibold text-yam-textPrimary">YamDailyEnergySummary</span>
+                        <span class="text-[10px] font-mono text-yam-textMuted">Hero Card</span>
+                    </div>
+
+                    <div class="bg-yam-bg border border-yam-border rounded-2xl p-4 space-y-3">
+                        <div class="flex items-baseline justify-between">
+                            <div>
+                                <span class="text-[11px] text-yam-textMuted block">Съедено</span>
+                                <div class="text-2xl font-extrabold text-yam-textPrimary tracking-tight">
+                                    1 840 <span class="text-xs font-normal text-yam-textSecondary">/ 2 200 ккал</span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xs font-semibold text-yam-primary">Осталось 360 ккал</span>
+                            </div>
+                        </div>
+
+                        <!-- Single progress bar (solid purple + track) -->
+                        <div class="w-full h-2 rounded-full bg-yam-elevated overflow-hidden">
+                            <div class="h-full bg-yam-primary rounded-full" style="width: 83%"></div>
+                        </div>
+
+                        <!-- Macro split breakdown with canonical colors -->
+                        <div class="grid grid-cols-3 gap-2 pt-1 border-t border-yam-border">
+                            <div>
+                                <span class="text-[10px] text-yam-textMuted block">Белки</span>
+                                <span class="text-xs font-bold text-yam-textPrimary block">126 <span
+                                        class="font-normal text-[10px] text-yam-textSecondary">/ 160 г</span></span>
+                                <div class="w-full h-1 bg-yam-elevated rounded-full mt-1 overflow-hidden">
+                                    <div class="h-full bg-yam-protein" style="width: 78%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-yam-textMuted block">Жиры</span>
+                                <span class="text-xs font-bold text-yam-textPrimary block">61 <span
+                                        class="font-normal text-[10px] text-yam-textSecondary">/ 75 г</span></span>
+                                <div class="w-full h-1 bg-yam-elevated rounded-full mt-1 overflow-hidden">
+                                    <div class="h-full bg-yam-fat" style="width: 81%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-yam-textMuted block">Углеводы</span>
+                                <span class="text-xs font-bold text-yam-textPrimary block">184 <span
+                                        class="font-normal text-[10px] text-yam-textSecondary">/ 230 г</span></span>
+                                <div class="w-full h-1 bg-yam-elevated rounded-full mt-1 overflow-hidden">
+                                    <div class="h-full bg-yam-carbs" style="width: 80%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- YamWaterTracker (Optional component) -->
+                <div class="bg-yam-surface border border-yam-border rounded-xl p-5 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="font-mono text-xs font-semibold text-yam-textPrimary">YamWaterTracker
+                            (Optional)</span>
+                        <span class="text-[10px] font-mono text-yam-textMuted">Hydration counter</span>
+                    </div>
+
+                    <div class="bg-yam-bg border border-yam-border rounded-2xl p-4 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span class="text-blue-400">💧</span>
+                                <span class="text-xs font-bold text-yam-textPrimary">Вода</span>
+                            </div>
+                            <span class="text-xs font-semibold text-yam-textSecondary">1 500 / 2 000 мл</span>
+                        </div>
+
+                        <div class="w-full h-2 rounded-full bg-yam-elevated overflow-hidden">
+                            <div class="h-full bg-blue-400 rounded-full" style="width: 75%"></div>
+                        </div>
+
+                        <div class="flex items-center justify-between pt-1">
+                            <button
+                                class="px-2.5 py-1 rounded-lg bg-yam-elevated hover:bg-yam-border text-xs font-medium text-yam-textSecondary">
+                                + 250 мл
+                            </button>
+                            <button
+                                class="px-2.5 py-1 rounded-lg bg-yam-elevated hover:bg-yam-border text-xs font-medium text-yam-textSecondary">
+                                + 500 мл
+                            </button>
+                            <button
+                                class="px-2.5 py-1 rounded-lg bg-yam-elevated hover:bg-yam-border text-xs font-medium text-yam-textSecondary">
+                                + 1 000 мл
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- 8. FEEDBACK AND SYSTEM STATES -->
+        <!-- ========================================================================= -->
+        <section id="feedback" class="scroll-mt-20">
+            <div class="flex items-baseline justify-between border-b border-yam-border pb-3 mb-6">
+                <div>
+                    <h2 class="text-lg font-bold text-yam-textPrimary flex items-center gap-2">
+                        <span>8. Feedback, Validation & States</span>
+                        <span class="spec-badge">System States</span>
+                    </h2>
+                    <p class="text-xs text-yam-textMuted mt-0.5">Snackbars with undo, compact inline validation errors,
+                        warnings, skeletons, and empty states.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                <!-- YamSnackbar -->
+                <div class="bg-yam-surface border border-yam-border rounded-xl p-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="font-mono text-xs font-semibold text-yam-textPrimary">YamSnackbar</span>
+                        <span class="text-[10px] font-mono text-yam-textMuted">Floating notification</span>
+                    </div>
+
+                    <div
+                        class="p-3 bg-yam-elevated border border-yam-border rounded-xl flex items-center justify-between shadow-lg">
+                        <div class="flex items-center gap-2 text-xs">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                            <span class="text-yam-textPrimary">Овсяные хлопья · 80 г добавлены</span>
+                        </div>
+                        <button class="text-xs font-semibold text-yam-primary hover:underline ml-3">
+                            Отменить
+                        </button>
+                    </div>
+                </div>
+
+                <!-- YamWarning & YamInlineError (БЖУ validation state) -->
+                <div class="bg-yam-surface border border-yam-border rounded-xl p-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="font-mono text-xs font-semibold text-yam-textPrimary">YamWarning &
+                            Validation</span>
+                        <span class="text-[10px] font-mono text-yam-textMuted">Restrained amber styling</span>
+                    </div>
+
+                    <!-- Non-aggressive amber warning box -->
+                    <div class="p-3 bg-amber-950/20 border border-amber-500/30 rounded-xl space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-semibold text-amber-300 flex items-center gap-1.5">
+                                <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                                Расхождение: 178 ккал
+                            </span>
+                            <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300">НЕ
+                                СХОДИТСЯ</span>
+                        </div>
+                        <p class="text-[11px] text-amber-200/80">По БЖУ получается ~358 ккал, а указано 180 ккал</p>
+                        <div class="flex items-center justify-between pt-1 border-t border-amber-500/20">
+                            <span class="text-[10px] font-mono text-yam-textMuted">30×4 + 14×9 + 28×4 = 358</span>
+                            <button
+                                class="px-2 py-1 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 text-[11px] font-medium transition">
+                                Установить 358
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- YamSkeleton states -->
+                <div class="bg-yam-surface border border-yam-border rounded-xl p-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="font-mono text-xs font-semibold text-yam-textPrimary">YamSkeleton</span>
+                        <span class="text-[10px] font-mono text-yam-textMuted">Shimmer placeholders</span>
+                    </div>
+
+                    <div class="p-3 bg-yam-bg border border-yam-border rounded-xl space-y-2.5 animate-pulse">
+                        <div class="flex justify-between items-center">
+                            <div class="h-3 w-32 bg-yam-elevated rounded"></div>
+                            <div class="h-6 w-14 bg-yam-elevated rounded-lg"></div>
+                        </div>
+                        <div class="h-2 w-20 bg-yam-elevated/70 rounded"></div>
+                        <div class="h-2 w-44 bg-yam-elevated/50 rounded"></div>
+                    </div>
+                </div>
+
+                <!-- YamEmptyState -->
+                <div class="bg-yam-surface border border-yam-border rounded-xl p-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="font-mono text-xs font-semibold text-yam-textPrimary">YamEmptyState</span>
+                        <span class="text-[10px] font-mono text-yam-textMuted">Restrained & Friendly</span>
+                    </div>
+
+                    <div class="p-6 bg-yam-bg border border-yam-border rounded-xl text-center space-y-2">
+                        <div
+                            class="w-10 h-10 rounded-full bg-yam-elevated text-yam-textMuted flex items-center justify-center mx-auto">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                        <div class="text-xs font-semibold text-yam-textPrimary">Продукт не найден</div>
+                        <div class="text-[11px] text-yam-textMuted max-w-xs mx-auto">Попробуйте изменить запрос или
+                            создайте новый продукт вручную</div>
+                        <button class="mt-2 text-xs font-medium text-yam-primary hover:underline">
+                            + Создать продукт
+                        </button>
+                    </div>
+                </div>
+
+                <!-- YamErrorState -->
+                <div class="bg-yam-surface border border-yam-border rounded-xl p-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="font-mono text-xs font-semibold text-yam-textPrimary">YamErrorState</span>
+                        <span class="text-[10px] font-mono text-yam-textMuted">Network / Retry</span>
+                    </div>
+
+                    <div class="p-6 bg-yam-bg border border-yam-border rounded-xl text-center space-y-2">
+                        <div
+                            class="w-10 h-10 rounded-full bg-red-950/40 text-yam-error flex items-center justify-center mx-auto">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div class="text-xs font-semibold text-yam-textPrimary">Не удалось загрузить данные</div>
+                        <div class="text-[11px] text-yam-textMuted">Проверьте подключение к интернету</div>
+                        <button
+                            class="mt-2 px-3 py-1.5 bg-yam-elevated hover:bg-yam-border border border-yam-border rounded-lg text-xs font-medium text-yam-textPrimary transition">
+                            Повторить
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- 9. BOTTOM SHEETS -->
+        <!-- ========================================================================= -->
+        <section id="bottomsheet" class="scroll-mt-20">
+            <div class="flex items-baseline justify-between border-b border-yam-border pb-3 mb-6">
+                <div>
+                    <h2 class="text-lg font-bold text-yam-textPrimary flex items-center gap-2">
+                        <span>9. Bottom Sheets</span>
+                        <span class="spec-badge">YamBottomSheet</span>
+                    </h2>
+                    <p class="text-xs text-yam-textMuted mt-0.5">Canonical bottom-sheet container and composition for
+                        fast food confirmation.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                <!-- Composition Anatomy Documentation -->
+                <div class="lg:col-span-5 space-y-4">
+                    <div class="bg-yam-surface border border-yam-border rounded-xl p-5 space-y-3">
+                        <h3 class="text-sm font-semibold text-yam-textPrimary">Canonical Architecture</h3>
+                        <p class="text-xs text-yam-textSecondary leading-relaxed">
+                            Bottom sheets are the primary confirmation surfaces in YAM. They MUST be composed strictly
+                            of existing library components without custom ad-hoc styling.
+                        </p>
+                        <ul class="text-xs space-y-2 text-yam-textMuted pt-2">
+                            <li class="flex items-center gap-2">
+                                <span class="font-mono text-yam-primary">1. Handle:</span> 36×4px pill centered, r99
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <span class="font-mono text-yam-primary">2. Header:</span> YamMealChip + Product Title +
+                                Close Icon
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <span class="font-mono text-yam-primary">3. Quantity:</span> YamQuantityControl (one
+                                unit select)
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <span class="font-mono text-yam-primary">4. Presets:</span> YamQuickAmountPresets (5
+                                items)
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <span class="font-mono text-yam-primary">5. Macros:</span> YamNutritionSummary (flat
+                                row)
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <span class="font-mono text-yam-primary">6. CTA:</span> YamPrimaryButton (solid #a78bfa)
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Rendered Full Composition -->
+                <div class="lg:col-span-7">
+                    <div
+                        class="max-w-md mx-auto bg-yam-surface border border-yam-border rounded-t-3xl rounded-b-xl p-5 space-y-4 shadow-2xl relative">
+                        <!-- Drag handle -->
+                        <div class="w-9 h-1 rounded-full bg-yam-border mx-auto"></div>
+
+                        <!-- Header with Meal selection & close -->
+                        <div class="flex items-center justify-between">
+                            <div
+                                class="h-7 px-2.5 rounded-lg bg-yam-elevated border border-yam-primary/40 text-yam-textPrimary flex items-center gap-1.5 text-xs font-medium">
+                                <span class="text-amber-400 text-xs">☀️</span>
+                                <span>В Завтрак</span>
+                                <svg class="w-3 h-3 text-yam-textMuted" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </div>
+                            <button
+                                class="w-8 h-8 rounded-full bg-yam-elevated text-yam-textMuted hover:text-yam-textPrimary flex items-center justify-center">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- Product title -->
+                        <div>
+                            <div class="flex items-center gap-1.5">
+                                <h4 class="text-base font-bold text-yam-textPrimary">Овсяные хлопья</h4>
+                                <svg class="w-4 h-4 text-yam-primary fill-current" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd"
+                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <p class="text-xs text-yam-textMuted mt-0.5">YAM Basics · 366 ккал / 100 г</p>
+                        </div>
+
+                        <!-- Canonical Quantity control -->
+                        <div
+                            class="bg-yam-bg border border-yam-border rounded-xl p-3 flex items-center justify-between">
+                            <button
+                                class="w-10 h-10 rounded-lg bg-yam-elevated text-yam-textPrimary text-lg font-bold flex items-center justify-center">−</button>
+                            <div class="flex items-baseline gap-1.5">
+                                <span class="text-2xl font-extrabold text-yam-textPrimary">80</span>
+                                <span
+                                    class="px-2 py-0.5 rounded bg-yam-elevated text-xs font-semibold text-yam-textSecondary">г
+                                    ▾</span>
+                            </div>
+                            <button
+                                class="w-10 h-10 rounded-lg bg-yam-elevated text-yam-textPrimary text-lg font-bold flex items-center justify-center">+</button>
+                        </div>
+
+                        <!-- Quick presets -->
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-[11px] text-yam-textMuted">
+                                <span>Быстрый выбор</span>
+                                <span>Обычно: 80 г</span>
+                            </div>
+                            <div class="grid grid-cols-5 gap-1 text-center">
+                                <div
+                                    class="py-1.5 rounded-lg bg-yam-bg border border-yam-border text-xs text-yam-textSecondary">
+                                    40 г</div>
+                                <div
+                                    class="py-1.5 rounded-lg bg-yam-bg border border-yam-border text-xs text-yam-textSecondary">
+                                    50 г</div>
+                                <div class="py-1.5 rounded-lg bg-yam-primary text-black text-xs font-bold">✓ 80 г</div>
+                                <div
+                                    class="py-1.5 rounded-lg bg-yam-bg border border-yam-border text-xs text-yam-textSecondary">
+                                    100 г</div>
+                                <div
+                                    class="py-1.5 rounded-lg bg-yam-bg border border-yam-border text-xs text-yam-textSecondary">
+                                    150 г</div>
+                            </div>
+                        </div>
+
+                        <!-- Nutrition summary row -->
+                        <div
+                            class="p-2.5 bg-yam-bg border border-yam-border rounded-xl flex items-center justify-between text-xs">
+                            <span class="font-bold text-yam-textPrimary">293 ккал</span>
+                            <div class="flex items-center gap-2">
+                                <span class="text-yam-protein font-medium">• Б 9,8 г</span>
+                                <span class="text-yam-fat font-medium">• Ж 4,9 г</span>
+                                <span class="text-yam-carbs font-medium">• У 47,6 г</span>
+                            </div>
+                        </div>
+
+                        <!-- Solid CTA -->
+                        <button
+                            class="w-full h-11 bg-yam-primary hover:bg-yam-primaryStrong text-black font-semibold text-xs rounded-xl flex items-center justify-center transition shadow-sm">
+                            Добавить в Завтрак · 293 ккал
+                        </button>
+
+                        <!-- Subtle secondary link -->
+                        <div class="text-center pt-1">
+                            <button class="text-[11px] text-yam-textMuted hover:text-yam-textSecondary">
+                                Изменить БЖУ или название
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- 10. STATISTICS COMPONENTS -->
+        <!-- ========================================================================= -->
+        <section id="statistics" class="scroll-mt-20">
+            <div class="flex items-baseline justify-between border-b border-yam-border pb-3 mb-6">
+                <div>
+                    <h2 class="text-lg font-bold text-yam-textPrimary flex items-center gap-2">
+                        <span>10. Statistics & Analytics Widgets</span>
+                        <span class="spec-badge">YamAnalytics</span>
+                    </h2>
+                    <p class="text-xs text-yam-textMuted mt-0.5">Reusable analytical components: 2x2 metric summaries,
+                        charts, heatmap calendar, and legends.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- YamStatSummaryGrid (2x2) -->
+                <div class="bg-yam-surface border border-yam-border rounded-xl p-5 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="font-mono text-xs font-semibold text-yam-textPrimary">YamStatSummaryGrid</span>
+                        <span class="text-[10px] font-mono text-yam-textMuted">Compact 2×2</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 p-3 bg-yam-bg border border-yam-border rounded-xl">
+                        <div>
+                            <span class="text-[10px] text-yam-textMuted block">Вес</span>
+                            <div class="text-sm font-bold text-yam-textPrimary">74,2 <span
+                                    class="text-xs font-normal">кг</span></div>
+                            <span class="text-[10px] text-emerald-400 font-medium">−1,8 кг (динамика)</span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-yam-textMuted block">Средние калории</span>
+                            <div class="text-sm font-bold text-yam-textPrimary">1 820 <span
+                                    class="text-xs font-normal">ккал</span></div>
+                            <span class="text-[10px] text-yam-textMuted">Цель 1 950 ккал</span>
+                        </div>
+                        <div class="pt-2 border-t border-yam-border">
+                            <span class="text-[10px] text-yam-textMuted block">Средний белок</span>
+                            <div class="text-sm font-bold text-yam-textPrimary">138 <span
+                                    class="text-xs font-normal">г/день</span></div>
+                            <span class="text-[10px] text-amber-400">98% от нормы</span>
+                        </div>
+                        <div class="pt-2 border-t border-yam-border">
+                            <span class="text-[10px] text-yam-textMuted block">Дни в цели</span>
+                            <div class="text-sm font-bold text-yam-textPrimary">73% <span
+                                    class="text-xs font-normal">дней</span></div>
+                            <span class="text-[10px] text-yam-textMuted">22 из 30 дней</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- YamHeatmapCell & 7-Day Matrix -->
+                <div class="bg-yam-surface border border-yam-border rounded-xl p-5 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="font-mono text-xs font-semibold text-yam-textPrimary">YamHeatmap
+                            (Регулярность)</span>
+                        <span class="text-[10px] font-mono text-yam-textMuted">7-day weekday matrix</span>
+                    </div>
+
+                    <div class="p-3 bg-yam-bg border border-yam-border rounded-xl space-y-2">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="font-semibold text-yam-textPrimary">Регулярность</span>
+                            <span class="text-[11px] text-emerald-400">22 из 30 в цели</span>
+                        </div>
+                        <!-- Weekday headers -->
+                        <div class="grid grid-cols-7 gap-1 text-center text-[9px] text-yam-textMuted">
+                            <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
+                        </div>
+                        <!-- Heatmap cells sample -->
+                        <div class="grid grid-cols-7 gap-1 text-center text-[10px] font-mono font-medium">
+                            <div class="p-1 rounded bg-lime-500/80 text-black">1</div>
+                            <div class="p-1 rounded bg-lime-500/80 text-black">2</div>
+                            <div class="p-1 rounded bg-yam-elevated text-yam-textMuted">3</div>
+                            <div class="p-1 rounded bg-lime-500/80 text-black">4</div>
+                            <div class="p-1 rounded bg-lime-500/80 text-black">5</div>
+                            <div class="p-1 rounded bg-amber-500/80 text-black">6</div>
+                            <div class="p-1 rounded bg-lime-500/80 text-black">7</div>
+                        </div>
+                        <!-- Legend -->
+                        <div class="flex items-center justify-between pt-2 border-t border-yam-border text-[10px]">
+                            <span class="flex items-center gap-1 text-yam-textSecondary"><span
+                                    class="w-2 h-2 rounded bg-lime-500"></span>В норме</span>
+                            <span class="flex items-center gap-1 text-yam-textSecondary"><span
+                                    class="w-2 h-2 rounded bg-yam-elevated"></span>Недобор</span>
+                            <span class="flex items-center gap-1 text-yam-textSecondary"><span
+                                    class="w-2 h-2 rounded bg-amber-500"></span>Профицит</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- YamChartContainer (Bar chart sample) -->
+                <div class="bg-yam-surface border border-yam-border rounded-xl p-5 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="font-mono text-xs font-semibold text-yam-textPrimary">YamChartContainer</span>
+                        <span class="text-[10px] font-mono text-yam-textMuted">Calorie Bars with Target Line</span>
+                    </div>
+
+                    <div class="p-3 bg-yam-bg border border-yam-border rounded-xl space-y-2">
+                        <div class="flex justify-between items-baseline text-xs">
+                            <div>
+                                <span class="text-xs font-bold text-yam-textPrimary">1 820</span>
+                                <span class="text-[10px] text-yam-textMuted ml-1">ккал среднее</span>
+                            </div>
+                            <span class="text-[10px] text-yam-primary flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-yam-primary"></span>Норма: 1 950 ккал
+                            </span>
+                        </div>
+
+                        <!-- Mini bar chart with dashed target line -->
+                        <div class="relative h-16 flex items-end justify-between gap-1 pt-4">
+                            <!-- Dashed target line -->
+                            <div class="absolute inset-x-0 top-6 border-b border-dashed border-yam-primary/50"></div>
+                            <div class="w-full bg-yam-elevated rounded-t h-8"></div>
+                            <div class="w-full bg-yam-elevated rounded-t h-10"></div>
+                            <div class="w-full bg-amber-500/80 rounded-t h-14"></div>
+                            <div class="w-full bg-yam-elevated rounded-t h-9"></div>
+                            <div class="w-full bg-yam-elevated rounded-t h-7"></div>
+                            <div class="w-full bg-amber-500/80 rounded-t h-14"></div>
+                            <div class="w-full bg-yam-primary rounded-t h-12"></div>
+                        </div>
+                        <div class="flex justify-between text-[9px] text-yam-textMuted pt-1">
+                            <span>19 авг</span>
+                            <span>Сегодня (19 сен)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- 11. LOADING / DISABLED / ERROR STATE MATRIX -->
+        <!-- ========================================================================= -->
+        <section id="matrix" class="scroll-mt-20">
+            <div class="flex items-baseline justify-between border-b border-yam-border pb-3 mb-6">
+                <div>
+                    <h2 class="text-lg font-bold text-yam-textPrimary flex items-center gap-2">
+                        <span>11. State Matrix (Flutter Mobile States)</span>
+                        <span class="spec-badge">State Matrix</span>
+                    </h2>
+                    <p class="text-xs text-yam-textMuted mt-0.5">Comprehensive behavior matrix for mobile touch targets
+                        without desktop-hover reliance.</p>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table
+                    class="w-full border-collapse text-left text-xs bg-yam-surface border border-yam-border rounded-xl">
+                    <thead>
+                        <tr
+                            class="border-b border-yam-border text-yam-textMuted font-mono text-[11px] bg-yam-elevated/40">
+                            <th class="p-3">Component</th>
+                            <th class="p-3">Default</th>
+                            <th class="p-3">Pressed / Active</th>
+                            <th class="p-3">Selected</th>
+                            <th class="p-3">Focused</th>
+                            <th class="p-3">Disabled</th>
+                            <th class="p-3">Error / Invalid</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-yam-border">
+                        <!-- Row: YamPrimaryButton -->
+                        <tr>
+                            <td class="p-3 font-semibold text-yam-textPrimary font-mono">YamPrimaryButton</td>
+                            <td class="p-3"><span
+                                    class="px-2 py-1 rounded bg-yam-primary text-black font-semibold text-[10px]">Solid
+                                    #a78bfa</span></td>
+                            <td class="p-3"><span
+                                    class="px-2 py-1 rounded bg-yam-primaryStrong text-black font-semibold text-[10px]">#8b5cf6</span>
+                            </td>
+                            <td class="p-3 text-yam-textMuted">—</td>
+                            <td class="p-3"><span
+                                    class="px-2 py-1 rounded border border-yam-primary text-yam-primary text-[10px]">Ring</span>
+                            </td>
+                            <td class="p-3"><span
+                                    class="px-2 py-1 rounded bg-yam-elevated text-yam-textMuted text-[10px]">Opacity
+                                    0.5</span></td>
+                            <td class="p-3 text-yam-textMuted">—</td>
+                        </tr>
+
+                        <!-- Row: YamTextField -->
+                        <tr>
+                            <td class="p-3 font-semibold text-yam-textPrimary font-mono">YamTextField</td>
+                            <td class="p-3"><span class="text-[10px] text-yam-textSecondary">Border #27252b</span></td>
+                            <td class="p-3 text-yam-textMuted">—</td>
+                            <td class="p-3 text-yam-textMuted">—</td>
+                            <td class="p-3"><span class="text-[10px] text-yam-primary">Border #a78bfa</span></td>
+                            <td class="p-3"><span class="text-[10px] text-yam-textMuted">Readonly</span></td>
+                            <td class="p-3"><span class="text-[10px] text-yam-error font-medium">Border #f87171</span>
+                            </td>
+                        </tr>
+
+                        <!-- Row: YamProductRow -->
+                        <tr>
+                            <td class="p-3 font-semibold text-yam-textPrimary font-mono">YamProductRow</td>
+                            <td class="p-3"><span class="text-[10px] text-yam-textSecondary">Bg #141316</span></td>
+                            <td class="p-3"><span class="text-[10px] text-yam-textPrimary">Bg #232227</span></td>
+                            <td class="p-3 text-yam-textMuted">—</td>
+                            <td class="p-3 text-yam-textMuted">—</td>
+                            <td class="p-3"><span class="text-[10px] text-yam-textMuted">Muted row</span></td>
+                            <td class="p-3 text-yam-textMuted">—</td>
+                        </tr>
+
+                        <!-- Row: Quick Add Button -->
+                        <tr>
+                            <td class="p-3 font-semibold text-yam-textPrimary font-mono">YamQuickAdd</td>
+                            <td class="p-3"><span class="px-2 py-0.5 rounded bg-yam-elevated text-[10px]">+ 80 г</span>
+                            </td>
+                            <td class="p-3"><span class="px-2 py-0.5 rounded bg-yam-border text-[10px]">Active</span>
+                            </td>
+                            <td class="p-3 text-yam-textMuted">—</td>
+                            <td class="p-3 text-yam-textMuted">—</td>
+                            <td class="p-3"><span class="text-[10px] text-yam-textMuted">Hidden</span></td>
+                            <td class="p-3 text-yam-textMuted">—</td>
+                        </tr>
+
+                        <!-- Row: YamSelect -->
+                        <tr>
+                            <td class="p-3 font-semibold text-yam-textPrimary font-mono">YamSelect</td>
+                            <td class="p-3"><span class="text-[10px] text-yam-textSecondary">Border #27252b</span></td>
+                            <td class="p-3"><span class="text-[10px] text-yam-textPrimary">Bg #232227</span></td>
+                            <td class="p-3"><span class="text-[10px] text-yam-primary">Active option</span></td>
+                            <td class="p-3 text-yam-textMuted">—</td>
+                            <td class="p-3"><span class="text-[10px] text-yam-textMuted">Opacity 0.4</span></td>
+                            <td class="p-3 text-yam-textMuted">—</td>
+                        </tr>
+
+                        <!-- Row: YamChip -->
+                        <tr>
+                            <td class="p-3 font-semibold text-yam-textPrimary font-mono">YamChip</td>
+                            <td class="p-3"><span class="px-2 py-0.5 rounded bg-yam-elevated text-[10px]">Border</span>
+                            </td>
+                            <td class="p-3"><span class="px-2 py-0.5 rounded bg-yam-border text-[10px]">Tap</span></td>
+                            <td class="p-3"><span
+                                    class="px-2 py-0.5 rounded bg-yam-primary text-black font-bold text-[10px]">Solid
+                                    purple</span></td>
+                            <td class="p-3 text-yam-textMuted">—</td>
+                            <td class="p-3"><span class="text-[10px] text-yam-textMuted">Disabled</span></td>
+                            <td class="p-3 text-yam-textMuted">—</td>
+                        </tr>
+
+                        <!-- Row: YamQuantityControl -->
+                        <tr>
+                            <td class="p-3 font-semibold text-yam-textPrimary font-mono">YamQuantityControl</td>
+                            <td class="p-3"><span class="text-[10px] text-yam-textPrimary">[-] 80 [г ▾] [+]</span></td>
+                            <td class="p-3"><span class="text-[10px] text-yam-textPrimary">Stepper active</span></td>
+                            <td class="p-3 text-yam-textMuted">—</td>
+                            <td class="p-3"><span class="text-[10px] text-yam-primary">Numeric edit</span></td>
+                            <td class="p-3"><span class="text-[10px] text-yam-textMuted">Steppers off</span></td>
+                            <td class="p-3"><span class="text-[10px] text-yam-error">0 or &gt;99999</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- FOOTER SPEC SUMMARY -->
+        <footer class="pt-8 border-t border-yam-border text-center text-xs text-yam-textMuted space-y-2">
+            <div class="flex items-center justify-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-yam-primary"></span>
+                <span class="font-semibold text-yam-textPrimary">YAM Design System · Flutter Ready</span>
+            </div>
+            <p>
+                Strict rules: No gradients · No glassmorphism · Protein (Orange) · Fat (Lime) · Carbs (Cyan) · Primary
+                Purple (#a78bfa)
+            </p>
+        </footer>
+
+    </main>
+
+</body>
+
+</html>

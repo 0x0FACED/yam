@@ -5,7 +5,7 @@ import 'package:yam/features/startup/presentation/startup_artwork.dart';
 import 'package:yam/features/startup/presentation/startup_screen.dart';
 
 void main() {
-  testWidgets('keeps the full animation visible for two seconds', (
+  testWidgets('keeps the full animation visible for its configured duration', (
     tester,
   ) async {
     var finished = false;
@@ -20,10 +20,10 @@ void main() {
     );
 
     await tester.pump(const Duration(milliseconds: 1));
-    await tester.pump(const Duration(seconds: 1));
+    await tester.pump(const Duration(milliseconds: 700));
     expect(finished, isFalse);
 
-    await tester.pump(AppMotion.logoIntro - const Duration(seconds: 1));
+    await tester.pump(AppMotion.logoIntro - const Duration(milliseconds: 700));
     expect(finished, isTrue);
   });
 

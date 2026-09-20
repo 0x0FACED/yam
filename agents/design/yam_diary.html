@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="ru">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+        name="viewport" />
+    <meta content="mobile_tab" name="shell-type" />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <style>
+        @layer base {
+
+            html,
+            body {
+                width: 100%;
+                margin: 0;
+                padding: 0;
+                background-color: #141316;
+                color: #e6e1e5;
+            }
+
+            body {
+                overscroll-behavior: none;
+            }
+
+            .pb-safe {
+                padding-bottom: env(safe-area-inset-bottom, 0px);
+            }
+
+            .pt-safe {
+                padding-top: env(safe-area-inset-top, 0px);
+            }
+
+            main>:first-child {
+                margin-top: 0 !important;
+            }
+
+            main>:last-child {
+                margin-bottom: 0 !important;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script
+        id="tailwind-config">tailwind.config = { "darkMode": "class", "theme": { "extend": { "colors": { "on-error-container": "#ffdad6", "surface-container-lowest": "#0f0e11", "on-tertiary-container": "#223b00", "surface-bright": "#3a383c", "secondary-container": "#ec6a06", "tertiary-container": "#6eae00", "inverse-on-surface": "#313033", "surface-container-highest": "#363437", "on-tertiary-fixed-variant": "#304f00", "on-surface": "#e6e1e5", "inverse-primary": "#674bb5", "surface-variant": "#363437", "primary-container": "#a78bfa", "error": "#ffb4ab", "on-primary-container": "#3c1989", "outline-variant": "#494552", "surface-container": "#201f22", "on-tertiary": "#1f3700", "surface-container-high": "#2b292d", "primary-fixed": "#e8ddff", "tertiary-fixed": "#acf847", "outline": "#948e9d", "on-error": "#690005", "secondary": "#ffb690", "on-background": "#e6e1e5", "secondary-fixed": "#ffdbca", "primary-fixed-dim": "#cebdff", "on-secondary-fixed-variant": "#783200", "on-primary": "#381385", "inverse-surface": "#e6e1e5", "surface": "#141316", "on-surface-variant": "#cac4d4", "tertiary-fixed-dim": "#91db2a", "on-secondary-container": "#4a1c00", "background": "#141316", "on-tertiary-fixed": "#102000", "on-primary-fixed-variant": "#4f319c", "surface-tint": "#cebdff", "surface-container-low": "#1c1b1e", "tertiary": "#91db2a", "on-primary-fixed": "#21005e", "surface-dim": "#141316", "primary": "#cebdff", "on-secondary": "#552100", "error-container": "#93000a", "on-secondary-fixed": "#341100", "secondary-fixed-dim": "#ffb690" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "gutter": "0.75rem", "margin": "1rem", "space-xs": "0.25rem", "space-lg": "1rem", "space-sm": "0.5rem", "space-xl": "1.5rem", "space-md": "0.75rem" }, "fontFamily": { "body-md": ["Inter"], "body-sm": ["Inter"], "label-lg": ["Inter"], "headline-sm": ["Inter"], "body-lg": ["Inter"], "label-md": ["Inter"], "headline-lg-mobile": ["Inter"], "headline-md": ["Inter"], "label-sm": ["Inter"], "headline-lg": ["Inter"] }, "fontSize": { "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }], "label-lg": ["14px", { "lineHeight": "18px", "fontWeight": "600" }], "headline-sm": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "body-lg": ["16px", { "lineHeight": "22px", "letterSpacing": "-0.005em", "fontWeight": "400" }], "label-md": ["12px", { "lineHeight": "16px", "fontWeight": "500" }], "headline-lg-mobile": ["28px", { "lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "headline-md": ["22px", { "lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "600" }], "label-sm": ["10px", { "lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500" }], "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }] } } } }</script>
+</head>
+
+<body
+    class="bg-surface font-body-md text-on-surface flex flex-col min-h-screen selection:bg-primary-container selection:text-on-primary-container">
+    <header class="fixed top-0 inset-x-0 z-50 bg-surface/90 backdrop-blur-xl border-b border-white/5 pt-safe">
+        <div class="h-12 px-4 flex items-center justify-between">
+            <div class="flex items-center gap-2"><img alt="YAM" class="w-7 h-7 object-contain"
+                    src="https://lh3.googleusercontent.com/aida/AEtjO1UH-_GzjFc1TOU3Arm39TGD50k1IbHxC7U2nJnPf7IaI5tuYH3MfWqWQedufRak_t7LNAQEa4hpKPpnB18wYWgsPjvjnI_zjygk5a2LmOv5NIfUDojYFjFg_smUfhe3SEGMN7jfVcP2-lU7lPolDvVa3GteBHh5JsuGiNeGDg1NRvyFqfIoVAWBedlBh-lgwsYJTrvb_ioP-LBVWm6bnPXm2DJLf3cKiuEFbav4J_nwgk3QGj6PavQCyKM" /><span
+                    class="font-headline-sm text-[17px] tracking-tight text-white font-bold">YAM</span></div>
+            <div
+                class="w-7 h-7 rounded-full bg-surface-container-high border border-white/10 flex items-center justify-center">
+                <span class="material-symbols-outlined text-zinc-300 text-[16px]">person</span></div>
+        </div>
+    </header>
+    <main class="flex flex-col relative w-full px-4 pt-14 pb-24 bg-surface flex-1">
+        <div class="flex flex-col w-full pb-4 select-none">
+            <!-- Date Navigation & Calendar Strip -->
+            <section class="flex flex-col my-2">
+                <!-- Header: Current Date & Day Selectors -->
+                <div class="flex items-center justify-between px-1 mb-2">
+                    <button aria-label="Предыдущий день"
+                        class="w-7 h-7 rounded-full flex items-center justify-center text-zinc-400 hover:text-white transition-colors active:scale-95">
+                        <span class="material-symbols-outlined text-[18px]">chevron_left</span>
+                    </button>
+                    <div class="flex flex-col items-center">
+                        <span class="text-sm text-white font-semibold tracking-tight">Сегодня</span>
+                        <span class="text-[11px] text-zinc-400">19 сентября, суббота</span>
+                    </div>
+                    <button aria-label="Следующий день"
+                        class="w-7 h-7 rounded-full flex items-center justify-center text-zinc-400 hover:text-white transition-colors active:scale-95">
+                        <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+                    </button>
+                </div>
+                <!-- 7-Day Horizontal Mini Strip -->
+                <div class="grid grid-cols-7 gap-1">
+                    <button
+                        class="flex flex-col items-center py-1.5 px-0.5 rounded-xl transition-colors active:scale-95">
+                        <span class="text-[10px] text-zinc-400 mb-0.5">пн</span>
+                        <span class="text-xs text-white font-medium">14</span>
+                    </button>
+                    <button
+                        class="flex flex-col items-center py-1.5 px-0.5 rounded-xl transition-colors active:scale-95">
+                        <span class="text-[10px] text-zinc-400 mb-0.5">вт</span>
+                        <span class="text-xs text-white font-medium">15</span>
+                    </button>
+                    <button
+                        class="flex flex-col items-center py-1.5 px-0.5 rounded-xl transition-colors active:scale-95">
+                        <span class="text-[10px] text-zinc-400 mb-0.5">ср</span>
+                        <span class="text-xs text-white font-medium">16</span>
+                    </button>
+                    <button
+                        class="flex flex-col items-center py-1.5 px-0.5 rounded-xl transition-colors active:scale-95">
+                        <span class="text-[10px] text-zinc-400 mb-0.5">чт</span>
+                        <span class="text-xs text-white font-medium">17</span>
+                    </button>
+                    <button
+                        class="flex flex-col items-center py-1.5 px-0.5 rounded-xl transition-colors active:scale-95">
+                        <span class="text-[10px] text-zinc-400 mb-0.5">пт</span>
+                        <span class="text-xs text-white font-medium">18</span>
+                    </button>
+                    <!-- Active Day (Saturday 19) -->
+                    <button
+                        class="flex flex-col items-center py-1.5 px-0.5 rounded-xl bg-[#a78bfa] text-black shadow-sm active:scale-95">
+                        <span class="text-[10px] font-semibold mb-0.5 text-black/80">сб</span>
+                        <span class="text-xs font-bold text-black">19</span>
+                    </button>
+                    <button
+                        class="flex flex-col items-center py-1.5 px-0.5 rounded-xl transition-colors active:scale-95">
+                        <span class="text-[10px] text-zinc-400 mb-0.5">вс</span>
+                        <span class="text-xs text-white font-medium">20</span>
+                    </button>
+                </div>
+            </section>
+            <!-- Energy & Macro Summary Card -->
+            <section class="bg-[#1a191d] border border-white/5 rounded-2xl p-4 shadow-sm my-3">
+                <!-- Top Row: Consumed and Mascot -->
+                <div class="flex items-start justify-between mb-1">
+                    <div>
+                        <span class="text-xs text-zinc-400 block mb-0.5">Съедено</span>
+                        <div class="flex items-baseline gap-1.5">
+                            <span class="text-2xl font-bold text-white tracking-tight">1 840</span>
+                            <span class="text-sm text-zinc-400">/ 2 200 ккал</span>
+                        </div>
+                    </div>
+                    <!-- Mascot Mini -->
+                    <img alt="YAM Mascot" class="w-9 h-9 object-contain"
+                        src="https://lh3.googleusercontent.com/aida/AEtjO1UH-_GzjFc1TOU3Arm39TGD50k1IbHxC7U2nJnPf7IaI5tuYH3MfWqWQedufRak_t7LNAQEa4hpKPpnB18wYWgsPjvjnI_zjygk5a2LmOv5NIfUDojYFjFg_smUfhe3SEGMN7jfVcP2-lU7lPolDvVa3GteBHh5JsuGiNeGDg1NRvyFqfIoVAWBedlBh-lgwsYJTrvb_ioP-LBVWm6bnPXm2DJLf3cKiuEFbav4J_nwgk3QGj6PavQCyKM" />
+                </div>
+                <!-- Remaining Calories Subtitle -->
+                <div class="text-xs text-[#cebdff] font-medium mb-3">
+                    Осталось 360 ккал
+                </div>
+                <!-- Calorie Progress Bar -->
+                <div class="w-full h-2 rounded-full bg-surface-container-highest overflow-hidden mb-3.5">
+                    <div class="h-full rounded-full bg-[#a78bfa]" style="width: 83.6%;"></div>
+                </div>
+                <!-- Macro Trio Split -->
+                <div class="grid grid-cols-3 gap-3 pt-0.5">
+                    <!-- Protein -->
+                    <div class="flex flex-col">
+                        <span class="text-[11px] text-zinc-400 mb-0.5">Белки</span>
+                        <div class="flex items-baseline gap-1 mb-1">
+                            <span class="text-xs text-white font-semibold">126</span>
+                            <span class="text-[10px] text-zinc-400">/ 160 г</span>
+                        </div>
+                        <div class="w-full h-1.5 rounded-full bg-surface-container-highest overflow-hidden">
+                            <div class="h-full rounded-full bg-[#F97316]" style="width: 78.7%;"></div>
+                        </div>
+                    </div>
+                    <!-- Fat -->
+                    <div class="flex flex-col">
+                        <span class="text-[11px] text-zinc-400 mb-0.5">Жиры</span>
+                        <div class="flex items-baseline gap-1 mb-1">
+                            <span class="text-xs text-white font-semibold">61</span>
+                            <span class="text-[10px] text-zinc-400">/ 75 г</span>
+                        </div>
+                        <div class="w-full h-1.5 rounded-full bg-surface-container-highest overflow-hidden">
+                            <div class="h-full rounded-full bg-[#84CC16]" style="width: 81.3%;"></div>
+                        </div>
+                    </div>
+                    <!-- Carbs -->
+                    <div class="flex flex-col">
+                        <span class="text-[11px] text-zinc-400 mb-0.5">Углеводы</span>
+                        <div class="flex items-baseline gap-1 mb-1">
+                            <span class="text-xs text-white font-semibold">184</span>
+                            <span class="text-[10px] text-zinc-400">/ 230 г</span>
+                        </div>
+                        <div class="w-full h-1.5 rounded-full bg-surface-container-highest overflow-hidden">
+                            <div class="h-full rounded-full bg-[#06B6D4]" style="width: 80%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- Meal Groups (Food Diary) -->
+            <div class="flex flex-col gap-3 mt-1">
+                <!-- Breakfast (Завтрак) -->
+                <div class="bg-[#1a191d] border border-white/5 rounded-2xl p-3.5 shadow-sm">
+                    <div class="flex items-center justify-between pb-2 mb-1 border-b border-white/5">
+                        <div class="flex items-center gap-2">
+                            <span class="text-base text-white font-semibold">Завтрак</span>
+                            <span
+                                class="text-[10px] bg-white/5 text-zinc-400 px-1.5 py-0.5 rounded font-medium">8:30</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm text-zinc-200 font-medium">482 <span
+                                    class="text-zinc-400 text-xs">ккал</span></span>
+                            <button aria-label="Добавить в завтрак"
+                                class="w-6 h-6 rounded-md bg-white/5 flex items-center justify-center text-zinc-300 hover:text-white active:scale-95 transition-colors">
+                                <span class="material-symbols-outlined text-[16px]">add</span>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Food Items List -->
+                    <div class="flex flex-col">
+                        <!-- Item 1 -->
+                        <div class="flex items-center justify-between py-2 border-b border-white/5">
+                            <div class="flex flex-col min-w-0 pr-2">
+                                <span class="text-sm font-medium text-white truncate">Яйца куриные вареные</span>
+                                <span class="text-xs text-zinc-400">3 шт. (150 г)</span>
+                            </div>
+                            <span class="text-sm font-medium text-zinc-200 whitespace-nowrap">216 ккал</span>
+                        </div>
+                        <!-- Item 2 -->
+                        <div class="flex items-center justify-between py-2 border-b border-white/5">
+                            <div class="flex flex-col min-w-0 pr-2">
+                                <span class="text-sm font-medium text-white truncate">Хлеб цельнозерновой</span>
+                                <span class="text-xs text-zinc-400">80 г</span>
+                            </div>
+                            <span class="text-sm font-medium text-zinc-200 whitespace-nowrap">190 ккал</span>
+                        </div>
+                        <!-- Item 3 -->
+                        <div class="flex items-center justify-between py-2">
+                            <div class="flex flex-col min-w-0 pr-2">
+                                <span class="text-sm font-medium text-white truncate">Молоко пастеризованное 2,5%</span>
+                                <span class="text-xs text-zinc-400">150 мл</span>
+                            </div>
+                            <span class="text-sm font-medium text-zinc-200 whitespace-nowrap">76 ккал</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Lunch (Обед) -->
+                <div class="bg-[#1a191d] border border-white/5 rounded-2xl p-3.5 shadow-sm">
+                    <div class="flex items-center justify-between pb-2 mb-1 border-b border-white/5">
+                        <div class="flex items-center gap-2">
+                            <span class="text-base text-white font-semibold">Обед</span>
+                            <span
+                                class="text-[10px] bg-white/5 text-zinc-400 px-1.5 py-0.5 rounded font-medium">13:15</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm text-zinc-200 font-medium">711 <span
+                                    class="text-zinc-400 text-xs">ккал</span></span>
+                            <button aria-label="Добавить в обед"
+                                class="w-6 h-6 rounded-md bg-white/5 flex items-center justify-center text-zinc-300 hover:text-white active:scale-95 transition-colors">
+                                <span class="material-symbols-outlined text-[16px]">add</span>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Food Items List -->
+                    <div class="flex flex-col">
+                        <div class="flex items-center justify-between py-2 border-b border-white/5">
+                            <div class="flex flex-col min-w-0 pr-2">
+                                <span class="text-sm font-medium text-white truncate">Куриное филе гриль</span>
+                                <span class="text-xs text-zinc-400">180 г</span>
+                            </div>
+                            <span class="text-sm font-medium text-zinc-200 whitespace-nowrap">297 ккал</span>
+                        </div>
+                        <div class="flex items-center justify-between py-2 border-b border-white/5">
+                            <div class="flex flex-col min-w-0 pr-2">
+                                <span class="text-sm font-medium text-white truncate">Гречневая каша рассыпчатая</span>
+                                <span class="text-xs text-zinc-400">150 г</span>
+                            </div>
+                            <span class="text-sm font-medium text-zinc-200 whitespace-nowrap">188 ккал</span>
+                        </div>
+                        <div class="flex items-center justify-between py-2 border-b border-white/5">
+                            <div class="flex flex-col min-w-0 pr-2">
+                                <span class="text-sm font-medium text-white truncate">Салат со свежими овощами</span>
+                                <span class="text-xs text-zinc-400">200 г</span>
+                            </div>
+                            <span class="text-sm font-medium text-zinc-200 whitespace-nowrap">110 ккал</span>
+                        </div>
+                        <div class="flex items-center justify-between py-2">
+                            <div class="flex flex-col min-w-0 pr-2">
+                                <span class="text-sm font-medium text-white truncate">Оливковое масло Extra
+                                    Virgin</span>
+                                <span class="text-xs text-zinc-400">12 г</span>
+                            </div>
+                            <span class="text-sm font-medium text-zinc-200 whitespace-nowrap">116 ккал</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Dinner (Ужин) -->
+                <div class="bg-[#1a191d] border border-white/5 rounded-2xl p-3.5 shadow-sm">
+                    <div class="flex items-center justify-between pb-2 mb-1 border-b border-white/5">
+                        <div class="flex items-center gap-2">
+                            <span class="text-base text-white font-semibold">Ужин</span>
+                            <span
+                                class="text-[10px] bg-white/5 text-zinc-400 px-1.5 py-0.5 rounded font-medium">19:20</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm text-zinc-200 font-medium">512 <span
+                                    class="text-zinc-400 text-xs">ккал</span></span>
+                            <button aria-label="Добавить в ужин"
+                                class="w-6 h-6 rounded-md bg-white/5 flex items-center justify-center text-zinc-300 hover:text-white active:scale-95 transition-colors">
+                                <span class="material-symbols-outlined text-[16px]">add</span>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Food Items List -->
+                    <div class="flex flex-col">
+                        <div class="flex items-center justify-between py-2 border-b border-white/5">
+                            <div class="flex flex-col min-w-0 pr-2">
+                                <span class="text-sm font-medium text-white truncate">Филе лосося на пару</span>
+                                <span class="text-xs text-zinc-400">160 г</span>
+                            </div>
+                            <span class="text-sm font-medium text-zinc-200 whitespace-nowrap">324 ккал</span>
+                        </div>
+                        <div class="flex items-center justify-between py-2 border-b border-white/5">
+                            <div class="flex flex-col min-w-0 pr-2">
+                                <span class="text-sm font-medium text-white truncate">Овощи на пару (брокколи,
+                                    морковь)</span>
+                                <span class="text-xs text-zinc-400">200 г</span>
+                            </div>
+                            <span class="text-sm font-medium text-zinc-200 whitespace-nowrap">98 ккал</span>
+                        </div>
+                        <div class="flex items-center justify-between py-2">
+                            <div class="flex flex-col min-w-0 pr-2">
+                                <span class="text-sm font-medium text-white truncate">Авокадо Хасс</span>
+                                <span class="text-xs text-zinc-400">50 г</span>
+                            </div>
+                            <span class="text-sm font-medium text-zinc-200 whitespace-nowrap">90 ккал</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Snack (Перекус) -->
+                <div class="bg-[#1a191d] border border-white/5 rounded-2xl p-3.5 shadow-sm">
+                    <div class="flex items-center justify-between pb-2 mb-1 border-b border-white/5">
+                        <div class="flex items-center gap-2">
+                            <span class="text-base text-white font-semibold">Перекус</span>
+                            <span
+                                class="text-[10px] bg-white/5 text-zinc-400 px-1.5 py-0.5 rounded font-medium">16:40</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm text-zinc-200 font-medium">135 <span
+                                    class="text-zinc-400 text-xs">ккал</span></span>
+                            <button aria-label="Добавить в перекус"
+                                class="w-6 h-6 rounded-md bg-white/5 flex items-center justify-center text-zinc-300 hover:text-primary active:scale-95 transition-colors">
+                                <span class="material-symbols-outlined text-[16px]">add</span>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Food Items List -->
+                    <div class="flex flex-col">
+                        <div class="flex items-center justify-between py-2 border-b border-white/5">
+                            <div class="flex flex-col min-w-0 pr-2">
+                                <span class="text-sm font-medium text-white truncate">Греческий йогурт натуральный
+                                    2%</span>
+                                <span class="text-xs text-zinc-400">120 г</span>
+                            </div>
+                            <span class="text-sm font-medium text-zinc-200 whitespace-nowrap">85 ккал</span>
+                        </div>
+                        <div class="flex items-center justify-between py-2">
+                            <div class="flex flex-col min-w-0 pr-2">
+                                <span class="text-sm font-medium text-white truncate">Яблоко зеленое Семеренко</span>
+                                <span class="text-xs text-zinc-400">100 г</span>
+                            </div>
+                            <span class="text-sm font-medium text-zinc-200 whitespace-nowrap">50 ккал</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Water & Hydration Quick Tracker -->
+            <section
+                class="mt-4 bg-[#1a191d] border border-white/5 rounded-2xl p-3.5 flex items-center justify-between shadow-sm">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center text-[#06B6D4]">
+                        <span class="material-symbols-outlined text-[20px]">water_drop</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-sm text-white font-semibold leading-tight">Вода</span>
+                        <span class="text-xs text-zinc-400 leading-tight">1 750 / 2 200 мл</span>
+                    </div>
+                </div>
+                <button
+                    class="px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white text-xs font-medium active:scale-95 transition-transform flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[15px] text-[#06B6D4]">add</span> 250 мл
+                </button>
+            </section>
+        </div>
+        <script>
+            document.querySelectorAll('button').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    this.classList.add('scale-95');
+                    setTimeout(() => this.classList.remove('scale-95'), 120);
+                });
+            });
+        </script>
+    </main>
+    <nav class="fixed bottom-0 inset-x-0 z-50 pb-safe bg-surface/90 backdrop-blur-xl border-t border-white/5"
+        data-active-classes="text-primary-container font-semibold">
+        <div class="flex justify-around items-center h-14 px-space-xs"><a aria-current="page"
+                class="flex flex-col items-center justify-center min-w-[64px] h-11 rounded-xl transition-colors text-[#a78bfa] font-semibold"
+                data-path="diary" href="#"><span class="material-symbols-outlined text-[22px]">menu_book</span><span
+                    class="text-[11px] mt-0.5">Дневник</span></a><a
+                class="flex flex-col items-center justify-center min-w-[64px] h-11 rounded-xl text-zinc-400 hover:text-white transition-colors"
+                data-path="statistics" href="#"><span
+                    class="material-symbols-outlined text-[22px]">bar_chart</span><span
+                    class="text-[11px] mt-0.5">Статистика</span></a><a
+                class="flex flex-col items-center justify-center min-w-[64px] h-11 rounded-xl text-zinc-400 hover:text-white transition-colors"
+                data-path="settings" href="#"><span class="material-symbols-outlined text-[22px]">tune</span><span
+                    class="text-[11px] mt-0.5">Настройки</span></a></div>
+    </nav>
+</body>
+
+</html>

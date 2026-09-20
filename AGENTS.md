@@ -25,6 +25,33 @@ Remove obsolete status rather than appending a session diary. Keep the file unde
 
 Create `docs/adr/NNNN-short-title.md` before or with a decision that changes product behavior, persisted data, architecture boundaries, dependency strategy, design tokens, or performance policy. An ADR supersedes a conflicting older ADR or blueprint detail only when it explicitly says so.
 
+## Design References
+
+Approved visual references live under `agents/design/`.
+
+For tasks that create or modify UI:
+
+1. Read the relevant accepted design ADRs first.
+2. Inspect `agents/design/design-system.html`.
+3. Inspect the HTML reference for the screen being implemented.
+4. Inspect existing Flutter theme tokens and reusable UI components.
+5. Inspect the current feature implementation and tests.
+
+The HTML files are visual specifications, not production code and not architectural examples.
+
+Do not copy:
+- Tailwind/CSS structure;
+- arbitrary inline colours or spacing values;
+- fake OS/status/navigation chrome;
+- browser-specific behaviour;
+- accidental inconsistencies between generated HTML files.
+
+When an HTML reference conflicts with an accepted ADR or the canonical Flutter design tokens, the ADR/tokens win.
+
+Do not redesign an approved reference unless the user explicitly asks for a design change.
+
+Reuse existing YAM components and semantic theme tokens. If a visual pattern is repeated across approved screens and no reusable Flutter component exists yet, promote it into the shared UI layer before duplicating it in features.
+
 ## Product Priorities
 
 Use this ordering for trade-offs:
@@ -53,7 +80,10 @@ Do not add a feature unless it makes tracking faster, simpler, or more accurate.
 
 - Follow the repository lints and idiomatic modern Dart. Prefer small immutable models, explicit types where they improve clarity, `const` widgets, and focused providers.
 - Put reusable visual tokens in `lib/app/theme` and reuse them. Colours, typography, spacing, shape, elevation, and motion must not be duplicated as ad-hoc literals across features.
-- Add a component to `lib/core/ui` only after a real repeated need. Do not create a generic design system for one screen.
+- Add a component to `lib/core/ui` only after a real repeated need. Do not create a generic design system for one screen. The approved screen set now constitutes repeated need for shared YAM
+form, navigation, feedback, list, and nutrition primitives.
+Do not wait for duplicate feature implementations before extracting
+an already-established repeated pattern.
 - Define animation timings and curves centrally before introducing product animation. Motion must be short, purposeful, interruptible where needed, and respect `MediaQuery.disableAnimations` or accessibility settings. Never use animation to hide loading or slow input.
 - Design for touch, keyboard, mouse, screen readers, text scaling, light/dark/system themes, portrait/landscape, narrow phones, tablets, and wide desktop windows. Use constraints and `LayoutBuilder`; avoid fragile fixed screen sizes.
 - Navigation must adapt rather than stretch a phone layout. The expected direction is bottom navigation on compact layouts and a rail/sidebar on wider layouts.

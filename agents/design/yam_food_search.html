@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+
+<html class="dark h-full bg-[#121114]" lang="ru">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+        name="viewport" />
+    <title>YAM — Поиск продукта</title>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <!-- Tailwind CSS v3 -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                    },
+                    colors: {
+                        yam: {
+                            bg: '#141316',
+                            surface: '#1c1b1f',
+                            elevated: '#232227',
+                            border: '#27252b',
+                            accent: '#a78bfa',
+                            'accent-strong': '#8b5cf6',
+                            'accent-subtle': 'rgba(167, 139, 250, 0.12)',
+                            protein: '#fb923c',
+                            fat: '#a3e635',
+                            carbs: '#38bdf8',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style data-purpose="base-enhancements">
+        /* Remove tap highlight & scrollbars for native app feeling */
+        * {
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        input {
+            user-select: text;
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* iOS Safe Area Padding Support */
+        .pt-safe {
+            padding-top: env(safe-area-inset-top, 12px);
+        }
+
+        .pb-safe {
+            padding-bottom: env(safe-area-inset-bottom, 20px);
+        }
+    </style>
+</head>
+
+<body class="h-full bg-[#141316] text-[#f4f4f5] font-sans antialiased overflow-hidden flex flex-col justify-between">
+    <!-- BEGIN: MainContentContainer -->
+    <div class="flex-1 flex flex-col h-full overflow-hidden max-w-md mx-auto w-full relative">
+        <!-- BEGIN: TopHeaderSection -->
+        <header class="pt-safe px-4 pt-3 pb-2.5 bg-[#141316] border-b border-[#242229] shrink-0 z-20"
+            data-purpose="search-header">
+            <!-- Search Bar Row -->
+            <div class="flex items-center gap-2.5">
+                <!-- Back Button -->
+                <button aria-label="Назад"
+                    class="w-10 h-10 -ml-1.5 flex items-center justify-center rounded-full text-zinc-300 hover:text-white active:bg-white/10 transition-colors"
+                    type="button">
+                    <svg class="w-6 h-6 stroke-[2.2]" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                        <path d="M15.75 19.5L8.25 12l7.5-7.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                    </svg>
+                </button>
+                <!-- Search Input Field -->
+                <div class="relative flex-1 flex items-center">
+                    <span class="absolute left-3.5 text-zinc-400 pointer-events-none flex items-center">
+                        <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" stroke-width="2.2"
+                            viewbox="0 0 24 24">
+                            <path d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                                stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                    </span>
+                    <input
+                        class="w-full h-11 bg-[#1e1d22] text-sm text-white placeholder-zinc-500 rounded-2xl pl-10 pr-11 border border-transparent focus:border-purple-400/50 focus:bg-[#222127] focus:outline-none focus:ring-0 transition-all font-normal"
+                        placeholder="Поиск продукта или блюда..." type="search" value="" />
+                    <!-- Barcode Scanner Quick Button inside search field -->
+                    <button aria-label="Сканировать штрихкод"
+                        class="absolute right-1.5 w-8 h-8 flex items-center justify-center text-zinc-400 hover:text-purple-300 active:scale-95 transition"
+                        type="button">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24">
+                            <path
+                                d="M3.75 4.5v3m0 9v3m16.5-15v3m0 9v3M3 12h18M6.75 7.5v9M9.75 7.5v9M14.25 7.5v9M17.25 7.5v9"
+                                stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                    </button>
+                </div>
+                <!-- Mini Brand Logo -->
+            </div>
+            <!-- Controls Subheader (Meal Selector & Create Product) -->
+            <div class="flex items-center justify-between mt-2.5 pt-1">
+                <!-- Meal Selector Pill -->
+                <button
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#201e25] border border-[#2d2a34] text-xs font-medium text-zinc-200 active:scale-95 active:bg-[#27252f] transition-all"
+                    type="button">
+                    <span class="text-amber-400 text-[13px] leading-none">☀️</span>
+                    <span>Приём: <strong class="font-semibold text-white">Завтрак</strong></span>
+                    <svg class="w-3.5 h-3.5 text-zinc-400 ml-0.5" fill="none" stroke="currentColor" stroke-width="2.2"
+                        viewbox="0 0 24 24">
+                        <path d="M19.5 8.25l-7.5 7.5-7.5-7.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                    </svg>
+                </button>
+                <!-- Create Custom Product Action -->
+                <button
+                    class="inline-flex items-center gap-1.5 text-xs font-medium text-purple-300/90 hover:text-purple-200 active:opacity-75 transition-colors py-1 px-1.5"
+                    type="button">
+                    <svg class="w-3.5 h-3.5 stroke-[2.4]" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                        <path d="M12 4.5v15m7.5-7.5h-15" stroke-linecap="round" stroke-linejoin="round"></path>
+                    </svg>
+                    <span>Создать продукт</span>
+                </button>
+            </div>
+            <!-- Navigation Tabs / Category Chips -->
+            <nav aria-label="Фильтры базы продуктов"
+                class="flex items-center gap-2 mt-3 overflow-x-auto no-scrollbar pb-0.5">
+                <button
+                    class="px-3.5 py-1 rounded-full text-xs font-semibold bg-purple-500/15 text-purple-300 border border-purple-500/30 whitespace-nowrap shadow-sm shadow-purple-950/40"
+                    type="button">Для вас</button>
+                <button
+                    class="px-3.5 py-1 rounded-full text-xs font-medium bg-[#1d1c21] text-zinc-400 border border-[#27252c] hover:text-zinc-200 whitespace-nowrap active:bg-[#24232a] transition-colors"
+                    type="button">
+                    Недавние
+                </button>
+                <button
+                    class="px-3.5 py-1 rounded-full text-xs font-medium bg-[#1d1c21] text-zinc-400 border border-[#27252c] hover:text-zinc-200 whitespace-nowrap active:bg-[#24232a] transition-colors"
+                    type="button">
+                    Мои блюда
+                </button>
+                <button
+                    class="px-3.5 py-1 rounded-full text-xs font-medium bg-[#1d1c21] text-zinc-400 border border-[#27252c] hover:text-zinc-200 whitespace-nowrap active:bg-[#24232a] transition-colors"
+                    type="button">
+                    Избранное
+                </button>
+            </nav>
+        </header>
+        <!-- END: TopHeaderSection -->
+        <!-- BEGIN: ProductScrollArea -->
+        <main class="flex-1 overflow-y-auto no-scrollbar pb-24 divide-y divide-[#211f26]">
+            <!-- SECTION: Frequently Added -->
+            <section class="pt-2" data-purpose="frequently-added-list">
+                <div class="px-4 py-2 flex items-center justify-between">
+                    <h2 class="text-base font-bold tracking-tight text-white flex items-center gap-1.5"><span>Часто на
+                            завтрак</span></h2>
+                </div>
+                <div class="divide-y divide-[#1e1d24]">
+                    <!-- Product Item 1: Овсяные хлопья -->
+                    <article
+                        class="px-4 py-3 flex items-center justify-between hover:bg-white/[0.02] active:bg-white/[0.04] transition-colors cursor-pointer group">
+                        <div class="flex-1 min-w-0 pr-3">
+                            <div class="flex items-center gap-1.5">
+                                <span class="font-semibold text-[15px] text-white tracking-tight truncate">Овсяные
+                                    хлопья</span>
+                                <!-- Verified Badge -->
+                                <svg class="w-3.5 h-3.5 text-purple-400 shrink-0" fill="currentColor"
+                                    viewbox="0 0 24 24">
+                                    <path clip-rule="evenodd"
+                                        d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
+                                        fill-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <div class="text-xs text-zinc-400 mt-0.5 flex items-center gap-1.5 truncate"><span>YAM
+                                    Basics</span></div>
+                            <!-- Calories and Macros -->
+                            <div class="mt-1.5 flex items-center gap-2 text-xs flex-wrap">
+                                <span class="font-medium text-zinc-200">366 ккал <span
+                                        class="text-zinc-500 font-normal">/ 100 г</span></span>
+                                <span class="text-zinc-700">•</span>
+                                <div class="flex items-center gap-2 font-mono text-[11px]">
+                                    <span class="flex items-center gap-0.5 text-zinc-300">
+                                        <span class="text-[#fb923c] font-semibold font-sans">Б</span> 12,3
+                                    </span>
+                                    <span class="flex items-center gap-0.5 text-zinc-300">
+                                        <span class="text-[#a3e635] font-semibold font-sans">Ж</span> 6,1
+                                    </span>
+                                    <span class="flex items-center gap-0.5 text-zinc-300">
+                                        <span class="text-[#38bdf8] font-semibold font-sans">У</span> 59,5
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Quick Add Button -->
+                        <button
+                            class="shrink-0 bg-[#201f25] hover:bg-[#282630] active:scale-95 border border-[#2f2c38] text-purple-300 text-xs font-semibold px-3.5 py-2 rounded-xl transition-all shadow-sm"
+                            type="button">
+                            + 80 г
+                        </button>
+                    </article>
+                    <!-- Product Item 2: Молоко 2,5% -->
+                    <article
+                        class="px-4 py-3 flex items-center justify-between hover:bg-white/[0.02] active:bg-white/[0.04] transition-colors cursor-pointer group">
+                        <div class="flex-1 min-w-0 pr-3">
+                            <div class="flex items-center gap-1.5">
+                                <span class="font-semibold text-[15px] text-white tracking-tight truncate">Молоко
+                                    2,5%</span>
+                                <svg class="w-3.5 h-3.5 text-purple-400 shrink-0" fill="currentColor"
+                                    viewbox="0 0 24 24">
+                                    <path clip-rule="evenodd"
+                                        d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
+                                        fill-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <div class="text-xs text-zinc-400 mt-0.5 flex items-center gap-1.5 truncate"><span>Домик в
+                                    деревне</span></div>
+                            <!-- Calories and Macros -->
+                            <div class="mt-1.5 flex items-center gap-2 text-xs flex-wrap">
+                                <span class="font-medium text-zinc-200">52 ккал <span
+                                        class="text-zinc-500 font-normal">/ 100 мл</span></span>
+                                <span class="text-zinc-700">•</span>
+                                <div class="flex items-center gap-2 font-mono text-[11px]">
+                                    <span class="flex items-center gap-0.5 text-zinc-300">
+                                        <span class="text-[#fb923c] font-semibold font-sans">Б</span> 2,8
+                                    </span>
+                                    <span class="flex items-center gap-0.5 text-zinc-300">
+                                        <span class="text-[#a3e635] font-semibold font-sans">Ж</span> 2,5
+                                    </span>
+                                    <span class="flex items-center gap-0.5 text-zinc-300">
+                                        <span class="text-[#38bdf8] font-semibold font-sans">У</span> 4,7
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Quick Add Button -->
+                        <button
+                            class="shrink-0 bg-[#201f25] hover:bg-[#282630] active:scale-95 border border-[#2f2c38] text-purple-300 text-xs font-semibold px-3 py-2 rounded-xl transition-all shadow-sm"
+                            type="button">
+                            + 150 мл
+                        </button>
+                    </article>
+                    <!-- Product Item 3: Сывороточный протеин -->
+                    <article
+                        class="px-4 py-3 flex items-center justify-between hover:bg-white/[0.02] active:bg-white/[0.04] transition-colors cursor-pointer group">
+                        <div class="flex-1 min-w-0 pr-3">
+                            <div class="flex items-center gap-1.5">
+                                <span class="font-semibold text-[15px] text-white tracking-tight truncate">Сывороточный
+                                    протеин</span>
+                                <svg class="w-3.5 h-3.5 text-purple-400 shrink-0" fill="currentColor"
+                                    viewbox="0 0 24 24">
+                                    <path clip-rule="evenodd"
+                                        d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
+                                        fill-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <div class="text-xs text-zinc-400 mt-0.5 flex items-center gap-1.5 truncate"><span>Neo High
+                                    Protein</span></div>
+                            <!-- Calories and Macros -->
+                            <div class="mt-1.5 flex items-center gap-2 text-xs flex-wrap">
+                                <span class="font-medium text-zinc-200">112 ккал <span
+                                        class="text-zinc-500 font-normal">/ 30 г</span></span>
+                                <span class="text-zinc-700">•</span>
+                                <div class="flex items-center gap-2 font-mono text-[11px]">
+                                    <span class="flex items-center gap-0.5 text-zinc-300">
+                                        <span class="text-[#fb923c] font-semibold font-sans">Б</span> 23,0
+                                    </span>
+                                    <span class="flex items-center gap-0.5 text-zinc-300">
+                                        <span class="text-[#a3e635] font-semibold font-sans">Ж</span> 1,6
+                                    </span>
+                                    <span class="flex items-center gap-0.5 text-zinc-300">
+                                        <span class="text-[#38bdf8] font-semibold font-sans">У</span> 2,4
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Quick Add Button -->
+                        <button
+                            class="shrink-0 bg-[#201f25] hover:bg-[#282630] active:scale-95 border border-[#2f2c38] text-purple-300 text-xs font-semibold px-3.5 py-2 rounded-xl transition-all shadow-sm"
+                            type="button">
+                            + 30 г
+                        </button>
+                    </article>
+                    <!-- Product Item 4: Яйцо куриное С1 -->
+                    <article
+                        class="px-4 py-3 flex items-center justify-between hover:bg-white/[0.02] active:bg-white/[0.04] transition-colors cursor-pointer group">
+                        <div class="flex-1 min-w-0 pr-3">
+                            <div class="flex items-center gap-1.5">
+                                <span class="font-semibold text-[15px] text-white tracking-tight truncate">Яйцо куриное
+                                    С1</span>
+                            </div>
+                            <div class="text-xs text-zinc-400 mt-0.5 flex items-center gap-1.5 truncate">
+                                <span>Село Зелёное</span>
+                                <span class="text-zinc-600">•</span>
+                                <span class="text-zinc-400">1 шт ~ 55 г</span>
+                            </div>
+                            <!-- Calories and Macros -->
+                            <div class="mt-1.5 flex items-center gap-2 text-xs flex-wrap">
+                                <span class="font-medium text-zinc-200">78 ккал <span
+                                        class="text-zinc-500 font-normal">/ 1 шт</span></span>
+                                <span class="text-zinc-700">•</span>
+                                <div class="flex items-center gap-2 font-mono text-[11px]">
+                                    <span class="flex items-center gap-0.5 text-zinc-300">
+                                        <span class="text-[#fb923c] font-semibold font-sans">Б</span> 6,5
+                                    </span>
+                                    <span class="flex items-center gap-0.5 text-zinc-300">
+                                        <span class="text-[#a3e635] font-semibold font-sans">Ж</span> 5,5
+                                    </span>
+                                    <span class="flex items-center gap-0.5 text-zinc-300">
+                                        <span class="text-[#38bdf8] font-semibold font-sans">У</span> 0,4
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Quick Add Button -->
+                        <button
+                            class="shrink-0 bg-[#201f25] hover:bg-[#282630] active:scale-95 border border-[#2f2c38] text-purple-300 text-xs font-semibold px-3.5 py-2 rounded-xl transition-all shadow-sm"
+                            type="button">
+                            + 2 шт
+                        </button>
+                    </article>
+                </div>
+            </section>
+            <!-- SECTION: Recent Products -->
+            <section class="pt-2" data-purpose="recent-products-list">
+                <div class="px-4 py-2 flex items-center justify-between">
+                    <h2 class="text-base font-bold tracking-tight text-white flex items-center gap-1.5">
+                        <span>Недавние</span>
+                    </h2>
+                    <button class="text-xs font-medium text-zinc-500 hover:text-zinc-300 active:underline transition"
+                        type="button">
+                        Очистить
+                    </button>
+                </div>
+                <div class="divide-y divide-[#1e1d24]">
+                    <!-- Recent Item 1: Банан свежий -->
+                    <article
+                        class="px-4 py-3 flex items-center justify-between hover:bg-white/[0.02] active:bg-white/[0.04] transition-colors cursor-pointer group">
+                        <div class="flex-1 min-w-0 pr-3">
+                            <div class="flex items-center gap-1.5">
+                                <span class="font-semibold text-[15px] text-white tracking-tight truncate">Банан
+                                    свежий</span>
+                            </div>
+                            <div class="text-xs text-zinc-400 mt-0.5 flex items-center gap-1.5 truncate">
+                                <span>Базовые продукты</span>
+                                <span class="text-zinc-600">•</span>
+                                <span class="text-zinc-400">1 плод без кожуры</span>
+                            </div>
+                            <!-- Calories and Macros -->
+                            <div class="mt-1.5 flex items-center gap-2 text-xs flex-wrap">
+                                <span class="font-medium text-zinc-200">89 ккал <span
+                                        class="text-zinc-500 font-normal">/ 100 г</span></span>
+                                <span class="text-zinc-700">•</span>
+                                <div class="flex items-center gap-2 font-mono text-[11px]">
+                                    <span class="flex items-center gap-0.5 text-zinc-300">
+                                        <span class="text-[#fb923c] font-semibold font-sans">Б</span> 1,1
+                                    </span>
+                                    <span class="flex items-center gap-0.5 text-zinc-300">
+                                        <span class="text-[#a3e635] font-semibold font-sans">Ж</span> 0,3
+                                    </span>
+                                    <span class="flex items-center gap-0.5 text-zinc-300">
+                                        <span class="text-[#38bdf8] font-semibold font-sans">У</span> 21,8
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Quick Add Button -->
+                        <button
+                            class="shrink-0 bg-[#201f25] hover:bg-[#282630] active:scale-95 border border-[#2f2c38] text-purple-300 text-xs font-semibold px-3.5 py-2 rounded-xl transition-all shadow-sm"
+                            type="button">
+                            + 120 г
+                        </button>
+                    </article>
+                    <!-- Recent Item 2: Хлеб цельнозерновой -->
+                    <article
+                        class="px-4 py-3 flex items-center justify-between hover:bg-white/[0.02] active:bg-white/[0.04] transition-colors cursor-pointer group">
+                        <div class="flex-1 min-w-0 pr-3">
+                            <div class="flex items-center gap-1.5">
+                                <span class="font-semibold text-[15px] text-white tracking-tight truncate">Хлеб
+                                    цельнозерновой</span>
+                            </div>
+                            <div class="text-xs text-zinc-400 mt-0.5 flex items-center gap-1.5 truncate">
+                                <span>Смак</span>
+                                <span class="text-zinc-600">•</span>
+                                <span class="text-zinc-400">1 ломтик ~ 40 г</span>
+                            </div>
+                            <!-- Calories and Macros -->
+                            <div class="mt-1.5 flex items-center gap-2 text-xs flex-wrap">
+                                <span class="font-medium text-zinc-200">210 ккал <span
+                                        class="text-zinc-500 font-normal">/ 100 г</span></span>
+                                <span class="text-zinc-700">•</span>
+                                <div class="flex items-center gap-2 font-mono text-[11px]">
+                                    <span class="flex items-center gap-0.5 text-zinc-300">
+                                        <span class="text-[#fb923c] font-semibold font-sans">Б</span> 8,5
+                                    </span>
+                                    <span class="flex items-center gap-0.5 text-zinc-300">
+                                        <span class="text-[#a3e635] font-semibold font-sans">Ж</span> 1,8
+                                    </span>
+                                    <span class="flex items-center gap-0.5 text-zinc-300">
+                                        <span class="text-[#38bdf8] font-semibold font-sans">У</span> 39,0
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Quick Add Button -->
+                        <button
+                            class="shrink-0 bg-[#201f25] hover:bg-[#282630] active:scale-95 border border-[#2f2c38] text-purple-300 text-xs font-semibold px-3.5 py-2 rounded-xl transition-all shadow-sm"
+                            type="button">
+                            + 40 г
+                        </button>
+                    </article>
+                    <!-- Recent Item 3: Кофе американо без сахара -->
+                    <article
+                        class="px-4 py-3 flex items-center justify-between hover:bg-white/[0.02] active:bg-white/[0.04] transition-colors cursor-pointer group">
+                        <div class="flex-1 min-w-0 pr-3">
+                            <div class="flex items-center gap-1.5">
+                                <span class="font-semibold text-[15px] text-white tracking-tight truncate">Кофе
+                                    американо без сахара</span>
+                            </div>
+                            <div class="text-xs text-zinc-400 mt-0.5 flex items-center gap-1.5 truncate">
+                                <span>Напитки</span>
+                                <span class="text-zinc-600">•</span>
+                                <span class="text-zinc-400">Чашка 200 мл</span>
+                            </div>
+                            <!-- Calories and Macros -->
+                            <div class="mt-1.5 flex items-center gap-2 text-xs flex-wrap">
+                                <span class="font-medium text-zinc-200">2 ккал <span class="text-zinc-500 font-normal">/
+                                        200 мл</span></span>
+                                <span class="text-zinc-700">•</span>
+                                <div class="flex items-center gap-2 font-mono text-[11px]">
+                                    <span class="flex items-center gap-0.5 text-zinc-300">
+                                        <span class="text-[#fb923c] font-semibold font-sans">Б</span> 0,2
+                                    </span>
+                                    <span class="flex items-center gap-0.5 text-zinc-300">
+                                        <span class="text-[#a3e635] font-semibold font-sans">Ж</span> 0,0
+                                    </span>
+                                    <span class="flex items-center gap-0.5 text-zinc-300">
+                                        <span class="text-[#38bdf8] font-semibold font-sans">У</span> 0,3
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Quick Add Button -->
+                        <button
+                            class="shrink-0 bg-[#201f25] hover:bg-[#282630] active:scale-95 border border-[#2f2c38] text-purple-300 text-xs font-semibold px-3 py-2 rounded-xl transition-all shadow-sm"
+                            type="button">
+                            + 200 мл
+                        </button>
+                    </article>
+                </div>
+            </section>
+        </main>
+        <!-- END: ProductScrollArea -->
+        <!-- BEGIN: FloatingBottomSummaryBar -->
+        <div
+            class="absolute bottom-0 inset-x-0 px-4 pb-safe pt-2 pointer-events-none z-30 flex flex-col items-center gap-2">
+            <div
+                class="pointer-events-auto w-full flex items-center justify-between bg-[#1f1e24] border border-[#2d2a35] shadow-lg shadow-black/50 px-3.5 py-2.5 rounded-2xl animate-fade-in">
+                <div class="flex items-center gap-2 min-w-0"><span
+                        class="w-5 h-5 rounded-full bg-purple-500/20 text-purple-300 flex items-center justify-center shrink-0"><svg
+                            class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.4"
+                            viewbox="0 0 24 24">
+                            <path d="M4.5 12.75l6 6 9-13.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg></span><span class="text-xs font-medium text-white truncate">Овсяные хлопья <span
+                            class="text-zinc-400">· 80 г добавлены</span></span></div><button
+                    class="text-xs font-semibold text-purple-300 hover:text-purple-200 active:opacity-75 transition-colors shrink-0 ml-3"
+                    type="button">Отменить</button>
+            </div>
+            <div class="h-2 w-full flex justify-center items-center">
+                <div class="w-32 h-1 bg-zinc-700/60 rounded-full"></div>
+            </div>
+        </div>
+        <!-- END: FloatingBottomSummaryBar -->
+    </div>
+    <!-- END: MainContentContainer -->
+</body>
+
+</html>
