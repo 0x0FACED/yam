@@ -158,7 +158,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String foodSearchFrequentForMeal(String meal) {
-    return 'Часто добавляют: $meal';
+    return 'Часто на $meal';
   }
 
   @override
@@ -249,6 +249,32 @@ class AppLocalizationsRu extends AppLocalizations {
   String get quickAddAdd => 'Добавить';
 
   @override
+  String get quickAddQuickSelect => 'Быстрый выбор';
+
+  @override
+  String quickAddUsualAmount(String quantity) {
+    return 'Обычно: $quantity';
+  }
+
+  @override
+  String quickAddSelectedMeal(String meal) {
+    return 'В «$meal»';
+  }
+
+  @override
+  String get quickAddClose => 'Закрыть добавление';
+
+  @override
+  String quickAddAddCalories(String calories) {
+    return 'Добавить · $calories ккал';
+  }
+
+  @override
+  String quickAddAddToMeal(String meal, String calories) {
+    return 'Добавить в «$meal» · $calories ккал';
+  }
+
+  @override
   String foodAdded(String food, String meal) {
     return '$food добавлен в раздел «$meal»';
   }
@@ -258,6 +284,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get actionRetry => 'Повторить';
+
+  @override
+  String get unitKilocalories => 'ккал';
 
   @override
   String get unitGrams => 'г';

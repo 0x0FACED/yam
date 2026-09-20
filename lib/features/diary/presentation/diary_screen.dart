@@ -6,7 +6,7 @@ import 'package:yam/app/theme/app_breakpoints.dart';
 import 'package:yam/app/theme/app_motion.dart';
 import 'package:yam/app/theme/app_spacing.dart';
 import 'package:yam/app/theme/app_typography.dart';
-import 'package:yam/core/ui/feedback/yam_undo_snack_bar.dart';
+import 'package:yam/core/ui/feedback/yam_snack_bar.dart';
 import 'package:yam/features/diary/presentation/diary_prototype_data.dart';
 import 'package:yam/features/diary/presentation/widgets/daily_nutrition_summary.dart';
 import 'package:yam/features/diary/presentation/widgets/diary_day_selector.dart';

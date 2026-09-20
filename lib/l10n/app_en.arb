@@ -163,6 +163,43 @@
   "quickAddIncrease": "Increase quantity",
   "quickAddAmountInvalid": "Enter a quantity greater than zero",
   "quickAddAdd": "Add",
+  "quickAddQuickSelect": "Quick select",
+  "quickAddUsualAmount": "Usually: {quantity}",
+  "@quickAddUsualAmount": {
+    "placeholders": {
+      "quantity": {
+        "type": "String"
+      }
+    }
+  },
+  "quickAddSelectedMeal": "In {meal}",
+  "@quickAddSelectedMeal": {
+    "placeholders": {
+      "meal": {
+        "type": "String"
+      }
+    }
+  },
+  "quickAddClose": "Close quick add",
+  "quickAddAddCalories": "Add · {calories} kcal",
+  "@quickAddAddCalories": {
+    "placeholders": {
+      "calories": {
+        "type": "String"
+      }
+    }
+  },
+  "quickAddAddToMeal": "Add to {meal} · {calories} kcal",
+  "@quickAddAddToMeal": {
+    "placeholders": {
+      "meal": {
+        "type": "String"
+      },
+      "calories": {
+        "type": "String"
+      }
+    }
+  },
   "foodAdded": "{food} added to {meal}",
   "@foodAdded": {
     "placeholders": {
@@ -176,6 +213,7 @@
   },
   "actionUndo": "Undo",
   "actionRetry": "Retry",
+  "unitKilocalories": "kcal",
   "unitGrams": "g",
   "unitMilliliters": "ml",
   "unitPieces": "pcs",

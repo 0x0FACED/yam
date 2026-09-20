@@ -71,6 +71,7 @@ class FoodSearchPrototypeFood {
     required this.lastAmount,
     required this.frequentMealIds,
     this.brand,
+    this.portionDescription,
     this.source = FoodSearchPrototypeSource.localCatalog,
     this.verified = true,
     this.recent = true,
@@ -80,6 +81,7 @@ class FoodSearchPrototypeFood {
   final String id;
   final String name;
   final String? brand;
+  final String? portionDescription;
   final double referenceAmount;
   final FoodSearchPrototypeUnit referenceUnit;
   final FoodSearchPrototypeNutrition nutrition;
@@ -163,7 +165,7 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
           baseAmount: 1,
           defaultAmount: 80,
           step: 10,
-          presets: [50, 80, 100, 150],
+          presets: [40, 50, 80, 100, 150],
         ),
         FoodSearchPrototypeServing(
           id: 'serving',
@@ -178,6 +180,7 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
       lastAmount: 80,
       frequentMealIds: {'breakfast'},
       favorite: true,
+      recent: false,
     ),
     FoodSearchPrototypeFood(
       id: 'milk-25',
@@ -212,6 +215,7 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
       lastServingId: 'milliliters',
       lastAmount: 150,
       frequentMealIds: {'breakfast', 'snacks'},
+      recent: false,
     ),
     FoodSearchPrototypeFood(
       id: 'whey-protein',
@@ -247,26 +251,29 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
       lastAmount: 30,
       frequentMealIds: {'breakfast', 'snacks'},
       favorite: true,
+      recent: false,
     ),
     FoodSearchPrototypeFood(
       id: 'banana',
-      name: russian ? 'Банан' : 'Banana',
+      name: russian ? 'Банан свежий' : 'Fresh banana',
+      brand: russian ? 'Базовые продукты' : 'Basic foods',
+      portionDescription: russian ? '1 плод без кожуры' : '1 peeled fruit',
       referenceAmount: 100,
       referenceUnit: FoodSearchPrototypeUnit.grams,
       nutrition: const FoodSearchPrototypeNutrition(
         calories: 89,
         protein: 1.1,
         fat: 0.3,
-        carbs: 22.8,
+        carbs: 21.8,
       ),
       servings: const [
         FoodSearchPrototypeServing(
           id: 'grams',
           unit: FoodSearchPrototypeUnit.grams,
           baseAmount: 1,
-          defaultAmount: 160,
+          defaultAmount: 120,
           step: 10,
-          presets: [100, 120, 160, 200],
+          presets: [80, 100, 120, 160],
         ),
         FoodSearchPrototypeServing(
           id: 'piece',
@@ -278,8 +285,9 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
         ),
       ],
       lastServingId: 'grams',
-      lastAmount: 160,
-      frequentMealIds: {'breakfast', 'snacks'},
+      lastAmount: 120,
+      frequentMealIds: const {},
+      verified: false,
     ),
     FoodSearchPrototypeFood(
       id: 'chicken-breast',
@@ -314,6 +322,7 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
       lastAmount: 220,
       frequentMealIds: {'lunch', 'dinner'},
       favorite: true,
+      recent: false,
     ),
     FoodSearchPrototypeFood(
       id: 'rice-cooked',
@@ -340,6 +349,7 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
       lastServingId: 'grams',
       lastAmount: 280,
       frequentMealIds: {'lunch', 'dinner'},
+      recent: false,
     ),
     FoodSearchPrototypeFood(
       id: 'cottage-cheese',
@@ -373,19 +383,22 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
       ],
       lastServingId: 'grams',
       lastAmount: 180,
-      frequentMealIds: {'breakfast', 'dinner'},
+      frequentMealIds: {'dinner'},
       source: FoodSearchPrototypeSource.userCreated,
       verified: false,
+      recent: false,
     ),
     FoodSearchPrototypeFood(
       id: 'eggs',
-      name: russian ? 'Куриные яйца' : 'Chicken eggs',
+      name: russian ? 'Яйцо куриное С1' : 'Grade A chicken egg',
+      brand: russian ? 'Село Зелёное' : 'Green Village',
+      portionDescription: russian ? '1 шт. ~ 55 г' : '1 pc ~ 55 g',
       referenceAmount: 1,
       referenceUnit: FoodSearchPrototypeUnit.pieces,
       nutrition: const FoodSearchPrototypeNutrition(
-        calories: 72,
-        protein: 6.3,
-        fat: 4.8,
+        calories: 78,
+        protein: 6.5,
+        fat: 5.5,
         carbs: 0.4,
       ),
       servings: const [
@@ -393,15 +406,81 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
           id: 'pieces',
           unit: FoodSearchPrototypeUnit.pieces,
           baseAmount: 1,
-          defaultAmount: 3,
+          defaultAmount: 2,
           step: 1,
           presets: [1, 2, 3, 4],
         ),
       ],
       lastServingId: 'pieces',
-      lastAmount: 3,
+      lastAmount: 2,
       frequentMealIds: {'breakfast'},
       favorite: true,
+      verified: false,
+      recent: false,
+    ),
+    FoodSearchPrototypeFood(
+      id: 'wholegrain-bread',
+      name: russian ? 'Хлеб цельнозерновой' : 'Wholegrain bread',
+      brand: russian ? 'Смак' : 'Smak',
+      portionDescription: russian ? '1 ломтик ~ 40 г' : '1 slice ~ 40 g',
+      referenceAmount: 100,
+      referenceUnit: FoodSearchPrototypeUnit.grams,
+      nutrition: const FoodSearchPrototypeNutrition(
+        calories: 210,
+        protein: 8.5,
+        fat: 1.8,
+        carbs: 39,
+      ),
+      servings: const [
+        FoodSearchPrototypeServing(
+          id: 'grams',
+          unit: FoodSearchPrototypeUnit.grams,
+          baseAmount: 1,
+          defaultAmount: 40,
+          step: 10,
+          presets: [20, 40, 60, 80],
+        ),
+        FoodSearchPrototypeServing(
+          id: 'piece',
+          unit: FoodSearchPrototypeUnit.pieces,
+          baseAmount: 40,
+          defaultAmount: 1,
+          step: 1,
+          presets: [1, 2, 3, 4],
+        ),
+      ],
+      lastServingId: 'grams',
+      lastAmount: 40,
+      frequentMealIds: const {},
+      verified: false,
+    ),
+    FoodSearchPrototypeFood(
+      id: 'americano',
+      name: russian ? 'Кофе американо без сахара' : 'Americano without sugar',
+      brand: russian ? 'Напитки' : 'Drinks',
+      portionDescription: russian ? 'Чашка 200 мл' : '200 ml cup',
+      referenceAmount: 200,
+      referenceUnit: FoodSearchPrototypeUnit.milliliters,
+      nutrition: const FoodSearchPrototypeNutrition(
+        calories: 2,
+        protein: 0.2,
+        fat: 0,
+        carbs: 0.3,
+      ),
+      servings: const [
+        FoodSearchPrototypeServing(
+          id: 'milliliters',
+          unit: FoodSearchPrototypeUnit.milliliters,
+          baseAmount: 1,
+          defaultAmount: 200,
+          step: 50,
+          presets: [100, 150, 200, 250],
+        ),
+      ],
+      lastServingId: 'milliliters',
+      lastAmount: 200,
+      frequentMealIds: const {},
+      verified: false,
     ),
   ];
 }

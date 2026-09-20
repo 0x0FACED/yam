@@ -32,7 +32,7 @@ Approved visual references live under `agents/design/`.
 For tasks that create or modify UI:
 
 1. Read the relevant accepted design ADRs first.
-2. Inspect `agents/design/design-system.html`.
+2. Inspect `agents/design/yam_components_2.html`.
 3. Inspect the HTML reference for the screen being implemented.
 4. Inspect existing Flutter theme tokens and reusable UI components.
 5. Inspect the current feature implementation and tests.

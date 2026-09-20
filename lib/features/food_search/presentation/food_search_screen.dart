@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yam/app/theme/app_motion.dart';
-import 'package:yam/app/theme/app_radius.dart';
 import 'package:yam/app/theme/app_spacing.dart';
+import 'package:yam/app/theme/app_typography.dart';
+import 'package:yam/core/ui/buttons/yam_buttons.dart';
+import 'package:yam/core/ui/feedback/yam_feedback_state.dart';
+import 'package:yam/core/ui/forms/yam_search_field.dart';
+import 'package:yam/core/ui/selection/yam_selection_controls.dart';
 import 'package:yam/features/food_search/presentation/food_search_format.dart';
 import 'package:yam/features/food_search/presentation/food_search_meals.dart';
 import 'package:yam/features/food_search/presentation/food_search_prototype_data.dart';
@@ -74,7 +78,6 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
     final selectedMeal = _selectedMealId == null
         ? null
         : buildFoodSearchPrototypeMeals(
@@ -90,128 +93,17 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: theme.scaffoldBackgroundColor,
-                    border: Border(
-                      bottom: BorderSide(
-                        color: theme.colorScheme.outlineVariant,
-                      ),
-                    ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(
-                      AppSpacing.md,
-                      AppSpacing.xs,
-                      AppSpacing.md,
-                      AppSpacing.sm,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Row(
-                          children: [
-                            IconButton(
-                              key: const ValueKey('food-search-back'),
-                              tooltip: l10n.foodSearchBack,
-                              onPressed: () => Navigator.of(context).maybePop(),
-                              icon: const Icon(Icons.arrow_back_rounded),
-                            ),
-                            const SizedBox(width: AppSpacing.xs),
-                            Expanded(
-                              child: SearchBar(
-                                key: const ValueKey('food-search-field'),
-                                controller: _searchController,
-                                focusNode: _searchFocusNode,
-                                hintText: l10n.foodSearchHint,
-                                textInputAction: TextInputAction.search,
-                                constraints: const BoxConstraints(
-                                  minHeight: 48,
-                                ),
-                                elevation: const WidgetStatePropertyAll(0),
-                                backgroundColor: WidgetStatePropertyAll(
-                                  theme.colorScheme.surfaceContainer,
-                                ),
-                                side: WidgetStateProperty.resolveWith((states) {
-                                  return BorderSide(
-                                    color: states.contains(WidgetState.focused)
-                                        ? theme.colorScheme.primary
-                                        : theme.colorScheme.outlineVariant,
-                                  );
-                                }),
-                                shape: WidgetStatePropertyAll(
-                                  RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                      AppRadius.control,
-                                    ),
-                                  ),
-                                ),
-                                leading: const Icon(Icons.search_rounded),
-                                trailing: [
-                                  if (_searchController.text.isNotEmpty)
-                                    IconButton(
-                                      tooltip: l10n.foodSearchClear,
-                                      onPressed: _clearSearch,
-                                      icon: const Icon(Icons.close_rounded),
-                                    ),
-                                ],
-                                onChanged: (_) {
-                                  setState(_updateVisibleFoods);
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: AppSpacing.xs),
-                        Wrap(
-                          alignment: WrapAlignment.spaceBetween,
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          spacing: AppSpacing.sm,
-                          runSpacing: AppSpacing.xxs,
-                          children: [
-                            OutlinedButton.icon(
-                              key: const ValueKey('food-search-meal'),
-                              onPressed: _selectMeal,
-                              icon: Icon(
-                                selectedMeal?.icon ?? Icons.restaurant_outlined,
-                              ),
-                              label: Text(
-                                selectedMeal == null
-                                    ? l10n.foodSearchChooseMeal
-                                    : l10n.foodSearchSelectedMeal(
-                                        selectedMeal.name,
-                                      ),
-                              ),
-                            ),
-                            TextButton.icon(
-                              key: const ValueKey('food-search-create-food'),
-                              onPressed: _openCreateFood,
-                              icon: const Icon(Icons.add_rounded),
-                              label: Text(l10n.foodSearchCreateFood),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: AppSpacing.xs),
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: [
-                              for (final tab in _FoodSearchTab.values) ...[
-                                _FoodSearchTabButton(
-                                  key: ValueKey('food-search-tab-${tab.name}'),
-                                  label: _tabLabel(l10n, tab),
-                                  selected: _selectedTab == tab,
-                                  onPressed: () => _selectTab(tab),
-                                ),
-                                if (tab != _FoodSearchTab.values.last)
-                                  const SizedBox(width: AppSpacing.xs),
-                              ],
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                _FoodSearchHeader(
+                  searchController: _searchController,
+                  searchFocusNode: _searchFocusNode,
+                  selectedMeal: selectedMeal,
+                  selectedTab: _selectedTab,
+                  onBack: () => Navigator.of(context).maybePop(),
+                  onSearchChanged: (_) => setState(_updateVisibleFoods),
+                  onClearSearch: _clearSearch,
+                  onSelectMeal: _selectMeal,
+                  onCreateFood: _openCreateFood,
+                  onSelectTab: _selectTab,
                 ),
                 Expanded(
                   child: AnimatedSwitcher(
@@ -223,12 +115,8 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
                     transitionBuilder: (child, animation) {
                       return FadeTransition(opacity: animation, child: child);
                     },
-                    layoutBuilder: (currentChild, previousChildren) {
-                      return Stack(
-                        alignment: Alignment.topCenter,
-                        children: [...previousChildren, ?currentChild],
-                      );
-                    },
+                    layoutBuilder: (currentChild, previousChildren) =>
+                        currentChild ?? const SizedBox.shrink(),
                     child: CustomScrollView(
                       key: ValueKey(_contentKey),
                       keyboardDismissBehavior:
@@ -279,7 +167,9 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
           ..._buildSection(
             selectedMeal == null
                 ? l10n.foodSearchFrequent
-                : l10n.foodSearchFrequentForMeal(selectedMeal.name),
+                : l10n.foodSearchFrequentForMeal(
+                    selectedMeal.name.toLowerCase(),
+                  ),
             _frequent,
           ),
           ..._buildSection(l10n.foodSearchRecent, _recent),
@@ -307,7 +197,7 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
       return [
         SliverFillRemaining(
           hasScrollBody: false,
-          child: _FoodSearchFeedbackState(
+          child: YamFeedbackState(
             icon: Icons.restaurant_menu_rounded,
             title: l10n.foodSearchTabEmptyTitle,
             message: l10n.foodSearchTabEmptyMessage,
@@ -326,7 +216,7 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
       return [
         SliverFillRemaining(
           hasScrollBody: false,
-          child: _FoodSearchFeedbackState(
+          child: YamFeedbackState(
             icon: Icons.search_off_rounded,
             title: l10n.foodSearchNoResultsTitle,
             message: l10n.foodSearchNoResultsMessage,
@@ -361,7 +251,7 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
               child: Column(
                 children: [
                   for (var index = 0; index < 4; index++)
-                    const _FoodSearchLoadingRow(),
+                    const YamProductRowSkeleton(),
                 ],
               ),
             ),
@@ -375,13 +265,14 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
     return [
       SliverFillRemaining(
         hasScrollBody: false,
-        child: _FoodSearchFeedbackState(
+        child: YamFeedbackState(
           icon: Icons.error_outline_rounded,
           title: l10n.foodSearchErrorTitle,
           message: l10n.foodSearchErrorMessage,
           actionKey: const ValueKey('food-search-retry'),
           actionLabel: l10n.actionRetry,
           actionIcon: Icons.refresh_rounded,
+          error: true,
           onAction: () {
             setState(() {
               _catalogState = FoodSearchPrototypeCatalogState.ready;
@@ -415,15 +306,6 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
       onOpen: () => _openQuickAdd(food),
       onQuickAdd: () => _quickAdd(food),
     );
-  }
-
-  String _tabLabel(AppLocalizations l10n, _FoodSearchTab tab) {
-    return switch (tab) {
-      _FoodSearchTab.forYou => l10n.foodSearchForYou,
-      _FoodSearchTab.recent => l10n.foodSearchRecent,
-      _FoodSearchTab.myDishes => l10n.foodSearchMyDishes,
-      _FoodSearchTab.favorites => l10n.foodSearchFavorites,
-    };
   }
 
   void _selectTab(_FoodSearchTab tab) {
@@ -563,65 +445,154 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
   }
 }
 
-class _FoodSearchTabButton extends StatelessWidget {
-  const _FoodSearchTabButton({
-    required this.label,
-    required this.selected,
-    required this.onPressed,
-    super.key,
+class _FoodSearchHeader extends StatelessWidget {
+  const _FoodSearchHeader({
+    required this.searchController,
+    required this.searchFocusNode,
+    required this.selectedMeal,
+    required this.selectedTab,
+    required this.onBack,
+    required this.onSearchChanged,
+    required this.onClearSearch,
+    required this.onSelectMeal,
+    required this.onCreateFood,
+    required this.onSelectTab,
   });
 
-  final String label;
-  final bool selected;
-  final VoidCallback onPressed;
+  final TextEditingController searchController;
+  final FocusNode searchFocusNode;
+  final FoodSearchPrototypeMeal? selectedMeal;
+  final _FoodSearchTab selectedTab;
+  final VoidCallback onBack;
+  final ValueChanged<String> onSearchChanged;
+  final VoidCallback onClearSearch;
+  final VoidCallback onSelectMeal;
+  final VoidCallback onCreateFood;
+  final ValueChanged<_FoodSearchTab> onSelectTab;
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final reduceMotion = MediaQuery.disableAnimationsOf(context);
-    return Semantics(
-      button: true,
-      selected: selected,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onPressed,
-          borderRadius: BorderRadius.circular(AppRadius.control),
-          child: AnimatedContainer(
-            duration: reduceMotion ? Duration.zero : AppMotion.smallChange,
-            curve: AppMotion.standardCurve,
-            constraints: const BoxConstraints(minHeight: 44),
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.sm,
-              vertical: AppSpacing.xs,
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: theme.scaffoldBackgroundColor,
+        border: Border(
+          bottom: BorderSide(color: theme.colorScheme.outlineVariant),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.xs,
+          AppSpacing.xxs,
+          AppSpacing.md,
+          AppSpacing.xs,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                YamIconButton(
+                  key: const ValueKey('food-search-back'),
+                  icon: Icons.arrow_back_ios_new_rounded,
+                  tooltip: l10n.foodSearchBack,
+                  onPressed: onBack,
+                ),
+                const SizedBox(width: AppSpacing.xxs),
+                Expanded(
+                  child: YamSearchField(
+                    fieldKey: const ValueKey('food-search-field'),
+                    controller: searchController,
+                    focusNode: searchFocusNode,
+                    hintText: l10n.foodSearchHint,
+                    clearTooltip: l10n.foodSearchClear,
+                    onChanged: onSearchChanged,
+                    onClear: onClearSearch,
+                  ),
+                ),
+              ],
             ),
-            decoration: BoxDecoration(
-              color: selected
-                  ? theme.colorScheme.primaryContainer
-                  : theme.colorScheme.surfaceContainer,
-              border: Border.all(
-                color: selected
-                    ? theme.colorScheme.primary
-                    : theme.colorScheme.outlineVariant,
+            const SizedBox(height: AppSpacing.xxs),
+            Padding(
+              padding: const EdgeInsets.only(left: AppSpacing.xs),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final stackActions =
+                      constraints.maxWidth < 300 ||
+                      MediaQuery.textScalerOf(context).scale(12) > 16;
+                  final mealSelector = YamMealChip(
+                    key: const ValueKey('food-search-meal'),
+                    icon: selectedMeal?.icon ?? Icons.restaurant_menu_rounded,
+                    label: selectedMeal == null
+                        ? l10n.foodSearchChooseMeal
+                        : l10n.foodSearchSelectedMeal(selectedMeal!.name),
+                    onPressed: onSelectMeal,
+                  );
+                  final createAction = YamTextButton(
+                    key: const ValueKey('food-search-create-food'),
+                    label: l10n.foodSearchCreateFood,
+                    icon: Icons.add_rounded,
+                    onPressed: onCreateFood,
+                    tone: YamTextButtonTone.accent,
+                  );
+
+                  if (stackActions) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [mealSelector, createAction],
+                    );
+                  }
+                  return Row(
+                    children: [
+                      Expanded(
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: mealSelector,
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.xs),
+                      createAction,
+                    ],
+                  );
+                },
               ),
-              borderRadius: BorderRadius.circular(AppRadius.control),
             ),
-            child: Center(
-              child: Text(
-                label,
-                style: theme.textTheme.labelLarge?.copyWith(
-                  color: selected
-                      ? theme.colorScheme.primary
-                      : theme.colorScheme.onSurfaceVariant,
-                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+            Padding(
+              padding: const EdgeInsets.only(left: AppSpacing.xs),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    for (final tab in _FoodSearchTab.values) ...[
+                      YamFilterChip(
+                        key: ValueKey('food-search-tab-${tab.name}'),
+                        label: _foodSearchTabLabel(l10n, tab),
+                        selected: selectedTab == tab,
+                        onPressed: () => onSelectTab(tab),
+                      ),
+                      if (tab != _FoodSearchTab.values.last)
+                        const SizedBox(width: AppSpacing.xs),
+                    ],
+                  ],
                 ),
               ),
             ),
-          ),
+          ],
         ),
       ),
     );
   }
+}
+
+String _foodSearchTabLabel(AppLocalizations l10n, _FoodSearchTab tab) {
+  return switch (tab) {
+    _FoodSearchTab.forYou => l10n.foodSearchForYou,
+    _FoodSearchTab.recent => l10n.foodSearchRecent,
+    _FoodSearchTab.myDishes => l10n.foodSearchMyDishes,
+    _FoodSearchTab.favorites => l10n.foodSearchFavorites,
+  };
 }
 
 class _SectionHeader extends StatelessWidget {
@@ -631,140 +602,24 @@ class _SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.md,
-        AppSpacing.md,
+        AppSpacing.sm,
         AppSpacing.md,
         AppSpacing.xs,
       ),
-      child: Text(title, style: Theme.of(context).textTheme.titleMedium),
-    );
-  }
-}
-
-class _FoodSearchFeedbackState extends StatelessWidget {
-  const _FoodSearchFeedbackState({
-    required this.icon,
-    required this.title,
-    required this.message,
-    this.actionKey,
-    this.actionLabel,
-    this.actionIcon,
-    this.onAction,
-  });
-
-  final IconData icon;
-  final String title;
-  final String message;
-  final Key? actionKey;
-  final String? actionLabel;
-  final IconData? actionIcon;
-  final VoidCallback? onAction;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 360),
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.xl),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceContainer,
-                  shape: BoxShape.circle,
-                ),
-                child: SizedBox.square(
-                  dimension: 48,
-                  child: Icon(
-                    icon,
-                    size: 24,
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              Text(
-                title,
-                textAlign: TextAlign.center,
-                style: theme.textTheme.titleMedium,
-              ),
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                message,
-                textAlign: TextAlign.center,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
-              if (actionLabel != null && onAction != null) ...[
-                const SizedBox(height: AppSpacing.sm),
-                TextButton.icon(
-                  key: actionKey,
-                  onPressed: onAction,
-                  icon: Icon(actionIcon),
-                  label: Text(actionLabel!),
-                ),
-              ],
-            ],
+      child: Semantics(
+        header: true,
+        child: Text(
+          title,
+          style: AppTypography.sectionTitle.copyWith(
+            color: theme.colorScheme.onSurface,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.1,
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _FoodSearchLoadingRow extends StatelessWidget {
-  const _FoodSearchLoadingRow();
-
-  @override
-  Widget build(BuildContext context) {
-    final color = Theme.of(context).colorScheme.surfaceContainer;
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: AppSpacing.sm,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          FractionallySizedBox(
-            widthFactor: 0.48,
-            child: Container(
-              height: 14,
-              decoration: BoxDecoration(
-                color: color,
-                borderRadius: BorderRadius.circular(AppRadius.small),
-              ),
-            ),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          FractionallySizedBox(
-            widthFactor: 0.3,
-            child: Container(
-              height: 10,
-              decoration: BoxDecoration(
-                color: color,
-                borderRadius: BorderRadius.circular(AppRadius.small),
-              ),
-            ),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          FractionallySizedBox(
-            widthFactor: 0.64,
-            child: Container(
-              height: 10,
-              decoration: BoxDecoration(
-                color: color,
-                borderRadius: BorderRadius.circular(AppRadius.small),
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

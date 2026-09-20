@@ -4,6 +4,7 @@ import 'package:yam/app/theme/app_motion.dart';
 import 'package:yam/app/theme/app_radius.dart';
 import 'package:yam/app/theme/app_spacing.dart';
 import 'package:yam/app/theme/app_typography.dart';
+import 'package:yam/core/ui/buttons/yam_buttons.dart';
 import 'package:yam/l10n/generated/app_localizations.dart';
 
 class DiaryDaySelector extends StatelessWidget {
@@ -38,13 +39,12 @@ class DiaryDaySelector extends StatelessWidget {
       children: [
         Row(
           children: [
-            IconButton(
+            YamIconButton(
+              icon: Icons.chevron_left_rounded,
               tooltip: l10n.diaryPreviousDay,
               onPressed: () =>
                   onDaySelected(selectedDay.subtract(const Duration(days: 1))),
-              iconSize: 20,
-              visualDensity: VisualDensity.compact,
-              icon: const Icon(Icons.chevron_left_rounded),
+              surface: false,
             ),
             Expanded(
               child: Semantics(
@@ -89,13 +89,12 @@ class DiaryDaySelector extends StatelessWidget {
                 ),
               ),
             ),
-            IconButton(
+            YamIconButton(
+              icon: Icons.chevron_right_rounded,
               tooltip: l10n.diaryNextDay,
               onPressed: () =>
                   onDaySelected(selectedDay.add(const Duration(days: 1))),
-              iconSize: 20,
-              visualDensity: VisualDensity.compact,
-              icon: const Icon(Icons.chevron_right_rounded),
+              surface: false,
             ),
           ],
         ),
@@ -118,10 +117,10 @@ class DiaryDaySelector extends StatelessWidget {
           const SizedBox(height: AppSpacing.xxs),
           Align(
             alignment: Alignment.centerRight,
-            child: TextButton.icon(
+            child: YamTextButton(
+              label: l10n.diaryReturnToToday,
+              icon: Icons.today_outlined,
               onPressed: () => onDaySelected(today),
-              icon: const Icon(Icons.today_outlined, size: 18),
-              label: Text(l10n.diaryReturnToToday),
             ),
           ),
         ],

@@ -524,6 +524,42 @@ abstract class AppLocalizations {
   /// **'Add'**
   String get quickAddAdd;
 
+  /// No description provided for @quickAddQuickSelect.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick select'**
+  String get quickAddQuickSelect;
+
+  /// No description provided for @quickAddUsualAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Usually: {quantity}'**
+  String quickAddUsualAmount(String quantity);
+
+  /// No description provided for @quickAddSelectedMeal.
+  ///
+  /// In en, this message translates to:
+  /// **'In {meal}'**
+  String quickAddSelectedMeal(String meal);
+
+  /// No description provided for @quickAddClose.
+  ///
+  /// In en, this message translates to:
+  /// **'Close quick add'**
+  String get quickAddClose;
+
+  /// No description provided for @quickAddAddCalories.
+  ///
+  /// In en, this message translates to:
+  /// **'Add · {calories} kcal'**
+  String quickAddAddCalories(String calories);
+
+  /// No description provided for @quickAddAddToMeal.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to {meal} · {calories} kcal'**
+  String quickAddAddToMeal(String meal, String calories);
+
   /// No description provided for @foodAdded.
   ///
   /// In en, this message translates to:
@@ -541,6 +577,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Retry'**
   String get actionRetry;
+
+  /// No description provided for @unitKilocalories.
+  ///
+  /// In en, this message translates to:
+  /// **'kcal'**
+  String get unitKilocalories;
 
   /// No description provided for @unitGrams.
   ///

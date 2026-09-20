@@ -248,6 +248,32 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quickAddAdd => 'Add';
 
   @override
+  String get quickAddQuickSelect => 'Quick select';
+
+  @override
+  String quickAddUsualAmount(String quantity) {
+    return 'Usually: $quantity';
+  }
+
+  @override
+  String quickAddSelectedMeal(String meal) {
+    return 'In $meal';
+  }
+
+  @override
+  String get quickAddClose => 'Close quick add';
+
+  @override
+  String quickAddAddCalories(String calories) {
+    return 'Add · $calories kcal';
+  }
+
+  @override
+  String quickAddAddToMeal(String meal, String calories) {
+    return 'Add to $meal · $calories kcal';
+  }
+
+  @override
   String foodAdded(String food, String meal) {
     return '$food added to $meal';
   }
@@ -257,6 +283,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get actionRetry => 'Retry';
+
+  @override
+  String get unitKilocalories => 'kcal';
 
   @override
   String get unitGrams => 'g';

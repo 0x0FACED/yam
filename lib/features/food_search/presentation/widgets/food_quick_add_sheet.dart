@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:yam/app/theme/app_radius.dart';
 import 'package:yam/app/theme/app_spacing.dart';
+import 'package:yam/app/theme/app_typography.dart';
+import 'package:yam/core/ui/buttons/yam_buttons.dart';
+import 'package:yam/core/ui/food/yam_quantity_control.dart';
+import 'package:yam/core/ui/selection/yam_selection_controls.dart';
 import 'package:yam/features/food_search/presentation/food_search_format.dart';
 import 'package:yam/features/food_search/presentation/food_search_meals.dart';
 import 'package:yam/features/food_search/presentation/food_search_prototype_data.dart';
@@ -17,7 +19,7 @@ Future<FoodAddPrototypeResult?> showFoodQuickAddSheet({
     isScrollControlled: true,
     useSafeArea: true,
     showDragHandle: true,
-    constraints: const BoxConstraints(maxWidth: 600),
+    constraints: const BoxConstraints(maxWidth: 480),
     builder: (context) =>
         _FoodQuickAddSheet(food: food, initialMealId: initialMealId),
   );
@@ -63,234 +65,253 @@ class _FoodQuickAddSheetState extends State<_FoodQuickAddSheet> {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
     final meals = buildFoodSearchPrototypeMeals(l10n);
+    final selectedMeal = _mealId == null
+        ? null
+        : meals.firstWhere((meal) => meal.id == _mealId);
     final amount = _amount;
     final validAmount = amount != null && amount > 0;
     final nutrition = widget.food.nutritionFor(
       _serving,
       validAmount ? amount : 0,
     );
+    final calorieValue = formatFoodSearchNumber(
+      context,
+      nutrition.calories.round(),
+    );
+    final sourceLabel =
+        widget.food.brand ??
+        switch (widget.food.source) {
+          FoodSearchPrototypeSource.localCatalog => l10n.foodSearchSourceLocal,
+          FoodSearchPrototypeSource.userCreated => l10n.foodSearchSourceUser,
+        };
+    final referenceQuantity = formatFoodSearchQuantity(
+      context,
+      widget.food.referenceUnit,
+      widget.food.referenceAmount,
+    );
+    final referenceCalories = l10n.foodSearchCaloriesPerReference(
+      formatFoodSearchNumber(context, widget.food.nutrition.calories),
+      referenceQuantity,
+    );
+    final selectedPresetIndex = _selectedPresetIndex(amount);
 
-    return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(
-          AppSpacing.lg,
-          0,
-          AppSpacing.lg,
-          AppSpacing.lg,
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.viewInsetsOf(context).bottom,
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              l10n.quickAddTitle,
-              style: theme.textTheme.labelLarge?.copyWith(
-                color: theme.colorScheme.primary,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.xs),
-            Text(
-              widget.food.name,
-              style: theme.textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-            if (widget.food.brand case final brand?) ...[
-              const SizedBox(height: AppSpacing.xxs),
-              Text(
-                brand,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ],
-            const SizedBox(height: AppSpacing.lg),
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final stackFields =
-                    constraints.maxWidth < 440 ||
-                    MediaQuery.textScalerOf(context).scale(16) > 20;
-                final quantityField = TextField(
-                  key: const ValueKey('quick-add-quantity'),
-                  controller: _amountController,
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
-                  ),
-                  inputFormatters: [
-                    FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
-                  ],
-                  decoration: InputDecoration(
-                    labelText: l10n.quickAddQuantity,
-                    errorText: _attemptedSubmit && !validAmount
-                        ? l10n.quickAddAmountInvalid
-                        : null,
-                  ),
-                  onChanged: (_) => setState(() {}),
-                );
-                final unitField = DropdownButtonFormField<String>(
-                  key: ValueKey('quick-add-unit-${_serving.id}'),
-                  initialValue: _serving.id,
-                  isExpanded: true,
-                  decoration: InputDecoration(labelText: l10n.quickAddUnit),
-                  items: [
-                    for (final serving in widget.food.servings)
-                      DropdownMenuItem(
-                        value: serving.id,
-                        child: Text(foodSearchUnitLabel(l10n, serving.unit)),
-                      ),
-                  ],
-                  onChanged: (servingId) {
-                    if (servingId == null) {
-                      return;
-                    }
-                    final serving = widget.food.servings.firstWhere(
-                      (candidate) => candidate.id == servingId,
-                    );
-                    setState(() {
-                      _serving = serving;
-                      _amountController.text = _editableNumber(
-                        serving.defaultAmount,
-                      );
-                    });
-                  },
-                );
-
-                if (stackFields) {
-                  return Column(
-                    children: [
-                      quantityField,
-                      const SizedBox(height: AppSpacing.sm),
-                      unitField,
-                    ],
-                  );
-                }
-                return Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(child: quantityField),
-                    const SizedBox(width: AppSpacing.sm),
-                    Expanded(child: unitField),
-                  ],
-                );
-              },
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Wrap(
-              spacing: AppSpacing.xs,
-              runSpacing: AppSpacing.xs,
-              children: [
-                OutlinedButton(
-                  onPressed: () => _changeAmount(-_serving.step),
-                  child: Text(
-                    '-${formatFoodSearchNumber(context, _serving.step)}',
-                    semanticsLabel: l10n.quickAddDecrease,
-                  ),
-                ),
-                OutlinedButton(
-                  onPressed: () => _changeAmount(_serving.step),
-                  child: Text(
-                    '+${formatFoodSearchNumber(context, _serving.step)}',
-                    semanticsLabel: l10n.quickAddIncrease,
-                  ),
-                ),
-                for (final preset in _serving.presets)
-                  ChoiceChip(
-                    label: Text(
-                      formatFoodSearchQuantity(context, _serving.unit, preset),
-                    ),
-                    selected: amount == preset,
-                    onSelected: (_) => _setAmount(preset),
-                  ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            DropdownButtonFormField<String>(
-              key: const ValueKey('quick-add-meal'),
-              initialValue: _mealId,
-              isExpanded: true,
-              decoration: InputDecoration(
-                labelText: l10n.quickAddMeal,
-                errorText: _attemptedSubmit && _mealId == null
-                    ? l10n.foodSearchMealRequired
-                    : null,
-              ),
-              items: [
-                for (final meal in meals)
-                  DropdownMenuItem(value: meal.id, child: Text(meal.name)),
-              ],
-              onChanged: (mealId) => setState(() => _mealId = mealId),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            DecoratedBox(
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainer,
-                borderRadius: BorderRadius.circular(AppRadius.card),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.md),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      l10n.quickAddNutrition,
-                      style: theme.textTheme.labelLarge?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    Wrap(
-                      spacing: AppSpacing.lg,
-                      runSpacing: AppSpacing.sm,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.md,
+            0,
+            AppSpacing.md,
+            AppSpacing.lg,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _NutritionValue(
-                          label: l10n.mealCalories(
-                            formatFoodSearchNumber(context, nutrition.calories),
+                        MenuAnchor(
+                          menuChildren: [
+                            for (final meal in meals)
+                              MenuItemButton(
+                                key: ValueKey('quick-add-meal-${meal.id}'),
+                                leadingIcon: Icon(meal.icon, size: 18),
+                                onPressed: () {
+                                  setState(() => _mealId = meal.id);
+                                },
+                                child: Text(meal.name),
+                              ),
+                          ],
+                          builder: (context, controller, child) {
+                            return YamMealChip(
+                              key: const ValueKey('quick-add-meal'),
+                              icon:
+                                  selectedMeal?.icon ??
+                                  Icons.restaurant_menu_rounded,
+                              label: selectedMeal == null
+                                  ? l10n.foodSearchChooseMeal
+                                  : l10n.quickAddSelectedMeal(
+                                      selectedMeal.name,
+                                    ),
+                              active: selectedMeal != null,
+                              maxWidth: 280,
+                              onPressed: controller.isOpen
+                                  ? controller.close
+                                  : controller.open,
+                            );
+                          },
+                        ),
+                        if (_attemptedSubmit && selectedMeal == null) ...[
+                          const SizedBox(height: AppSpacing.xxs),
+                          Semantics(
+                            liveRegion: true,
+                            child: Text(
+                              l10n.foodSearchMealRequired,
+                              style: AppTypography.caption.copyWith(
+                                color: theme.colorScheme.error,
+                              ),
+                            ),
                           ),
-                          emphasized: true,
+                        ],
+                        const SizedBox(height: AppSpacing.sm),
+                        Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                widget.food.name,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: AppTypography.screenTitle.copyWith(
+                                  color: theme.colorScheme.onSurface,
+                                ),
+                              ),
+                            ),
+                            if (widget.food.verified) ...[
+                              const SizedBox(width: AppSpacing.xs),
+                              Tooltip(
+                                message: l10n.foodSearchVerified,
+                                child: Icon(
+                                  Icons.verified_rounded,
+                                  size: 18,
+                                  color: theme.colorScheme.primary,
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
-                        _NutritionValue(
-                          label:
-                              '${l10n.macroProtein} ${formatFoodSearchNumber(context, nutrition.protein)} ${l10n.unitGrams}',
-                        ),
-                        _NutritionValue(
-                          label:
-                              '${l10n.macroFat} ${formatFoodSearchNumber(context, nutrition.fat)} ${l10n.unitGrams}',
-                        ),
-                        _NutritionValue(
-                          label:
-                              '${l10n.macroCarbs} ${formatFoodSearchNumber(context, nutrition.carbs)} ${l10n.unitGrams}',
+                        const SizedBox(height: AppSpacing.xxs),
+                        Text(
+                          '$sourceLabel · $referenceCalories',
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTypography.caption.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
                         ),
                       ],
                     ),
-                  ],
+                  ),
+                  const SizedBox(width: AppSpacing.xs),
+                  YamIconButton(
+                    key: const ValueKey('quick-add-close'),
+                    icon: Icons.close_rounded,
+                    tooltip: l10n.quickAddClose,
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.md),
+              YamQuantityControl(
+                amountFieldKey: const ValueKey('quick-add-quantity'),
+                unitKey: ValueKey('quick-add-unit-${_serving.id}'),
+                controller: _amountController,
+                unitLabels: [
+                  for (final serving in widget.food.servings)
+                    foodSearchUnitLabel(l10n, serving.unit),
+                ],
+                selectedUnitIndex: widget.food.servings.indexOf(_serving),
+                amountSemanticLabel: l10n.quickAddQuantity,
+                unitTooltip: l10n.quickAddUnit,
+                decreaseTooltip: l10n.quickAddDecrease,
+                increaseTooltip: l10n.quickAddIncrease,
+                errorText: _attemptedSubmit && !validAmount
+                    ? l10n.quickAddAmountInvalid
+                    : null,
+                onAmountChanged: (_) => setState(() {}),
+                onUnitSelected: _selectServing,
+                onDecrease: () => _changeAmount(-_serving.step),
+                onIncrease: () => _changeAmount(_serving.step),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              YamQuickAmountPresets(
+                title: l10n.quickAddQuickSelect,
+                usualAmountLabel: l10n.quickAddUsualAmount(
+                  formatFoodSearchQuantity(
+                    context,
+                    widget.food.lastServing.unit,
+                    widget.food.lastAmount,
+                  ),
                 ),
+                labels: [
+                  for (final preset in _serving.presets)
+                    formatFoodSearchQuantity(context, _serving.unit, preset),
+                ],
+                selectedIndex: selectedPresetIndex,
+                onSelected: (index) => _setAmount(_serving.presets[index]),
               ),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            FilledButton.icon(
-              key: const ValueKey('quick-add-submit'),
-              onPressed: _submit,
-              icon: const Icon(Icons.add_rounded),
-              label: Text(l10n.quickAddAdd),
-              style: FilledButton.styleFrom(
-                minimumSize: const Size.fromHeight(52),
+              const SizedBox(height: AppSpacing.md),
+              YamNutritionSummary(
+                calorieValue: calorieValue,
+                calorieUnit: l10n.unitKilocalories,
+                proteinLabel: l10n.macroProteinShort,
+                proteinValue:
+                    '${formatFoodSearchNumber(context, nutrition.protein)} ${l10n.unitGrams}',
+                fatLabel: l10n.macroFatShort,
+                fatValue:
+                    '${formatFoodSearchNumber(context, nutrition.fat)} ${l10n.unitGrams}',
+                carbsLabel: l10n.macroCarbsShort,
+                carbsValue:
+                    '${formatFoodSearchNumber(context, nutrition.carbs)} ${l10n.unitGrams}',
               ),
-            ),
-          ],
+              const SizedBox(height: AppSpacing.md),
+              YamPrimaryButton(
+                key: const ValueKey('quick-add-submit'),
+                label: selectedMeal == null
+                    ? l10n.quickAddAddCalories(calorieValue)
+                    : l10n.quickAddAddToMeal(selectedMeal.name, calorieValue),
+                onPressed: _submit,
+                expanded: true,
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
+  int? _selectedPresetIndex(double? amount) {
+    if (amount == null) {
+      return null;
+    }
+    final index = _serving.presets.indexOf(amount);
+    return index < 0 ? null : index;
+  }
+
+  void _selectServing(int index) {
+    final serving = widget.food.servings[index];
+    setState(() {
+      _serving = serving;
+      _setControllerAmount(serving.defaultAmount);
+    });
+  }
+
   void _changeAmount(double delta) {
     final current = _amount ?? _serving.defaultAmount;
-    _setAmount((current + delta).clamp(_serving.step, double.infinity));
+    final amount = (current + delta)
+        .clamp(_serving.step, double.infinity)
+        .toDouble();
+    _setAmount(amount);
   }
 
   void _setAmount(double amount) {
-    setState(() => _amountController.text = _editableNumber(amount));
+    setState(() => _setControllerAmount(amount));
+  }
+
+  void _setControllerAmount(double amount) {
+    final text = _editableNumber(amount);
+    _amountController.value = TextEditingValue(
+      text: text,
+      selection: TextSelection.collapsed(offset: text.length),
+    );
   }
 
   void _submit() {
@@ -312,26 +333,6 @@ class _FoodQuickAddSheetState extends State<_FoodQuickAddSheet> {
         protein: nutrition.protein,
         fat: nutrition.fat,
         carbs: nutrition.carbs,
-      ),
-    );
-  }
-}
-
-class _NutritionValue extends StatelessWidget {
-  const _NutritionValue({required this.label, this.emphasized = false});
-
-  final String label;
-  final bool emphasized;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Text(
-      label,
-      style: theme.textTheme.bodyMedium?.copyWith(
-        color: emphasized ? theme.colorScheme.primary : null,
-        fontWeight: emphasized ? FontWeight.w800 : FontWeight.w600,
-        fontFeatures: const [FontFeature.tabularFigures()],
       ),
     );
   }
