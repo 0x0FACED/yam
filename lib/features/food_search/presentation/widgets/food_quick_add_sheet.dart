@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yam/app/theme/app_radius.dart';
 import 'package:yam/app/theme/app_spacing.dart';
 import 'package:yam/app/theme/app_typography.dart';
 import 'package:yam/core/ui/buttons/yam_buttons.dart';
@@ -206,6 +207,9 @@ class _FoodQuickAddSheetState extends State<_FoodQuickAddSheet> {
                     icon: Icons.close_rounded,
                     tooltip: l10n.quickAddClose,
                     onPressed: () => Navigator.of(context).pop(),
+                    iconSize: 17,
+                    visualSize: 32,
+                    visualBorderRadius: AppRadius.pill,
                   ),
                 ],
               ),

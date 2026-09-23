@@ -197,7 +197,7 @@ class YamProductRow extends StatelessWidget {
                   child: quickAddButton,
                 ),
               ),
-            if (showDivider) const Divider(),
+            if (showDivider) const Divider(height: 1),
           ],
         );
       },
@@ -227,21 +227,35 @@ class YamQuickAddButton extends StatelessWidget {
       button: true,
       label: semanticLabel,
       excludeSemantics: true,
-      child: OutlinedButton(
+      child: TextButton(
         key: buttonKey,
         onPressed: onPressed,
-        style: OutlinedButton.styleFrom(
-          foregroundColor: theme.colorScheme.onSurface,
-          backgroundColor: theme.colorScheme.surfaceContainer,
+        style: TextButton.styleFrom(
+          foregroundColor: theme.colorScheme.primary,
           minimumSize: const Size(0, 44),
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
-          side: BorderSide(color: theme.colorScheme.outlineVariant),
+          padding: EdgeInsets.zero,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppRadius.small),
+            borderRadius: BorderRadius.circular(AppRadius.control),
           ),
           textStyle: AppTypography.label.copyWith(fontWeight: FontWeight.w700),
         ),
-        child: Text(label),
+        child: Container(
+          height: 32,
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surfaceContainer,
+            border: Border.all(color: theme.colorScheme.outlineVariant),
+            borderRadius: BorderRadius.circular(AppRadius.control),
+          ),
+          child: Text(
+            label,
+            style: AppTypography.label.copyWith(
+              color: theme.colorScheme.primary,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
       ),
     );
   }

@@ -73,6 +73,8 @@ class YamMealSectionHeader extends StatelessWidget {
           icon: Icons.add_rounded,
           tooltip: addTooltip,
           onPressed: onAdd,
+          iconSize: 16,
+          visualSize: 24,
         ),
       ],
     );
@@ -186,7 +188,7 @@ class YamDiaryFoodRow extends StatelessWidget {
           onTap: onPressed,
           borderRadius: BorderRadius.circular(AppRadius.small),
           child: ConstrainedBox(
-            constraints: const BoxConstraints(minHeight: 60),
+            constraints: const BoxConstraints(minHeight: 48),
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
               child: largeText

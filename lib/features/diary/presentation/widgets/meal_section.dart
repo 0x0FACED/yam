@@ -42,8 +42,8 @@ class MealSection extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               _MealHeader(meal: meal, onAddFood: onAddFood),
-              const SizedBox(height: AppSpacing.xs),
-              Divider(color: theme.colorScheme.outlineVariant),
+              const SizedBox(height: AppSpacing.xxs),
+              Divider(height: 1, color: theme.colorScheme.outlineVariant),
               if (meal.entries.isEmpty)
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),

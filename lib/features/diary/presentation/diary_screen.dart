@@ -61,12 +61,6 @@ class _DiaryScreenState extends State<DiaryScreen> {
     );
 
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        key: const ValueKey('diary-add-food'),
-        onPressed: _openFoodSearch,
-        tooltip: l10n.diaryAddFood,
-        child: const Icon(Icons.add_rounded),
-      ),
       body: SafeArea(
         bottom: false,
         child: LayoutBuilder(
@@ -140,7 +134,7 @@ class _DiaryScreenState extends State<DiaryScreen> {
       SliverPadding(
         padding: EdgeInsets.fromLTRB(
           horizontalPadding,
-          AppSpacing.sm,
+          AppSpacing.xs,
           horizontalPadding,
           0,
         ),
@@ -153,7 +147,7 @@ class _DiaryScreenState extends State<DiaryScreen> {
       SliverPadding(
         padding: EdgeInsets.fromLTRB(
           horizontalPadding,
-          AppSpacing.sm,
+          AppSpacing.xs,
           horizontalPadding,
           0,
         ),
@@ -166,7 +160,7 @@ class _DiaryScreenState extends State<DiaryScreen> {
         ),
       ),
       SliverPadding(
-        padding: contentPadding.copyWith(top: AppSpacing.md),
+        padding: contentPadding.copyWith(top: AppSpacing.sm),
         sliver: SliverList.builder(
           itemCount: day.meals.length,
           itemBuilder: (context, index) {
@@ -184,7 +178,7 @@ class _DiaryScreenState extends State<DiaryScreen> {
           },
         ),
       ),
-      const SliverToBoxAdapter(child: SizedBox(height: 96)),
+      const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.md)),
     ];
   }
 
@@ -196,9 +190,9 @@ class _DiaryScreenState extends State<DiaryScreen> {
       SliverPadding(
         padding: EdgeInsets.fromLTRB(
           horizontalPadding,
-          AppSpacing.sm,
+          AppSpacing.xs,
           horizontalPadding,
-          96,
+          AppSpacing.md,
         ),
         sliver: SliverToBoxAdapter(
           child: _ConstrainedDiaryContent(

@@ -165,6 +165,8 @@ class YamIconButton extends StatelessWidget {
     this.selected = false,
     this.surface = true,
     this.iconSize = 18,
+    this.visualSize,
+    this.visualBorderRadius,
     super.key,
   });
 
@@ -174,6 +176,8 @@ class YamIconButton extends StatelessWidget {
   final bool selected;
   final bool surface;
   final double iconSize;
+  final double? visualSize;
+  final double? visualBorderRadius;
 
   @override
   Widget build(BuildContext context) {
@@ -189,6 +193,30 @@ class YamIconButton extends StatelessWidget {
         ? theme.colorScheme.outlineVariant
         : Colors.transparent;
 
+    final visualSize = this.visualSize;
+    final icon = visualSize == null
+        ? Icon(this.icon)
+        : Container(
+            width: visualSize,
+            height: visualSize,
+            decoration: BoxDecoration(
+              color: background,
+              borderRadius: BorderRadius.circular(
+                visualBorderRadius ?? AppRadius.small,
+              ),
+            ),
+            alignment: Alignment.center,
+            child: Icon(
+              this.icon,
+              size: iconSize,
+              color: onPressed == null
+                  ? theme.colorScheme.onSurfaceVariant
+                  : selected
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.onSurfaceVariant,
+            ),
+          );
+
     return Semantics(
       selected: selected,
       child: IconButton(
@@ -202,16 +230,18 @@ class YamIconButton extends StatelessWidget {
               ? theme.colorScheme.primary
               : theme.colorScheme.onSurface,
           disabledForegroundColor: theme.colorScheme.onSurfaceVariant,
-          backgroundColor: background,
-          disabledBackgroundColor: surface
+          backgroundColor: visualSize == null ? background : Colors.transparent,
+          disabledBackgroundColor: visualSize == null && surface
               ? theme.scaffoldBackgroundColor
               : Colors.transparent,
-          side: BorderSide(color: border),
+          side: visualSize == null
+              ? BorderSide(color: border)
+              : BorderSide.none,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppRadius.small),
           ),
         ),
-        icon: Icon(icon),
+        icon: icon,
       ),
     );
   }

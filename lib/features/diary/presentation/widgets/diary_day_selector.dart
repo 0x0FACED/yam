@@ -106,7 +106,6 @@ class DiaryDaySelector extends StatelessWidget {
                 child: _DayTile(
                   day: startOfWeek.add(Duration(days: index)),
                   selectedDay: selectedDay,
-                  today: today,
                   locale: locale,
                   onSelected: onDaySelected,
                 ),
@@ -133,14 +132,12 @@ class _DayTile extends StatelessWidget {
   const _DayTile({
     required this.day,
     required this.selectedDay,
-    required this.today,
     required this.locale,
     required this.onSelected,
   });
 
   final DateTime day;
   final DateTime selectedDay;
-  final DateTime today;
   final String locale;
   final ValueChanged<DateTime> onSelected;
 
@@ -148,7 +145,6 @@ class _DayTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final selected = _isSameDay(day, selectedDay);
-    final isToday = _isSameDay(day, today);
     final foreground = selected
         ? theme.colorScheme.onPrimary
         : theme.colorScheme.onSurface;
@@ -174,7 +170,7 @@ class _DayTile extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppRadius.control),
               onTap: () => onSelected(day),
               child: ConstrainedBox(
-                constraints: const BoxConstraints(minHeight: 48),
+                constraints: const BoxConstraints(minHeight: 44),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: AppSpacing.xxs),
                   child: Column(
@@ -203,21 +199,6 @@ class _DayTile extends StatelessWidget {
                               : FontWeight.w500,
                           fontFeatures: AppTypography.tabularFigures,
                         ),
-                      ),
-                      SizedBox(
-                        height: 3,
-                        child: isToday && !selected
-                            ? Center(
-                                child: Container(
-                                  width: 3,
-                                  height: 3,
-                                  decoration: BoxDecoration(
-                                    color: theme.colorScheme.primary,
-                                    shape: BoxShape.circle,
-                                  ),
-                                ),
-                              )
-                            : null,
                       ),
                     ],
                   ),

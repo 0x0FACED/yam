@@ -212,6 +212,7 @@
     }
   },
   "actionUndo": "Undo",
+  "actionClear": "Clear",
   "actionRetry": "Retry",
   "unitKilocalories": "kcal",
   "unitGrams": "g",
@@ -331,7 +332,7 @@
   "settingsDataSection": "Data",
   "settingsExportData": "Export data",
   "settingsDeleteAllData": "Delete all data",
-  "settingsUnavailable": "Not available yet",
+  "settingsUnavailable": "Unavailable",
   "settingsAboutSection": "About",
   "settingsAboutYam": "About YAM",
   "settingsVersion": "Version",

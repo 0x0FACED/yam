@@ -30,7 +30,7 @@ class YamFilterChip extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onPressed,
-          borderRadius: BorderRadius.circular(AppRadius.small),
+          borderRadius: BorderRadius.circular(AppRadius.pill),
           child: ConstrainedBox(
             constraints: const BoxConstraints(minHeight: 44),
             child: Center(
@@ -43,14 +43,14 @@ class YamFilterChip extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   color: selected
-                      ? theme.colorScheme.primary
+                      ? theme.colorScheme.primary.withValues(alpha: 0.14)
                       : theme.colorScheme.surfaceContainer,
                   border: Border.all(
                     color: selected
-                        ? theme.colorScheme.primary
+                        ? theme.colorScheme.primary.withValues(alpha: 0.4)
                         : theme.colorScheme.outlineVariant,
                   ),
-                  borderRadius: BorderRadius.circular(AppRadius.small),
+                  borderRadius: BorderRadius.circular(AppRadius.pill),
                   boxShadow: selected
                       ? [
                           BoxShadow(
@@ -67,7 +67,7 @@ class YamFilterChip extends StatelessWidget {
                   label,
                   style: AppTypography.label.copyWith(
                     color: selected
-                        ? theme.colorScheme.onPrimary
+                        ? theme.colorScheme.primary
                         : theme.colorScheme.onSurfaceVariant,
                     fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
                   ),
@@ -108,7 +108,7 @@ class YamMealChip extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onPressed,
-          borderRadius: BorderRadius.circular(AppRadius.small),
+          borderRadius: BorderRadius.circular(AppRadius.pill),
           child: ConstrainedBox(
             constraints: BoxConstraints(minHeight: 44, maxWidth: maxWidth),
             child: Center(
@@ -118,12 +118,8 @@ class YamMealChip extends StatelessWidget {
                   color: active
                       ? theme.colorScheme.surfaceContainer
                       : theme.scaffoldBackgroundColor,
-                  border: Border.all(
-                    color: active
-                        ? theme.colorScheme.primary.withValues(alpha: 0.4)
-                        : theme.colorScheme.outlineVariant,
-                  ),
-                  borderRadius: BorderRadius.circular(AppRadius.small),
+                  border: Border.all(color: theme.colorScheme.outlineVariant),
+                  borderRadius: BorderRadius.circular(AppRadius.pill),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(

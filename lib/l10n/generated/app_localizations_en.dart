@@ -282,6 +282,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get actionUndo => 'Undo';
 
   @override
+  String get actionClear => 'Clear';
+
+  @override
   String get actionRetry => 'Retry';
 
   @override
@@ -481,7 +484,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsDeleteAllData => 'Delete all data';
 
   @override
-  String get settingsUnavailable => 'Not available yet';
+  String get settingsUnavailable => 'Unavailable';
 
   @override
   String get settingsAboutSection => 'About';

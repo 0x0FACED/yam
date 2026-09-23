@@ -32,8 +32,9 @@ Approved visual references live under `agents/design/`.
 For tasks that create or modify UI:
 
 1. Read the relevant accepted design ADRs first.
-2. Inspect `agents/design/yam_components_2.html`.
-3. Inspect the HTML reference for the screen being implemented.
+2. Inspect the HTML reference for the screen being implemented.
+3. Inspect `agents/design/yam_components_2.html` for shared patterns and states
+   not specified by the screen reference.
 4. Inspect existing Flutter theme tokens and reusable UI components.
 5. Inspect the current feature implementation and tests.
 
@@ -46,7 +47,10 @@ Do not copy:
 - browser-specific behaviour;
 - accidental inconsistencies between generated HTML files.
 
-When an HTML reference conflicts with an accepted ADR or the canonical Flutter design tokens, the ADR/tokens win.
+When a screen HTML reference conflicts with an accepted ADR or canonical
+Flutter semantic tokens, the ADR/tokens win. For screen-level composition,
+density, spacing intent, and contextual visual geometry, the screen reference
+wins over `yam_components_2.html`.
 
 Do not redesign an approved reference unless the user explicitly asks for a design change.
 

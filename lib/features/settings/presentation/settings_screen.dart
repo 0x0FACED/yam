@@ -73,10 +73,12 @@ class SettingsScreen extends StatelessWidget {
                                 YamSettingsRow(
                                   title: l10n.settingsGoalsNutrition,
                                   subtitle: goalsSummary,
+                                  minHeight: 56,
                                 ),
                                 YamSettingsRow(
                                   title: l10n.settingsWeight,
                                   subtitle: weightSummary,
+                                  minHeight: 56,
                                 ),
                               ],
                             ),
@@ -110,11 +112,13 @@ class SettingsScreen extends StatelessWidget {
                                 YamSettingsRow(
                                   title: l10n.settingsExportData,
                                   value: l10n.settingsUnavailable,
+                                  mutedValue: true,
                                 ),
                                 YamSettingsRow(
                                   title: l10n.settingsDeleteAllData,
                                   value: l10n.settingsUnavailable,
                                   tone: YamSettingsRowTone.destructive,
+                                  mutedValue: true,
                                 ),
                               ],
                             ),
@@ -187,16 +191,13 @@ class _SettingsHeader extends StatelessWidget {
     return SliverAppBar(
       pinned: true,
       primary: false,
-      toolbarHeight: 48,
+      toolbarHeight: 56,
       automaticallyImplyLeading: false,
       titleSpacing: 0,
       elevation: 0,
       scrolledUnderElevation: 0,
       backgroundColor: theme.scaffoldBackgroundColor,
       surfaceTintColor: Colors.transparent,
-      shape: Border(
-        bottom: BorderSide(color: theme.colorScheme.outlineVariant),
-      ),
       title: Padding(
         padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
         child: Align(

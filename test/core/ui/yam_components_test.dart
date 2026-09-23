@@ -13,6 +13,7 @@ void main() {
   ) async {
     var primaryPressed = false;
     var filterPressed = false;
+    var compactIconPressed = false;
 
     await tester.pumpWidget(
       _TestApp(
@@ -28,6 +29,13 @@ void main() {
               selected: true,
               onPressed: () => filterPressed = true,
             ),
+            YamIconButton(
+              icon: Icons.add_rounded,
+              tooltip: 'Add to meal',
+              visualSize: 24,
+              iconSize: 16,
+              onPressed: () => compactIconPressed = true,
+            ),
           ],
         ),
       ),
@@ -41,12 +49,18 @@ void main() {
       tester.getSize(find.byType(YamFilterChip)).height,
       greaterThanOrEqualTo(44),
     );
+    expect(
+      tester.getSize(find.byType(YamIconButton)).height,
+      greaterThanOrEqualTo(44),
+    );
 
     await tester.tap(find.byType(YamPrimaryButton));
     await tester.tap(find.byType(YamFilterChip));
+    await tester.tap(find.byType(YamIconButton));
 
     expect(primaryPressed, isTrue);
     expect(filterPressed, isTrue);
+    expect(compactIconPressed, isTrue);
   });
 
   testWidgets('search field clears text and reports the clear action', (

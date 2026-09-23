@@ -50,7 +50,10 @@ class DailyNutritionSummary extends StatelessWidget {
           Text.rich(
             TextSpan(
               children: [
-                TextSpan(text: consumed, style: AppTypography.prominentMetric),
+                TextSpan(
+                  text: consumed,
+                  style: AppTypography.prominentMetric.copyWith(fontSize: 24),
+                ),
                 TextSpan(
                   text: ' ${l10n.diaryCalorieGoalSuffix(target)}',
                   style: AppTypography.productTitle.copyWith(
@@ -80,8 +83,6 @@ class DailyNutritionSummary extends StatelessWidget {
             trackColor: theme.colorScheme.surfaceContainer,
             semanticValue: '$consumed ${l10n.diaryCalorieGoalSuffix(target)}',
           ),
-          const SizedBox(height: AppSpacing.md),
-          Divider(color: theme.colorScheme.outlineVariant),
           const SizedBox(height: AppSpacing.sm),
           LayoutBuilder(
             builder: (context, constraints) {

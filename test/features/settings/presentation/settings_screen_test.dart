@@ -19,6 +19,7 @@ void main() {
 
     expect(find.byType(SettingsScreen), findsOneWidget);
     expect(find.text('System'), findsOneWidget);
+    expect(tester.getTopRight(find.text('Metric')).dx, closeTo(358, 0.1));
 
     await tester.tap(find.byKey(const ValueKey('settings-theme')));
     await tester.pumpAndSettle();
@@ -41,7 +42,7 @@ void main() {
 
     expect(find.text('Goals & nutrition'), findsOneWidget);
     expect(find.text('Metric'), findsOneWidget);
-    expect(find.text('Not available yet'), findsNWidgets(2));
+    expect(find.text('Unavailable'), findsNWidgets(2));
     expect(tester.takeException(), isNull);
 
     await tester.ensureVisible(find.byKey(const ValueKey('settings-about')));

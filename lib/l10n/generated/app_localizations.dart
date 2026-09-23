@@ -572,6 +572,12 @@ abstract class AppLocalizations {
   /// **'Undo'**
   String get actionUndo;
 
+  /// No description provided for @actionClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get actionClear;
+
   /// No description provided for @actionRetry.
   ///
   /// In en, this message translates to:
@@ -886,7 +892,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsUnavailable.
   ///
   /// In en, this message translates to:
-  /// **'Not available yet'**
+  /// **'Unavailable'**
   String get settingsUnavailable;
 
   /// No description provided for @settingsAboutSection.

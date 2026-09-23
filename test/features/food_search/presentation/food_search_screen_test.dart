@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -9,16 +11,14 @@ import 'package:yam/features/food_search/presentation/food_search_screen.dart';
 import 'package:yam/l10n/generated/app_localizations.dart';
 
 void main() {
-  testWidgets('requires a meal and returns an in-memory diary entry', (
-    tester,
-  ) async {
+  testWidgets('requires a meal before completing quick add', (tester) async {
     await _setWindowSize(tester, const Size(390, 844));
     final router = createAppRouter();
     addTearDown(router.dispose);
     await tester.pumpWidget(_RouterTestApp(router: router));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(const ValueKey('diary-add-food')));
+    unawaited(router.push<void>('/add-food'));
     await tester.pumpAndSettle();
 
     expect(find.byKey(const ValueKey('food-search-field')), findsOneWidget);
@@ -47,11 +47,7 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('quick-add-submit')));
     await tester.pumpAndSettle();
 
-    expect(find.text('Rolled oats'), findsOneWidget);
-    expect(find.textContaining('added to Breakfast'), findsOneWidget);
-
-    await tester.tap(find.text('Undo'));
-    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('food-search-field')), findsNothing);
     expect(find.text('Rolled oats'), findsNothing);
   });
 
@@ -75,6 +71,10 @@ void main() {
 
     expect(find.text('Rolled oats'), findsOneWidget);
     expect(find.text('80 g'), findsOneWidget);
+
+    await tester.tap(find.text('Undo'));
+    await tester.pumpAndSettle();
+    expect(find.text('Rolled oats'), findsNothing);
   });
 
   testWidgets('shows empty search and custom-food placeholder states', (
@@ -86,7 +86,7 @@ void main() {
     await tester.pumpWidget(_RouterTestApp(router: router));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(const ValueKey('diary-add-food')));
+    unawaited(router.push<void>('/add-food'));
     await tester.pumpAndSettle();
 
     await tester.enterText(
@@ -139,6 +139,21 @@ void main() {
     expect(find.text('Wholegrain bread'), findsOneWidget);
   });
 
+  testWidgets('clears recent foods for the current search session', (
+    tester,
+  ) async {
+    await _setWindowSize(tester, const Size(390, 844));
+    await tester.pumpWidget(const _ScreenTestApp());
+    await tester.pumpAndSettle();
+
+    expect(find.text('Clear'), findsOneWidget);
+    await tester.tap(find.text('Clear'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Fresh banana'), findsNothing);
+    expect(find.text('Clear'), findsNothing);
+  });
+
   testWidgets('renders catalog loading and error feedback states', (
     tester,
   ) async {
@@ -176,7 +191,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(NavigationRail), findsOneWidget);
-    await tester.tap(find.byKey(const ValueKey('diary-add-food')));
+    await tester.tap(find.byTooltip('Add food to Breakfast'));
     await tester.pumpAndSettle();
 
     expect(find.byKey(const ValueKey('food-search-field')), findsOneWidget);
@@ -221,6 +236,15 @@ void main() {
     expect(find.text('Quick select'), findsOneWidget);
     expect(find.text('Usually: 80 g'), findsOneWidget);
     expect(find.text('Add to Breakfast · 293 kcal'), findsOneWidget);
+    expect(
+      tester.getTopRight(find.text('Usually: 80 g')).dx,
+      closeTo(
+        tester.getTopRight(find.byKey(const ValueKey('quick-add-submit'))).dx,
+        0.1,
+      ),
+    );
+    expect(tester.getSize(find.byTooltip('Decrease quantity')).height, 44);
+    expect(tester.getSize(find.byTooltip('Close quick add')).height, 44);
 
     await tester.tap(find.byTooltip('Increase quantity'));
     await tester.pump();

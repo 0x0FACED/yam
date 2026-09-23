@@ -40,11 +40,12 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(const ValueKey('diary-add-food')));
+    expect(find.byKey(const ValueKey('diary-add-food')), findsNothing);
+    await tester.tap(find.byTooltip('Добавить еду в раздел «Завтрак»'));
     await tester.pumpAndSettle();
 
     expect(find.byKey(const ValueKey('food-search-field')), findsOneWidget);
-    expect(find.text('Часто добавляют'), findsOneWidget);
+    expect(find.text('Часто на завтрак'), findsOneWidget);
     expect(find.byType(NavigationBar), findsNothing);
   });
 

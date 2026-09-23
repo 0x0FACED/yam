@@ -12,8 +12,8 @@ For visual decisions:
 
 1. Accepted design ADRs
 2. Canonical Flutter theme/design tokens
-3. `yam_components_2.html`
-4. Approved screen HTML
+3. Approved screen HTML for screen composition, density and contextual geometry
+4. `yam_components_2.html` for shared patterns and unspecified states
 5. Existing implementation
 6. Agent judgment
 
@@ -61,6 +61,10 @@ Those details are not authoritative.
 
 Match visual hierarchy, spacing, density, composition and interaction
 intent, then implement idiomatically in Flutter.
+
+Compact visual controls may keep a larger transparent or low-emphasis hit area.
+Do not enlarge their visible surface solely to satisfy the 44 logical px touch
+target.
 
 ## Screen references
 

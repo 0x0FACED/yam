@@ -283,6 +283,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get actionUndo => 'Отменить';
 
   @override
+  String get actionClear => 'Очистить';
+
+  @override
   String get actionRetry => 'Повторить';
 
   @override
@@ -490,7 +493,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsDeleteAllData => 'Удалить все данные';
 
   @override
-  String get settingsUnavailable => 'Пока недоступно';
+  String get settingsUnavailable => 'Недоступно';
 
   @override
   String get settingsAboutSection => 'О приложении';

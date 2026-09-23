@@ -4,6 +4,7 @@ import 'package:yam/app/theme/app_radius.dart';
 import 'package:yam/app/theme/app_semantic_colors.dart';
 import 'package:yam/app/theme/app_spacing.dart';
 import 'package:yam/app/theme/app_typography.dart';
+import 'package:yam/core/ui/buttons/yam_buttons.dart';
 
 class YamQuantityControl extends StatelessWidget {
   const YamQuantityControl({
@@ -150,7 +151,10 @@ class YamQuantityControl extends StatelessWidget {
             borderRadius: BorderRadius.circular(AppRadius.card),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.sm),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.sm,
+              vertical: AppSpacing.xs,
+            ),
             child: Row(
               children: [
                 _QuantityStepButton(
@@ -225,7 +229,7 @@ class YamQuickAmountPresets extends StatelessWidget {
               ),
             ),
             const SizedBox(width: AppSpacing.xs),
-            Flexible(
+            Expanded(
               child: Text(
                 usualAmountLabel,
                 textAlign: TextAlign.end,
@@ -394,21 +398,13 @@ class _QuantityStepButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return IconButton(
+    return YamIconButton(
+      icon: icon,
       tooltip: tooltip,
       onPressed: onPressed,
-      icon: Icon(icon),
-      style: IconButton.styleFrom(
-        minimumSize: const Size.square(48),
-        maximumSize: const Size.square(48),
-        foregroundColor: theme.colorScheme.onSurface,
-        backgroundColor: theme.colorScheme.surfaceContainer,
-        side: BorderSide(color: theme.colorScheme.outlineVariant),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppRadius.control),
-        ),
-      ),
+      iconSize: 19,
+      visualSize: 36,
+      visualBorderRadius: AppRadius.pill,
     );
   }
 }

@@ -45,7 +45,6 @@ class YamSettingsSection extends StatelessWidget {
           color: theme.colorScheme.surface,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppRadius.control),
-            side: BorderSide(color: theme.colorScheme.outlineVariant),
           ),
           clipBehavior: Clip.antiAlias,
           child: Column(
@@ -75,6 +74,8 @@ class YamSettingsRow extends StatelessWidget {
     this.onPressed,
     this.showChevron = false,
     this.tone = YamSettingsRowTone.normal,
+    this.minHeight = 52,
+    this.mutedValue = false,
     super.key,
   });
 
@@ -84,6 +85,8 @@ class YamSettingsRow extends StatelessWidget {
   final VoidCallback? onPressed;
   final bool showChevron;
   final YamSettingsRowTone tone;
+  final double minHeight;
+  final bool mutedValue;
 
   @override
   Widget build(BuildContext context) {
@@ -123,11 +126,11 @@ class YamSettingsRow extends StatelessWidget {
             child: Text(
               value!,
               textAlign: TextAlign.end,
-              style: AppTypography.body.copyWith(
-                color: tone == YamSettingsRowTone.destructive
-                    ? theme.colorScheme.error
-                    : theme.colorScheme.onSurfaceVariant,
-              ),
+              style: (mutedValue ? AppTypography.caption : AppTypography.body)
+                  .copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                    fontWeight: mutedValue ? FontWeight.w500 : null,
+                  ),
             ),
           ),
         if (value != null && showChevron) const SizedBox(width: AppSpacing.xxs),
@@ -157,16 +160,21 @@ class YamSettingsRow extends StatelessWidget {
               Expanded(child: details),
               if (value != null || showChevron) ...[
                 const SizedBox(width: AppSpacing.md),
-                Flexible(child: trailing),
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: trailing,
+                  ),
+                ),
               ],
             ],
           );
     final row = ConstrainedBox(
-      constraints: const BoxConstraints(minHeight: 56),
+      constraints: BoxConstraints(minHeight: minHeight),
       child: Padding(
-        padding: const EdgeInsets.symmetric(
+        padding: EdgeInsets.symmetric(
           horizontal: AppSpacing.md,
-          vertical: AppSpacing.sm,
+          vertical: subtitle == null ? AppSpacing.xs : 10,
         ),
         child: content,
       ),

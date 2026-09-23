@@ -29,7 +29,7 @@ class FoodSearchScreen extends StatefulWidget {
 }
 
 class _FoodSearchScreenState extends State<FoodSearchScreen> {
-  static const _maxContentWidth = 760.0;
+  static const _maxContentWidth = 448.0;
 
   final _searchController = TextEditingController();
   final _searchFocusNode = FocusNode();
@@ -44,6 +44,7 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
   late FoodSearchPrototypeCatalogState _catalogState;
   _FoodSearchTab _selectedTab = _FoodSearchTab.forYou;
   String? _selectedMealId;
+  bool _recentCleared = false;
 
   @override
   void initState() {
@@ -172,11 +173,22 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
                   ),
             _frequent,
           ),
-          ..._buildSection(l10n.foodSearchRecent, _recent),
+          ..._buildSection(
+            l10n.foodSearchRecent,
+            _recent,
+            trailingLabel: l10n.actionClear,
+            onTrailingPressed: _clearRecent,
+          ),
           const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xl)),
         ];
       case _FoodSearchTab.recent:
-        return _buildSingleTabSlivers(l10n.foodSearchRecent, _recent, l10n);
+        return _buildSingleTabSlivers(
+          l10n.foodSearchRecent,
+          _recent,
+          l10n,
+          trailingLabel: l10n.actionClear,
+          onTrailingPressed: _clearRecent,
+        );
       case _FoodSearchTab.myDishes:
         return _buildSingleTabSlivers(l10n.foodSearchMyDishes, _myDishes, l10n);
       case _FoodSearchTab.favorites:
@@ -191,8 +203,10 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
   List<Widget> _buildSingleTabSlivers(
     String title,
     List<FoodSearchPrototypeFood> foods,
-    AppLocalizations l10n,
-  ) {
+    AppLocalizations l10n, {
+    String? trailingLabel,
+    VoidCallback? onTrailingPressed,
+  }) {
     if (foods.isEmpty) {
       return [
         SliverFillRemaining(
@@ -206,7 +220,12 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
       ];
     }
     return [
-      ..._buildSection(title, foods),
+      ..._buildSection(
+        title,
+        foods,
+        trailingLabel: trailingLabel,
+        onTrailingPressed: onTrailingPressed,
+      ),
       const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xl)),
     ];
   }
@@ -285,13 +304,21 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
 
   List<Widget> _buildSection(
     String title,
-    List<FoodSearchPrototypeFood> foods,
-  ) {
+    List<FoodSearchPrototypeFood> foods, {
+    String? trailingLabel,
+    VoidCallback? onTrailingPressed,
+  }) {
     if (foods.isEmpty) {
       return const [];
     }
     return [
-      SliverToBoxAdapter(child: _SectionHeader(title: title)),
+      SliverToBoxAdapter(
+        child: _SectionHeader(
+          title: title,
+          trailingLabel: trailingLabel,
+          onTrailingPressed: onTrailingPressed,
+        ),
+      ),
       SliverList.builder(
         itemCount: foods.length,
         itemBuilder: (context, index) => _buildFoodRow(foods[index]),
@@ -335,10 +362,9 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
             (food) => food.frequentMealIds.contains(_selectedMealId),
           );
     _frequent = frequent.take(4).toList(growable: false);
-    _recent = _foods
-        .where((food) => food.recent)
-        .take(6)
-        .toList(growable: false);
+    _recent = _recentCleared
+        ? const []
+        : _foods.where((food) => food.recent).take(6).toList(growable: false);
     _myDishes = _foods
         .where((food) => food.source == FoodSearchPrototypeSource.userCreated)
         .toList(growable: false);
@@ -349,6 +375,13 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
     _searchController.clear();
     setState(_updateVisibleFoods);
     _searchFocusNode.requestFocus();
+  }
+
+  void _clearRecent() {
+    setState(() {
+      _recentCleared = true;
+      _recent = const [];
+    });
   }
 
   Future<void> _selectMeal() async {
@@ -496,9 +529,11 @@ class _FoodSearchHeader extends StatelessWidget {
               children: [
                 YamIconButton(
                   key: const ValueKey('food-search-back'),
-                  icon: Icons.arrow_back_ios_new_rounded,
+                  icon: Icons.chevron_left_rounded,
                   tooltip: l10n.foodSearchBack,
                   onPressed: onBack,
+                  surface: false,
+                  iconSize: 26,
                 ),
                 const SizedBox(width: AppSpacing.xxs),
                 Expanded(
@@ -596,29 +631,44 @@ String _foodSearchTabLabel(AppLocalizations l10n, _FoodSearchTab tab) {
 }
 
 class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({required this.title});
+  const _SectionHeader({
+    required this.title,
+    this.trailingLabel,
+    this.onTrailingPressed,
+  });
 
   final String title;
+  final String? trailingLabel;
+  final VoidCallback? onTrailingPressed;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.md,
-        AppSpacing.sm,
-        AppSpacing.md,
-        AppSpacing.xs,
-      ),
-      child: Semantics(
-        header: true,
-        child: Text(
-          title,
-          style: AppTypography.sectionTitle.copyWith(
-            color: theme.colorScheme.onSurface,
-            fontWeight: FontWeight.w700,
-            letterSpacing: -0.1,
-          ),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: 44),
+        child: Row(
+          children: [
+            Expanded(
+              child: Semantics(
+                header: true,
+                child: Text(
+                  title,
+                  style: AppTypography.sectionTitle.copyWith(
+                    color: theme.colorScheme.onSurface,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.1,
+                  ),
+                ),
+              ),
+            ),
+            if (trailingLabel != null && onTrailingPressed != null)
+              YamTextButton(
+                label: trailingLabel!,
+                onPressed: onTrailingPressed,
+              ),
+          ],
         ),
       ),
     );

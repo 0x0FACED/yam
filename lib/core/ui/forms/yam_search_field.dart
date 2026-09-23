@@ -70,10 +70,10 @@ class YamSearchField extends StatelessWidget {
                 height: 44,
               ),
               filled: true,
-              fillColor: theme.scaffoldBackgroundColor,
+              fillColor: theme.colorScheme.surfaceContainer,
               contentPadding: const EdgeInsets.only(right: 12),
-              border: _border(theme.colorScheme.outlineVariant),
-              enabledBorder: _border(theme.colorScheme.outlineVariant),
+              border: _border(Colors.transparent),
+              enabledBorder: _border(Colors.transparent),
               focusedBorder: _border(theme.colorScheme.primary),
             ),
             onChanged: onChanged,
@@ -85,7 +85,7 @@ class YamSearchField extends StatelessWidget {
 
   OutlineInputBorder _border(Color color) {
     return OutlineInputBorder(
-      borderRadius: BorderRadius.circular(AppRadius.control),
+      borderRadius: BorderRadius.circular(AppRadius.card),
       borderSide: BorderSide(color: color),
     );
   }
