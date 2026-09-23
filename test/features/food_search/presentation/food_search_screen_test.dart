@@ -22,7 +22,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byKey(const ValueKey('food-search-field')), findsOneWidget);
-    expect(tester.testTextInput.hasAnyClients, isTrue);
+    expect(tester.testTextInput.hasAnyClients, isFalse);
 
     await tester.enterText(
       find.byKey(const ValueKey('food-search-field')),
@@ -51,7 +51,7 @@ void main() {
     expect(find.text('Rolled oats'), findsNothing);
   });
 
-  testWidgets('meal entry point supports one-tap last portion add', (
+  testWidgets('meal entry point opens portion sheet and supports Undo', (
     tester,
   ) async {
     await _setWindowSize(tester, const Size(390, 844));
@@ -64,9 +64,14 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Meal: Breakfast'), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('food-search-tab-favorites')));
+    await tester.pumpAndSettle();
     await tester.tap(
-      find.byKey(const ValueKey('food-quick-add-rolled-oats')).first,
+      find.byKey(const ValueKey('food-result-rolled-oats')).first,
     );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const ValueKey('quick-add-submit')));
     await tester.pumpAndSettle();
 
     expect(find.text('Rolled oats'), findsOneWidget);
@@ -106,52 +111,47 @@ void main() {
     );
   });
 
-  testWidgets('matches contextual sections and keeps quick add inline', (
+  testWidgets('recent history is explicit and favorites show stars', (
     tester,
   ) async {
     await _setWindowSize(tester, const Size(390, 844));
     await tester.pumpWidget(
       const _ScreenTestApp(
-        arguments: FoodSearchPrototypeArguments(initialMealId: 'breakfast'),
+        arguments: FoodSearchPrototypeArguments(
+          initialMealId: 'breakfast',
+          recentFoodIds: ['banana', 'rolled-oats'],
+        ),
       ),
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Frequent for breakfast'), findsOneWidget);
+    expect(find.text('Recent'), findsOneWidget);
+    expect(find.text('Fresh banana'), findsOneWidget);
     expect(find.text('Rolled oats'), findsOneWidget);
-    expect(find.text('Milk 2.5%'), findsOneWidget);
-    expect(find.text('Whey protein'), findsOneWidget);
-    expect(find.text('Grade A chicken egg'), findsOneWidget);
-
-    final rowCenter = tester.getCenter(
-      find.byKey(const ValueKey('food-result-rolled-oats')),
-    );
-    final actionCenter = tester.getCenter(
-      find.byKey(const ValueKey('food-quick-add-rolled-oats')),
-    );
-    expect((rowCenter.dy - actionCenter.dy).abs(), lessThan(12));
-
-    await tester.tap(find.byKey(const ValueKey('food-search-tab-recent')));
+    expect(find.byIcon(Icons.star_rounded), findsOneWidget);
+    expect(find.text('Grains'), findsOneWidget);
+    expect(find.byIcon(Icons.verified_rounded), findsNothing);
+    await tester.tap(find.byKey(const ValueKey('food-search-tab-favorites')));
     await tester.pumpAndSettle();
 
-    expect(find.text('Frequent for breakfast'), findsNothing);
-    expect(find.text('Fresh banana'), findsOneWidget);
-    expect(find.text('Wholegrain bread'), findsOneWidget);
+    expect(find.text('Favorites'), findsOneWidget);
+    expect(find.text('Fresh banana'), findsNothing);
+    expect(find.text('Rolled oats'), findsOneWidget);
   });
 
-  testWidgets('clears recent foods for the current search session', (
+  testWidgets('recent and my dishes start empty without invented history', (
     tester,
   ) async {
     await _setWindowSize(tester, const Size(390, 844));
     await tester.pumpWidget(const _ScreenTestApp());
     await tester.pumpAndSettle();
 
-    expect(find.text('Clear'), findsOneWidget);
-    await tester.tap(find.text('Clear'));
+    expect(find.text('Nothing here yet'), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('food-search-tab-myDishes')));
     await tester.pumpAndSettle();
 
-    expect(find.text('Fresh banana'), findsNothing);
-    expect(find.text('Clear'), findsNothing);
+    expect(find.text('Nothing here yet'), findsOneWidget);
+    expect(find.text('Cottage cheese 5%'), findsNothing);
   });
 
   testWidgets('renders catalog loading and error feedback states', (
@@ -206,7 +206,10 @@ void main() {
     await tester.pumpWidget(
       const _ScreenTestApp(
         textScaler: TextScaler.linear(2),
-        arguments: FoodSearchPrototypeArguments(initialMealId: 'breakfast'),
+        arguments: FoodSearchPrototypeArguments(
+          initialMealId: 'breakfast',
+          recentFoodIds: ['rolled-oats'],
+        ),
       ),
     );
     await tester.pumpAndSettle();
@@ -225,7 +228,10 @@ void main() {
     await _setWindowSize(tester, const Size(390, 844));
     await tester.pumpWidget(
       const _ScreenTestApp(
-        arguments: FoodSearchPrototypeArguments(initialMealId: 'breakfast'),
+        arguments: FoodSearchPrototypeArguments(
+          initialMealId: 'breakfast',
+          recentFoodIds: ['rolled-oats'],
+        ),
       ),
     );
     await tester.pumpAndSettle();

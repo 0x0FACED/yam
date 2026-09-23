@@ -150,7 +150,10 @@ class _GoldenApp extends StatelessWidget {
         );
       },
       home: const FoodSearchScreen(
-        arguments: FoodSearchPrototypeArguments(initialMealId: 'breakfast'),
+        arguments: FoodSearchPrototypeArguments(
+          initialMealId: 'breakfast',
+          recentFoodIds: ['rolled-oats', 'milk-25', 'whey-protein', 'eggs'],
+        ),
       ),
     );
   }

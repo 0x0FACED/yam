@@ -8,38 +8,23 @@ class FoodSearchResultRow extends StatelessWidget {
   const FoodSearchResultRow({
     required this.food,
     required this.onOpen,
-    required this.onQuickAdd,
     super.key,
   });
 
   final FoodSearchPrototypeFood food;
   final VoidCallback onOpen;
-  final VoidCallback onQuickAdd;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final lastQuantity = formatFoodSearchQuantity(
-      context,
-      food.lastServing.unit,
-      food.lastAmount,
-    );
     final referenceQuantity = formatFoodSearchQuantity(
       context,
       food.referenceUnit,
       food.referenceAmount,
     );
-    final sourceLabel =
-        food.brand ??
-        switch (food.source) {
-          FoodSearchPrototypeSource.localCatalog => l10n.foodSearchSourceLocal,
-          FoodSearchPrototypeSource.userCreated => l10n.foodSearchSourceUser,
-        };
-
     return YamProductRow(
       name: food.name,
-      sourceLabel: sourceLabel,
-      portionDescription: food.portionDescription,
+      metadataLabel: formatFoodSearchMetadata(l10n, food),
       calorieLabel: l10n.foodSearchCaloriesPerReference(
         formatFoodSearchNumber(context, food.nutrition.calories),
         referenceQuantity,
@@ -50,17 +35,10 @@ class FoodSearchResultRow extends StatelessWidget {
       fatValue: formatFoodSearchNumber(context, food.nutrition.fat),
       carbsLabel: l10n.macroCarbsShort,
       carbsValue: formatFoodSearchNumber(context, food.nutrition.carbs),
-      quickAddLabel: l10n.foodSearchQuickAdd(lastQuantity),
-      quickAddSemanticLabel: l10n.foodSearchQuickAddSemantics(
-        food.name,
-        lastQuantity,
-      ),
-      verified: food.verified,
-      verifiedTooltip: l10n.foodSearchVerified,
+      favorite: food.favorite,
+      favoriteLabel: l10n.foodSearchFavorites,
       openKey: ValueKey('food-result-${food.id}'),
-      quickAddKey: ValueKey('food-quick-add-${food.id}'),
       onPressed: onOpen,
-      onQuickAdd: onQuickAdd,
     );
   }
 }

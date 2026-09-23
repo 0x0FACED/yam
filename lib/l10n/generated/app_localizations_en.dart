@@ -151,17 +151,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Product creation will be implemented in a later slice.';
 
   @override
-  String get foodSearchForYou => 'For you';
-
-  @override
-  String get foodSearchFrequent => 'Frequently added';
-
-  @override
-  String foodSearchFrequentForMeal(String meal) {
-    return 'Frequent for $meal';
-  }
-
-  @override
   String get foodSearchRecent => 'Recent';
 
   @override
@@ -197,28 +186,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get foodSearchErrorMessage => 'Try loading the local catalog again.';
 
   @override
-  String get foodSearchVerified => 'Verified food';
-
-  @override
-  String get foodSearchSourceLocal => 'Local catalog';
-
-  @override
-  String get foodSearchSourceUser => 'Your food';
-
-  @override
   String foodSearchCaloriesPerReference(String calories, String quantity) {
     return '$calories kcal / $quantity';
   }
 
   @override
-  String foodSearchQuickAdd(String quantity) {
-    return '+ $quantity';
-  }
+  String get foodCategoryGrains => 'Grains';
 
   @override
-  String foodSearchQuickAddSemantics(String food, String quantity) {
-    return 'Add $food, $quantity';
-  }
+  String get foodCategoryDairy => 'Dairy';
+
+  @override
+  String get foodCategorySportsNutrition => 'Sports nutrition';
+
+  @override
+  String get foodCategoryFruit => 'Fruit';
+
+  @override
+  String get foodCategoryPoultry => 'Meat & poultry';
+
+  @override
+  String get foodCategoryEggs => 'Eggs';
+
+  @override
+  String get foodCategoryBread => 'Bread';
+
+  @override
+  String get foodCategoryDrinks => 'Drinks';
 
   @override
   String get quickAddTitle => 'Add to diary';

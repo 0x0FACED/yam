@@ -29,6 +29,7 @@ class _DiaryScreenState extends State<DiaryScreen> {
   final _scrollController = ScrollController();
   final Map<DateTime, Map<String, List<DiaryPrototypeEntry>>>
   _prototypeAdditions = {};
+  final List<({String entryId, String foodId})> _recentFoodAdditions = [];
 
   late final DateTime _today;
   late DateTime _selectedDay;
@@ -291,9 +292,19 @@ class _DiaryScreenState extends State<DiaryScreen> {
 
   Future<void> _openFoodSearch({String? mealId}) async {
     final targetDay = _selectedDay;
+    final recentFoodIds = <String>[];
+    for (final addition in _recentFoodAdditions.reversed) {
+      if (!recentFoodIds.contains(addition.foodId)) {
+        recentFoodIds.add(addition.foodId);
+        if (recentFoodIds.length == foodSearchRecentLimit) break;
+      }
+    }
     final result = await context.push<FoodAddPrototypeResult>(
       '/add-food',
-      extra: FoodSearchPrototypeArguments(initialMealId: mealId),
+      extra: FoodSearchPrototypeArguments(
+        initialMealId: mealId,
+        recentFoodIds: recentFoodIds,
+      ),
     );
     if (!mounted || result == null) {
       return;
@@ -321,6 +332,7 @@ class _DiaryScreenState extends State<DiaryScreen> {
         entry,
       ];
       _prototypeAdditions[targetDay] = additionsForDay;
+      _recentFoodAdditions.add((entryId: entryId, foodId: result.foodId));
       _highlightedEntryId = entryId;
       _highlightedEntryKey = entryKey;
     });
@@ -412,6 +424,9 @@ class _DiaryScreenState extends State<DiaryScreen> {
           if (entry.id != entryId) entry,
       ];
       _prototypeAdditions[day] = additionsForDay;
+      _recentFoodAdditions.removeWhere(
+        (addition) => addition.entryId == entryId,
+      );
       if (_highlightedEntryId == entryId) {
         _highlightedEntryId = null;
         _highlightedEntryKey = null;

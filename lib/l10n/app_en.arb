@@ -100,16 +100,6 @@
   "foodSearchCreateFood": "Create food",
   "createProductBack": "Back to food search",
   "createProductStubMessage": "Product creation will be implemented in a later slice.",
-  "foodSearchForYou": "For you",
-  "foodSearchFrequent": "Frequently added",
-  "foodSearchFrequentForMeal": "Frequent for {meal}",
-  "@foodSearchFrequentForMeal": {
-    "placeholders": {
-      "meal": {
-        "type": "String"
-      }
-    }
-  },
   "foodSearchRecent": "Recent",
   "foodSearchMyDishes": "My dishes",
   "foodSearchFavorites": "Favorites",
@@ -121,9 +111,6 @@
   "foodSearchLoading": "Loading foods",
   "foodSearchErrorTitle": "Foods could not be loaded",
   "foodSearchErrorMessage": "Try loading the local catalog again.",
-  "foodSearchVerified": "Verified food",
-  "foodSearchSourceLocal": "Local catalog",
-  "foodSearchSourceUser": "Your food",
   "foodSearchCaloriesPerReference": "{calories} kcal / {quantity}",
   "@foodSearchCaloriesPerReference": {
     "placeholders": {
@@ -135,25 +122,14 @@
       }
     }
   },
-  "foodSearchQuickAdd": "+ {quantity}",
-  "@foodSearchQuickAdd": {
-    "placeholders": {
-      "quantity": {
-        "type": "String"
-      }
-    }
-  },
-  "foodSearchQuickAddSemantics": "Add {food}, {quantity}",
-  "@foodSearchQuickAddSemantics": {
-    "placeholders": {
-      "food": {
-        "type": "String"
-      },
-      "quantity": {
-        "type": "String"
-      }
-    }
-  },
+  "foodCategoryGrains": "Grains",
+  "foodCategoryDairy": "Dairy",
+  "foodCategorySportsNutrition": "Sports nutrition",
+  "foodCategoryFruit": "Fruit",
+  "foodCategoryPoultry": "Meat & poultry",
+  "foodCategoryEggs": "Eggs",
+  "foodCategoryBread": "Bread",
+  "foodCategoryDrinks": "Drinks",
   "quickAddTitle": "Add to diary",
   "quickAddQuantity": "Quantity",
   "quickAddUnit": "Unit",

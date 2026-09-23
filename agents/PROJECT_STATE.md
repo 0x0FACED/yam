@@ -8,8 +8,8 @@
 - Дата: 2026-09-23.
 - Стадия: visual implementation pass; Дневник, Food Search, Add Food sheet и
   Settings реализованы по approved references.
-- Текущий статус: Diary доработан по пользовательским замечаниям;
-  Food Search и Settings остаются в presentation-prototype scope.
+- Текущий статус: Diary и Food Search доработаны по пользовательским
+  замечаниям; следующий шаг — ручная проверка Food Search на Android.
 
 ## Авторитетные Источники
 
@@ -24,6 +24,9 @@
 - Приоритет screen-level composition над component catalogue: ADR 0010.
 - Навигация по датам и оба входа в добавление еды: ADR 0011. Он заменяет
   решение ADR 0010 об удалении глобального Diary FAB.
+- Упрощённый Food Search, реальные recent за текущую сессию и метаданные:
+  `docs/adr/0012-food-search-interactions.md`. Он заменяет в текущем прототипе
+  контракт one-tap quick add из ADR 0002/0007.
 - Performance-оптимизация до реальной проблемы отложена ADR 0008; обязательных
   profile-бенчмарков и числовых бюджетов у MVP нет.
 
@@ -62,7 +65,8 @@
   API принимают display values и callbacks и не зависят от feature
   prototype-моделей.
 - Shared controls разделяют visual geometry и accessibility geometry: compact
-  icon/chip/quick-add presentation сохраняет touch target не меньше 44 dp.
+  icon/chip presentation сохраняет touch target не меньше 44 dp; у
+  `YamFilterChip` и `YamMealChip` ripple ограничен видимой pill-поверхностью.
 
 ## Дневник
 
@@ -98,19 +102,25 @@
 
 ## Остальной UI
 
-- `lib/features/food_search/presentation/food_search_screen.dart` соответствует
-  `agents/design/yam_food_search.html`: compact search header, contextual meal
-  selector, create action, горизонтальные pill filters и плотные sectioned
-  results. Task-content ограничен 448 dp и центрируется на wide layouts.
+- `lib/features/food_search/presentation/food_search_screen.dart` содержит
+  compact search header, contextual meal selector, create action и три вкладки:
+  Недавние (по умолчанию), Мои блюда и Избранное. Вход не открывает клавиатуру;
+  поле фокусируется по нажатию. Для вертикального списка включён штатный
+  Android stretch overscroll даже при коротком/пустом содержимом. Task-content
+  ограничен 448 dp и центрируется на wide layouts.
 - Header, search, meal/filter controls, product rows, loading/error/empty states
   и основные действия используют shared `Yam*` API. Feature widgets только
   форматируют localized display values и dispatch intent.
-- `food_search_result_row.dart` сохраняет title/source/nutrition hierarchy,
-  semantic macro colors, inline quick add на телефоне и adaptive stacking при
-  200% text scale. Presentation fixtures разделяют breakfast suggestions и
-  recent foods и содержат serving metadata из visual reference.
-- Quick-add имеет компактную 32 dp visual surface внутри 44 dp touch target;
-  Recent можно очистить в памяти текущей search session.
+- `YamProductRow`/`food_search_result_row.dart`: нажатие и подсветка охватывают
+  всю строку и открывают sheet количества; отдельного inline quick add и
+  галочки verified нет. Перед названием избранного продукта стоит звезда;
+  вторичная строка показывает локализованную категорию и фактический бренд
+  через ` · ` (без подмены источником каталога и порцией).
+- `DiaryScreen` ведёт в памяти добавления по entryId/foodId; поиск получает
+  последние четыре разных реально добавленных продукта в обратном порядке,
+  Undo убирает своё событие. Начальный Recent пуст, My Dishes пуст до
+  реализации создания; Favorites по флагу fixture. Демо-подборка «Для вас»
+  удалена. Категории локализованы в `lib/l10n/`; код сгенерирован `gen-l10n`.
 - `food_quick_add_sheet.dart` соответствует `agents/design/yam_add_food.html`:
   meal chip и close в header, product metadata, editable quantity stepper,
   unit menu, presets, плоский nutrition preview и динамический CTA с meal/kcal.
@@ -119,7 +129,7 @@
   по правой content-границе.
 - Общий entry point по-прежнему требует meal, meal-specific entry сохраняет
   preselection; пересчёт нутриентов, возврат результата в Дневник и Undo
-  сохранены по ADR 0007. Barcode, success-плашка и edit nutrition/name action
+  сохранены по ADR 0007/0012. Barcode, success-плашка и edit nutrition/name action
   намеренно не добавлены в отсутствие соответствующих маршрутов.
 - `lib/features/settings/presentation/settings_screen.dart` реализует compact и
   wide grouped-list layout: goals/weight summary, app preferences, data state и
@@ -137,42 +147,24 @@
 
 ## Проверка
 
-- `dart format` изменённых Dart-файлов -- успешно.
-- `flutter analyze` -- успешно, issues не найдено.
-- Целевые и все прочие non-golden тесты с golden Дневника: 45 passed.
-  Проверены стабильная геометрия selector при смене дня, возврат из другой
-  недели, Android stretch widget, FAB и доступность последнего приёма, контраст
-  light fat. Diary goldens обновлены для compact/wide, light/dark и 200% текста,
-  добавлен снимок выбранного вчерашнего дня.
-- Полный `flutter test` запущен: 8 несовпадений старых golden Food Search и
-  Settings (в light Food Search меняется fat token; dark Settings тоже расходится
-  из-за рендеринга шрифтов при отсутствии UI-изменений); их эталоны не
-  перезаписаны. Найденное в том же прогоне старое ожидание
-  общего цвета жиров в `test/app/theme/app_theme_test.dart` исправлено; после
-  него 45 целевых и non-golden проверок проходят.
-- `test/core/ui/yam_components_test.dart` проверяет touch targets/callbacks,
-  очистку поиска, narrow 200% product row и YAM Undo snackbar.
-- Widget-тесты дополнительно фиксируют right-edge alignment для quick amount и
-  Settings values; compact icon controls сохраняют 44 dp hit target.
-- Food Search golden verification покрывает compact dark RU, compact light EN,
-  wide dark EN и compact dark RU при 200% text scale в
-  `test/features/food_search/presentation/goldens/`.
-- Add Food sheet отдельно покрыт compact light EN и compact dark RU goldens;
-  widget-тест проверяет step, preset, unit switch, nutrition/CTA recalculation и
-  отсутствие overflow при 200% text scale.
-- Diary goldens после ADR 0011 проходят; существующие Food Search и Settings
-  goldens требуют отдельной проверки воспроизводимости рендерера.
-- Settings покрыт compact dark RU и wide light EN goldens; widget-тесты
-  проверяют реальное session theme switching, About и layout при 200% text.
-- Отдельные performance-бенчмарки удалены согласно ADR 0008.
+- После ADR 0012: `dart format` изменённых Dart-файлов, `flutter gen-l10n`
+  и `flutter analyze` — успешно; тесты и goldens не запускались по запросу
+  пользователя, ручная проверка на устройстве ожидается. Существующие
+  функциональные тесты приведены к новой логике; Food Search golden-снимки
+  устарели после изменения композиции и пока не перегенерированы.
+- После ADR 0011: 45 focused/non-golden тестов и Diary goldens проходили.
+  Полный `flutter test` до ADR 0012 имел 8 несовпадений старых Food Search и
+  Settings goldens (в том числе из-за окружения рендеринга); полный набор не
+  является обязательным для visual prototype по обновлённому `AGENTS.md`.
 
 ## Следующее Действие
 
-- Сверить Food Search и Settings golden с окружением, где были созданы
-  исходные эталоны, и восстановить воспроизводимость полного `flutter test`.
+- Вручную проверить Food Search на Android: нажатие и удержание pill/строки,
+  отсутствие начальной клавиатуры, пустые вкладки, добавление → Recent → Undo,
+  клавиатуру и stretch на коротком списке.
 
 ## Блокеры
 
-- Полный прогон блокируют 8 несовпадений Food Search/Settings golden
-  (смена light fat token и расхождение рендеринга шрифтов); реализация Edit
-  Diary Entry пока не начата.
+- Create Product пока остаётся заглушкой, поэтому My Dishes пуст. Старые
+  Food Search goldens не соответствуют новому экрану, а Settings goldens
+  расходились из-за рендерера шрифтов; Edit Diary Entry пока не начат.

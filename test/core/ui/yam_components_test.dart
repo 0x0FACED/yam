@@ -146,15 +146,13 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
     addTearDown(tester.view.resetPhysicalSize);
     var opened = false;
-    var added = false;
 
     await tester.pumpWidget(
       _TestApp(
         textScaler: const TextScaler.linear(2),
         child: YamProductRow(
           name: 'Rolled oats',
-          sourceLabel: 'Local catalog',
-          portionDescription: 'One usual serving',
+          metadataLabel: 'Grains',
           calorieLabel: '370 kcal / 100 g',
           proteinLabel: 'P',
           proteinValue: '13',
@@ -162,12 +160,10 @@ void main() {
           fatValue: '7',
           carbsLabel: 'C',
           carbsValue: '62',
-          quickAddLabel: '+ 80 g',
-          quickAddSemanticLabel: 'Add 80 g of Rolled oats',
+          favorite: true,
+          favoriteLabel: 'Favorites',
           openKey: const ValueKey('open-product'),
-          quickAddKey: const ValueKey('quick-add-product'),
           onPressed: () => opened = true,
-          onQuickAdd: () => added = true,
         ),
       ),
     );
@@ -175,10 +171,9 @@ void main() {
     expect(tester.takeException(), isNull);
 
     await tester.tap(find.byKey(const ValueKey('open-product')));
-    await tester.tap(find.byKey(const ValueKey('quick-add-product')));
 
     expect(opened, isTrue);
-    expect(added, isTrue);
+    expect(find.byIcon(Icons.star_rounded), findsOneWidget);
   });
 
   testWidgets('undo snackbar uses the YAM surface and dismisses on action', (

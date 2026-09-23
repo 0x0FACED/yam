@@ -151,17 +151,6 @@ class AppLocalizationsRu extends AppLocalizations {
       'Создание продукта будет реализовано в следующем этапе.';
 
   @override
-  String get foodSearchForYou => 'Для вас';
-
-  @override
-  String get foodSearchFrequent => 'Часто добавляют';
-
-  @override
-  String foodSearchFrequentForMeal(String meal) {
-    return 'Часто на $meal';
-  }
-
-  @override
   String get foodSearchRecent => 'Недавние';
 
   @override
@@ -198,28 +187,33 @@ class AppLocalizationsRu extends AppLocalizations {
       'Попробуйте снова загрузить локальный каталог.';
 
   @override
-  String get foodSearchVerified => 'Проверенный продукт';
-
-  @override
-  String get foodSearchSourceLocal => 'Локальный каталог';
-
-  @override
-  String get foodSearchSourceUser => 'Ваш продукт';
-
-  @override
   String foodSearchCaloriesPerReference(String calories, String quantity) {
     return '$calories ккал / $quantity';
   }
 
   @override
-  String foodSearchQuickAdd(String quantity) {
-    return '+ $quantity';
-  }
+  String get foodCategoryGrains => 'Крупы';
 
   @override
-  String foodSearchQuickAddSemantics(String food, String quantity) {
-    return 'Добавить $food, $quantity';
-  }
+  String get foodCategoryDairy => 'Молочные продукты';
+
+  @override
+  String get foodCategorySportsNutrition => 'Спортивное питание';
+
+  @override
+  String get foodCategoryFruit => 'Фрукты';
+
+  @override
+  String get foodCategoryPoultry => 'Мясо и птица';
+
+  @override
+  String get foodCategoryEggs => 'Яйца';
+
+  @override
+  String get foodCategoryBread => 'Хлеб';
+
+  @override
+  String get foodCategoryDrinks => 'Напитки';
 
   @override
   String get quickAddTitle => 'Добавить в дневник';

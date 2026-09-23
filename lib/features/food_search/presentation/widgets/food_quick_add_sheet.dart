@@ -79,12 +79,7 @@ class _FoodQuickAddSheetState extends State<_FoodQuickAddSheet> {
       context,
       nutrition.calories.round(),
     );
-    final sourceLabel =
-        widget.food.brand ??
-        switch (widget.food.source) {
-          FoodSearchPrototypeSource.localCatalog => l10n.foodSearchSourceLocal,
-          FoodSearchPrototypeSource.userCreated => l10n.foodSearchSourceUser,
-        };
+    final metadataLabel = formatFoodSearchMetadata(l10n, widget.food);
     final referenceQuantity = formatFoodSearchQuantity(
       context,
       widget.food.referenceUnit,
@@ -164,34 +159,17 @@ class _FoodQuickAddSheetState extends State<_FoodQuickAddSheet> {
                           ),
                         ],
                         const SizedBox(height: AppSpacing.sm),
-                        Row(
-                          children: [
-                            Flexible(
-                              child: Text(
-                                widget.food.name,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: AppTypography.screenTitle.copyWith(
-                                  color: theme.colorScheme.onSurface,
-                                ),
-                              ),
-                            ),
-                            if (widget.food.verified) ...[
-                              const SizedBox(width: AppSpacing.xs),
-                              Tooltip(
-                                message: l10n.foodSearchVerified,
-                                child: Icon(
-                                  Icons.verified_rounded,
-                                  size: 18,
-                                  color: theme.colorScheme.primary,
-                                ),
-                              ),
-                            ],
-                          ],
+                        Text(
+                          widget.food.name,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTypography.screenTitle.copyWith(
+                            color: theme.colorScheme.onSurface,
+                          ),
                         ),
                         const SizedBox(height: AppSpacing.xxs),
                         Text(
-                          '$sourceLabel · $referenceCalories',
+                          '$metadataLabel · $referenceCalories',
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: AppTypography.caption.copyWith(

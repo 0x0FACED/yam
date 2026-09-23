@@ -111,7 +111,7 @@ an already-established repeated pattern.
 ## Verification And Delivery
 
 - Format edited Dart files with `dart format`.
-- Run `flutter analyze` and the smallest relevant test suite. Run `flutter test` for changes affecting shared logic or application behaviour.
-- Add unit tests for calculations, conversions, persistence migrations, and derived state. Add widget or golden tests for important UI flows when they become stable.
+- Run `flutter analyze` for edited Dart code. For visual/prototype UI iterations, use manual acceptance as the primary check: do not add tests or goldens for every UI tweak and do not run the full `flutter test` suite by default. Keep existing tests consistent with changed behaviour. Run focused tests when requested or when necessary to validate nontrivial behaviour; reserve the full suite for changes to shared business logic, persistence, or an explicit request.
+- Add unit tests for calculations, conversions, persistence migrations, and derived state when those features are implemented. Add widget or golden tests for important UI flows when they become stable and there is a concrete verification need.
 - Inspect the final diff. Do not modify unrelated worktree changes and do not commit unless asked.
 - Write identifiers and code in English. Keep project documentation in Russian unless the existing document establishes another language.

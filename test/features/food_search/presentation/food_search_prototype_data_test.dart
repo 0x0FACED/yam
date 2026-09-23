@@ -29,19 +29,22 @@ void main() {
     expect(russian.first.name, 'Овсяные хлопья');
   });
 
-  test('keeps breakfast suggestions separate from recent foods', () {
+  test('keeps catalog categories and favorites separate from user foods', () {
     final foods = buildFoodSearchPrototypeFoods(const Locale('en'));
 
-    expect(
-      foods
-          .where((food) => food.frequentMealIds.contains('breakfast'))
-          .map((food) => food.id),
-      ['rolled-oats', 'milk-25', 'whey-protein', 'eggs'],
-    );
-    expect(foods.where((food) => food.recent).map((food) => food.id), [
-      'banana',
-      'wholegrain-bread',
-      'americano',
+    expect(foods.first.category, FoodSearchPrototypeCategory.grains);
+    expect(foods.first.brand, isNull);
+    expect(foods.where((food) => food.favorite).map((food) => food.id), [
+      'rolled-oats',
+      'whey-protein',
+      'chicken-breast',
+      'eggs',
     ]);
+    expect(
+      foods.where(
+        (food) => food.source == FoodSearchPrototypeSource.userCreated,
+      ),
+      isEmpty,
+    );
   });
 }

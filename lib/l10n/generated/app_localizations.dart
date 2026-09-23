@@ -350,24 +350,6 @@ abstract class AppLocalizations {
   /// **'Product creation will be implemented in a later slice.'**
   String get createProductStubMessage;
 
-  /// No description provided for @foodSearchForYou.
-  ///
-  /// In en, this message translates to:
-  /// **'For you'**
-  String get foodSearchForYou;
-
-  /// No description provided for @foodSearchFrequent.
-  ///
-  /// In en, this message translates to:
-  /// **'Frequently added'**
-  String get foodSearchFrequent;
-
-  /// No description provided for @foodSearchFrequentForMeal.
-  ///
-  /// In en, this message translates to:
-  /// **'Frequent for {meal}'**
-  String foodSearchFrequentForMeal(String meal);
-
   /// No description provided for @foodSearchRecent.
   ///
   /// In en, this message translates to:
@@ -434,41 +416,59 @@ abstract class AppLocalizations {
   /// **'Try loading the local catalog again.'**
   String get foodSearchErrorMessage;
 
-  /// No description provided for @foodSearchVerified.
-  ///
-  /// In en, this message translates to:
-  /// **'Verified food'**
-  String get foodSearchVerified;
-
-  /// No description provided for @foodSearchSourceLocal.
-  ///
-  /// In en, this message translates to:
-  /// **'Local catalog'**
-  String get foodSearchSourceLocal;
-
-  /// No description provided for @foodSearchSourceUser.
-  ///
-  /// In en, this message translates to:
-  /// **'Your food'**
-  String get foodSearchSourceUser;
-
   /// No description provided for @foodSearchCaloriesPerReference.
   ///
   /// In en, this message translates to:
   /// **'{calories} kcal / {quantity}'**
   String foodSearchCaloriesPerReference(String calories, String quantity);
 
-  /// No description provided for @foodSearchQuickAdd.
+  /// No description provided for @foodCategoryGrains.
   ///
   /// In en, this message translates to:
-  /// **'+ {quantity}'**
-  String foodSearchQuickAdd(String quantity);
+  /// **'Grains'**
+  String get foodCategoryGrains;
 
-  /// No description provided for @foodSearchQuickAddSemantics.
+  /// No description provided for @foodCategoryDairy.
   ///
   /// In en, this message translates to:
-  /// **'Add {food}, {quantity}'**
-  String foodSearchQuickAddSemantics(String food, String quantity);
+  /// **'Dairy'**
+  String get foodCategoryDairy;
+
+  /// No description provided for @foodCategorySportsNutrition.
+  ///
+  /// In en, this message translates to:
+  /// **'Sports nutrition'**
+  String get foodCategorySportsNutrition;
+
+  /// No description provided for @foodCategoryFruit.
+  ///
+  /// In en, this message translates to:
+  /// **'Fruit'**
+  String get foodCategoryFruit;
+
+  /// No description provided for @foodCategoryPoultry.
+  ///
+  /// In en, this message translates to:
+  /// **'Meat & poultry'**
+  String get foodCategoryPoultry;
+
+  /// No description provided for @foodCategoryEggs.
+  ///
+  /// In en, this message translates to:
+  /// **'Eggs'**
+  String get foodCategoryEggs;
+
+  /// No description provided for @foodCategoryBread.
+  ///
+  /// In en, this message translates to:
+  /// **'Bread'**
+  String get foodCategoryBread;
+
+  /// No description provided for @foodCategoryDrinks.
+  ///
+  /// In en, this message translates to:
+  /// **'Drinks'**
+  String get foodCategoryDrinks;
 
   /// No description provided for @quickAddTitle.
   ///

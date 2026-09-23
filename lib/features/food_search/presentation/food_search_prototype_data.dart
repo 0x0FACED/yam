@@ -1,5 +1,7 @@
 import 'package:flutter/widgets.dart';
 
+const foodSearchRecentLimit = 4;
+
 enum FoodSearchPrototypeUnit {
   grams,
   milliliters,
@@ -7,6 +9,17 @@ enum FoodSearchPrototypeUnit {
   servings,
   scoops,
   glasses,
+}
+
+enum FoodSearchPrototypeCategory {
+  grains,
+  dairy,
+  sportsNutrition,
+  fruit,
+  poultry,
+  eggs,
+  bread,
+  drinks,
 }
 
 enum FoodSearchPrototypeSource { localCatalog, userCreated }
@@ -63,35 +76,29 @@ class FoodSearchPrototypeFood {
   const FoodSearchPrototypeFood({
     required this.id,
     required this.name,
+    required this.category,
     required this.referenceAmount,
     required this.referenceUnit,
     required this.nutrition,
     required this.servings,
     required this.lastServingId,
     required this.lastAmount,
-    required this.frequentMealIds,
     this.brand,
-    this.portionDescription,
     this.source = FoodSearchPrototypeSource.localCatalog,
-    this.verified = true,
-    this.recent = true,
     this.favorite = false,
   });
 
   final String id;
   final String name;
+  final FoodSearchPrototypeCategory category;
   final String? brand;
-  final String? portionDescription;
   final double referenceAmount;
   final FoodSearchPrototypeUnit referenceUnit;
   final FoodSearchPrototypeNutrition nutrition;
   final List<FoodSearchPrototypeServing> servings;
   final String lastServingId;
   final double lastAmount;
-  final Set<String> frequentMealIds;
   final FoodSearchPrototypeSource source;
-  final bool verified;
-  final bool recent;
   final bool favorite;
 
   FoodSearchPrototypeServing get lastServing =>
@@ -111,10 +118,12 @@ class FoodSearchPrototypeArguments {
   const FoodSearchPrototypeArguments({
     this.initialMealId,
     this.initialCatalogState = FoodSearchPrototypeCatalogState.ready,
+    this.recentFoodIds = const [],
   });
 
   final String? initialMealId;
   final FoodSearchPrototypeCatalogState initialCatalogState;
+  final List<String> recentFoodIds;
 }
 
 @immutable
@@ -149,7 +158,7 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
     FoodSearchPrototypeFood(
       id: 'rolled-oats',
       name: russian ? 'Овсяные хлопья' : 'Rolled oats',
-      brand: 'YAM Basics',
+      category: FoodSearchPrototypeCategory.grains,
       referenceAmount: 100,
       referenceUnit: FoodSearchPrototypeUnit.grams,
       nutrition: const FoodSearchPrototypeNutrition(
@@ -178,13 +187,12 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
       ],
       lastServingId: 'grams',
       lastAmount: 80,
-      frequentMealIds: {'breakfast'},
       favorite: true,
-      recent: false,
     ),
     FoodSearchPrototypeFood(
       id: 'milk-25',
       name: russian ? 'Молоко 2,5%' : 'Milk 2.5%',
+      category: FoodSearchPrototypeCategory.dairy,
       brand: russian ? 'Домик в деревне' : 'Village Dairy',
       referenceAmount: 100,
       referenceUnit: FoodSearchPrototypeUnit.milliliters,
@@ -214,12 +222,11 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
       ],
       lastServingId: 'milliliters',
       lastAmount: 150,
-      frequentMealIds: {'breakfast', 'snacks'},
-      recent: false,
     ),
     FoodSearchPrototypeFood(
       id: 'whey-protein',
       name: russian ? 'Сывороточный протеин' : 'Whey protein',
+      category: FoodSearchPrototypeCategory.sportsNutrition,
       brand: 'Neo High Protein',
       referenceAmount: 30,
       referenceUnit: FoodSearchPrototypeUnit.grams,
@@ -249,15 +256,12 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
       ],
       lastServingId: 'grams',
       lastAmount: 30,
-      frequentMealIds: {'breakfast', 'snacks'},
       favorite: true,
-      recent: false,
     ),
     FoodSearchPrototypeFood(
       id: 'banana',
       name: russian ? 'Банан свежий' : 'Fresh banana',
-      brand: russian ? 'Базовые продукты' : 'Basic foods',
-      portionDescription: russian ? '1 плод без кожуры' : '1 peeled fruit',
+      category: FoodSearchPrototypeCategory.fruit,
       referenceAmount: 100,
       referenceUnit: FoodSearchPrototypeUnit.grams,
       nutrition: const FoodSearchPrototypeNutrition(
@@ -286,12 +290,11 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
       ],
       lastServingId: 'grams',
       lastAmount: 120,
-      frequentMealIds: const {},
-      verified: false,
     ),
     FoodSearchPrototypeFood(
       id: 'chicken-breast',
       name: russian ? 'Куриная грудка' : 'Chicken breast',
+      category: FoodSearchPrototypeCategory.poultry,
       referenceAmount: 100,
       referenceUnit: FoodSearchPrototypeUnit.grams,
       nutrition: const FoodSearchPrototypeNutrition(
@@ -320,14 +323,12 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
       ],
       lastServingId: 'grams',
       lastAmount: 220,
-      frequentMealIds: {'lunch', 'dinner'},
       favorite: true,
-      recent: false,
     ),
     FoodSearchPrototypeFood(
       id: 'rice-cooked',
       name: russian ? 'Рис отварной' : 'Cooked rice',
-      brand: 'YAM Basics',
+      category: FoodSearchPrototypeCategory.grains,
       referenceAmount: 100,
       referenceUnit: FoodSearchPrototypeUnit.grams,
       nutrition: const FoodSearchPrototypeNutrition(
@@ -348,12 +349,11 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
       ],
       lastServingId: 'grams',
       lastAmount: 280,
-      frequentMealIds: {'lunch', 'dinner'},
-      recent: false,
     ),
     FoodSearchPrototypeFood(
       id: 'cottage-cheese',
       name: russian ? 'Творог 5%' : 'Cottage cheese 5%',
+      category: FoodSearchPrototypeCategory.dairy,
       brand: russian ? 'Простоквашино' : 'Farmhouse',
       referenceAmount: 100,
       referenceUnit: FoodSearchPrototypeUnit.grams,
@@ -383,16 +383,12 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
       ],
       lastServingId: 'grams',
       lastAmount: 180,
-      frequentMealIds: {'dinner'},
-      source: FoodSearchPrototypeSource.userCreated,
-      verified: false,
-      recent: false,
     ),
     FoodSearchPrototypeFood(
       id: 'eggs',
       name: russian ? 'Яйцо куриное С1' : 'Grade A chicken egg',
+      category: FoodSearchPrototypeCategory.eggs,
       brand: russian ? 'Село Зелёное' : 'Green Village',
-      portionDescription: russian ? '1 шт. ~ 55 г' : '1 pc ~ 55 g',
       referenceAmount: 1,
       referenceUnit: FoodSearchPrototypeUnit.pieces,
       nutrition: const FoodSearchPrototypeNutrition(
@@ -413,16 +409,13 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
       ],
       lastServingId: 'pieces',
       lastAmount: 2,
-      frequentMealIds: {'breakfast'},
       favorite: true,
-      verified: false,
-      recent: false,
     ),
     FoodSearchPrototypeFood(
       id: 'wholegrain-bread',
       name: russian ? 'Хлеб цельнозерновой' : 'Wholegrain bread',
+      category: FoodSearchPrototypeCategory.bread,
       brand: russian ? 'Смак' : 'Smak',
-      portionDescription: russian ? '1 ломтик ~ 40 г' : '1 slice ~ 40 g',
       referenceAmount: 100,
       referenceUnit: FoodSearchPrototypeUnit.grams,
       nutrition: const FoodSearchPrototypeNutrition(
@@ -451,14 +444,11 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
       ],
       lastServingId: 'grams',
       lastAmount: 40,
-      frequentMealIds: const {},
-      verified: false,
     ),
     FoodSearchPrototypeFood(
       id: 'americano',
       name: russian ? 'Кофе американо без сахара' : 'Americano without sugar',
-      brand: russian ? 'Напитки' : 'Drinks',
-      portionDescription: russian ? 'Чашка 200 мл' : '200 ml cup',
+      category: FoodSearchPrototypeCategory.drinks,
       referenceAmount: 200,
       referenceUnit: FoodSearchPrototypeUnit.milliliters,
       nutrition: const FoodSearchPrototypeNutrition(
@@ -479,8 +469,6 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
       ],
       lastServingId: 'milliliters',
       lastAmount: 200,
-      frequentMealIds: const {},
-      verified: false,
     ),
   ];
 }

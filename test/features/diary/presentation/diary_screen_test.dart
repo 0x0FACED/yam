@@ -106,7 +106,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byKey(const ValueKey('food-search-field')), findsOneWidget);
-    expect(find.text('Часто на завтрак'), findsOneWidget);
+    expect(find.text('Приём: Завтрак'), findsOneWidget);
+    expect(find.text('Недавние'), findsOneWidget);
     expect(find.byType(NavigationBar), findsNothing);
   });
 
@@ -126,7 +127,7 @@ void main() {
 
     expect(find.byKey(const ValueKey('food-search-field')), findsOneWidget);
     expect(find.text('Выбрать приём пищи'), findsOneWidget);
-    expect(find.text('Часто на завтрак'), findsNothing);
+    expect(find.text('Недавние'), findsOneWidget);
   });
 
   testWidgets('supports large text without overflow', (tester) async {

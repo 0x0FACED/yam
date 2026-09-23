@@ -26,21 +26,19 @@ class YamFilterChip extends StatelessWidget {
       button: true,
       selected: selected,
       enabled: enabled,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
+      label: label,
+      onTap: onPressed,
+      child: ExcludeSemantics(
+        child: GestureDetector(
+          behavior: HitTestBehavior.translucent,
           onTap: onPressed,
-          borderRadius: BorderRadius.circular(AppRadius.pill),
+          excludeFromSemantics: true,
           child: ConstrainedBox(
             constraints: const BoxConstraints(minHeight: 44),
             child: Center(
               child: AnimatedContainer(
                 duration: reduceMotion ? Duration.zero : AppMotion.smallChange,
                 curve: AppMotion.standardCurve,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 6,
-                ),
                 decoration: BoxDecoration(
                   color: selected
                       ? theme.colorScheme.primary.withValues(alpha: 0.14)
@@ -63,13 +61,29 @@ class YamFilterChip extends StatelessWidget {
                         ]
                       : null,
                 ),
-                child: Text(
-                  label,
-                  style: AppTypography.label.copyWith(
-                    color: selected
-                        ? theme.colorScheme.primary
-                        : theme.colorScheme.onSurfaceVariant,
-                    fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                child: Material(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(AppRadius.pill),
+                  clipBehavior: Clip.antiAlias,
+                  child: InkWell(
+                    onTap: onPressed,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 6,
+                      ),
+                      child: Text(
+                        label,
+                        style: AppTypography.label.copyWith(
+                          color: selected
+                              ? theme.colorScheme.primary
+                              : theme.colorScheme.onSurfaceVariant,
+                          fontWeight: selected
+                              ? FontWeight.w700
+                              : FontWeight.w500,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -104,11 +118,13 @@ class YamMealChip extends StatelessWidget {
     return Semantics(
       button: onPressed != null,
       selected: active,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
+      label: label,
+      onTap: onPressed,
+      child: ExcludeSemantics(
+        child: GestureDetector(
+          behavior: HitTestBehavior.translucent,
           onTap: onPressed,
-          borderRadius: BorderRadius.circular(AppRadius.pill),
+          excludeFromSemantics: true,
           child: ConstrainedBox(
             constraints: BoxConstraints(minHeight: 44, maxWidth: maxWidth),
             child: Center(
@@ -121,44 +137,52 @@ class YamMealChip extends StatelessWidget {
                   border: Border.all(color: theme.colorScheme.outlineVariant),
                   borderRadius: BorderRadius.circular(AppRadius.pill),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.sm,
-                    vertical: 6,
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        icon,
-                        size: 16,
-                        color: active
-                            ? theme.colorScheme.primary
-                            : theme.colorScheme.onSurfaceVariant,
+                child: Material(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(AppRadius.pill),
+                  clipBehavior: Clip.antiAlias,
+                  child: InkWell(
+                    onTap: onPressed,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.sm,
+                        vertical: 6,
                       ),
-                      const SizedBox(width: AppSpacing.xs),
-                      Flexible(
-                        child: Text(
-                          label,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: AppTypography.label.copyWith(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            icon,
+                            size: 16,
                             color: active
-                                ? theme.colorScheme.onSurface
+                                ? theme.colorScheme.primary
                                 : theme.colorScheme.onSurfaceVariant,
-                            fontWeight: FontWeight.w600,
                           ),
-                        ),
+                          const SizedBox(width: AppSpacing.xs),
+                          Flexible(
+                            child: Text(
+                              label,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppTypography.label.copyWith(
+                                color: active
+                                    ? theme.colorScheme.onSurface
+                                    : theme.colorScheme.onSurfaceVariant,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          if (onPressed != null) ...[
+                            const SizedBox(width: AppSpacing.xxs),
+                            Icon(
+                              Icons.keyboard_arrow_down_rounded,
+                              size: 16,
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ],
+                        ],
                       ),
-                      if (onPressed != null) ...[
-                        const SizedBox(width: AppSpacing.xxs),
-                        Icon(
-                          Icons.keyboard_arrow_down_rounded,
-                          size: 16,
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                      ],
-                    ],
+                    ),
                   ),
                 ),
               ),

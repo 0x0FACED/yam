@@ -44,3 +44,22 @@ String foodSearchUnitLabel(
     FoodSearchPrototypeUnit.glasses => l10n.unitGlasses,
   };
 }
+
+String formatFoodSearchMetadata(
+  AppLocalizations l10n,
+  FoodSearchPrototypeFood food,
+) {
+  final category = switch (food.category) {
+    FoodSearchPrototypeCategory.grains => l10n.foodCategoryGrains,
+    FoodSearchPrototypeCategory.dairy => l10n.foodCategoryDairy,
+    FoodSearchPrototypeCategory.sportsNutrition =>
+      l10n.foodCategorySportsNutrition,
+    FoodSearchPrototypeCategory.fruit => l10n.foodCategoryFruit,
+    FoodSearchPrototypeCategory.poultry => l10n.foodCategoryPoultry,
+    FoodSearchPrototypeCategory.eggs => l10n.foodCategoryEggs,
+    FoodSearchPrototypeCategory.bread => l10n.foodCategoryBread,
+    FoodSearchPrototypeCategory.drinks => l10n.foodCategoryDrinks,
+  };
+  final brand = food.brand;
+  return brand == null || brand.isEmpty ? category : '$category · $brand';
+}
