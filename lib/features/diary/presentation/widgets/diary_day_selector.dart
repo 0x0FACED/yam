@@ -106,23 +106,13 @@ class DiaryDaySelector extends StatelessWidget {
                 child: _DayTile(
                   day: startOfWeek.add(Duration(days: index)),
                   selectedDay: selectedDay,
+                  today: today,
                   locale: locale,
                   onSelected: onDaySelected,
                 ),
               ),
           ],
         ),
-        if (!selectedIsToday) ...[
-          const SizedBox(height: AppSpacing.xxs),
-          Align(
-            alignment: Alignment.centerRight,
-            child: YamTextButton(
-              label: l10n.diaryReturnToToday,
-              icon: Icons.today_outlined,
-              onPressed: () => onDaySelected(today),
-            ),
-          ),
-        ],
       ],
     );
   }
@@ -132,12 +122,14 @@ class _DayTile extends StatelessWidget {
   const _DayTile({
     required this.day,
     required this.selectedDay,
+    required this.today,
     required this.locale,
     required this.onSelected,
   });
 
   final DateTime day;
   final DateTime selectedDay;
+  final DateTime today;
   final String locale;
   final ValueChanged<DateTime> onSelected;
 
@@ -145,6 +137,8 @@ class _DayTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final selected = _isSameDay(day, selectedDay);
+    final isToday = _isSameDay(day, today);
+    final l10n = AppLocalizations.of(context);
     final foreground = selected
         ? theme.colorScheme.onPrimary
         : theme.colorScheme.onSurface;
@@ -157,7 +151,10 @@ class _DayTile extends StatelessWidget {
       child: Semantics(
         button: true,
         selected: selected,
-        label: DateFormat.yMMMMEEEEd(locale).format(day),
+        label: [
+          DateFormat.yMMMMEEEEd(locale).format(day),
+          if (isToday) l10n.diaryToday,
+        ].join(', '),
         child: ExcludeSemantics(
           child: AnimatedContainer(
             duration: animationDuration,
@@ -199,6 +196,22 @@ class _DayTile extends StatelessWidget {
                               : FontWeight.w500,
                           fontFeatures: AppTypography.tabularFigures,
                         ),
+                      ),
+                      const SizedBox(height: 2),
+                      SizedBox(
+                        height: 5,
+                        child: isToday
+                            ? Container(
+                                key: const ValueKey('diary-today-marker'),
+                                width: 5,
+                                decoration: BoxDecoration(
+                                  color: selected
+                                      ? theme.colorScheme.onPrimary
+                                      : theme.colorScheme.primary,
+                                  shape: BoxShape.circle,
+                                ),
+                              )
+                            : null,
                       ),
                     ],
                   ),

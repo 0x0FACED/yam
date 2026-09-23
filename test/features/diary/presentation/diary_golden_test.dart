@@ -38,6 +38,25 @@ void main() {
     );
   });
 
+  testWidgets('compact dark diary shows today while browsing yesterday', (
+    tester,
+  ) async {
+    await _pumpDiary(
+      tester,
+      size: const Size(390, 844),
+      locale: const Locale('ru'),
+      themeMode: ThemeMode.dark,
+      today: today,
+    );
+    await tester.tap(find.byTooltip('Предыдущий день'));
+    await tester.pumpAndSettle();
+
+    await expectLater(
+      find.byKey(const ValueKey('golden-boundary')),
+      matchesGoldenFile('goldens/diary_compact_dark_ru_previous_day.png'),
+    );
+  });
+
   testWidgets('wide light diary in English', (tester) async {
     await _pumpDiary(
       tester,

@@ -27,7 +27,7 @@ abstract final class AppTheme {
         ),
     semanticColors: const AppSemanticColors(
       protein: AppColors.protein,
-      fat: AppColors.fat,
+      fat: AppColors.lightFat,
       carbs: AppColors.carbs,
       success: AppColors.lightSuccess,
       warning: AppColors.lightWarning,

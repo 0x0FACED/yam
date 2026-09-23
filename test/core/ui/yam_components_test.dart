@@ -1,13 +1,56 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:yam/app/theme/app_colors.dart';
 import 'package:yam/app/theme/app_theme.dart';
+import 'package:yam/app/theme/app_semantic_colors.dart';
 import 'package:yam/core/ui/buttons/yam_buttons.dart';
+import 'package:yam/core/ui/diary/yam_diary_rows.dart';
 import 'package:yam/core/ui/feedback/yam_snack_bar.dart';
 import 'package:yam/core/ui/food/yam_product_row.dart';
 import 'package:yam/core/ui/forms/yam_search_field.dart';
 import 'package:yam/core/ui/selection/yam_selection_controls.dart';
 
 void main() {
+  test('fat accent stays legible on light surfaces', () {
+    final fat = AppTheme.light.extension<AppSemanticColors>()!.fat;
+    for (final surface in [AppColors.lightSurface, AppColors.brandCream]) {
+      final contrast =
+          (surface.computeLuminance() + 0.05) / (fat.computeLuminance() + 0.05);
+      expect(contrast, greaterThanOrEqualTo(4.5));
+    }
+  });
+
+  testWidgets('meal add is visible without inflating the header', (
+    tester,
+  ) async {
+    var added = false;
+    await tester.pumpWidget(
+      _TestApp(
+        child: YamMealSectionHeader(
+          mealName: 'Breakfast',
+          timeLabel: '8:30',
+          calorieValue: '482',
+          calorieUnit: 'kcal',
+          addTooltip: 'Add to breakfast',
+          onAdd: () => added = true,
+        ),
+      ),
+    );
+
+    final add = find.descendant(
+      of: find.byType(YamMealSectionHeader),
+      matching: find.byType(YamIconButton),
+    );
+    expect(tester.widget<YamIconButton>(add).visualSize, 36);
+    expect(tester.getSize(add).height, greaterThanOrEqualTo(44));
+    expect(
+      tester.getSize(find.byType(YamMealSectionHeader)).height,
+      lessThanOrEqualTo(48),
+    );
+    await tester.tap(add);
+    expect(added, isTrue);
+  });
+
   testWidgets('buttons and chips expose callbacks with touch-size targets', (
     tester,
   ) async {

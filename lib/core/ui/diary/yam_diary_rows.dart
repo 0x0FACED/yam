@@ -9,7 +9,8 @@ class YamMealSectionHeader extends StatelessWidget {
   const YamMealSectionHeader({
     required this.mealName,
     required this.timeLabel,
-    required this.calorieLabel,
+    required this.calorieValue,
+    required this.calorieUnit,
     required this.addTooltip,
     required this.onAdd,
     super.key,
@@ -17,7 +18,8 @@ class YamMealSectionHeader extends StatelessWidget {
 
   final String mealName;
   final String timeLabel;
-  final String calorieLabel;
+  final String calorieValue;
+  final String calorieUnit;
   final String addTooltip;
   final VoidCallback onAdd;
 
@@ -60,12 +62,24 @@ class YamMealSectionHeader extends StatelessWidget {
     final actions = Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          calorieLabel,
-          style: AppTypography.productTitle.copyWith(
-            color: theme.colorScheme.onSurface,
-            fontWeight: FontWeight.w700,
-            fontFeatures: AppTypography.tabularFigures,
+        Text.rich(
+          TextSpan(
+            children: [
+              TextSpan(
+                text: calorieValue,
+                style: AppTypography.productTitle.copyWith(
+                  color: theme.colorScheme.onSurface,
+                  fontWeight: FontWeight.w500,
+                  fontFeatures: AppTypography.tabularFigures,
+                ),
+              ),
+              TextSpan(
+                text: ' $calorieUnit',
+                style: AppTypography.label.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
           ),
         ),
         const SizedBox(width: AppSpacing.xs),
@@ -73,8 +87,8 @@ class YamMealSectionHeader extends StatelessWidget {
           icon: Icons.add_rounded,
           tooltip: addTooltip,
           onPressed: onAdd,
-          iconSize: 16,
-          visualSize: 24,
+          iconSize: 20,
+          visualSize: 36,
         ),
       ],
     );

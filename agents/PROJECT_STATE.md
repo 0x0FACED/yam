@@ -5,11 +5,11 @@
 
 ## Обновлено
 
-- Дата: 2026-09-20.
+- Дата: 2026-09-23.
 - Стадия: visual implementation pass; Дневник, Food Search, Add Food sheet и
   Settings реализованы по approved references.
-- Текущий статус: screen-alignment pass для Diary, Food Search и Settings
-  завершён; следующий slice -- Edit Diary Entry.
+- Текущий статус: Diary доработан по пользовательским замечаниям;
+  Food Search и Settings остаются в presentation-prototype scope.
 
 ## Авторитетные Источники
 
@@ -22,6 +22,8 @@
 - UX presentation-flow добавления еды: `docs/adr/0007-add-food-visual-prototype.md`.
 - Settings presentation и session-only theme: ADR 0009.
 - Приоритет screen-level composition над component catalogue: ADR 0010.
+- Навигация по датам и оба входа в добавление еды: ADR 0011. Он заменяет
+  решение ADR 0010 об удалении глобального Diary FAB.
 - Performance-оптимизация до реальной проблемы отложена ADR 0008; обязательных
   profile-бенчмарков и числовых бюджетов у MVP нет.
 
@@ -48,8 +50,9 @@
 - `lib/app/theme/app_typography.dart` задает именованную шкалу typography и
   tabular figures без новой font dependency.
 - `lib/app/theme/app_semantic_colors.dart` предоставляет theme-aware success,
-  warning и goal-status colors; macro semantics остаются фиксированными:
-  protein orange, fat lime, carbs cyan.
+  warning и goal-status colors; macro semantics сохраняют protein orange,
+  fat lime, carbs cyan. Светлая тема использует более тёмный lime для жиров
+  (`AppColors.lightFat`), тёмная — исходный `AppColors.fat`.
 - `lib/core/ui/` содержит используемые Дневником и Food Search primitives:
   `YamPrimaryButton`, `YamSecondaryButton`, `YamTextButton`, `YamIconButton`,
   `YamSearchField`, `YamFilterChip`, `YamMealChip`, `YamProductRow`,
@@ -63,20 +66,27 @@
 
 ## Дневник
 
-- `lib/features/diary/presentation/diary_screen.dart` соответствует approved
-  hierarchy: закрепленный YAM header без mascot/profile, compact date selector,
-  daily summary и meal cards. Глобальный add FAB удалён по ADR 0010.
+- `lib/features/diary/presentation/diary_screen.dart` содержит закрепленный YAM
+  header, compact date selector, daily summary и meal cards. Закреплённая кнопка
+  возврата к сегодня появляется в header при просмотре других дат, не сдвигая
+  контент. Фиолетовый FAB вновь ведёт в общий Food Search с выбором приёма
+  пищи по ADR 0011; нижний inset не даёт ему закрывать последний приём.
+- В Diary через локальный `ScrollConfiguration` восстановлен штатный Android
+  stretch overscroll; глобальное поведение других экранов не изменено.
 - Compact layout сохраняет отдельные slivers для selector, summary и lazy meal
   list. Wide layout сохраняет ограниченную двухколоночную композицию.
 - `diary_day_selector.dart` использует компактную week strip, полные semantic
-  dates, 44+ dp controls, selection motion и ограничение ширины на desktop.
-- Верхние промежутки между selector/summary/meals и нижний content inset
-  уменьшены до screen-reference density; shell navigation не дублируется
-  лишним вертикальным padding.
+  dates, 44+ dp controls и selection motion. Точка под сегодняшней датой
+  сохраняется при выборе другого дня; область маркера зарезервирована у всех
+  дат для стабильной высоты selector.
+- Верхние промежутки между selector/summary/meals выровнены по screen-reference
+  density; нижний content inset учитывает FAB без лишнего padding у shell navigation.
 - `daily_nutrition_summary.dart` показывает kcal, remaining/over-target state и
   подписанные macro progress indicators в обеих темах.
 - `meal_section.dart` форматирует feature-data для shared
-  `YamMealSectionHeader` и `YamDiaryFoodRow`; adaptive large-text layout,
+  `YamMealSectionHeader` и `YamDiaryFoodRow`; верхний отступ карточки уменьшен,
+  видимая контекстная «+» увеличена до 36 dp при 44+ dp hit target, калории
+  разделены на число и приглушённую единицу. Adaptive large-text layout,
   contextual add и tappable highlight state сохранены.
 - Compact contextual add каждого meal открывает Food Search с preselection;
   result reveal, highlight и канонический floating `YamSnackbar` с Undo
@@ -129,7 +139,17 @@
 
 - `dart format` изменённых Dart-файлов -- успешно.
 - `flutter analyze` -- успешно, issues не найдено.
-- Полный `flutter test` -- успешно, 46 тестов.
+- Целевые и все прочие non-golden тесты с golden Дневника: 45 passed.
+  Проверены стабильная геометрия selector при смене дня, возврат из другой
+  недели, Android stretch widget, FAB и доступность последнего приёма, контраст
+  light fat. Diary goldens обновлены для compact/wide, light/dark и 200% текста,
+  добавлен снимок выбранного вчерашнего дня.
+- Полный `flutter test` запущен: 8 несовпадений старых golden Food Search и
+  Settings (в light Food Search меняется fat token; dark Settings тоже расходится
+  из-за рендеринга шрифтов при отсутствии UI-изменений); их эталоны не
+  перезаписаны. Найденное в том же прогоне старое ожидание
+  общего цвета жиров в `test/app/theme/app_theme_test.dart` исправлено; после
+  него 45 целевых и non-golden проверок проходят.
 - `test/core/ui/yam_components_test.dart` проверяет touch targets/callbacks,
   очистку поиска, narrow 200% product row и YAM Undo snackbar.
 - Widget-тесты дополнительно фиксируют right-edge alignment для quick amount и
@@ -140,21 +160,19 @@
 - Add Food sheet отдельно покрыт compact light EN и compact dark RU goldens;
   widget-тест проверяет step, preset, unit switch, nutrition/CTA recalculation и
   отсутствие overflow при 200% text scale.
-- Diary, Food Search и Settings golden baselines обновлены после screen-level
-  alignment по ADR 0010; compact/wide, light/dark, RU/EN и 200% text проверки
-  проходят.
+- Diary goldens после ADR 0011 проходят; существующие Food Search и Settings
+  goldens требуют отдельной проверки воспроизводимости рендерера.
 - Settings покрыт compact dark RU и wide light EN goldens; widget-тесты
   проверяют реальное session theme switching, About и layout при 200% text.
-- Debug APK успешно собран, установлен и запущен на физическом Android 16 по
-  Wi-Fi через `flutter run --debug --no-resident`.
 - Отдельные performance-бенчмарки удалены согласно ADR 0008.
 
 ## Следующее Действие
 
-- Реализовать Edit Diary Entry sheet по
-  `agents/design/yam_edit_diary_entry.html`, переиспользуя готовые quantity,
-  nutrition и button primitives.
+- Сверить Food Search и Settings golden с окружением, где были созданы
+  исходные эталоны, и восстановить воспроизводимость полного `flutter test`.
 
 ## Блокеры
 
-- Нет.
+- Полный прогон блокируют 8 несовпадений Food Search/Settings golden
+  (смена light fat token и расхождение рендеринга шрифтов); реализация Edit
+  Diary Entry пока не начата.

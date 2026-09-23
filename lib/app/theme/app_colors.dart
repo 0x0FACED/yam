@@ -4,6 +4,7 @@ abstract final class AppColors {
   static const brandPurple = Color(0xFF7B3AEF);
   static const protein = Color(0xFFFF8736);
   static const fat = Color(0xFFC7F464);
+  static const lightFat = Color(0xFF4C7600);
   static const carbs = Color(0xFF55D6BE);
   static const brandInk = Color(0xFF17151C);
   static const brandCream = Color(0xFFF8F5EE);

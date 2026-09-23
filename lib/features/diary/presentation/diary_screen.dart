@@ -6,6 +6,7 @@ import 'package:yam/app/theme/app_breakpoints.dart';
 import 'package:yam/app/theme/app_motion.dart';
 import 'package:yam/app/theme/app_spacing.dart';
 import 'package:yam/app/theme/app_typography.dart';
+import 'package:yam/core/ui/buttons/yam_buttons.dart';
 import 'package:yam/core/ui/feedback/yam_snack_bar.dart';
 import 'package:yam/features/diary/presentation/diary_prototype_data.dart';
 import 'package:yam/features/diary/presentation/widgets/daily_nutrition_summary.dart';
@@ -61,6 +62,12 @@ class _DiaryScreenState extends State<DiaryScreen> {
     );
 
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        key: const ValueKey('diary-add-food'),
+        tooltip: l10n.diaryAddFood,
+        onPressed: _openFoodSearch,
+        child: const Icon(Icons.add_rounded),
+      ),
       body: SafeArea(
         bottom: false,
         child: LayoutBuilder(
@@ -70,16 +77,19 @@ class _DiaryScreenState extends State<DiaryScreen> {
                 ? AppSpacing.xl
                 : AppSpacing.md;
 
-            return CustomScrollView(
-              key: const ValueKey('diary-scroll-view'),
-              controller: _scrollController,
-              slivers: [
-                _buildHeaderSliver(horizontalPadding),
-                if (constraints.maxWidth >= AppBreakpoints.wideDiary)
-                  ..._buildWideSlivers(day, horizontalPadding)
-                else
-                  ..._buildCompactSlivers(day, horizontalPadding),
-              ],
+            return ScrollConfiguration(
+              behavior: const MaterialScrollBehavior(),
+              child: CustomScrollView(
+                key: const ValueKey('diary-scroll-view'),
+                controller: _scrollController,
+                slivers: [
+                  _buildHeaderSliver(horizontalPadding),
+                  if (constraints.maxWidth >= AppBreakpoints.wideDiary)
+                    ..._buildWideSlivers(day, horizontalPadding)
+                  else
+                    ..._buildCompactSlivers(day, horizontalPadding),
+                ],
+              ),
             );
           },
         ),
@@ -105,19 +115,31 @@ class _DiaryScreenState extends State<DiaryScreen> {
       title: Padding(
         padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
         child: _ConstrainedDiaryContent(
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Semantics(
-              header: true,
-              child: Text(
-                AppLocalizations.of(context).appName,
-                style: AppTypography.sectionTitle.copyWith(
-                  color: theme.colorScheme.onSurface,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -0.2,
+          child: Row(
+            children: [
+              Expanded(
+                child: Semantics(
+                  header: true,
+                  child: Text(
+                    AppLocalizations.of(context).appName,
+                    style: AppTypography.sectionTitle.copyWith(
+                      color: theme.colorScheme.onSurface,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.2,
+                    ),
+                  ),
                 ),
               ),
-            ),
+              if (!_isSameDay(_selectedDay, _today))
+                YamIconButton(
+                  icon: Icons.today_rounded,
+                  tooltip: AppLocalizations.of(context).diaryReturnToToday,
+                  onPressed: _returnToToday,
+                  surface: false,
+                  iconSize: 22,
+                  visualSize: 32,
+                ),
+            ],
           ),
         ),
       ),
@@ -178,7 +200,9 @@ class _DiaryScreenState extends State<DiaryScreen> {
           },
         ),
       ),
-      const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.md)),
+      const SliverToBoxAdapter(
+        child: SizedBox(height: AppSpacing.xxl + AppSpacing.xl),
+      ),
     ];
   }
 
@@ -192,7 +216,7 @@ class _DiaryScreenState extends State<DiaryScreen> {
           horizontalPadding,
           AppSpacing.xs,
           horizontalPadding,
-          AppSpacing.md,
+          AppSpacing.xxl + AppSpacing.xl,
         ),
         sliver: SliverToBoxAdapter(
           child: _ConstrainedDiaryContent(
@@ -244,6 +268,13 @@ class _DiaryScreenState extends State<DiaryScreen> {
 
   void _selectDay(DateTime day) {
     setState(() => _selectedDay = DateTime(day.year, day.month, day.day));
+  }
+
+  void _returnToToday() {
+    _selectDay(_today);
+    if (_scrollController.hasClients) {
+      _scrollController.jumpTo(0);
+    }
   }
 
   Future<void> _openCalendar() async {

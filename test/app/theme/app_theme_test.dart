@@ -15,12 +15,12 @@ void main() {
     }
   });
 
-  test('keeps macro semantics fixed and status semantics theme-aware', () {
+  test('keeps macro meanings stable with theme-aware contrast', () {
     final light = AppTheme.light.extension<AppSemanticColors>()!;
     final dark = AppTheme.dark.extension<AppSemanticColors>()!;
 
     expect(light.protein, AppColors.protein);
-    expect(light.fat, AppColors.fat);
+    expect(light.fat, AppColors.lightFat);
     expect(light.carbs, AppColors.carbs);
     expect(dark.protein, AppColors.protein);
     expect(dark.fat, AppColors.fat);

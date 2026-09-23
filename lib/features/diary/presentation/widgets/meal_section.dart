@@ -37,7 +37,12 @@ class MealSection extends StatelessWidget {
         ),
         clipBehavior: Clip.antiAlias,
         child: Padding(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.sm,
+            AppSpacing.xs,
+            AppSpacing.sm,
+            AppSpacing.sm,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -95,7 +100,8 @@ class _MealHeader extends StatelessWidget {
     return YamMealSectionHeader(
       mealName: meal.name,
       timeLabel: time,
-      calorieLabel: l10n.mealCalories(calories),
+      calorieValue: calories,
+      calorieUnit: l10n.unitKilocalories,
       addTooltip: l10n.diaryAddFoodToMeal(meal.name),
       onAdd: onAddFood,
     );
