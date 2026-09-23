@@ -6,9 +6,9 @@
 ## Обновлено
 
 - Дата: 2026-09-20.
-- Стадия: visual implementation pass; Дневник, Food Search и Add Food sheet
-  переведены на канонические shared-компоненты.
-- Текущий статус: Add Food sheet завершён; следующий slice -- Edit Diary Entry.
+- Стадия: visual implementation pass; Дневник, Food Search, Add Food sheet и
+  Settings реализованы по approved references.
+- Текущий статус: Settings завершён; следующий slice -- Edit Diary Entry.
 
 ## Авторитетные Источники
 
@@ -19,6 +19,7 @@
 - Визуальное направление и токены: `docs/adr/0003-design-direction.md`.
 - Adaptive shell: `docs/adr/0004-adaptive-navigation.md`.
 - UX presentation-flow добавления еды: `docs/adr/0007-add-food-visual-prototype.md`.
+- Settings presentation и session-only theme: ADR 0009.
 - Performance-оптимизация до реальной проблемы отложена ADR 0008; обязательных
   profile-бенчмарков и числовых бюджетов у MVP нет.
 
@@ -51,9 +52,10 @@
   `YamPrimaryButton`, `YamSecondaryButton`, `YamTextButton`, `YamIconButton`,
   `YamSearchField`, `YamFilterChip`, `YamMealChip`, `YamProductRow`,
   `YamQuantityControl`, `YamQuickAmountPresets`, `YamNutritionSummary`,
-  `YamMealSectionHeader`, `YamDiaryFoodRow`, feedback/skeleton states,
-  `YamSnackbar` и `YamProgressBar`. API принимают display values и callbacks и
-  не зависят от feature prototype-моделей.
+  `YamMealSectionHeader`, `YamDiaryFoodRow`, `YamSettingsSection`,
+  `YamSettingsRow`, feedback/skeleton states, `YamSnackbar` и `YamProgressBar`.
+  API принимают display values и callbacks и не зависят от feature
+  prototype-моделей.
 
 ## Дневник
 
@@ -95,7 +97,13 @@
   preselection; пересчёт нутриентов, возврат результата в Дневник и Undo
   сохранены по ADR 0007. Barcode, success-плашка и edit nutrition/name action
   намеренно не добавлены в отсутствие соответствующих маршрутов.
-- Statistics и Settings пока route placeholders.
+- `lib/features/settings/presentation/settings_screen.dart` реализует compact и
+  wide grouped-list layout: goals/weight summary, app preferences, data state и
+  About/version. Theme picker реально переключает System/Light/Dark на время
+  текущего запуска через app-level `ValueNotifier<ThemeMode>` по ADR 0009.
+- Units/language/goals/data rows не имитируют persistence или отсутствующие
+  маршруты; export/delete явно помечены недоступными.
+- Statistics пока остаётся route placeholder.
 - Edit Diary Entry, Create Product, Goals и onboarding еще не реализованы.
 - Tap по diary row сейчас показывает selection/highlight state; настоящий Edit
   Entry sheet будет подключен в своем slice.
@@ -104,7 +112,7 @@
 
 - `dart format` изменённых Dart-файлов -- успешно.
 - `flutter analyze` -- успешно, issues не найдено.
-- Полный `flutter test` -- успешно, 41 тест.
+- Полный `flutter test` -- успешно, 45 тестов.
 - `test/core/ui/yam_components_test.dart` проверяет touch targets/callbacks,
   очистку поиска, narrow 200% product row и YAM Undo snackbar.
 - Food Search golden verification покрывает compact dark RU, compact light EN,
@@ -115,6 +123,8 @@
   отсутствие overflow при 200% text scale.
 - Diary и Food Search golden baselines обновлены после component migration;
   compact/wide, light/dark, RU/EN и 200% text проверки проходят.
+- Settings покрыт compact dark RU и wide light EN goldens; widget-тесты
+  проверяют реальное session theme switching, About и layout при 200% text.
 - Debug APK успешно собран, установлен и запущен на физическом Android 16 по
   Wi-Fi через `flutter run --debug --no-resident`.
 - Отдельные performance-бенчмарки удалены согласно ADR 0008.

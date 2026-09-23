@@ -34,7 +34,7 @@ void main() {
 
     await tester.tap(find.byKey(const ValueKey('food-result-rolled-oats')));
     await tester.pumpAndSettle();
-    expect(find.text('Add to diary'), findsOneWidget);
+    expect(find.byKey(const ValueKey('quick-add-submit')), findsOneWidget);
 
     await tester.tap(find.byKey(const ValueKey('quick-add-submit')));
     await tester.pump();
@@ -81,7 +81,12 @@ void main() {
     tester,
   ) async {
     await _setWindowSize(tester, const Size(390, 844));
-    await tester.pumpWidget(const _ScreenTestApp());
+    final router = createAppRouter();
+    addTearDown(router.dispose);
+    await tester.pumpWidget(_RouterTestApp(router: router));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const ValueKey('diary-add-food')));
     await tester.pumpAndSettle();
 
     await tester.enterText(
@@ -94,13 +99,73 @@ void main() {
     await tester.tap(find.byTooltip('Clear search'));
     await tester.pump();
     await tester.tap(find.byKey(const ValueKey('food-search-create-food')));
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(
-      find.text(
-        'Custom food creation will be available in the functional version.',
-      ),
+      find.text('Product creation will be implemented in a later slice.'),
       findsOneWidget,
     );
+  });
+
+  testWidgets('matches contextual sections and keeps quick add inline', (
+    tester,
+  ) async {
+    await _setWindowSize(tester, const Size(390, 844));
+    await tester.pumpWidget(
+      const _ScreenTestApp(
+        arguments: FoodSearchPrototypeArguments(initialMealId: 'breakfast'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Frequent for breakfast'), findsOneWidget);
+    expect(find.text('Rolled oats'), findsOneWidget);
+    expect(find.text('Milk 2.5%'), findsOneWidget);
+    expect(find.text('Whey protein'), findsOneWidget);
+    expect(find.text('Grade A chicken egg'), findsOneWidget);
+
+    final rowCenter = tester.getCenter(
+      find.byKey(const ValueKey('food-result-rolled-oats')),
+    );
+    final actionCenter = tester.getCenter(
+      find.byKey(const ValueKey('food-quick-add-rolled-oats')),
+    );
+    expect((rowCenter.dy - actionCenter.dy).abs(), lessThan(12));
+
+    await tester.tap(find.byKey(const ValueKey('food-search-tab-recent')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Frequent for breakfast'), findsNothing);
+    expect(find.text('Fresh banana'), findsOneWidget);
+    expect(find.text('Wholegrain bread'), findsOneWidget);
+  });
+
+  testWidgets('renders catalog loading and error feedback states', (
+    tester,
+  ) async {
+    await _setWindowSize(tester, const Size(390, 844));
+    await tester.pumpWidget(
+      const _ScreenTestApp(
+        arguments: FoodSearchPrototypeArguments(
+          initialCatalogState: FoodSearchPrototypeCatalogState.loading,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.bySemanticsLabel('Loading foods'), findsOneWidget);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pumpWidget(
+      const _ScreenTestApp(
+        arguments: FoodSearchPrototypeArguments(
+          initialCatalogState: FoodSearchPrototypeCatalogState.error,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Foods could not be loaded'), findsOneWidget);
+    expect(find.byKey(const ValueKey('food-search-retry')), findsOneWidget);
   });
 
   testWidgets('covers the navigation rail on a wide window', (tester) async {
@@ -135,7 +200,49 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('food-result-rolled-oats')));
     await tester.pumpAndSettle();
 
-    expect(find.text('Add to diary'), findsOneWidget);
+    expect(find.byKey(const ValueKey('quick-add-submit')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('quick-add quantity controls update the nutrition preview', (
+    tester,
+  ) async {
+    await _setWindowSize(tester, const Size(390, 844));
+    await tester.pumpWidget(
+      const _ScreenTestApp(
+        arguments: FoodSearchPrototypeArguments(initialMealId: 'breakfast'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const ValueKey('food-result-rolled-oats')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Quick select'), findsOneWidget);
+    expect(find.text('Usually: 80 g'), findsOneWidget);
+    expect(find.text('Add to Breakfast · 293 kcal'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Increase quantity'));
+    await tester.pump();
+    expect(find.text('90'), findsOneWidget);
+    expect(find.text('Add to Breakfast · 329 kcal'), findsOneWidget);
+
+    await tester.tap(find.text('50 g'));
+    await tester.pump();
+    expect(find.text('50'), findsOneWidget);
+    expect(find.text('Add to Breakfast · 183 kcal'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('quick-add-unit-grams')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('serving').last);
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('quick-add-unit-serving')),
+      findsOneWidget,
+    );
+    expect(find.text('1'), findsOneWidget);
+    expect(find.text('Add to Breakfast · 293 kcal'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }

@@ -427,6 +427,80 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsTitle => 'Настройки';
 
   @override
-  String get settingsPrototypeMessage =>
-      'Здесь будут настраиваться цели, единицы и внешний вид.';
+  String get settingsGoalsSection => 'Цели';
+
+  @override
+  String get settingsGoalsNutrition => 'Цели и питание';
+
+  @override
+  String settingsGoalsSummary(
+    String calories,
+    String protein,
+    String fat,
+    String carbs,
+  ) {
+    return '$calories ккал · Б $protein · Ж $fat · У $carbs';
+  }
+
+  @override
+  String get settingsWeight => 'Вес';
+
+  @override
+  String settingsWeightSummary(String current, String target) {
+    return '$current кг → $target кг';
+  }
+
+  @override
+  String get settingsApplicationSection => 'Приложение';
+
+  @override
+  String get settingsTheme => 'Тема';
+
+  @override
+  String get settingsThemeSystem => 'Системная';
+
+  @override
+  String get settingsThemeLight => 'Светлая';
+
+  @override
+  String get settingsThemeDark => 'Тёмная';
+
+  @override
+  String get settingsUnits => 'Единицы измерения';
+
+  @override
+  String get settingsUnitsMetric => 'Метрические';
+
+  @override
+  String get settingsLanguage => 'Язык';
+
+  @override
+  String get settingsLanguageEnglish => 'Английский';
+
+  @override
+  String get settingsLanguageRussian => 'Русский';
+
+  @override
+  String get settingsDataSection => 'Данные';
+
+  @override
+  String get settingsExportData => 'Экспорт данных';
+
+  @override
+  String get settingsDeleteAllData => 'Удалить все данные';
+
+  @override
+  String get settingsUnavailable => 'Пока недоступно';
+
+  @override
+  String get settingsAboutSection => 'О приложении';
+
+  @override
+  String get settingsAboutYam => 'О YAM';
+
+  @override
+  String get settingsVersion => 'Версия';
+
+  @override
+  String get settingsAboutDescription => 'Быстрый локальный дневник питания.';
 }

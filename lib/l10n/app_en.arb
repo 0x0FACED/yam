@@ -287,5 +287,53 @@
   "statisticsTitle": "Statistics",
   "statisticsPrototypeMessage": "Nutrition and weight trends will appear here.",
   "settingsTitle": "Settings",
-  "settingsPrototypeMessage": "Goals, units and appearance will be configured here."
+  "settingsGoalsSection": "Goals",
+  "settingsGoalsNutrition": "Goals & nutrition",
+  "settingsGoalsSummary": "{calories} kcal · P {protein} · F {fat} · C {carbs}",
+  "@settingsGoalsSummary": {
+    "placeholders": {
+      "calories": {
+        "type": "String"
+      },
+      "protein": {
+        "type": "String"
+      },
+      "fat": {
+        "type": "String"
+      },
+      "carbs": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsWeight": "Weight",
+  "settingsWeightSummary": "{current} kg → {target} kg",
+  "@settingsWeightSummary": {
+    "placeholders": {
+      "current": {
+        "type": "String"
+      },
+      "target": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsApplicationSection": "App",
+  "settingsTheme": "Theme",
+  "settingsThemeSystem": "System",
+  "settingsThemeLight": "Light",
+  "settingsThemeDark": "Dark",
+  "settingsUnits": "Units",
+  "settingsUnitsMetric": "Metric",
+  "settingsLanguage": "Language",
+  "settingsLanguageEnglish": "English",
+  "settingsLanguageRussian": "Russian",
+  "settingsDataSection": "Data",
+  "settingsExportData": "Export data",
+  "settingsDeleteAllData": "Delete all data",
+  "settingsUnavailable": "Not available yet",
+  "settingsAboutSection": "About",
+  "settingsAboutYam": "About YAM",
+  "settingsVersion": "Version",
+  "settingsAboutDescription": "A fast, local-first nutrition tracker."
 }

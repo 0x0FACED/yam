@@ -28,4 +28,20 @@ void main() {
     expect(english.first.name, 'Rolled oats');
     expect(russian.first.name, 'Овсяные хлопья');
   });
+
+  test('keeps breakfast suggestions separate from recent foods', () {
+    final foods = buildFoodSearchPrototypeFoods(const Locale('en'));
+
+    expect(
+      foods
+          .where((food) => food.frequentMealIds.contains('breakfast'))
+          .map((food) => food.id),
+      ['rolled-oats', 'milk-25', 'whey-protein', 'eggs'],
+    );
+    expect(foods.where((food) => food.recent).map((food) => food.id), [
+      'banana',
+      'wholegrain-bread',
+      'americano',
+    ]);
+  });
 }

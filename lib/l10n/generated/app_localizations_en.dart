@@ -418,6 +418,81 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsTitle => 'Settings';
 
   @override
-  String get settingsPrototypeMessage =>
-      'Goals, units and appearance will be configured here.';
+  String get settingsGoalsSection => 'Goals';
+
+  @override
+  String get settingsGoalsNutrition => 'Goals & nutrition';
+
+  @override
+  String settingsGoalsSummary(
+    String calories,
+    String protein,
+    String fat,
+    String carbs,
+  ) {
+    return '$calories kcal · P $protein · F $fat · C $carbs';
+  }
+
+  @override
+  String get settingsWeight => 'Weight';
+
+  @override
+  String settingsWeightSummary(String current, String target) {
+    return '$current kg → $target kg';
+  }
+
+  @override
+  String get settingsApplicationSection => 'App';
+
+  @override
+  String get settingsTheme => 'Theme';
+
+  @override
+  String get settingsThemeSystem => 'System';
+
+  @override
+  String get settingsThemeLight => 'Light';
+
+  @override
+  String get settingsThemeDark => 'Dark';
+
+  @override
+  String get settingsUnits => 'Units';
+
+  @override
+  String get settingsUnitsMetric => 'Metric';
+
+  @override
+  String get settingsLanguage => 'Language';
+
+  @override
+  String get settingsLanguageEnglish => 'English';
+
+  @override
+  String get settingsLanguageRussian => 'Russian';
+
+  @override
+  String get settingsDataSection => 'Data';
+
+  @override
+  String get settingsExportData => 'Export data';
+
+  @override
+  String get settingsDeleteAllData => 'Delete all data';
+
+  @override
+  String get settingsUnavailable => 'Not available yet';
+
+  @override
+  String get settingsAboutSection => 'About';
+
+  @override
+  String get settingsAboutYam => 'About YAM';
+
+  @override
+  String get settingsVersion => 'Version';
+
+  @override
+  String get settingsAboutDescription =>
+      'A fast, local-first nutrition tracker.';
 }

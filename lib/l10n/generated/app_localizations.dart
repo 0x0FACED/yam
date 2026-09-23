@@ -770,11 +770,148 @@ abstract class AppLocalizations {
   /// **'Settings'**
   String get settingsTitle;
 
-  /// No description provided for @settingsPrototypeMessage.
+  /// No description provided for @settingsGoalsSection.
   ///
   /// In en, this message translates to:
-  /// **'Goals, units and appearance will be configured here.'**
-  String get settingsPrototypeMessage;
+  /// **'Goals'**
+  String get settingsGoalsSection;
+
+  /// No description provided for @settingsGoalsNutrition.
+  ///
+  /// In en, this message translates to:
+  /// **'Goals & nutrition'**
+  String get settingsGoalsNutrition;
+
+  /// No description provided for @settingsGoalsSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{calories} kcal · P {protein} · F {fat} · C {carbs}'**
+  String settingsGoalsSummary(
+    String calories,
+    String protein,
+    String fat,
+    String carbs,
+  );
+
+  /// No description provided for @settingsWeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight'**
+  String get settingsWeight;
+
+  /// No description provided for @settingsWeightSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{current} kg → {target} kg'**
+  String settingsWeightSummary(String current, String target);
+
+  /// No description provided for @settingsApplicationSection.
+  ///
+  /// In en, this message translates to:
+  /// **'App'**
+  String get settingsApplicationSection;
+
+  /// No description provided for @settingsTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get settingsTheme;
+
+  /// No description provided for @settingsThemeSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get settingsThemeSystem;
+
+  /// No description provided for @settingsThemeLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get settingsThemeLight;
+
+  /// No description provided for @settingsThemeDark.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get settingsThemeDark;
+
+  /// No description provided for @settingsUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Units'**
+  String get settingsUnits;
+
+  /// No description provided for @settingsUnitsMetric.
+  ///
+  /// In en, this message translates to:
+  /// **'Metric'**
+  String get settingsUnitsMetric;
+
+  /// No description provided for @settingsLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get settingsLanguage;
+
+  /// No description provided for @settingsLanguageEnglish.
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get settingsLanguageEnglish;
+
+  /// No description provided for @settingsLanguageRussian.
+  ///
+  /// In en, this message translates to:
+  /// **'Russian'**
+  String get settingsLanguageRussian;
+
+  /// No description provided for @settingsDataSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Data'**
+  String get settingsDataSection;
+
+  /// No description provided for @settingsExportData.
+  ///
+  /// In en, this message translates to:
+  /// **'Export data'**
+  String get settingsExportData;
+
+  /// No description provided for @settingsDeleteAllData.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete all data'**
+  String get settingsDeleteAllData;
+
+  /// No description provided for @settingsUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Not available yet'**
+  String get settingsUnavailable;
+
+  /// No description provided for @settingsAboutSection.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get settingsAboutSection;
+
+  /// No description provided for @settingsAboutYam.
+  ///
+  /// In en, this message translates to:
+  /// **'About YAM'**
+  String get settingsAboutYam;
+
+  /// No description provided for @settingsVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Version'**
+  String get settingsVersion;
+
+  /// No description provided for @settingsAboutDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'A fast, local-first nutrition tracker.'**
+  String get settingsAboutDescription;
 }
 
 class _AppLocalizationsDelegate

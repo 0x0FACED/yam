@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yam/app/navigation/adaptive_navigation_shell.dart';
@@ -6,9 +7,14 @@ import 'package:yam/features/diary/presentation/diary_screen.dart';
 import 'package:yam/features/food_search/presentation/create_product_stub_screen.dart';
 import 'package:yam/features/food_search/presentation/food_search_prototype_data.dart';
 import 'package:yam/features/food_search/presentation/food_search_screen.dart';
+import 'package:yam/features/settings/presentation/settings_screen.dart';
 import 'package:yam/l10n/generated/app_localizations.dart';
 
-GoRouter createAppRouter({DateTime? diaryToday}) {
+GoRouter createAppRouter({
+  DateTime? diaryToday,
+  ValueListenable<ThemeMode>? themeModeListenable,
+  ValueChanged<ThemeMode>? onThemeModeChanged,
+}) {
   return GoRouter(
     initialLocation: '/diary',
     routes: [
@@ -45,11 +51,19 @@ GoRouter createAppRouter({DateTime? diaryToday}) {
               GoRoute(
                 path: '/settings',
                 builder: (context, state) {
-                  final l10n = AppLocalizations.of(context);
-                  return _SectionPlaceholder(
-                    icon: Icons.settings_rounded,
-                    title: l10n.settingsTitle,
-                    message: l10n.settingsPrototypeMessage,
+                  final changeTheme = onThemeModeChanged ?? (_) {};
+                  if (themeModeListenable case final listenable?) {
+                    return ValueListenableBuilder<ThemeMode>(
+                      valueListenable: listenable,
+                      builder: (context, themeMode, child) => SettingsScreen(
+                        themeMode: themeMode,
+                        onThemeModeChanged: changeTheme,
+                      ),
+                    );
+                  }
+                  return SettingsScreen(
+                    themeMode: ThemeMode.system,
+                    onThemeModeChanged: changeTheme,
                   );
                 },
               ),
