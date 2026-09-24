@@ -17,11 +17,14 @@ String formatFoodSearchQuantity(
   num value,
 ) {
   final l10n = AppLocalizations.of(context);
+  final locale = Localizations.localeOf(context).toLanguageTag();
   final normalized = value is double && value == value.roundToDouble()
       ? value.toInt()
+      : value is double && value.abs() >= 0.001
+      ? double.parse(value.toStringAsFixed(3))
       : value;
 
-  return switch (unit) {
+  final translated = switch (unit) {
     FoodSearchPrototypeUnit.grams => l10n.quantityGrams(normalized),
     FoodSearchPrototypeUnit.milliliters => l10n.quantityMilliliters(normalized),
     FoodSearchPrototypeUnit.pieces => l10n.quantityPieces(normalized),
@@ -29,6 +32,9 @@ String formatFoodSearchQuantity(
     FoodSearchPrototypeUnit.scoops => l10n.quantityScoops(normalized),
     FoodSearchPrototypeUnit.glasses => l10n.quantityGlasses(normalized),
   };
+  final formatted = NumberFormat.decimalPattern(locale)
+    ..maximumFractionDigits = 3;
+  return translated.replaceFirst('$normalized', formatted.format(normalized));
 }
 
 String foodSearchUnitLabel(
@@ -62,4 +68,42 @@ String formatFoodSearchMetadata(
   };
   final brand = food.brand;
   return brand == null || brand.isEmpty ? category : '$category · $brand';
+}
+
+String? foodSearchServingEquivalent(
+  BuildContext context,
+  FoodSearchPrototypeFood food,
+  FoodSearchPrototypeServing serving,
+) {
+  final l10n = AppLocalizations.of(context);
+  final massPerPiece = food.gramsPerReferenceUnit;
+  if (food.referenceUnit == FoodSearchPrototypeUnit.pieces &&
+      massPerPiece != null &&
+      serving.unit == FoodSearchPrototypeUnit.grams) {
+    return l10n.quickAddUnitEquivalent(
+      formatFoodSearchQuantity(context, FoodSearchPrototypeUnit.pieces, 1),
+      formatFoodSearchQuantity(
+        context,
+        FoodSearchPrototypeUnit.grams,
+        massPerPiece,
+      ),
+    );
+  }
+  if (serving.unit == food.referenceUnit && massPerPiece == null) return null;
+
+  final equivalent = massPerPiece == null
+      ? formatFoodSearchQuantity(
+          context,
+          food.referenceUnit,
+          serving.baseAmount,
+        )
+      : formatFoodSearchQuantity(
+          context,
+          FoodSearchPrototypeUnit.grams,
+          serving.baseAmount * massPerPiece,
+        );
+  return l10n.quickAddUnitEquivalent(
+    formatFoodSearchQuantity(context, serving.unit, 1),
+    equivalent,
+  );
 }

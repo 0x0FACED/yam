@@ -110,6 +110,198 @@ abstract class AppLocalizations {
   /// **'YAM is starting'**
   String get startupLoadingLabel;
 
+  /// No description provided for @onboardingStepOf.
+  ///
+  /// In en, this message translates to:
+  /// **'Step {step} of {total}'**
+  String onboardingStepOf(int step, int total);
+
+  /// No description provided for @onboardingGoalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What would you like to change?'**
+  String get onboardingGoalTitle;
+
+  /// No description provided for @onboardingGoalDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'This helps set your daily calorie and macro goals'**
+  String get onboardingGoalDescription;
+
+  /// No description provided for @onboardingGoalLose.
+  ///
+  /// In en, this message translates to:
+  /// **'Lose weight'**
+  String get onboardingGoalLose;
+
+  /// No description provided for @onboardingGoalLoseDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'For gradual weight loss'**
+  String get onboardingGoalLoseDescription;
+
+  /// No description provided for @onboardingGoalMaintain.
+  ///
+  /// In en, this message translates to:
+  /// **'Maintain weight'**
+  String get onboardingGoalMaintain;
+
+  /// No description provided for @onboardingGoalMaintainDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'To keep your current weight'**
+  String get onboardingGoalMaintainDescription;
+
+  /// No description provided for @onboardingGoalGain.
+  ///
+  /// In en, this message translates to:
+  /// **'Gain weight'**
+  String get onboardingGoalGain;
+
+  /// No description provided for @onboardingGoalGainDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'For gradual weight gain'**
+  String get onboardingGoalGainDescription;
+
+  /// No description provided for @onboardingWeightTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight'**
+  String get onboardingWeightTitle;
+
+  /// No description provided for @onboardingWeightDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your current and target weight'**
+  String get onboardingWeightDescription;
+
+  /// No description provided for @onboardingCurrentWeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Current weight'**
+  String get onboardingCurrentWeight;
+
+  /// No description provided for @onboardingTargetWeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Target weight'**
+  String get onboardingTargetWeight;
+
+  /// No description provided for @onboardingWeightDifference.
+  ///
+  /// In en, this message translates to:
+  /// **'Difference to goal'**
+  String get onboardingWeightDifference;
+
+  /// No description provided for @onboardingWeightUnchanged.
+  ///
+  /// In en, this message translates to:
+  /// **'Maintain current weight'**
+  String get onboardingWeightUnchanged;
+
+  /// No description provided for @onboardingNutritionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Nutrition goals'**
+  String get onboardingNutritionTitle;
+
+  /// No description provided for @onboardingNutritionDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Set your daily targets for your routine'**
+  String get onboardingNutritionDescription;
+
+  /// No description provided for @onboardingCalories.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily calories'**
+  String get onboardingCalories;
+
+  /// No description provided for @onboardingMacros.
+  ///
+  /// In en, this message translates to:
+  /// **'Macronutrients'**
+  String get onboardingMacros;
+
+  /// No description provided for @onboardingEnergyFromMacros.
+  ///
+  /// In en, this message translates to:
+  /// **'From macros: {calories} kcal'**
+  String onboardingEnergyFromMacros(String calories);
+
+  /// No description provided for @onboardingEnergyAbove.
+  ///
+  /// In en, this message translates to:
+  /// **'+{difference} kcal vs target'**
+  String onboardingEnergyAbove(String difference);
+
+  /// No description provided for @onboardingEnergyBelow.
+  ///
+  /// In en, this message translates to:
+  /// **'−{difference} kcal vs target'**
+  String onboardingEnergyBelow(String difference);
+
+  /// No description provided for @onboardingEnergyMatches.
+  ///
+  /// In en, this message translates to:
+  /// **'Matches target'**
+  String get onboardingEnergyMatches;
+
+  /// No description provided for @onboardingEnergyFormulaHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculation: protein and carbs × 4, fat × 9 kcal/g.'**
+  String get onboardingEnergyFormulaHint;
+
+  /// No description provided for @onboardingNutritionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'You can change these later in Settings.'**
+  String get onboardingNutritionHint;
+
+  /// No description provided for @onboardingContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get onboardingContinue;
+
+  /// No description provided for @onboardingStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get onboardingStart;
+
+  /// No description provided for @onboardingBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get onboardingBack;
+
+  /// No description provided for @onboardingClose.
+  ///
+  /// In en, this message translates to:
+  /// **'Close onboarding'**
+  String get onboardingClose;
+
+  /// No description provided for @onboardingInvalidPositive.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a number greater than zero'**
+  String get onboardingInvalidPositive;
+
+  /// No description provided for @onboardingInvalidNonNegative.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a number of zero or more'**
+  String get onboardingInvalidNonNegative;
+
+  /// No description provided for @unitKilograms.
+  ///
+  /// In en, this message translates to:
+  /// **'kg'**
+  String get unitKilograms;
+
   /// No description provided for @navigationDiary.
   ///
   /// In en, this message translates to:
@@ -488,6 +680,12 @@ abstract class AppLocalizations {
   /// **'Unit'**
   String get quickAddUnit;
 
+  /// No description provided for @quickAddUnitEquivalent.
+  ///
+  /// In en, this message translates to:
+  /// **'{unit} = {quantity}'**
+  String quickAddUnitEquivalent(String unit, String quantity);
+
   /// No description provided for @quickAddMeal.
   ///
   /// In en, this message translates to:
@@ -548,17 +746,35 @@ abstract class AppLocalizations {
   /// **'Close quick add'**
   String get quickAddClose;
 
-  /// No description provided for @quickAddAddCalories.
-  ///
-  /// In en, this message translates to:
-  /// **'Add · {calories} kcal'**
-  String quickAddAddCalories(String calories);
-
   /// No description provided for @quickAddAddToMeal.
   ///
   /// In en, this message translates to:
-  /// **'Add to {meal} · {calories} kcal'**
-  String quickAddAddToMeal(String meal, String calories);
+  /// **'Add to {meal}'**
+  String quickAddAddToMeal(String meal);
+
+  /// No description provided for @quickAddFavoriteAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to favorites'**
+  String get quickAddFavoriteAdd;
+
+  /// No description provided for @quickAddFavoriteRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from favorites'**
+  String get quickAddFavoriteRemove;
+
+  /// No description provided for @foodFavoriteAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'{food} added to favorites'**
+  String foodFavoriteAdded(String food);
+
+  /// No description provided for @foodFavoriteRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'{food} removed from favorites'**
+  String foodFavoriteRemoved(String food);
 
   /// No description provided for @foodAdded.
   ///
@@ -781,6 +997,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Goals'**
   String get settingsGoalsSection;
+
+  /// No description provided for @settingsOpenOnboarding.
+  ///
+  /// In en, this message translates to:
+  /// **'Go through onboarding'**
+  String get settingsOpenOnboarding;
 
   /// No description provided for @settingsGoalsNutrition.
   ///

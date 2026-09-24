@@ -3,23 +3,24 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yam/app/theme/app_breakpoints.dart';
+import 'package:yam/app/session/session_profile.dart';
 import 'package:yam/app/theme/app_motion.dart';
 import 'package:yam/app/theme/app_spacing.dart';
 import 'package:yam/app/theme/app_typography.dart';
 import 'package:yam/core/ui/buttons/yam_buttons.dart';
-import 'package:yam/core/ui/feedback/yam_snack_bar.dart';
+import 'package:yam/core/ui/motion/yam_entrance_reveal.dart';
 import 'package:yam/features/diary/presentation/diary_prototype_data.dart';
 import 'package:yam/features/diary/presentation/widgets/daily_nutrition_summary.dart';
 import 'package:yam/features/diary/presentation/widgets/diary_day_selector.dart';
 import 'package:yam/features/diary/presentation/widgets/meal_section.dart';
-import 'package:yam/features/food_search/presentation/food_search_meals.dart';
 import 'package:yam/features/food_search/presentation/food_search_prototype_data.dart';
 import 'package:yam/l10n/generated/app_localizations.dart';
 
 class DiaryScreen extends StatefulWidget {
-  const DiaryScreen({this.today, super.key});
+  const DiaryScreen({this.today, this.profile, super.key});
 
   final DateTime? today;
+  final SessionProfile? profile;
 
   @override
   State<DiaryScreen> createState() => _DiaryScreenState();
@@ -30,6 +31,7 @@ class _DiaryScreenState extends State<DiaryScreen> {
   final Map<DateTime, Map<String, List<DiaryPrototypeEntry>>>
   _prototypeAdditions = {};
   final List<({String entryId, String foodId})> _recentFoodAdditions = [];
+  final Set<String> _favoriteOverrides = {};
 
   late final DateTime _today;
   late DateTime _selectedDay;
@@ -60,6 +62,7 @@ class _DiaryScreenState extends State<DiaryScreen> {
       l10n,
       includeEntries: _isSameDay(_selectedDay, _today),
       additionalEntries: _prototypeAdditions[_selectedDay] ?? const {},
+      profile: widget.profile,
     );
 
     return Scaffold(
@@ -163,7 +166,9 @@ class _DiaryScreenState extends State<DiaryScreen> {
         ),
         sliver: SliverToBoxAdapter(
           child: RepaintBoundary(
-            child: _ConstrainedDiaryContent(child: _buildDaySelector()),
+            child: _ConstrainedDiaryContent(
+              child: YamEntranceReveal(index: 0, child: _buildDaySelector()),
+            ),
           ),
         ),
       ),
@@ -177,7 +182,10 @@ class _DiaryScreenState extends State<DiaryScreen> {
         sliver: SliverToBoxAdapter(
           child: RepaintBoundary(
             child: _ConstrainedDiaryContent(
-              child: DailyNutritionSummary(day: day),
+              child: YamEntranceReveal(
+                index: 1,
+                child: DailyNutritionSummary(day: day),
+              ),
             ),
           ),
         ),
@@ -188,15 +196,22 @@ class _DiaryScreenState extends State<DiaryScreen> {
           itemCount: day.meals.length,
           itemBuilder: (context, index) {
             final meal = day.meals[index];
+            final section = MealSection(
+              key: ValueKey(meal.id),
+              meal: meal,
+              onAddFood: () => _openFoodSearch(mealId: meal.id),
+              onEntryPressed: _previewEntrySelection,
+              highlightedEntryId: _highlightedEntryId,
+              highlightedEntryKey: _highlightedEntryKey,
+            );
             return _ConstrainedDiaryContent(
-              child: MealSection(
-                key: ValueKey(meal.id),
-                meal: meal,
-                onAddFood: () => _openFoodSearch(mealId: meal.id),
-                onEntryPressed: _previewEntrySelection,
-                highlightedEntryId: _highlightedEntryId,
-                highlightedEntryKey: _highlightedEntryKey,
-              ),
+              child: index < 2
+                  ? YamEntranceReveal(
+                      key: ValueKey('diary-reveal-${meal.id}'),
+                      index: index + 2,
+                      child: section,
+                    )
+                  : section,
             );
           },
         ),
@@ -224,14 +239,17 @@ class _DiaryScreenState extends State<DiaryScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _buildDaySelector(),
+                YamEntranceReveal(index: 0, child: _buildDaySelector()),
                 const SizedBox(height: AppSpacing.lg),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(
                       width: 360,
-                      child: DailyNutritionSummary(day: day),
+                      child: YamEntranceReveal(
+                        index: 1,
+                        child: DailyNutritionSummary(day: day),
+                      ),
                     ),
                     const SizedBox(width: AppSpacing.xl),
                     Expanded(
@@ -292,6 +310,8 @@ class _DiaryScreenState extends State<DiaryScreen> {
 
   Future<void> _openFoodSearch({String? mealId}) async {
     final targetDay = _selectedDay;
+    String? lastEntryId;
+    GlobalKey? lastEntryKey;
     final recentFoodIds = <String>[];
     for (final addition in _recentFoodAdditions.reversed) {
       if (!recentFoodIds.contains(addition.foodId)) {
@@ -299,64 +319,75 @@ class _DiaryScreenState extends State<DiaryScreen> {
         if (recentFoodIds.length == foodSearchRecentLimit) break;
       }
     }
-    final result = await context.push<FoodAddPrototypeResult>(
+    await context.push<void>(
       '/add-food',
       extra: FoodSearchPrototypeArguments(
         initialMealId: mealId,
         recentFoodIds: recentFoodIds,
+        favoriteOverrides: Set.unmodifiable(_favoriteOverrides),
+        onFavoritesChanged: (overrides) {
+          if (!mounted) return;
+          setState(() {
+            _favoriteOverrides
+              ..clear()
+              ..addAll(overrides);
+          });
+        },
+        onFoodAdded: (result) {
+          if (!mounted) return () {};
+          final entryId = 'prototype-addition-${_nextPrototypeEntryId++}';
+          final entry = DiaryPrototypeEntry(
+            id: entryId,
+            name: result.name,
+            brand: result.brand,
+            quantity: result.quantityLabel,
+            calories: result.calories,
+            protein: result.protein,
+            fat: result.fat,
+            carbs: result.carbs,
+          );
+          final entryKey = GlobalKey();
+
+          setState(() {
+            final additionsForDay = Map<String, List<DiaryPrototypeEntry>>.from(
+              _prototypeAdditions[targetDay] ?? const {},
+            );
+            additionsForDay[result.mealId] = [
+              ...(additionsForDay[result.mealId] ?? const []),
+              entry,
+            ];
+            _prototypeAdditions[targetDay] = additionsForDay;
+            _recentFoodAdditions.add((entryId: entryId, foodId: result.foodId));
+          });
+          lastEntryId = entryId;
+          lastEntryKey = entryKey;
+
+          return () {
+            if (!mounted) return;
+            _undoPrototypeAddition(
+              day: targetDay,
+              mealId: result.mealId,
+              entryId: entryId,
+            );
+            if (lastEntryId == entryId) {
+              lastEntryId = null;
+              lastEntryKey = null;
+            }
+          };
+        },
       ),
     );
-    if (!mounted || result == null) {
-      return;
-    }
-
-    final entryId = 'prototype-addition-${_nextPrototypeEntryId++}';
-    final entry = DiaryPrototypeEntry(
-      id: entryId,
-      name: result.name,
-      brand: result.brand,
-      quantity: result.quantityLabel,
-      calories: result.calories,
-      protein: result.protein,
-      fat: result.fat,
-      carbs: result.carbs,
-    );
-    final entryKey = GlobalKey();
-
+    if (!mounted || lastEntryId == null || lastEntryKey == null) return;
+    final highlightedId = lastEntryId!;
+    final highlightedKey = lastEntryKey!;
     setState(() {
-      final additionsForDay = Map<String, List<DiaryPrototypeEntry>>.from(
-        _prototypeAdditions[targetDay] ?? const {},
-      );
-      additionsForDay[result.mealId] = [
-        ...(additionsForDay[result.mealId] ?? const []),
-        entry,
-      ];
-      _prototypeAdditions[targetDay] = additionsForDay;
-      _recentFoodAdditions.add((entryId: entryId, foodId: result.foodId));
-      _highlightedEntryId = entryId;
-      _highlightedEntryKey = entryKey;
+      _highlightedEntryId = highlightedId;
+      _highlightedEntryKey = highlightedKey;
     });
-
-    _scheduleHighlightClear(entryId);
-
+    _scheduleHighlightClear(highlightedId);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _revealAddedEntry(entryKey);
+      _revealAddedEntry(highlightedKey);
     });
-
-    final l10n = AppLocalizations.of(context);
-    showYamUndoSnackBar(
-      context: context,
-      message: l10n.foodAdded(
-        result.name,
-        foodSearchPrototypeMealName(l10n, result.mealId),
-      ),
-      undoLabel: l10n.actionUndo,
-      onUndo: () => _undoPrototypeAddition(
-        day: targetDay,
-        mealId: result.mealId,
-        entryId: entryId,
-      ),
-    );
   }
 
   void _previewEntrySelection(DiaryPrototypeEntry entry) {
@@ -472,18 +503,27 @@ class _MealList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        for (final meal in day.meals)
-          MealSection(
-            key: ValueKey(meal.id),
-            meal: meal,
-            onAddFood: () => onAddFood(meal.id),
-            onEntryPressed: onEntryPressed,
-            highlightedEntryId: highlightedEntryId,
-            highlightedEntryKey: highlightedEntryKey,
-          ),
+        for (var index = 0; index < day.meals.length; index++)
+          if (index < 2)
+            YamEntranceReveal(
+              key: ValueKey('diary-reveal-${day.meals[index].id}'),
+              index: index + 2,
+              child: _buildMeal(day.meals[index]),
+            )
+          else
+            _buildMeal(day.meals[index]),
       ],
     );
   }
+
+  Widget _buildMeal(DiaryPrototypeMeal meal) => MealSection(
+    key: ValueKey(meal.id),
+    meal: meal,
+    onAddFood: () => onAddFood(meal.id),
+    onEntryPressed: onEntryPressed,
+    highlightedEntryId: highlightedEntryId,
+    highlightedEntryKey: highlightedEntryKey,
+  );
 }
 
 bool _isSameDay(DateTime left, DateTime right) {

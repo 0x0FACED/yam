@@ -2,11 +2,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yam/app/navigation/adaptive_navigation_shell.dart';
+import 'package:yam/app/session/session_profile.dart';
 import 'package:yam/app/theme/app_spacing.dart';
 import 'package:yam/features/diary/presentation/diary_screen.dart';
 import 'package:yam/features/food_search/presentation/create_product_stub_screen.dart';
 import 'package:yam/features/food_search/presentation/food_search_prototype_data.dart';
 import 'package:yam/features/food_search/presentation/food_search_screen.dart';
+import 'package:yam/features/onboarding/presentation/onboarding_screen.dart';
 import 'package:yam/features/settings/presentation/settings_screen.dart';
 import 'package:yam/l10n/generated/app_localizations.dart';
 
@@ -14,6 +16,8 @@ GoRouter createAppRouter({
   DateTime? diaryToday,
   ValueListenable<ThemeMode>? themeModeListenable,
   ValueChanged<ThemeMode>? onThemeModeChanged,
+  ValueListenable<SessionProfile?>? profileListenable,
+  ValueChanged<SessionProfile>? onProfileChanged,
 }) {
   return GoRouter(
     initialLocation: '/diary',
@@ -27,7 +31,16 @@ GoRouter createAppRouter({
             routes: [
               GoRoute(
                 path: '/diary',
-                builder: (context, state) => DiaryScreen(today: diaryToday),
+                builder: (context, state) {
+                  if (profileListenable case final listenable?) {
+                    return ValueListenableBuilder<SessionProfile?>(
+                      valueListenable: listenable,
+                      builder: (context, profile, child) =>
+                          DiaryScreen(today: diaryToday, profile: profile),
+                    );
+                  }
+                  return DiaryScreen(today: diaryToday);
+                },
               ),
             ],
           ),
@@ -52,24 +65,33 @@ GoRouter createAppRouter({
                 path: '/settings',
                 builder: (context, state) {
                   final changeTheme = onThemeModeChanged ?? (_) {};
-                  if (themeModeListenable case final listenable?) {
-                    return ValueListenableBuilder<ThemeMode>(
-                      valueListenable: listenable,
-                      builder: (context, themeMode, child) => SettingsScreen(
-                        themeMode: themeMode,
-                        onThemeModeChanged: changeTheme,
-                      ),
-                    );
-                  }
-                  return SettingsScreen(
-                    themeMode: ThemeMode.system,
-                    onThemeModeChanged: changeTheme,
+                  final listenables = <Listenable>[
+                    ?themeModeListenable,
+                    ?profileListenable,
+                  ];
+                  return ListenableBuilder(
+                    listenable: Listenable.merge(listenables),
+                    builder: (context, child) => SettingsScreen(
+                      themeMode: themeModeListenable?.value ?? ThemeMode.system,
+                      onThemeModeChanged: changeTheme,
+                      profile: profileListenable?.value,
+                    ),
                   );
                 },
               ),
             ],
           ),
         ],
+      ),
+      GoRoute(
+        path: '/onboarding',
+        builder: (context, state) => OnboardingScreen(
+          initialProfile: profileListenable?.value ?? SessionProfile.example,
+          onCompleted: (profile) {
+            onProfileChanged?.call(profile);
+            context.pop();
+          },
+        ),
       ),
       GoRoute(
         path: '/add-food',

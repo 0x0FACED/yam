@@ -15,6 +15,115 @@ class AppLocalizationsEn extends AppLocalizations {
   String get startupLoadingLabel => 'YAM is starting';
 
   @override
+  String onboardingStepOf(int step, int total) {
+    return 'Step $step of $total';
+  }
+
+  @override
+  String get onboardingGoalTitle => 'What would you like to change?';
+
+  @override
+  String get onboardingGoalDescription =>
+      'This helps set your daily calorie and macro goals';
+
+  @override
+  String get onboardingGoalLose => 'Lose weight';
+
+  @override
+  String get onboardingGoalLoseDescription => 'For gradual weight loss';
+
+  @override
+  String get onboardingGoalMaintain => 'Maintain weight';
+
+  @override
+  String get onboardingGoalMaintainDescription => 'To keep your current weight';
+
+  @override
+  String get onboardingGoalGain => 'Gain weight';
+
+  @override
+  String get onboardingGoalGainDescription => 'For gradual weight gain';
+
+  @override
+  String get onboardingWeightTitle => 'Weight';
+
+  @override
+  String get onboardingWeightDescription =>
+      'Enter your current and target weight';
+
+  @override
+  String get onboardingCurrentWeight => 'Current weight';
+
+  @override
+  String get onboardingTargetWeight => 'Target weight';
+
+  @override
+  String get onboardingWeightDifference => 'Difference to goal';
+
+  @override
+  String get onboardingWeightUnchanged => 'Maintain current weight';
+
+  @override
+  String get onboardingNutritionTitle => 'Nutrition goals';
+
+  @override
+  String get onboardingNutritionDescription =>
+      'Set your daily targets for your routine';
+
+  @override
+  String get onboardingCalories => 'Daily calories';
+
+  @override
+  String get onboardingMacros => 'Macronutrients';
+
+  @override
+  String onboardingEnergyFromMacros(String calories) {
+    return 'From macros: $calories kcal';
+  }
+
+  @override
+  String onboardingEnergyAbove(String difference) {
+    return '+$difference kcal vs target';
+  }
+
+  @override
+  String onboardingEnergyBelow(String difference) {
+    return '−$difference kcal vs target';
+  }
+
+  @override
+  String get onboardingEnergyMatches => 'Matches target';
+
+  @override
+  String get onboardingEnergyFormulaHint =>
+      'Calculation: protein and carbs × 4, fat × 9 kcal/g.';
+
+  @override
+  String get onboardingNutritionHint =>
+      'You can change these later in Settings.';
+
+  @override
+  String get onboardingContinue => 'Continue';
+
+  @override
+  String get onboardingStart => 'Start';
+
+  @override
+  String get onboardingBack => 'Back';
+
+  @override
+  String get onboardingClose => 'Close onboarding';
+
+  @override
+  String get onboardingInvalidPositive => 'Enter a number greater than zero';
+
+  @override
+  String get onboardingInvalidNonNegative => 'Enter a number of zero or more';
+
+  @override
+  String get unitKilograms => 'kg';
+
+  @override
   String get navigationDiary => 'Diary';
 
   @override
@@ -224,6 +333,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quickAddUnit => 'Unit';
 
   @override
+  String quickAddUnitEquivalent(String unit, String quantity) {
+    return '$unit = $quantity';
+  }
+
+  @override
   String get quickAddMeal => 'Meal';
 
   @override
@@ -258,13 +372,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quickAddClose => 'Close quick add';
 
   @override
-  String quickAddAddCalories(String calories) {
-    return 'Add · $calories kcal';
+  String quickAddAddToMeal(String meal) {
+    return 'Add to $meal';
   }
 
   @override
-  String quickAddAddToMeal(String meal, String calories) {
-    return 'Add to $meal · $calories kcal';
+  String get quickAddFavoriteAdd => 'Add to favorites';
+
+  @override
+  String get quickAddFavoriteRemove => 'Remove from favorites';
+
+  @override
+  String foodFavoriteAdded(String food) {
+    return '$food added to favorites';
+  }
+
+  @override
+  String foodFavoriteRemoved(String food) {
+    return '$food removed from favorites';
   }
 
   @override
@@ -416,6 +541,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsGoalsSection => 'Goals';
+
+  @override
+  String get settingsOpenOnboarding => 'Go through onboarding';
 
   @override
   String get settingsGoalsNutrition => 'Goals & nutrition';

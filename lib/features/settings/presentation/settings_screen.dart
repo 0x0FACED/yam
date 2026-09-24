@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:yam/app/session/session_profile.dart';
 import 'package:yam/app/theme/app_breakpoints.dart';
 import 'package:yam/app/theme/app_radius.dart';
 import 'package:yam/app/theme/app_spacing.dart';
 import 'package:yam/app/theme/app_typography.dart';
 import 'package:yam/core/ui/lists/yam_settings_list.dart';
+import 'package:yam/core/ui/motion/yam_entrance_reveal.dart';
 import 'package:yam/l10n/generated/app_localizations.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({
     required this.themeMode,
     required this.onThemeModeChanged,
+    this.profile,
     super.key,
   });
 
@@ -18,6 +22,7 @@ class SettingsScreen extends StatelessWidget {
 
   final ThemeMode themeMode;
   final ValueChanged<ThemeMode> onThemeModeChanged;
+  final SessionProfile? profile;
 
   @override
   Widget build(BuildContext context) {
@@ -28,14 +33,14 @@ class SettingsScreen extends StatelessWidget {
       ..minimumFractionDigits = 0
       ..maximumFractionDigits = 1;
     final goalsSummary = l10n.settingsGoalsSummary(
-      numbers.format(2200),
-      numbers.format(160),
-      numbers.format(75),
-      numbers.format(230),
+      numbers.format(profile?.calorieTarget ?? 2200),
+      numbers.format(profile?.proteinTarget ?? 160),
+      numbers.format(profile?.fatTarget ?? 75),
+      numbers.format(profile?.carbsTarget ?? 230),
     );
     final weightSummary = l10n.settingsWeightSummary(
-      weightNumbers.format(74.2),
-      weightNumbers.format(72),
+      weightNumbers.format(profile?.currentWeightKg ?? 74.2),
+      weightNumbers.format(profile?.targetWeightKg ?? 72),
     );
 
     return Scaffold(
@@ -67,76 +72,95 @@ class SettingsScreen extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            YamSettingsSection(
-                              title: l10n.settingsGoalsSection,
-                              children: [
-                                YamSettingsRow(
-                                  title: l10n.settingsGoalsNutrition,
-                                  subtitle: goalsSummary,
-                                  minHeight: 56,
-                                ),
-                                YamSettingsRow(
-                                  title: l10n.settingsWeight,
-                                  subtitle: weightSummary,
-                                  minHeight: 56,
-                                ),
-                              ],
+                            YamEntranceReveal(
+                              index: 0,
+                              child: YamSettingsSection(
+                                title: l10n.settingsGoalsSection,
+                                children: [
+                                  YamSettingsRow(
+                                    title: l10n.settingsGoalsNutrition,
+                                    subtitle: goalsSummary,
+                                    minHeight: 56,
+                                  ),
+                                  YamSettingsRow(
+                                    title: l10n.settingsWeight,
+                                    subtitle: weightSummary,
+                                    minHeight: 56,
+                                  ),
+                                  YamSettingsRow(
+                                    key: const ValueKey('settings-onboarding'),
+                                    title: l10n.settingsOpenOnboarding,
+                                    showChevron: true,
+                                    onPressed: () =>
+                                        context.push('/onboarding'),
+                                  ),
+                                ],
+                              ),
                             ),
                             const SizedBox(height: AppSpacing.lg),
-                            YamSettingsSection(
-                              title: l10n.settingsApplicationSection,
-                              children: [
-                                YamSettingsRow(
-                                  key: const ValueKey('settings-theme'),
-                                  title: l10n.settingsTheme,
-                                  value: _themeModeLabel(l10n, themeMode),
-                                  showChevron: true,
-                                  onPressed: () => _showThemePicker(context),
-                                ),
-                                YamSettingsRow(
-                                  title: l10n.settingsUnits,
-                                  value: l10n.settingsUnitsMetric,
-                                ),
-                                YamSettingsRow(
-                                  title: l10n.settingsLanguage,
-                                  value: locale.languageCode == 'ru'
-                                      ? l10n.settingsLanguageRussian
-                                      : l10n.settingsLanguageEnglish,
-                                ),
-                              ],
+                            YamEntranceReveal(
+                              index: 1,
+                              child: YamSettingsSection(
+                                title: l10n.settingsApplicationSection,
+                                children: [
+                                  YamSettingsRow(
+                                    key: const ValueKey('settings-theme'),
+                                    title: l10n.settingsTheme,
+                                    value: _themeModeLabel(l10n, themeMode),
+                                    showChevron: true,
+                                    onPressed: () => _showThemePicker(context),
+                                  ),
+                                  YamSettingsRow(
+                                    title: l10n.settingsUnits,
+                                    value: l10n.settingsUnitsMetric,
+                                  ),
+                                  YamSettingsRow(
+                                    title: l10n.settingsLanguage,
+                                    value: locale.languageCode == 'ru'
+                                        ? l10n.settingsLanguageRussian
+                                        : l10n.settingsLanguageEnglish,
+                                  ),
+                                ],
+                              ),
                             ),
                             const SizedBox(height: AppSpacing.lg),
-                            YamSettingsSection(
-                              title: l10n.settingsDataSection,
-                              children: [
-                                YamSettingsRow(
-                                  title: l10n.settingsExportData,
-                                  value: l10n.settingsUnavailable,
-                                  mutedValue: true,
-                                ),
-                                YamSettingsRow(
-                                  title: l10n.settingsDeleteAllData,
-                                  value: l10n.settingsUnavailable,
-                                  tone: YamSettingsRowTone.destructive,
-                                  mutedValue: true,
-                                ),
-                              ],
+                            YamEntranceReveal(
+                              index: 2,
+                              child: YamSettingsSection(
+                                title: l10n.settingsDataSection,
+                                children: [
+                                  YamSettingsRow(
+                                    title: l10n.settingsExportData,
+                                    value: l10n.settingsUnavailable,
+                                    mutedValue: true,
+                                  ),
+                                  YamSettingsRow(
+                                    title: l10n.settingsDeleteAllData,
+                                    value: l10n.settingsUnavailable,
+                                    tone: YamSettingsRowTone.destructive,
+                                    mutedValue: true,
+                                  ),
+                                ],
+                              ),
                             ),
                             const SizedBox(height: AppSpacing.lg),
-                            YamSettingsSection(
-                              title: l10n.settingsAboutSection,
-                              children: [
-                                YamSettingsRow(
-                                  key: const ValueKey('settings-about'),
-                                  title: l10n.settingsAboutYam,
-                                  showChevron: true,
-                                  onPressed: () => _showAbout(context),
-                                ),
-                                YamSettingsRow(
-                                  title: l10n.settingsVersion,
-                                  value: _appVersion,
-                                ),
-                              ],
+                            YamEntranceReveal(
+                              index: 3,
+                              child: YamSettingsSection(
+                                title: l10n.settingsAboutSection,
+                                children: [
+                                  YamSettingsRow(
+                                    key: const ValueKey('settings-about'),
+                                    title: l10n.settingsAboutYam,
+                                    showChevron: true,
+                                    onPressed: () => _showAbout(context),
+                                  ),
+                                  YamSettingsRow(
+                                    title: l10n.settingsVersion,
+                                    value: _appVersion,
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),

@@ -4,7 +4,8 @@ import 'package:yam/app/theme/app_radius.dart';
 import 'package:yam/app/theme/app_semantic_colors.dart';
 import 'package:yam/app/theme/app_spacing.dart';
 import 'package:yam/app/theme/app_typography.dart';
-import 'package:yam/core/ui/buttons/yam_buttons.dart';
+import 'package:yam/core/ui/buttons/yam_repeat_icon_button.dart';
+import 'package:yam/core/ui/selection/yam_selection_controls.dart';
 
 class YamQuantityControl extends StatelessWidget {
   const YamQuantityControl({
@@ -69,77 +70,31 @@ class YamQuantityControl extends StatelessWidget {
         ),
       ),
     );
-    final unitSelector = PopupMenuButton<int>(
-      key: unitKey,
-      initialValue: selectedUnitIndex,
-      tooltip: unitTooltip,
-      position: PopupMenuPosition.under,
-      onSelected: onUnitSelected,
-      itemBuilder: (context) => [
-        for (var index = 0; index < unitLabels.length; index++)
-          PopupMenuItem<int>(value: index, child: Text(unitLabels[index])),
-      ],
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: largeText ? 132 : 112),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: theme.colorScheme.surfaceContainer,
-            border: Border.all(color: theme.colorScheme.outlineVariant),
-            borderRadius: BorderRadius.circular(AppRadius.small),
-          ),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(minHeight: 44),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Flexible(
-                    child: Text(
-                      unitLabels[selectedUnitIndex],
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppTypography.label.copyWith(
-                        color: theme.colorScheme.onSurface,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.xxs),
-                  Icon(
-                    Icons.keyboard_arrow_down_rounded,
-                    size: 16,
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-    final editor = largeText
-        ? Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              amountField,
-              const SizedBox(height: AppSpacing.xxs),
-              unitSelector,
-            ],
-          )
-        : Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              amountField,
-              const SizedBox(width: AppSpacing.xs),
-              unitSelector,
-            ],
-          );
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        Semantics(
+          container: true,
+          label: unitTooltip,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                for (var index = 0; index < unitLabels.length; index++) ...[
+                  YamFilterChip(
+                    key: index == selectedUnitIndex ? unitKey : null,
+                    label: unitLabels[index],
+                    selected: index == selectedUnitIndex,
+                    onPressed: () => onUnitSelected(index),
+                  ),
+                  if (index < unitLabels.length - 1)
+                    const SizedBox(width: AppSpacing.xs),
+                ],
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.sm),
         DecoratedBox(
           decoration: BoxDecoration(
             color: theme.scaffoldBackgroundColor,
@@ -163,7 +118,7 @@ class YamQuantityControl extends StatelessWidget {
                   onPressed: onDecrease,
                 ),
                 const SizedBox(width: AppSpacing.xs),
-                Expanded(child: Center(child: editor)),
+                Expanded(child: Center(child: amountField)),
                 const SizedBox(width: AppSpacing.xs),
                 _QuantityStepButton(
                   icon: Icons.add_rounded,
@@ -398,13 +353,10 @@ class _QuantityStepButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return YamIconButton(
+    return YamRepeatIconButton(
       icon: icon,
       tooltip: tooltip,
       onPressed: onPressed,
-      iconSize: 19,
-      visualSize: 36,
-      visualBorderRadius: AppRadius.pill,
     );
   }
 }

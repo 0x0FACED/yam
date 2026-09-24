@@ -10,6 +10,7 @@ class YamPrimaryButton extends StatelessWidget {
     required this.label,
     required this.onPressed,
     this.icon,
+    this.trailingIcon,
     this.loading = false,
     this.expanded = false,
     super.key,
@@ -18,6 +19,7 @@ class YamPrimaryButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
   final IconData? icon;
+  final IconData? trailingIcon;
   final bool loading;
   final bool expanded;
 
@@ -55,6 +57,10 @@ class YamPrimaryButton extends StatelessWidget {
             Icon(icon, size: 18),
           if (loading || icon != null) const SizedBox(width: AppSpacing.xs),
           Flexible(child: Text(label, textAlign: TextAlign.center)),
+          if (trailingIcon != null) ...[
+            const SizedBox(width: AppSpacing.xs),
+            Icon(trailingIcon, size: 18),
+          ],
         ],
       ),
     );

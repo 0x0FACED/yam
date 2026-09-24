@@ -15,6 +15,114 @@ class AppLocalizationsRu extends AppLocalizations {
   String get startupLoadingLabel => 'YAM запускается';
 
   @override
+  String onboardingStepOf(int step, int total) {
+    return 'Шаг $step из $total';
+  }
+
+  @override
+  String get onboardingGoalTitle => 'Что хочешь изменить?';
+
+  @override
+  String get onboardingGoalDescription =>
+      'Это определит баланс калорий и макронутриентов на каждый день';
+
+  @override
+  String get onboardingGoalLose => 'Снизить вес';
+
+  @override
+  String get onboardingGoalLoseDescription => 'Для постепенного снижения веса';
+
+  @override
+  String get onboardingGoalMaintain => 'Поддерживать вес';
+
+  @override
+  String get onboardingGoalMaintainDescription => 'Чтобы сохранять текущий вес';
+
+  @override
+  String get onboardingGoalGain => 'Набрать вес';
+
+  @override
+  String get onboardingGoalGainDescription => 'Для постепенного набора веса';
+
+  @override
+  String get onboardingWeightTitle => 'Вес';
+
+  @override
+  String get onboardingWeightDescription => 'Укажи текущий и желаемый вес';
+
+  @override
+  String get onboardingCurrentWeight => 'Текущий вес';
+
+  @override
+  String get onboardingTargetWeight => 'Целевой вес';
+
+  @override
+  String get onboardingWeightDifference => 'Разница до цели';
+
+  @override
+  String get onboardingWeightUnchanged => 'Удержание текущего веса';
+
+  @override
+  String get onboardingNutritionTitle => 'Цели питания';
+
+  @override
+  String get onboardingNutritionDescription =>
+      'Задайте базовые суточные ориентиры под ваш режим';
+
+  @override
+  String get onboardingCalories => 'Калории в день';
+
+  @override
+  String get onboardingMacros => 'Макронутриенты';
+
+  @override
+  String onboardingEnergyFromMacros(String calories) {
+    return 'По БЖУ: $calories ккал';
+  }
+
+  @override
+  String onboardingEnergyAbove(String difference) {
+    return '+$difference ккал относительно цели';
+  }
+
+  @override
+  String onboardingEnergyBelow(String difference) {
+    return '−$difference ккал относительно цели';
+  }
+
+  @override
+  String get onboardingEnergyMatches => 'Совпадает с целью';
+
+  @override
+  String get onboardingEnergyFormulaHint =>
+      'Расчёт: белки и углеводы × 4, жиры × 9 ккал/г.';
+
+  @override
+  String get onboardingNutritionHint =>
+      'Эти значения можно изменить позже в настройках.';
+
+  @override
+  String get onboardingContinue => 'Продолжить';
+
+  @override
+  String get onboardingStart => 'Начать';
+
+  @override
+  String get onboardingBack => 'Назад';
+
+  @override
+  String get onboardingClose => 'Закрыть онбординг';
+
+  @override
+  String get onboardingInvalidPositive => 'Введите число больше нуля';
+
+  @override
+  String get onboardingInvalidNonNegative => 'Введите число не меньше нуля';
+
+  @override
+  String get unitKilograms => 'кг';
+
+  @override
   String get navigationDiary => 'Дневник';
 
   @override
@@ -225,6 +333,11 @@ class AppLocalizationsRu extends AppLocalizations {
   String get quickAddUnit => 'Единица';
 
   @override
+  String quickAddUnitEquivalent(String unit, String quantity) {
+    return '$unit = $quantity';
+  }
+
+  @override
   String get quickAddMeal => 'Приём пищи';
 
   @override
@@ -259,13 +372,24 @@ class AppLocalizationsRu extends AppLocalizations {
   String get quickAddClose => 'Закрыть добавление';
 
   @override
-  String quickAddAddCalories(String calories) {
-    return 'Добавить · $calories ккал';
+  String quickAddAddToMeal(String meal) {
+    return 'Добавить в «$meal»';
   }
 
   @override
-  String quickAddAddToMeal(String meal, String calories) {
-    return 'Добавить в «$meal» · $calories ккал';
+  String get quickAddFavoriteAdd => 'Добавить в избранное';
+
+  @override
+  String get quickAddFavoriteRemove => 'Убрать из избранного';
+
+  @override
+  String foodFavoriteAdded(String food) {
+    return '«$food» — в избранном';
+  }
+
+  @override
+  String foodFavoriteRemoved(String food) {
+    return '«$food» убран из избранного';
   }
 
   @override
@@ -425,6 +549,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get settingsGoalsSection => 'Цели';
+
+  @override
+  String get settingsOpenOnboarding => 'Пройти онбординг';
 
   @override
   String get settingsGoalsNutrition => 'Цели и питание';

@@ -8,6 +8,53 @@
   "@startupLoadingLabel": {
     "description": "Screen reader label for the animated startup screen"
   },
+  "onboardingStepOf": "Step {step} of {total}",
+  "@onboardingStepOf": {
+    "placeholders": {
+      "step": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "onboardingGoalTitle": "What would you like to change?",
+  "onboardingGoalDescription": "This helps set your daily calorie and macro goals",
+  "onboardingGoalLose": "Lose weight",
+  "onboardingGoalLoseDescription": "For gradual weight loss",
+  "onboardingGoalMaintain": "Maintain weight",
+  "onboardingGoalMaintainDescription": "To keep your current weight",
+  "onboardingGoalGain": "Gain weight",
+  "onboardingGoalGainDescription": "For gradual weight gain",
+  "onboardingWeightTitle": "Weight",
+  "onboardingWeightDescription": "Enter your current and target weight",
+  "onboardingCurrentWeight": "Current weight",
+  "onboardingTargetWeight": "Target weight",
+  "onboardingWeightDifference": "Difference to goal",
+  "onboardingWeightUnchanged": "Maintain current weight",
+  "onboardingNutritionTitle": "Nutrition goals",
+  "onboardingNutritionDescription": "Set your daily targets for your routine",
+  "onboardingCalories": "Daily calories",
+  "onboardingMacros": "Macronutrients",
+  "onboardingEnergyFromMacros": "From macros: {calories} kcal",
+  "@onboardingEnergyFromMacros": {
+    "placeholders": {"calories": {"type": "String"}}
+  },
+  "onboardingEnergyAbove": "+{difference} kcal vs target",
+  "@onboardingEnergyAbove": {
+    "placeholders": {"difference": {"type": "String"}}
+  },
+  "onboardingEnergyBelow": "−{difference} kcal vs target",
+  "@onboardingEnergyBelow": {
+    "placeholders": {"difference": {"type": "String"}}
+  },
+  "onboardingEnergyMatches": "Matches target",
+  "onboardingEnergyFormulaHint": "Calculation: protein and carbs × 4, fat × 9 kcal/g.",
+  "onboardingNutritionHint": "You can change these later in Settings.",
+  "onboardingContinue": "Continue",
+  "onboardingStart": "Start",
+  "onboardingBack": "Back",
+  "onboardingClose": "Close onboarding",
+  "onboardingInvalidPositive": "Enter a number greater than zero",
+  "onboardingInvalidNonNegative": "Enter a number of zero or more",
+  "unitKilograms": "kg",
   "navigationDiary": "Diary",
   "navigationStatistics": "Stats",
   "navigationSettings": "Settings",
@@ -133,6 +180,13 @@
   "quickAddTitle": "Add to diary",
   "quickAddQuantity": "Quantity",
   "quickAddUnit": "Unit",
+  "quickAddUnitEquivalent": "{unit} = {quantity}",
+  "@quickAddUnitEquivalent": {
+    "placeholders": {
+      "unit": {"type": "String"},
+      "quantity": {"type": "String"}
+    }
+  },
   "quickAddMeal": "Meal",
   "quickAddNutrition": "For this amount",
   "quickAddDecrease": "Decrease quantity",
@@ -157,24 +211,23 @@
     }
   },
   "quickAddClose": "Close quick add",
-  "quickAddAddCalories": "Add · {calories} kcal",
-  "@quickAddAddCalories": {
-    "placeholders": {
-      "calories": {
-        "type": "String"
-      }
-    }
-  },
-  "quickAddAddToMeal": "Add to {meal} · {calories} kcal",
+  "quickAddAddToMeal": "Add to {meal}",
   "@quickAddAddToMeal": {
     "placeholders": {
       "meal": {
         "type": "String"
-      },
-      "calories": {
-        "type": "String"
       }
     }
+  },
+  "quickAddFavoriteAdd": "Add to favorites",
+  "quickAddFavoriteRemove": "Remove from favorites",
+  "foodFavoriteAdded": "{food} added to favorites",
+  "@foodFavoriteAdded": {
+    "placeholders": {"food": {"type": "String"}}
+  },
+  "foodFavoriteRemoved": "{food} removed from favorites",
+  "@foodFavoriteRemoved": {
+    "placeholders": {"food": {"type": "String"}}
   },
   "foodAdded": "{food} added to {meal}",
   "@foodAdded": {
@@ -265,6 +318,7 @@
   "statisticsPrototypeMessage": "Nutrition and weight trends will appear here.",
   "settingsTitle": "Settings",
   "settingsGoalsSection": "Goals",
+  "settingsOpenOnboarding": "Go through onboarding",
   "settingsGoalsNutrition": "Goals & nutrition",
   "settingsGoalsSummary": "{calories} kcal · P {protein} · F {fat} · C {carbs}",
   "@settingsGoalsSummary": {

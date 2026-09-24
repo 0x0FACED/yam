@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:yam/app/theme/app_radius.dart';
 import 'package:yam/app/theme/app_spacing.dart';
 import 'package:yam/app/theme/app_typography.dart';
 import 'package:yam/core/ui/buttons/yam_buttons.dart';
+import 'package:yam/core/ui/feedback/yam_snack_bar.dart';
 import 'package:yam/core/ui/food/yam_quantity_control.dart';
 import 'package:yam/core/ui/selection/yam_selection_controls.dart';
 import 'package:yam/features/food_search/presentation/food_search_format.dart';
@@ -14,6 +16,8 @@ Future<FoodAddPrototypeResult?> showFoodQuickAddSheet({
   required BuildContext context,
   required FoodSearchPrototypeFood food,
   required String? initialMealId,
+  required bool favorite,
+  required ValueChanged<bool> onFavoriteChanged,
 }) {
   return showModalBottomSheet<FoodAddPrototypeResult>(
     context: context,
@@ -21,16 +25,27 @@ Future<FoodAddPrototypeResult?> showFoodQuickAddSheet({
     useSafeArea: true,
     showDragHandle: true,
     constraints: const BoxConstraints(maxWidth: 480),
-    builder: (context) =>
-        _FoodQuickAddSheet(food: food, initialMealId: initialMealId),
+    builder: (context) => _FoodQuickAddSheet(
+      food: food,
+      initialMealId: initialMealId,
+      favorite: favorite,
+      onFavoriteChanged: onFavoriteChanged,
+    ),
   );
 }
 
 class _FoodQuickAddSheet extends StatefulWidget {
-  const _FoodQuickAddSheet({required this.food, required this.initialMealId});
+  const _FoodQuickAddSheet({
+    required this.food,
+    required this.initialMealId,
+    required this.favorite,
+    required this.onFavoriteChanged,
+  });
 
   final FoodSearchPrototypeFood food;
   final String? initialMealId;
+  final bool favorite;
+  final ValueChanged<bool> onFavoriteChanged;
 
   @override
   State<_FoodQuickAddSheet> createState() => _FoodQuickAddSheetState();
@@ -39,27 +54,41 @@ class _FoodQuickAddSheet extends StatefulWidget {
 class _FoodQuickAddSheetState extends State<_FoodQuickAddSheet> {
   late FoodSearchPrototypeServing _serving;
   late final TextEditingController _amountController;
+  late double? _amount;
+  late double? _referenceQuantity;
   String? _mealId;
+  late bool _favorite;
+  String _decimalSeparator = '.';
+  VoidCallback? _dismissFavoriteFeedback;
   bool _attemptedSubmit = false;
 
   @override
   void initState() {
     super.initState();
     _serving = widget.food.lastServing;
+    _amount = widget.food.lastAmount;
+    _referenceQuantity = _serving.baseAmount * widget.food.lastAmount;
     _amountController = TextEditingController(
       text: _editableNumber(widget.food.lastAmount),
     );
     _mealId = widget.initialMealId;
+    _favorite = widget.favorite;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _decimalSeparator = NumberFormat.decimalPattern(
+      Localizations.localeOf(context).toLanguageTag(),
+    ).symbols.DECIMAL_SEP;
   }
 
   @override
   void dispose() {
+    _dismissFavoriteFeedback?.call();
     _amountController.dispose();
     super.dispose();
   }
-
-  double? get _amount =>
-      double.tryParse(_amountController.text.trim().replaceAll(',', '.'));
 
   @override
   Widget build(BuildContext context) {
@@ -90,6 +119,11 @@ class _FoodQuickAddSheetState extends State<_FoodQuickAddSheet> {
       referenceQuantity,
     );
     final selectedPresetIndex = _selectedPresetIndex(amount);
+    final unitEquivalent = foodSearchServingEquivalent(
+      context,
+      widget.food,
+      _serving,
+    );
 
     return SafeArea(
       top: false,
@@ -180,14 +214,33 @@ class _FoodQuickAddSheetState extends State<_FoodQuickAddSheet> {
                     ),
                   ),
                   const SizedBox(width: AppSpacing.xs),
-                  YamIconButton(
-                    key: const ValueKey('quick-add-close'),
-                    icon: Icons.close_rounded,
-                    tooltip: l10n.quickAddClose,
-                    onPressed: () => Navigator.of(context).pop(),
-                    iconSize: 17,
-                    visualSize: 32,
-                    visualBorderRadius: AppRadius.pill,
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      YamIconButton(
+                        key: const ValueKey('quick-add-favorite'),
+                        icon: _favorite
+                            ? Icons.star_rounded
+                            : Icons.star_border_rounded,
+                        tooltip: _favorite
+                            ? l10n.quickAddFavoriteRemove
+                            : l10n.quickAddFavoriteAdd,
+                        selected: _favorite,
+                        onPressed: _toggleFavorite,
+                        iconSize: 18,
+                        visualSize: 32,
+                        visualBorderRadius: AppRadius.small,
+                      ),
+                      YamIconButton(
+                        key: const ValueKey('quick-add-close'),
+                        icon: Icons.close_rounded,
+                        tooltip: l10n.quickAddClose,
+                        onPressed: () => Navigator.of(context).pop(),
+                        iconSize: 17,
+                        visualSize: 32,
+                        visualBorderRadius: AppRadius.small,
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -208,11 +261,20 @@ class _FoodQuickAddSheetState extends State<_FoodQuickAddSheet> {
                 errorText: _attemptedSubmit && !validAmount
                     ? l10n.quickAddAmountInvalid
                     : null,
-                onAmountChanged: (_) => setState(() {}),
+                onAmountChanged: _onAmountChanged,
                 onUnitSelected: _selectServing,
-                onDecrease: () => _changeAmount(-_serving.step),
-                onIncrease: () => _changeAmount(_serving.step),
+                onDecrease: () => _changeAmount(-1),
+                onIncrease: () => _changeAmount(1),
               ),
+              if (unitEquivalent != null) ...[
+                const SizedBox(height: AppSpacing.xxs),
+                Text(
+                  unitEquivalent,
+                  style: AppTypography.caption.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
               const SizedBox(height: AppSpacing.sm),
               YamQuickAmountPresets(
                 title: l10n.quickAddQuickSelect,
@@ -248,8 +310,8 @@ class _FoodQuickAddSheetState extends State<_FoodQuickAddSheet> {
               YamPrimaryButton(
                 key: const ValueKey('quick-add-submit'),
                 label: selectedMeal == null
-                    ? l10n.quickAddAddCalories(calorieValue)
-                    : l10n.quickAddAddToMeal(selectedMeal.name, calorieValue),
+                    ? l10n.quickAddAdd
+                    : l10n.quickAddAddToMeal(selectedMeal.name),
                 onPressed: _submit,
                 expanded: true,
               ),
@@ -268,28 +330,55 @@ class _FoodQuickAddSheetState extends State<_FoodQuickAddSheet> {
     return index < 0 ? null : index;
   }
 
+  void _toggleFavorite() {
+    setState(() => _favorite = !_favorite);
+    widget.onFavoriteChanged(_favorite);
+    _dismissFavoriteFeedback?.call();
+    final l10n = AppLocalizations.of(context);
+    _dismissFavoriteFeedback = showYamSuccessSnackBar(
+      context: context,
+      message: _favorite
+          ? l10n.foodFavoriteAdded(widget.food.name)
+          : l10n.foodFavoriteRemoved(widget.food.name),
+    );
+  }
+
   void _selectServing(int index) {
     final serving = widget.food.servings[index];
+    if (serving == _serving) return;
+    final reference = _referenceQuantity;
     setState(() {
       _serving = serving;
-      _setControllerAmount(serving.defaultAmount);
+      final converted = reference == null
+          ? serving.defaultAmount
+          : reference / serving.baseAmount;
+      _setControllerAmount(converted, referenceQuantity: reference);
+    });
+  }
+
+  void _onAmountChanged(String text) {
+    setState(() {
+      _amount = double.tryParse(text.trim().replaceAll(',', '.'));
+      _referenceQuantity = _amount == null
+          ? null
+          : _amount! * _serving.baseAmount;
     });
   }
 
   void _changeAmount(double delta) {
     final current = _amount ?? _serving.defaultAmount;
-    final amount = (current + delta)
-        .clamp(_serving.step, double.infinity)
-        .toDouble();
-    _setAmount(amount);
+    final amount = current + delta;
+    if (amount > 0) _setAmount(amount);
   }
 
   void _setAmount(double amount) {
     setState(() => _setControllerAmount(amount));
   }
 
-  void _setControllerAmount(double amount) {
-    final text = _editableNumber(amount);
+  void _setControllerAmount(double amount, {double? referenceQuantity}) {
+    _amount = amount;
+    _referenceQuantity = referenceQuantity ?? amount * _serving.baseAmount;
+    final text = _editableNumber(amount).replaceAll('.', _decimalSeparator);
     _amountController.value = TextEditingValue(
       text: text,
       selection: TextSelection.collapsed(offset: text.length),
@@ -323,5 +412,8 @@ class _FoodQuickAddSheetState extends State<_FoodQuickAddSheet> {
 String _editableNumber(double value) {
   return value == value.roundToDouble()
       ? value.toInt().toString()
-      : value.toStringAsFixed(1);
+      : value
+            .toStringAsFixed(3)
+            .replaceFirst(RegExp(r'0+$'), '')
+            .replaceFirst(RegExp(r'\.$'), '');
 }

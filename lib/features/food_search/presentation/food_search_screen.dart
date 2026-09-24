@@ -4,6 +4,7 @@ import 'package:yam/app/theme/app_motion.dart';
 import 'package:yam/app/theme/app_spacing.dart';
 import 'package:yam/app/theme/app_typography.dart';
 import 'package:yam/core/ui/buttons/yam_buttons.dart';
+import 'package:yam/core/ui/feedback/yam_snack_bar.dart';
 import 'package:yam/core/ui/feedback/yam_feedback_state.dart';
 import 'package:yam/core/ui/forms/yam_search_field.dart';
 import 'package:yam/core/ui/selection/yam_selection_controls.dart';
@@ -32,6 +33,8 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
 
   final _searchController = TextEditingController();
   final _searchFocusNode = FocusNode();
+  late List<String> _recentFoodIds;
+  late Set<String> _favoriteOverrides;
 
   Locale? _catalogLocale;
   List<FoodSearchPrototypeFood> _foods = const [];
@@ -48,6 +51,8 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
     super.initState();
     _selectedMealId = widget.arguments.initialMealId;
     _catalogState = widget.arguments.initialCatalogState;
+    _recentFoodIds = List.of(widget.arguments.recentFoodIds);
+    _favoriteOverrides = Set.of(widget.arguments.favoriteOverrides);
   }
 
   @override
@@ -281,6 +286,7 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
     return FoodSearchResultRow(
       key: ValueKey('food-row-${food.id}'),
       food: food,
+      favorite: _isFavorite(food),
       onOpen: () => _openQuickAdd(food),
     );
   }
@@ -308,15 +314,30 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
 
     final foodsById = {for (final food in _foods) food.id: food};
     _recent = [
-      for (final id in widget.arguments.recentFoodIds.take(
-        foodSearchRecentLimit,
-      ))
+      for (final id in _recentFoodIds.take(foodSearchRecentLimit))
         ?foodsById[id],
     ];
     _myDishes = _foods
         .where((food) => food.source == FoodSearchPrototypeSource.userCreated)
         .toList(growable: false);
-    _favorites = _foods.where((food) => food.favorite).toList(growable: false);
+    _favorites = _foods.where(_isFavorite).toList(growable: false);
+  }
+
+  bool _isFavorite(FoodSearchPrototypeFood food) =>
+      _favoriteOverrides.contains(food.id) != food.favorite;
+
+  void _setFavorite(FoodSearchPrototypeFood food, bool favorite) {
+    setState(() {
+      if (favorite == food.favorite) {
+        _favoriteOverrides.remove(food.id);
+      } else {
+        _favoriteOverrides.add(food.id);
+      }
+      _updateVisibleFoods();
+    });
+    widget.arguments.onFavoritesChanged?.call(
+      Set.unmodifiable(_favoriteOverrides),
+    );
   }
 
   void _clearSearch() {
@@ -376,14 +397,45 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
   }
 
   Future<void> _openQuickAdd(FoodSearchPrototypeFood food) async {
+    dismissYamSnackBar(context);
     final result = await showFoodQuickAddSheet(
       context: context,
       food: food,
       initialMealId: _selectedMealId,
+      favorite: _isFavorite(food),
+      onFavoriteChanged: (favorite) => _setFavorite(food, favorite),
     );
-    if (mounted && result != null) {
-      Navigator.of(context).pop(result);
-    }
+    if (!mounted || result == null) return;
+
+    final undoDiary = widget.arguments.onFoodAdded?.call(result);
+    final previousRecent = List<String>.of(_recentFoodIds);
+    setState(() {
+      _selectedMealId = result.mealId;
+      _recentFoodIds = [
+        result.foodId,
+        for (final id in _recentFoodIds)
+          if (id != result.foodId) id,
+      ].take(foodSearchRecentLimit).toList(growable: false);
+      _updateVisibleFoods();
+    });
+    final l10n = AppLocalizations.of(context);
+    showYamUndoSnackBar(
+      context: context,
+      message: l10n.foodAdded(
+        result.name,
+        foodSearchPrototypeMealName(l10n, result.mealId),
+      ),
+      undoLabel: l10n.actionUndo,
+      onUndo: () {
+        undoDiary?.call();
+        if (mounted) {
+          setState(() {
+            _recentFoodIds = previousRecent;
+            _updateVisibleFoods();
+          });
+        }
+      },
+    );
   }
 
   void _openCreateFood() {

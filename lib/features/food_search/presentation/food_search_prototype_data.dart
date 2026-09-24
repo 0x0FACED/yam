@@ -57,7 +57,6 @@ class FoodSearchPrototypeServing {
     required this.unit,
     required this.baseAmount,
     required this.defaultAmount,
-    required this.step,
     required this.presets,
   });
 
@@ -67,7 +66,6 @@ class FoodSearchPrototypeServing {
   /// Amount in the food's reference unit represented by one selected unit.
   final double baseAmount;
   final double defaultAmount;
-  final double step;
   final List<double> presets;
 }
 
@@ -84,6 +82,7 @@ class FoodSearchPrototypeFood {
     required this.lastServingId,
     required this.lastAmount,
     this.brand,
+    this.gramsPerReferenceUnit,
     this.source = FoodSearchPrototypeSource.localCatalog,
     this.favorite = false,
   });
@@ -92,6 +91,9 @@ class FoodSearchPrototypeFood {
   final String name;
   final FoodSearchPrototypeCategory category;
   final String? brand;
+
+  /// Product-specific mass for one reference unit when nutrition is per piece.
+  final double? gramsPerReferenceUnit;
   final double referenceAmount;
   final FoodSearchPrototypeUnit referenceUnit;
   final FoodSearchPrototypeNutrition nutrition;
@@ -119,11 +121,17 @@ class FoodSearchPrototypeArguments {
     this.initialMealId,
     this.initialCatalogState = FoodSearchPrototypeCatalogState.ready,
     this.recentFoodIds = const [],
+    this.favoriteOverrides = const {},
+    this.onFoodAdded,
+    this.onFavoritesChanged,
   });
 
   final String? initialMealId;
   final FoodSearchPrototypeCatalogState initialCatalogState;
   final List<String> recentFoodIds;
+  final Set<String> favoriteOverrides;
+  final VoidCallback Function(FoodAddPrototypeResult result)? onFoodAdded;
+  final ValueChanged<Set<String>>? onFavoritesChanged;
 }
 
 @immutable
@@ -173,7 +181,6 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
           unit: FoodSearchPrototypeUnit.grams,
           baseAmount: 1,
           defaultAmount: 80,
-          step: 10,
           presets: [40, 50, 80, 100, 150],
         ),
         FoodSearchPrototypeServing(
@@ -181,7 +188,6 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
           unit: FoodSearchPrototypeUnit.servings,
           baseAmount: 80,
           defaultAmount: 1,
-          step: 0.5,
           presets: [0.5, 1, 1.5, 2],
         ),
       ],
@@ -208,15 +214,20 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
           unit: FoodSearchPrototypeUnit.milliliters,
           baseAmount: 1,
           defaultAmount: 150,
-          step: 10,
           presets: [100, 150, 200, 250],
+        ),
+        FoodSearchPrototypeServing(
+          id: 'serving',
+          unit: FoodSearchPrototypeUnit.servings,
+          baseAmount: 150,
+          defaultAmount: 1,
+          presets: [0.5, 1, 1.5, 2],
         ),
         FoodSearchPrototypeServing(
           id: 'glass',
           unit: FoodSearchPrototypeUnit.glasses,
           baseAmount: 250,
           defaultAmount: 1,
-          step: 0.5,
           presets: [0.5, 1, 1.5, 2],
         ),
       ],
@@ -242,15 +253,20 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
           unit: FoodSearchPrototypeUnit.grams,
           baseAmount: 1,
           defaultAmount: 30,
-          step: 10,
           presets: [20, 30, 40, 60],
+        ),
+        FoodSearchPrototypeServing(
+          id: 'serving',
+          unit: FoodSearchPrototypeUnit.servings,
+          baseAmount: 30,
+          defaultAmount: 1,
+          presets: [0.5, 1, 1.5, 2],
         ),
         FoodSearchPrototypeServing(
           id: 'scoop',
           unit: FoodSearchPrototypeUnit.scoops,
           baseAmount: 30,
           defaultAmount: 1,
-          step: 0.5,
           presets: [0.5, 1, 1.5, 2],
         ),
       ],
@@ -276,15 +292,20 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
           unit: FoodSearchPrototypeUnit.grams,
           baseAmount: 1,
           defaultAmount: 120,
-          step: 10,
           presets: [80, 100, 120, 160],
+        ),
+        FoodSearchPrototypeServing(
+          id: 'serving',
+          unit: FoodSearchPrototypeUnit.servings,
+          baseAmount: 120,
+          defaultAmount: 1,
+          presets: [0.5, 1, 1.5, 2],
         ),
         FoodSearchPrototypeServing(
           id: 'piece',
           unit: FoodSearchPrototypeUnit.pieces,
           baseAmount: 120,
           defaultAmount: 1,
-          step: 1,
           presets: [1, 2, 3],
         ),
       ],
@@ -309,7 +330,6 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
           unit: FoodSearchPrototypeUnit.grams,
           baseAmount: 1,
           defaultAmount: 220,
-          step: 10,
           presets: [100, 150, 200, 250],
         ),
         FoodSearchPrototypeServing(
@@ -317,7 +337,6 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
           unit: FoodSearchPrototypeUnit.servings,
           baseAmount: 200,
           defaultAmount: 1,
-          step: 0.5,
           presets: [0.5, 1, 1.5, 2],
         ),
       ],
@@ -343,8 +362,14 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
           unit: FoodSearchPrototypeUnit.grams,
           baseAmount: 1,
           defaultAmount: 280,
-          step: 10,
           presets: [150, 200, 250, 300],
+        ),
+        FoodSearchPrototypeServing(
+          id: 'serving',
+          unit: FoodSearchPrototypeUnit.servings,
+          baseAmount: 280,
+          defaultAmount: 1,
+          presets: [0.5, 1, 1.5, 2],
         ),
       ],
       lastServingId: 'grams',
@@ -369,7 +394,6 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
           unit: FoodSearchPrototypeUnit.grams,
           baseAmount: 1,
           defaultAmount: 180,
-          step: 10,
           presets: [100, 150, 180, 200],
         ),
         FoodSearchPrototypeServing(
@@ -377,7 +401,6 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
           unit: FoodSearchPrototypeUnit.servings,
           baseAmount: 180,
           defaultAmount: 1,
-          step: 0.5,
           presets: [0.5, 1, 1.5, 2],
         ),
       ],
@@ -389,6 +412,7 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
       name: russian ? 'Яйцо куриное С1' : 'Grade A chicken egg',
       category: FoodSearchPrototypeCategory.eggs,
       brand: russian ? 'Село Зелёное' : 'Green Village',
+      gramsPerReferenceUnit: 55,
       referenceAmount: 1,
       referenceUnit: FoodSearchPrototypeUnit.pieces,
       nutrition: const FoodSearchPrototypeNutrition(
@@ -399,12 +423,25 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
       ),
       servings: const [
         FoodSearchPrototypeServing(
+          id: 'grams',
+          unit: FoodSearchPrototypeUnit.grams,
+          baseAmount: 1 / 55,
+          defaultAmount: 110,
+          presets: [55, 83, 110, 165],
+        ),
+        FoodSearchPrototypeServing(
           id: 'pieces',
           unit: FoodSearchPrototypeUnit.pieces,
           baseAmount: 1,
           defaultAmount: 2,
-          step: 1,
           presets: [1, 2, 3, 4],
+        ),
+        FoodSearchPrototypeServing(
+          id: 'serving',
+          unit: FoodSearchPrototypeUnit.servings,
+          baseAmount: 2,
+          defaultAmount: 1,
+          presets: [0.5, 1, 1.5, 2],
         ),
       ],
       lastServingId: 'pieces',
@@ -430,15 +467,20 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
           unit: FoodSearchPrototypeUnit.grams,
           baseAmount: 1,
           defaultAmount: 40,
-          step: 10,
           presets: [20, 40, 60, 80],
+        ),
+        FoodSearchPrototypeServing(
+          id: 'serving',
+          unit: FoodSearchPrototypeUnit.servings,
+          baseAmount: 40,
+          defaultAmount: 1,
+          presets: [0.5, 1, 1.5, 2],
         ),
         FoodSearchPrototypeServing(
           id: 'piece',
           unit: FoodSearchPrototypeUnit.pieces,
           baseAmount: 40,
           defaultAmount: 1,
-          step: 1,
           presets: [1, 2, 3, 4],
         ),
       ],
@@ -463,8 +505,21 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
           unit: FoodSearchPrototypeUnit.milliliters,
           baseAmount: 1,
           defaultAmount: 200,
-          step: 50,
           presets: [100, 150, 200, 250],
+        ),
+        FoodSearchPrototypeServing(
+          id: 'glass',
+          unit: FoodSearchPrototypeUnit.glasses,
+          baseAmount: 200,
+          defaultAmount: 1,
+          presets: [0.5, 1, 1.5, 2],
+        ),
+        FoodSearchPrototypeServing(
+          id: 'serving',
+          unit: FoodSearchPrototypeUnit.servings,
+          baseAmount: 200,
+          defaultAmount: 1,
+          presets: [0.5, 1, 1.5, 2],
         ),
       ],
       lastServingId: 'milliliters',

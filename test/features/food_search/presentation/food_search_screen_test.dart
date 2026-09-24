@@ -6,6 +6,9 @@ import 'package:go_router/go_router.dart';
 import 'package:yam/app/router.dart';
 import 'package:yam/app/theme/app_scroll_behavior.dart';
 import 'package:yam/app/theme/app_theme.dart';
+import 'package:yam/core/ui/feedback/yam_snack_bar.dart';
+import 'package:yam/core/ui/food/yam_quantity_control.dart';
+import 'package:yam/features/diary/presentation/widgets/daily_nutrition_summary.dart';
 import 'package:yam/features/food_search/presentation/food_search_prototype_data.dart';
 import 'package:yam/features/food_search/presentation/food_search_screen.dart';
 import 'package:yam/l10n/generated/app_localizations.dart';
@@ -47,11 +50,12 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('quick-add-submit')));
     await tester.pumpAndSettle();
 
-    expect(find.byKey(const ValueKey('food-search-field')), findsNothing);
-    expect(find.text('Rolled oats'), findsNothing);
+    expect(find.byKey(const ValueKey('food-search-field')), findsOneWidget);
+    expect(find.text('Meal: Breakfast'), findsOneWidget);
+    expect(find.byType(YamSnackBar), findsOneWidget);
   });
 
-  testWidgets('meal entry point opens portion sheet and supports Undo', (
+  testWidgets('meal entry point stays in search and supports Undo', (
     tester,
   ) async {
     await _setWindowSize(tester, const Size(390, 844));
@@ -74,12 +78,85 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('quick-add-submit')));
     await tester.pumpAndSettle();
 
-    expect(find.text('Rolled oats'), findsOneWidget);
-    expect(find.text('80 g'), findsOneWidget);
+    expect(find.byKey(const ValueKey('food-search-field')), findsOneWidget);
+    expect(find.byType(YamSnackBar), findsOneWidget);
 
     await tester.tap(find.text('Undo'));
     await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Back to diary'));
+    await tester.pumpAndSettle();
     expect(find.text('Rolled oats'), findsNothing);
+  });
+
+  testWidgets('multiple foods can be added before returning to the diary', (
+    tester,
+  ) async {
+    await _setWindowSize(tester, const Size(390, 844));
+    final router = createAppRouter();
+    addTearDown(router.dispose);
+    await tester.pumpWidget(_RouterTestApp(router: router));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Add food to Breakfast'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('food-search-tab-favorites')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('food-result-rolled-oats')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('quick-add-submit')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('food-search-field')), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('food-result-whey-protein')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('quick-add-submit')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('food-search-field')), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Back to diary'));
+    await tester.pumpAndSettle();
+    expect(
+      tester
+          .widget<DailyNutritionSummary>(find.byType(DailyNutritionSummary))
+          .day
+          .consumedCalories,
+      2245,
+    );
+
+    await tester.tap(find.byTooltip('Add food to Breakfast'));
+    await tester.pumpAndSettle();
+    expect(find.text('Whey protein'), findsOneWidget);
+    expect(find.text('Rolled oats'), findsOneWidget);
+  });
+
+  testWidgets('favorites toggle from the sheet stays visible on search', (
+    tester,
+  ) async {
+    await _setWindowSize(tester, const Size(390, 844));
+    final router = createAppRouter();
+    addTearDown(router.dispose);
+    await tester.pumpWidget(_RouterTestApp(router: router));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Add food to Breakfast'));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const ValueKey('food-search-field')),
+      'Milk',
+    );
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('food-result-milk-25')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Add to favorites'));
+    await tester.pump();
+    expect(find.text('Milk 2.5% added to favorites'), findsOneWidget);
+    await tester.tap(find.byTooltip('Close quick add'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Clear search'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('food-search-tab-favorites')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('food-result-milk-25')), findsOneWidget);
   });
 
   testWidgets('shows empty search and custom-food placeholder states', (
@@ -125,7 +202,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Recent'), findsOneWidget);
+    expect(find.text('Recent'), findsWidgets);
     expect(find.text('Fresh banana'), findsOneWidget);
     expect(find.text('Rolled oats'), findsOneWidget);
     expect(find.byIcon(Icons.star_rounded), findsOneWidget);
@@ -134,7 +211,7 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('food-search-tab-favorites')));
     await tester.pumpAndSettle();
 
-    expect(find.text('Favorites'), findsOneWidget);
+    expect(find.text('Favorites'), findsWidgets);
     expect(find.text('Fresh banana'), findsNothing);
     expect(find.text('Rolled oats'), findsOneWidget);
   });
@@ -241,7 +318,13 @@ void main() {
 
     expect(find.text('Quick select'), findsOneWidget);
     expect(find.text('Usually: 80 g'), findsOneWidget);
-    expect(find.text('Add to Breakfast · 293 kcal'), findsOneWidget);
+    expect(find.text('Add to Breakfast'), findsOneWidget);
+    expect(
+      tester
+          .widget<YamNutritionSummary>(find.byType(YamNutritionSummary))
+          .calorieValue,
+      '293',
+    );
     expect(
       tester.getTopRight(find.text('Usually: 80 g')).dx,
       closeTo(
@@ -254,26 +337,92 @@ void main() {
 
     await tester.tap(find.byTooltip('Increase quantity'));
     await tester.pump();
-    expect(find.text('90'), findsOneWidget);
-    expect(find.text('Add to Breakfast · 329 kcal'), findsOneWidget);
+    expect(find.text('81'), findsOneWidget);
+    expect(
+      tester
+          .widget<YamNutritionSummary>(find.byType(YamNutritionSummary))
+          .calorieValue,
+      '296',
+    );
 
     await tester.tap(find.text('50 g'));
     await tester.pump();
     expect(find.text('50'), findsOneWidget);
-    expect(find.text('Add to Breakfast · 183 kcal'), findsOneWidget);
+    expect(
+      tester
+          .widget<YamNutritionSummary>(find.byType(YamNutritionSummary))
+          .calorieValue,
+      '183',
+    );
 
     await tester.tap(find.byKey(const ValueKey('quick-add-unit-grams')));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('serving').last);
+    await tester.pump();
+    await tester.tap(find.text('serving'));
     await tester.pumpAndSettle();
 
     expect(
       find.byKey(const ValueKey('quick-add-unit-serving')),
       findsOneWidget,
     );
-    expect(find.text('1'), findsOneWidget);
-    expect(find.text('Add to Breakfast · 293 kcal'), findsOneWidget);
+    expect(find.text('0.625'), findsOneWidget);
+    expect(
+      tester
+          .widget<YamNutritionSummary>(find.byType(YamNutritionSummary))
+          .calorieValue,
+      '183',
+    );
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('egg mass and pieces preserve nutrition through unit switches', (
+    tester,
+  ) async {
+    await _setWindowSize(tester, const Size(390, 844));
+    await tester.pumpWidget(
+      const _ScreenTestApp(
+        arguments: FoodSearchPrototypeArguments(
+          initialMealId: 'breakfast',
+          recentFoodIds: ['eggs'],
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('food-result-eggs')));
+    await tester.pumpAndSettle();
+
+    final control = find.byType(YamQuantityControl);
+    await tester.tap(find.descendant(of: control, matching: find.text('g')));
+    await tester.pump();
+    expect(find.text('110'), findsOneWidget);
+
+    await tester.enterText(
+      find.byKey(const ValueKey('quick-add-quantity')),
+      '83',
+    );
+    await tester.pump();
+    expect(
+      tester
+          .widget<YamNutritionSummary>(find.byType(YamNutritionSummary))
+          .calorieValue,
+      '118',
+    );
+
+    await tester.tap(find.descendant(of: control, matching: find.text('pcs')));
+    await tester.pump();
+    expect(find.text('1.509'), findsOneWidget);
+    expect(
+      tester
+          .widget<YamNutritionSummary>(find.byType(YamNutritionSummary))
+          .calorieValue,
+      '118',
+    );
+
+    await tester.tap(find.descendant(of: control, matching: find.text('g')));
+    await tester.pump();
+    expect(find.text('83'), findsOneWidget);
+    await tester.tap(find.byTooltip('Increase quantity'));
+    await tester.pump();
+    expect(find.text('84'), findsOneWidget);
   });
 }
 

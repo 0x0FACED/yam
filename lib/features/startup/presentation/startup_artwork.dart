@@ -1,7 +1,12 @@
+import 'dart:ui' show Brightness, Color;
+
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:yam/app/theme/app_colors.dart';
 
 class StartupArtwork {
-  StartupArtwork._(this._pictures);
+  StartupArtwork._(this._lightPictures, this._darkPictures);
+
+  static const ColorMapper darkColorMapper = _DarkIntroInkMapper();
 
   static const mascot = 'assets/inapp/intro_batat_base.svg';
   static const mouthClosed = 'assets/inapp/intro_mouth_closed.svg';
@@ -21,25 +26,56 @@ class StartupArtwork {
     fullLogo,
   ];
 
-  final Map<String, PictureInfo> _pictures;
+  final Map<String, PictureInfo> _lightPictures;
+  final Map<String, PictureInfo> _darkPictures;
   bool _disposed = false;
 
   static Future<StartupArtwork> load() async {
-    final pictures = await Future.wait(
-      _assets.map((asset) => vg.loadPicture(SvgAssetLoader(asset), null)),
+    final pictures = await Future.wait([
+      for (final asset in _assets) vg.loadPicture(SvgAssetLoader(asset), null),
+      for (final asset in _assets)
+        vg.loadPicture(
+          SvgAssetLoader(asset, colorMapper: darkColorMapper),
+          null,
+        ),
+    ]);
+    return StartupArtwork._(
+      Map.fromIterables(_assets, pictures.take(_assets.length)),
+      Map.fromIterables(_assets, pictures.skip(_assets.length)),
     );
-    return StartupArtwork._(Map.fromIterables(_assets, pictures));
   }
 
-  PictureInfo? pictureFor(String asset) => _pictures[asset];
+  PictureInfo? pictureFor(
+    String asset, {
+    Brightness brightness = Brightness.light,
+  }) => brightness == Brightness.dark
+      ? _darkPictures[asset]
+      : _lightPictures[asset];
 
   void dispose() {
     if (_disposed) {
       return;
     }
     _disposed = true;
-    for (final picture in _pictures.values) {
+    for (final picture in [..._lightPictures.values, ..._darkPictures.values]) {
       picture.picture.dispose();
     }
+  }
+}
+
+class _DarkIntroInkMapper extends ColorMapper {
+  const _DarkIntroInkMapper();
+
+  @override
+  Color substitute(
+    String? id,
+    String elementName,
+    String attributeName,
+    Color color,
+  ) {
+    return switch (color.toARGB32()) {
+      0xFF17141C || 0xFF17151C => AppColors.darkTextPrimary,
+      _ => color,
+    };
   }
 }

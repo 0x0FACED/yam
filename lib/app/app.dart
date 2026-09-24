@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yam/app/router.dart';
+import 'package:yam/app/session/session_profile.dart';
 import 'package:yam/app/theme/app_scroll_behavior.dart';
 import 'package:yam/app/theme/app_theme.dart';
+import 'package:yam/core/ui/motion/yam_entrance_reveal.dart';
 import 'package:yam/features/startup/presentation/startup_artwork.dart';
 import 'package:yam/features/startup/presentation/startup_screen.dart';
 import 'package:yam/l10n/generated/app_localizations.dart';
@@ -19,15 +21,20 @@ class YamApp extends StatefulWidget {
 class _YamAppState extends State<YamApp> {
   late final GoRouter _router;
   late final ValueNotifier<ThemeMode> _themeMode;
+  late final ValueNotifier<SessionProfile?> _profile;
   bool _startupComplete = false;
+  int _entranceEpoch = 0;
 
   @override
   void initState() {
     super.initState();
     _themeMode = ValueNotifier(ThemeMode.system);
+    _profile = ValueNotifier<SessionProfile?>(null);
     _router = createAppRouter(
       themeModeListenable: _themeMode,
       onThemeModeChanged: (mode) => _themeMode.value = mode,
+      profileListenable: _profile,
+      onProfileChanged: _saveProfile,
     );
   }
 
@@ -35,6 +42,7 @@ class _YamAppState extends State<YamApp> {
   void dispose() {
     _router.dispose();
     _themeMode.dispose();
+    _profile.dispose();
     widget.startupArtwork?.dispose();
     super.dispose();
   }
@@ -64,7 +72,10 @@ class _YamAppState extends State<YamApp> {
           }
           return KeyedSubtree(
             key: const ValueKey('app-content'),
-            child: child ?? const SizedBox.shrink(),
+            child: YamEntranceScope(
+              epoch: _entranceEpoch,
+              child: child ?? const SizedBox.shrink(),
+            ),
           );
         },
       ),
@@ -73,7 +84,15 @@ class _YamAppState extends State<YamApp> {
 
   void _finishStartup() {
     if (mounted) {
-      setState(() => _startupComplete = true);
+      setState(() {
+        _startupComplete = true;
+        _entranceEpoch++;
+      });
     }
+  }
+
+  void _saveProfile(SessionProfile profile) {
+    _profile.value = profile;
+    if (mounted) setState(() => _entranceEpoch++);
   }
 }

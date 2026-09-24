@@ -3,7 +3,6 @@ import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:yam/app/theme/app_colors.dart';
 import 'package:yam/app/theme/app_motion.dart';
 import 'package:yam/features/startup/presentation/startup_artwork.dart';
 
@@ -80,11 +79,12 @@ class _StartupScreenState extends State<StartupScreen>
 
   @override
   Widget build(BuildContext context) {
+    final background = Theme.of(context).scaffoldBackgroundColor;
     return Semantics(
       container: true,
       label: widget.semanticsLabel,
       child: ColoredBox(
-        color: AppColors.brandCream,
+        color: background,
         child: SafeArea(
           child: Center(
             child: Padding(
@@ -146,25 +146,21 @@ class _IntroScene extends StatelessWidget {
                         children: [
                           _ArtworkPicture(
                             asset: StartupArtwork.mascot,
-                            picture: artwork?.pictureFor(StartupArtwork.mascot),
+                            artwork: artwork,
                             key: const ValueKey('startup-mascot'),
                           ),
                           Opacity(
                             opacity: 1 - mouthOpen,
                             child: _ArtworkPicture(
                               asset: StartupArtwork.mouthClosed,
-                              picture: artwork?.pictureFor(
-                                StartupArtwork.mouthClosed,
-                              ),
+                              artwork: artwork,
                             ),
                           ),
                           Opacity(
                             opacity: mouthOpen,
                             child: _ArtworkPicture(
                               asset: StartupArtwork.mouthOpen,
-                              picture: artwork?.pictureFor(
-                                StartupArtwork.mouthOpen,
-                              ),
+                              artwork: artwork,
                             ),
                           ),
                         ],
@@ -173,7 +169,7 @@ class _IntroScene extends StatelessWidget {
                   ),
                   _AnimatedLetter(
                     asset: StartupArtwork.letterY,
-                    picture: artwork?.pictureFor(StartupArtwork.letterY),
+                    artwork: artwork,
                     width: 78,
                     start: const Offset(124, 179),
                     control: const Offset(48, 98),
@@ -185,7 +181,7 @@ class _IntroScene extends StatelessWidget {
                   ),
                   _AnimatedLetter(
                     asset: StartupArtwork.letterA,
-                    picture: artwork?.pictureFor(StartupArtwork.letterA),
+                    artwork: artwork,
                     width: 79,
                     start: const Offset(124, 179),
                     control: const Offset(150, 76),
@@ -197,7 +193,7 @@ class _IntroScene extends StatelessWidget {
                   ),
                   _AnimatedLetter(
                     asset: StartupArtwork.letterM,
-                    picture: artwork?.pictureFor(StartupArtwork.letterM),
+                    artwork: artwork,
                     width: 110,
                     start: const Offset(108, 179),
                     control: const Offset(218, 98),
@@ -220,7 +216,7 @@ class _IntroScene extends StatelessWidget {
 class _AnimatedLetter extends StatelessWidget {
   const _AnimatedLetter({
     required this.asset,
-    required this.picture,
+    required this.artwork,
     required this.width,
     required this.start,
     required this.control,
@@ -232,7 +228,7 @@ class _AnimatedLetter extends StatelessWidget {
   });
 
   final String asset;
-  final PictureInfo? picture;
+  final StartupArtwork? artwork;
   final double width;
   final Offset start;
   final Offset control;
@@ -264,7 +260,7 @@ class _AnimatedLetter extends StatelessWidget {
             angle: angle,
             child: Transform.scale(
               scale: scale,
-              child: _ArtworkPicture(asset: asset, picture: picture),
+              child: _ArtworkPicture(asset: asset, artwork: artwork),
             ),
           ),
         ),
@@ -290,7 +286,7 @@ class _ReducedMotionLogo extends StatelessWidget {
         width: 320,
         child: _ArtworkPicture(
           asset: StartupArtwork.fullLogo,
-          picture: artwork?.pictureFor(StartupArtwork.fullLogo),
+          artwork: artwork,
         ),
       ),
     );
@@ -300,19 +296,26 @@ class _ReducedMotionLogo extends StatelessWidget {
 class _ArtworkPicture extends StatelessWidget {
   const _ArtworkPicture({
     required this.asset,
-    required this.picture,
+    required this.artwork,
     super.key,
   });
 
   final String asset;
-  final PictureInfo? picture;
+  final StartupArtwork? artwork;
 
   @override
   Widget build(BuildContext context) {
-    final picture = this.picture;
+    final brightness = Theme.of(context).brightness;
+    final picture = artwork?.pictureFor(asset, brightness: brightness);
     return RepaintBoundary(
       child: picture == null
-          ? SvgPicture.asset(asset, excludeFromSemantics: true)
+          ? SvgPicture.asset(
+              asset,
+              excludeFromSemantics: true,
+              colorMapper: brightness == Brightness.dark
+                  ? StartupArtwork.darkColorMapper
+                  : null,
+            )
           : CustomPaint(painter: _PicturePainter(picture)),
     );
   }

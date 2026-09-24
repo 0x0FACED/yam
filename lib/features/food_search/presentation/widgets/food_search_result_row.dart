@@ -7,11 +7,13 @@ import 'package:yam/l10n/generated/app_localizations.dart';
 class FoodSearchResultRow extends StatelessWidget {
   const FoodSearchResultRow({
     required this.food,
+    required this.favorite,
     required this.onOpen,
     super.key,
   });
 
   final FoodSearchPrototypeFood food;
+  final bool favorite;
   final VoidCallback onOpen;
 
   @override
@@ -35,7 +37,7 @@ class FoodSearchResultRow extends StatelessWidget {
       fatValue: formatFoodSearchNumber(context, food.nutrition.fat),
       carbsLabel: l10n.macroCarbsShort,
       carbsValue: formatFoodSearchNumber(context, food.nutrition.carbs),
-      favorite: food.favorite,
+      favorite: favorite,
       favoriteLabel: l10n.foodSearchFavorites,
       openKey: ValueKey('food-result-${food.id}'),
       onPressed: onOpen,

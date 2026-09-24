@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yam/app/session/session_profile.dart';
 import 'package:yam/l10n/generated/app_localizations.dart';
 
 @immutable
@@ -83,6 +84,7 @@ DiaryPrototypeDay buildDiaryPrototypeDay(
   AppLocalizations l10n, {
   required bool includeEntries,
   Map<String, List<DiaryPrototypeEntry>> additionalEntries = const {},
+  SessionProfile? profile,
 }) {
   final baseEntries = includeEntries
       ? _buildEntries(l10n)
@@ -95,10 +97,10 @@ DiaryPrototypeDay buildDiaryPrototypeDay(
   }
 
   return DiaryPrototypeDay(
-    calorieTarget: 2200,
-    proteinTarget: 160,
-    fatTarget: 75,
-    carbsTarget: 230,
+    calorieTarget: profile?.calorieTarget ?? 2200,
+    proteinTarget: profile?.proteinTarget ?? 160,
+    fatTarget: profile?.fatTarget ?? 75,
+    carbsTarget: profile?.carbsTarget ?? 230,
     meals: [
       DiaryPrototypeMeal(
         id: 'breakfast',

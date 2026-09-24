@@ -29,6 +29,37 @@ void main() {
     expect(russian.first.name, 'Овсяные хлопья');
   });
 
+  test(
+    'solid fixtures have explicit mass and portions without guessing volume',
+    () {
+      final foods = buildFoodSearchPrototypeFoods(const Locale('en'));
+      for (final food in foods) {
+        final units = food.servings.map((serving) => serving.unit).toSet();
+        expect(units, contains(FoodSearchPrototypeUnit.servings));
+        if (food.referenceUnit == FoodSearchPrototypeUnit.milliliters) {
+          expect(units, contains(FoodSearchPrototypeUnit.milliliters));
+          expect(units, isNot(contains(FoodSearchPrototypeUnit.grams)));
+        } else {
+          expect(units, contains(FoodSearchPrototypeUnit.grams));
+        }
+      }
+
+      final eggs = foods.firstWhere((food) => food.id == 'eggs');
+      final grams = eggs.servings.firstWhere(
+        (serving) => serving.unit == FoodSearchPrototypeUnit.grams,
+      );
+      final pieces = eggs.servings.firstWhere(
+        (serving) => serving.unit == FoodSearchPrototypeUnit.pieces,
+      );
+      expect(eggs.gramsPerReferenceUnit, 55);
+      expect(eggs.nutritionFor(grams, 55).calories, closeTo(78, 0.001));
+      expect(
+        eggs.nutritionFor(grams, 83).calories,
+        closeTo(eggs.nutritionFor(pieces, 83 / 55).calories, 0.001),
+      );
+    },
+  );
+
   test('keeps catalog categories and favorites separate from user foods', () {
     final foods = buildFoodSearchPrototypeFoods(const Locale('en'));
 
