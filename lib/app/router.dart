@@ -6,6 +6,8 @@ import 'package:yam/app/session/session_profile.dart';
 import 'package:yam/app/theme/app_spacing.dart';
 import 'package:yam/features/diary/presentation/diary_screen.dart';
 import 'package:yam/features/food_search/presentation/create_product_stub_screen.dart';
+import 'package:yam/features/food_search/presentation/create_product_screen.dart';
+import 'package:yam/features/food_search/data/user_food_repository.dart';
 import 'package:yam/features/food_search/presentation/food_search_prototype_data.dart';
 import 'package:yam/features/food_search/presentation/food_search_screen.dart';
 import 'package:yam/features/onboarding/presentation/onboarding_screen.dart';
@@ -18,6 +20,7 @@ GoRouter createAppRouter({
   ValueChanged<ThemeMode>? onThemeModeChanged,
   ValueListenable<SessionProfile?>? profileListenable,
   ValueChanged<SessionProfile>? onProfileChanged,
+  UserFoodRepository? userFoodRepository,
 }) {
   return GoRouter(
     initialLocation: '/diary',
@@ -99,12 +102,17 @@ GoRouter createAppRouter({
           final arguments = state.extra is FoodSearchPrototypeArguments
               ? state.extra! as FoodSearchPrototypeArguments
               : const FoodSearchPrototypeArguments();
-          return FoodSearchScreen(arguments: arguments);
+          return FoodSearchScreen(
+            arguments: arguments,
+            userFoodRepository: userFoodRepository,
+          );
         },
         routes: [
           GoRoute(
             path: 'create',
-            builder: (context, state) => const CreateProductStubScreen(),
+            builder: (context, state) => userFoodRepository == null
+                ? const CreateProductStubScreen()
+                : CreateProductScreen(repository: userFoodRepository),
           ),
         ],
       ),

@@ -19,11 +19,13 @@ class FoodSearchResultRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final referenceQuantity = formatFoodSearchQuantity(
-      context,
-      food.referenceUnit,
-      food.referenceAmount,
-    );
+    final referenceQuantity =
+        food.referenceDescription ??
+        formatFoodSearchQuantity(
+          context,
+          food.referenceUnit,
+          food.referenceAmount,
+        );
     return YamProductRow(
       name: food.name,
       metadataLabel: formatFoodSearchMetadata(l10n, food),

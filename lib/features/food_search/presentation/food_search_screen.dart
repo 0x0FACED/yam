@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yam/app/theme/app_motion.dart';
@@ -9,6 +11,8 @@ import 'package:yam/core/ui/feedback/yam_feedback_state.dart';
 import 'package:yam/core/ui/forms/yam_search_field.dart';
 import 'package:yam/core/ui/selection/yam_selection_controls.dart';
 import 'package:yam/features/food_search/presentation/food_search_meals.dart';
+import 'package:yam/features/food_search/presentation/custom_food_adapter.dart';
+import 'package:yam/features/food_search/data/user_food_repository.dart';
 import 'package:yam/features/food_search/presentation/food_search_prototype_data.dart';
 import 'package:yam/features/food_search/presentation/widgets/food_quick_add_sheet.dart';
 import 'package:yam/features/food_search/presentation/widgets/food_search_result_row.dart';
@@ -19,10 +23,12 @@ enum _FoodSearchTab { recent, myDishes, favorites }
 class FoodSearchScreen extends StatefulWidget {
   const FoodSearchScreen({
     this.arguments = const FoodSearchPrototypeArguments(),
+    this.userFoodRepository,
     super.key,
   });
 
   final FoodSearchPrototypeArguments arguments;
+  final UserFoodRepository? userFoodRepository;
 
   @override
   State<FoodSearchScreen> createState() => _FoodSearchScreenState();
@@ -33,6 +39,8 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
 
   final _searchController = TextEditingController();
   final _searchFocusNode = FocusNode();
+  StreamSubscription<List<SavedUserFood>>? _savedFoodSubscription;
+  List<SavedUserFood> _savedFoods = const [];
   late List<String> _recentFoodIds;
   late Set<String> _favoriteOverrides;
 
@@ -53,6 +61,15 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
     _catalogState = widget.arguments.initialCatalogState;
     _recentFoodIds = List.of(widget.arguments.recentFoodIds);
     _favoriteOverrides = Set.of(widget.arguments.favoriteOverrides);
+    _savedFoodSubscription = widget.userFoodRepository?.watchFoods().listen((
+      foods,
+    ) {
+      if (!mounted) return;
+      setState(() {
+        _savedFoods = foods;
+        _refreshFoods();
+      });
+    });
   }
 
   @override
@@ -61,16 +78,26 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
     final locale = Localizations.localeOf(context);
     if (_catalogLocale != locale) {
       _catalogLocale = locale;
-      _foods = buildFoodSearchPrototypeFoods(locale);
-      _updateVisibleFoods();
+      _refreshFoods();
     }
   }
 
   @override
   void dispose() {
+    _savedFoodSubscription?.cancel();
     _searchController.dispose();
     _searchFocusNode.dispose();
     super.dispose();
+  }
+
+  void _refreshFoods() {
+    final locale = _catalogLocale;
+    if (locale == null) return;
+    _foods = [
+      ...buildFoodSearchPrototypeFoods(locale),
+      ...adaptUserFoods(_savedFoods, AppLocalizations.of(context)),
+    ];
+    _updateVisibleFoods();
   }
 
   @override
@@ -326,7 +353,20 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
   bool _isFavorite(FoodSearchPrototypeFood food) =>
       _favoriteOverrides.contains(food.id) != food.favorite;
 
-  void _setFavorite(FoodSearchPrototypeFood food, bool favorite) {
+  Future<void> _setFavorite(FoodSearchPrototypeFood food, bool favorite) async {
+    final repository = widget.userFoodRepository;
+    if (food.source == FoodSearchPrototypeSource.userCreated &&
+        repository != null) {
+      await repository.setFavorite(food.id, favorite);
+      final updated = await repository.loadFoods();
+      if (mounted) {
+        setState(() {
+          _savedFoods = updated;
+          _refreshFoods();
+        });
+      }
+      return;
+    }
     setState(() {
       if (favorite == food.favorite) {
         _favoriteOverrides.remove(food.id);
@@ -438,8 +478,24 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
     );
   }
 
-  void _openCreateFood() {
-    context.push<void>('/add-food/create');
+  Future<void> _openCreateFood() async {
+    final id = await context.push<String>('/add-food/create');
+    final repository = widget.userFoodRepository;
+    if (!mounted || id == null || repository == null) return;
+    final saved = await repository.loadFoods();
+    if (!mounted) return;
+    setState(() {
+      _savedFoods = saved;
+      _searchController.clear();
+      _searchFocusNode.unfocus();
+      _selectedTab = _FoodSearchTab.myDishes;
+      _refreshFoods();
+    });
+    final name = saved.firstWhere((food) => food.food.id == id).food.name;
+    showYamSuccessSnackBar(
+      context: context,
+      message: AppLocalizations.of(context).createProductSaved(name),
+    );
   }
 }
 

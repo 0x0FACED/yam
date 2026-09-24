@@ -530,6 +530,198 @@ abstract class AppLocalizations {
   /// **'Create food'**
   String get foodSearchCreateFood;
 
+  /// No description provided for @createProductName.
+  ///
+  /// In en, this message translates to:
+  /// **'Food name'**
+  String get createProductName;
+
+  /// No description provided for @createProductNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'For example, rolled oats'**
+  String get createProductNameHint;
+
+  /// No description provided for @createProductBrand.
+  ///
+  /// In en, this message translates to:
+  /// **'Brand'**
+  String get createProductBrand;
+
+  /// No description provided for @createProductBrandHint.
+  ///
+  /// In en, this message translates to:
+  /// **'If applicable'**
+  String get createProductBrandHint;
+
+  /// No description provided for @createProductCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get createProductCategory;
+
+  /// No description provided for @createProductNutritionBasis.
+  ///
+  /// In en, this message translates to:
+  /// **'Nutrition values for'**
+  String get createProductNutritionBasis;
+
+  /// No description provided for @createProductPerHundredGrams.
+  ///
+  /// In en, this message translates to:
+  /// **'100 g'**
+  String get createProductPerHundredGrams;
+
+  /// No description provided for @createProductPerHundredMilliliters.
+  ///
+  /// In en, this message translates to:
+  /// **'100 ml'**
+  String get createProductPerHundredMilliliters;
+
+  /// No description provided for @createProductPerServing.
+  ///
+  /// In en, this message translates to:
+  /// **'1 serving'**
+  String get createProductPerServing;
+
+  /// No description provided for @createProductServingSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Size of this serving'**
+  String get createProductServingSize;
+
+  /// No description provided for @createProductNutrition.
+  ///
+  /// In en, this message translates to:
+  /// **'Nutrition facts'**
+  String get createProductNutrition;
+
+  /// No description provided for @createProductCalories.
+  ///
+  /// In en, this message translates to:
+  /// **'Calories'**
+  String get createProductCalories;
+
+  /// No description provided for @createProductServings.
+  ///
+  /// In en, this message translates to:
+  /// **'Additional units'**
+  String get createProductServings;
+
+  /// No description provided for @createProductAddServing.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a unit'**
+  String get createProductAddServing;
+
+  /// No description provided for @createProductServingName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name (optional)'**
+  String get createProductServingName;
+
+  /// No description provided for @createProductServingNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'For example, bottle'**
+  String get createProductServingNameHint;
+
+  /// No description provided for @createProductServingAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount in one unit'**
+  String get createProductServingAmount;
+
+  /// No description provided for @createProductRemoveServing.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove unit'**
+  String get createProductRemoveServing;
+
+  /// No description provided for @createProductBarcode.
+  ///
+  /// In en, this message translates to:
+  /// **'Barcode (optional)'**
+  String get createProductBarcode;
+
+  /// No description provided for @createProductSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save food'**
+  String get createProductSave;
+
+  /// No description provided for @createProductSaving.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving…'**
+  String get createProductSaving;
+
+  /// No description provided for @createProductNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a food name'**
+  String get createProductNameRequired;
+
+  /// No description provided for @createProductInvalidNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a number of zero or more'**
+  String get createProductInvalidNumber;
+
+  /// No description provided for @createProductPositiveAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter an amount greater than zero'**
+  String get createProductPositiveAmount;
+
+  /// No description provided for @createProductInvalidBarcode.
+  ///
+  /// In en, this message translates to:
+  /// **'Use digits for the barcode'**
+  String get createProductInvalidBarcode;
+
+  /// No description provided for @createProductDuplicateBarcode.
+  ///
+  /// In en, this message translates to:
+  /// **'A food with this barcode already exists'**
+  String get createProductDuplicateBarcode;
+
+  /// No description provided for @createProductSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save food'**
+  String get createProductSaveFailed;
+
+  /// No description provided for @createProductSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'{food} saved'**
+  String createProductSaved(String food);
+
+  /// No description provided for @createProductUnitServing.
+  ///
+  /// In en, this message translates to:
+  /// **'Serving'**
+  String get createProductUnitServing;
+
+  /// No description provided for @createProductUnitPiece.
+  ///
+  /// In en, this message translates to:
+  /// **'Piece'**
+  String get createProductUnitPiece;
+
+  /// No description provided for @createProductUnitGlass.
+  ///
+  /// In en, this message translates to:
+  /// **'Glass'**
+  String get createProductUnitGlass;
+
+  /// No description provided for @createProductUnitScoop.
+  ///
+  /// In en, this message translates to:
+  /// **'Scoop'**
+  String get createProductUnitScoop;
+
   /// No description provided for @createProductBack.
   ///
   /// In en, this message translates to:
@@ -619,6 +811,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Grains'**
   String get foodCategoryGrains;
+
+  /// No description provided for @foodCategoryOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get foodCategoryOther;
 
   /// No description provided for @foodCategoryDairy.
   ///
@@ -775,6 +973,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{food} removed from favorites'**
   String foodFavoriteRemoved(String food);
+
+  /// No description provided for @foodFavoriteSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not update favorites'**
+  String get foodFavoriteSaveFailed;
 
   /// No description provided for @foodAdded.
   ///

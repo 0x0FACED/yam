@@ -55,20 +55,26 @@ String formatFoodSearchMetadata(
   AppLocalizations l10n,
   FoodSearchPrototypeFood food,
 ) {
-  final category = switch (food.category) {
-    FoodSearchPrototypeCategory.grains => l10n.foodCategoryGrains,
-    FoodSearchPrototypeCategory.dairy => l10n.foodCategoryDairy,
-    FoodSearchPrototypeCategory.sportsNutrition =>
-      l10n.foodCategorySportsNutrition,
-    FoodSearchPrototypeCategory.fruit => l10n.foodCategoryFruit,
-    FoodSearchPrototypeCategory.poultry => l10n.foodCategoryPoultry,
-    FoodSearchPrototypeCategory.eggs => l10n.foodCategoryEggs,
-    FoodSearchPrototypeCategory.bread => l10n.foodCategoryBread,
-    FoodSearchPrototypeCategory.drinks => l10n.foodCategoryDrinks,
-  };
+  final category = foodSearchCategoryLabel(l10n, food.category);
   final brand = food.brand;
   return brand == null || brand.isEmpty ? category : '$category · $brand';
 }
+
+String foodSearchCategoryLabel(
+  AppLocalizations l10n,
+  FoodSearchPrototypeCategory category,
+) => switch (category) {
+  FoodSearchPrototypeCategory.other => l10n.foodCategoryOther,
+  FoodSearchPrototypeCategory.grains => l10n.foodCategoryGrains,
+  FoodSearchPrototypeCategory.dairy => l10n.foodCategoryDairy,
+  FoodSearchPrototypeCategory.sportsNutrition =>
+    l10n.foodCategorySportsNutrition,
+  FoodSearchPrototypeCategory.fruit => l10n.foodCategoryFruit,
+  FoodSearchPrototypeCategory.poultry => l10n.foodCategoryPoultry,
+  FoodSearchPrototypeCategory.eggs => l10n.foodCategoryEggs,
+  FoodSearchPrototypeCategory.bread => l10n.foodCategoryBread,
+  FoodSearchPrototypeCategory.drinks => l10n.foodCategoryDrinks,
+};
 
 String? foodSearchServingEquivalent(
   BuildContext context,
@@ -103,7 +109,27 @@ String? foodSearchServingEquivalent(
           serving.baseAmount * massPerPiece,
         );
   return l10n.quickAddUnitEquivalent(
-    formatFoodSearchQuantity(context, serving.unit, 1),
+    formatFoodSearchServingQuantity(context, serving, 1),
     equivalent,
   );
+}
+
+String foodSearchServingUnitLabel(
+  AppLocalizations l10n,
+  FoodSearchPrototypeServing serving,
+) => serving.label ?? foodSearchUnitLabel(l10n, serving.unit);
+
+String formatFoodSearchServingQuantity(
+  BuildContext context,
+  FoodSearchPrototypeServing serving,
+  num value,
+) {
+  final label = serving.label;
+  if (label == null) {
+    return formatFoodSearchQuantity(context, serving.unit, value);
+  }
+  final locale = Localizations.localeOf(context).toLanguageTag();
+  final formatted = NumberFormat.decimalPattern(locale)
+    ..maximumFractionDigits = 3;
+  return '${formatted.format(value)} $label';
 }

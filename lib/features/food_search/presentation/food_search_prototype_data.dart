@@ -12,6 +12,7 @@ enum FoodSearchPrototypeUnit {
 }
 
 enum FoodSearchPrototypeCategory {
+  other,
   grains,
   dairy,
   sportsNutrition,
@@ -58,6 +59,7 @@ class FoodSearchPrototypeServing {
     required this.baseAmount,
     required this.defaultAmount,
     required this.presets,
+    this.label,
   });
 
   final String id;
@@ -67,6 +69,7 @@ class FoodSearchPrototypeServing {
   final double baseAmount;
   final double defaultAmount;
   final List<double> presets;
+  final String? label;
 }
 
 @immutable
@@ -83,6 +86,8 @@ class FoodSearchPrototypeFood {
     required this.lastAmount,
     this.brand,
     this.gramsPerReferenceUnit,
+    this.referenceDescription,
+    this.hasUsualAmount = true,
     this.source = FoodSearchPrototypeSource.localCatalog,
     this.favorite = false,
   });
@@ -94,6 +99,8 @@ class FoodSearchPrototypeFood {
 
   /// Product-specific mass for one reference unit when nutrition is per piece.
   final double? gramsPerReferenceUnit;
+  final String? referenceDescription;
+  final bool hasUsualAmount;
   final double referenceAmount;
   final FoodSearchPrototypeUnit referenceUnit;
   final FoodSearchPrototypeNutrition nutrition;

@@ -8,8 +8,8 @@
 - Дата: 2026-09-24.
 - Стадия: visual implementation pass; Дневник, Food Search, Add Food sheet и
   Settings реализованы по approved references.
-- Текущий статус: оба уведомления YAM (Undo и избранное поверх sheet) плавно
-  проявляются и исчезают без смещения; режим Reduce Motion убирает задержку.
+- Текущий статус: созданные продукты хранятся в SQLite. Следующий проход по
+  Create Product записан в proposed ADR 0017; код по нему не менялся.
 
 ## Авторитетные Источники
 
@@ -34,6 +34,10 @@
 - Добавление нескольких продуктов, избранное и единицы в sheet:
   `docs/adr/0015-add-food-sheet-and-session-flow.md` заменяет в ADR 0007
   автоматический возврат в Дневник после добавления.
+- Локальный persisted каталог созданных продуктов: `docs/adr/0016-persist-custom-foods.md`;
+  данные Дневника и builtin fixtures пока остаются в памяти.
+- Предстоящие правки создания и удаления: proposed
+  `docs/adr/0017-custom-food-follow-up.md` (не supersede ADR 0016).
 - Performance-оптимизация до реальной проблемы отложена ADR 0008; обязательных
   profile-бенчмарков и числовых бюджетов у MVP нет.
 
@@ -46,7 +50,9 @@
 - Hydration/water и account/profile UI не входят в текущий проход.
 - Barcode scanning не реализуется; в Create Product допустим ручной barcode.
 - Add Food action редактирования nutrition/name не показывается без маршрута.
-- Persistence, remote API, sync, account и production ranking не строятся.
+- Сохраняются только созданные продукты, порции и их избранное; дневные записи,
+  встроенный каталог и недавние по-прежнему prototype. Remote API, sync и
+  account не строятся.
 
 ## Реализованная Основа
 
@@ -54,6 +60,10 @@
   Light и Dark themes и существующим startup-intro; `SessionProfile` живёт
   в `ValueNotifier` только до перезапуска, `YamEntranceScope` запускает
   одноразовое мягкое проявление семантических блоков после интро/онбординга.
+- `UserFoodDatabase` (Drift/SQLite) и `UserFoodRepository` создаются в `YamApp`;
+  `user_food_database.g.dart` генерируется через `build_runner`. Начальная
+  схема v1 содержит user foods, user servings и стабильный installation
+  deviceId; food/serving ID — UUID v7, timestamps UTC, soft-delete поля.
 - `startup_screen.dart` берёт фон интро из `Theme.scaffoldBackgroundColor`;
   `startup_artwork.dart` заранее загружает SVG для обеих тем и заменяет только
   тёмные ink-заливки на `AppColors.darkTextPrimary` в dark-версии. Для fallback
@@ -85,6 +95,8 @@
   `YamEntranceReveal` находятся в `lib/core/ui/`; длительности/кривые —
   в `lib/app/theme/app_motion.dart`. Reveal использует только opacity без
   перемещения/масштаба и уважает `MediaQuery.disableAnimations`.
+- `YamTextField` в `lib/core/ui/forms/` используется новой формой для названия,
+  бренда и ручного штрихкода.
 - `YamGoalSliderField` в `lib/core/ui/forms/` объединяет точный числовой ввод
   с ползунком (шаг 5 г, диапазон расширяется для введённых вручную значений).
   `YamNumberField` использует более крупную каноническую типографику и
@@ -153,6 +165,10 @@
   поле фокусируется по нажатию. Для вертикального списка включён штатный
   Android stretch overscroll даже при коротком/пустом содержимом. Task-content
   ограничен 448 dp и центрируется на wide layouts.
+- Food Search наблюдает локальные user foods, объединяет их с demo fixtures,
+  использует сохранённое избранное у созданных продуктов и session-флаги у
+  fixture. Сохранение возвращает во вкладку «Мои блюда», очистив запрос,
+  и не открывает sheet автоматически; выбранный приём сохраняется.
 - Header, search, meal/filter controls, product rows, loading/error/empty states
   и основные действия используют shared `Yam*` API. Feature widgets только
   форматируют localized display values и dispatch intent.
@@ -163,9 +179,8 @@
   через ` · ` (без подмены источником каталога и порцией).
 - `DiaryScreen` ведёт в памяти добавления по entryId/foodId; поиск получает
   последние четыре разных реально добавленных продукта в обратном порядке,
-  Undo убирает своё событие. Начальный Recent пуст, My Dishes пуст до
-  реализации создания; Favorites строится из флагов fixture и session-overrides
-  после нажатия на звезду в sheet. Категории локализованы в `lib/l10n/`.
+  Undo убирает своё событие. Recent остаётся сессионным. Категории локализованы
+  в `lib/l10n/`, включая «Другое».
 - `food_quick_add_sheet.dart` сохраняет meal chip, editable quantity, presets и
   nutrition preview; CTA без повторения ккал закрывает только sheet. Выбранный
   в sheet приём запоминается для следующего продукта. Избранное переключается
@@ -177,7 +192,12 @@
   указан под контролом. Тап шага ±1, удержание ускоряет повтор.
 - `food_search_prototype_data.dart` задаёт граммы и порции для всех твёрдых
   fixture-продуктов, 55 г на яйцо, а для жидкостей мл/стакан/порцию без
-  допущения мл = г. Коэффициенты будущего Create Product — отдельный slice.
+  допущения мл = г. Для пользовательского продукта единицы и коэффициенты
+  задаются при создании, дополнительная порция не обязательна.
+- `create_product_screen.dart` заменяет production-заглушку `/add-food/create`:
+  название, категория, бренд, базис 100 г/100 мл/1 порция (с обязательным
+  эквивалентом), ккал и БЖУ, дополнительные именованные единицы, ручной
+  штрихкод и inline-валидация. Сохранение продукта+порций атомарное.
 - Общий entry point по-прежнему требует meal, meal-specific entry сохраняет
   preselection; пересчёт нутриентов и Undo сохранены по ADR 0007/0012/0015.
   Barcode и edit nutrition/name action не добавлены без маршрутов.
@@ -194,31 +214,29 @@
 - `YamSettingsRow` растягивает trailing-область до правого края; values больше
   не остаются около центра при коротком тексте.
 - Statistics пока остаётся route placeholder.
-- Edit Diary Entry, Create Product и отдельный Goals editor ещё не реализованы.
+- Edit Diary Entry и отдельный Goals editor ещё не реализованы.
 - Tap по diary row сейчас показывает selection/highlight state; настоящий Edit
   Entry sheet будет подключен в своем slice.
 
 ## Проверка
 
-- `flutter gen-l10n`, `dart format`, `flutter analyze` — успешно. Focused
-  core/UI и Food Search widget-тесты проходят: fade-in/fade-out SnackBar,
-  disableAnimations, Undo, избранное поверх sheet, серия добавлений,
-  единицы и удержание. Конверсия яйца 83 г ↔ штуки проверена отдельно.
-- Startup widget-тесты и Android debug APK ранее проходили. Food Search
-  goldens устарели после изменения состава вкладок/формы, Settings goldens
-  зависели от рендерера шрифтов; полный suite/goldens согласно `AGENTS.md`
-  не запускались для этой UI-итерации.
+- Зависимости разрешены; `dart run build_runner build
+  --delete-conflicting-outputs`, `flutter gen-l10n`, `dart format` и
+  `flutter analyze` — успешно. Тест БД на сохранение после повторного
+  открытия и отказ при невалидной порции прошёл до UI-интеграции. По прямому
+  запросу пользователя **не запускать `flutter test`** дальше: тестовый
+  UI-сценарий оказался зависшим и удалён, дальнейшую проверку UI он делает
+  вручную. Старые Food Search/Settings goldens неактуальны.
 
 ## Следующее Действие
 
-- Вручную на Android оценить появление/исчезновение SnackBar в обеих темах:
-  Undo после добавления и success поверх sheet при переключении избранного.
+- Выполнить ADR 0017: сначала решить обновление уже сохранённых ккал, затем
+  расчёт из БЖУ, long-press удаление в «Моих блюдах» и геометрию категории.
 
 ## Блокеры
 
-- Выбор темы в Настройках хранится только до перезапуска (ADR 0009), поэтому
-  следующий холодный запуск следует системной теме. Данные профиля тоже
-  сбрасываются до persistence slice. Create Product остаётся заглушкой,
-  поэтому My Dishes пуст. Старые
-  Food Search goldens не соответствуют новому экрану, а Settings goldens
-  расходились из-за рендерера шрифтов; Edit Diary Entry пока не начат.
+- Diary и Recent ещё в памяти; реально персистентны только созданные продукты
+  и их избранное. Текущий Flutter SDK требует pinned Drift 2.31 /
+  drift_flutter 0.2.4 до обновления генератора; iOS сборка на Linux не
+  проверялась. Goldens устарели после изменения Food Search. Для ADR 0017
+  нужно определить судьбу ранее сохранённых продуктов с ручными ккал.

@@ -252,6 +252,105 @@ class AppLocalizationsRu extends AppLocalizations {
   String get foodSearchCreateFood => 'Создать продукт';
 
   @override
+  String get createProductName => 'Название продукта';
+
+  @override
+  String get createProductNameHint => 'Например, овсяные хлопья';
+
+  @override
+  String get createProductBrand => 'Бренд';
+
+  @override
+  String get createProductBrandHint => 'Если есть';
+
+  @override
+  String get createProductCategory => 'Категория';
+
+  @override
+  String get createProductNutritionBasis => 'Значения указаны на';
+
+  @override
+  String get createProductPerHundredGrams => '100 г';
+
+  @override
+  String get createProductPerHundredMilliliters => '100 мл';
+
+  @override
+  String get createProductPerServing => '1 порцию';
+
+  @override
+  String get createProductServingSize => 'Размер этой порции';
+
+  @override
+  String get createProductNutrition => 'Пищевая ценность';
+
+  @override
+  String get createProductCalories => 'Калории';
+
+  @override
+  String get createProductServings => 'Дополнительные единицы';
+
+  @override
+  String get createProductAddServing => 'Добавить единицу';
+
+  @override
+  String get createProductServingName => 'Название (необязательно)';
+
+  @override
+  String get createProductServingNameHint => 'Например, бутылка';
+
+  @override
+  String get createProductServingAmount => 'В одной единице';
+
+  @override
+  String get createProductRemoveServing => 'Удалить единицу';
+
+  @override
+  String get createProductBarcode => 'Штрихкод (необязательно)';
+
+  @override
+  String get createProductSave => 'Сохранить продукт';
+
+  @override
+  String get createProductSaving => 'Сохранение…';
+
+  @override
+  String get createProductNameRequired => 'Укажите название';
+
+  @override
+  String get createProductInvalidNumber => 'Введите число не меньше нуля';
+
+  @override
+  String get createProductPositiveAmount => 'Укажите размер больше нуля';
+
+  @override
+  String get createProductInvalidBarcode => 'Введите штрихкод цифрами';
+
+  @override
+  String get createProductDuplicateBarcode =>
+      'Продукт с таким штрихкодом уже есть';
+
+  @override
+  String get createProductSaveFailed => 'Не удалось сохранить продукт';
+
+  @override
+  String createProductSaved(String food) {
+    return 'Продукт «$food» сохранён';
+  }
+
+  @override
+  String get createProductUnitServing => 'Порция';
+
+  @override
+  String get createProductUnitPiece => 'Штука';
+
+  @override
+  String get createProductUnitGlass => 'Стакан';
+
+  @override
+  String get createProductUnitScoop => 'Мерная ложка';
+
+  @override
   String get createProductBack => 'Назад к поиску еды';
 
   @override
@@ -301,6 +400,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get foodCategoryGrains => 'Крупы';
+
+  @override
+  String get foodCategoryOther => 'Другое';
 
   @override
   String get foodCategoryDairy => 'Молочные продукты';
@@ -391,6 +493,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String foodFavoriteRemoved(String food) {
     return '«$food» убран из избранного';
   }
+
+  @override
+  String get foodFavoriteSaveFailed => 'Не удалось изменить избранное';
 
   @override
   String foodAdded(String food, String meal) {

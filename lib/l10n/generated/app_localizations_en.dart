@@ -253,6 +253,105 @@ class AppLocalizationsEn extends AppLocalizations {
   String get foodSearchCreateFood => 'Create food';
 
   @override
+  String get createProductName => 'Food name';
+
+  @override
+  String get createProductNameHint => 'For example, rolled oats';
+
+  @override
+  String get createProductBrand => 'Brand';
+
+  @override
+  String get createProductBrandHint => 'If applicable';
+
+  @override
+  String get createProductCategory => 'Category';
+
+  @override
+  String get createProductNutritionBasis => 'Nutrition values for';
+
+  @override
+  String get createProductPerHundredGrams => '100 g';
+
+  @override
+  String get createProductPerHundredMilliliters => '100 ml';
+
+  @override
+  String get createProductPerServing => '1 serving';
+
+  @override
+  String get createProductServingSize => 'Size of this serving';
+
+  @override
+  String get createProductNutrition => 'Nutrition facts';
+
+  @override
+  String get createProductCalories => 'Calories';
+
+  @override
+  String get createProductServings => 'Additional units';
+
+  @override
+  String get createProductAddServing => 'Add a unit';
+
+  @override
+  String get createProductServingName => 'Name (optional)';
+
+  @override
+  String get createProductServingNameHint => 'For example, bottle';
+
+  @override
+  String get createProductServingAmount => 'Amount in one unit';
+
+  @override
+  String get createProductRemoveServing => 'Remove unit';
+
+  @override
+  String get createProductBarcode => 'Barcode (optional)';
+
+  @override
+  String get createProductSave => 'Save food';
+
+  @override
+  String get createProductSaving => 'Saving…';
+
+  @override
+  String get createProductNameRequired => 'Enter a food name';
+
+  @override
+  String get createProductInvalidNumber => 'Enter a number of zero or more';
+
+  @override
+  String get createProductPositiveAmount => 'Enter an amount greater than zero';
+
+  @override
+  String get createProductInvalidBarcode => 'Use digits for the barcode';
+
+  @override
+  String get createProductDuplicateBarcode =>
+      'A food with this barcode already exists';
+
+  @override
+  String get createProductSaveFailed => 'Could not save food';
+
+  @override
+  String createProductSaved(String food) {
+    return '$food saved';
+  }
+
+  @override
+  String get createProductUnitServing => 'Serving';
+
+  @override
+  String get createProductUnitPiece => 'Piece';
+
+  @override
+  String get createProductUnitGlass => 'Glass';
+
+  @override
+  String get createProductUnitScoop => 'Scoop';
+
+  @override
   String get createProductBack => 'Back to food search';
 
   @override
@@ -301,6 +400,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get foodCategoryGrains => 'Grains';
+
+  @override
+  String get foodCategoryOther => 'Other';
 
   @override
   String get foodCategoryDairy => 'Dairy';
@@ -391,6 +493,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String foodFavoriteRemoved(String food) {
     return '$food removed from favorites';
   }
+
+  @override
+  String get foodFavoriteSaveFailed => 'Could not update favorites';
 
   @override
   String foodAdded(String food, String meal) {

@@ -17,7 +17,7 @@ Future<FoodAddPrototypeResult?> showFoodQuickAddSheet({
   required FoodSearchPrototypeFood food,
   required String? initialMealId,
   required bool favorite,
-  required ValueChanged<bool> onFavoriteChanged,
+  required Future<void> Function(bool) onFavoriteChanged,
 }) {
   return showModalBottomSheet<FoodAddPrototypeResult>(
     context: context,
@@ -45,7 +45,7 @@ class _FoodQuickAddSheet extends StatefulWidget {
   final FoodSearchPrototypeFood food;
   final String? initialMealId;
   final bool favorite;
-  final ValueChanged<bool> onFavoriteChanged;
+  final Future<void> Function(bool) onFavoriteChanged;
 
   @override
   State<_FoodQuickAddSheet> createState() => _FoodQuickAddSheetState();
@@ -61,6 +61,7 @@ class _FoodQuickAddSheetState extends State<_FoodQuickAddSheet> {
   String _decimalSeparator = '.';
   VoidCallback? _dismissFavoriteFeedback;
   bool _attemptedSubmit = false;
+  String? _favoriteError;
 
   @override
   void initState() {
@@ -109,11 +110,13 @@ class _FoodQuickAddSheetState extends State<_FoodQuickAddSheet> {
       nutrition.calories.round(),
     );
     final metadataLabel = formatFoodSearchMetadata(l10n, widget.food);
-    final referenceQuantity = formatFoodSearchQuantity(
-      context,
-      widget.food.referenceUnit,
-      widget.food.referenceAmount,
-    );
+    final referenceQuantity =
+        widget.food.referenceDescription ??
+        formatFoodSearchQuantity(
+          context,
+          widget.food.referenceUnit,
+          widget.food.referenceAmount,
+        );
     final referenceCalories = l10n.foodSearchCaloriesPerReference(
       formatFoodSearchNumber(context, widget.food.nutrition.calories),
       referenceQuantity,
@@ -244,6 +247,15 @@ class _FoodQuickAddSheetState extends State<_FoodQuickAddSheet> {
                   ),
                 ],
               ),
+              if (_favoriteError != null) ...[
+                const SizedBox(height: AppSpacing.xxs),
+                Text(
+                  _favoriteError!,
+                  style: AppTypography.caption.copyWith(
+                    color: theme.colorScheme.error,
+                  ),
+                ),
+              ],
               const SizedBox(height: AppSpacing.md),
               YamQuantityControl(
                 amountFieldKey: const ValueKey('quick-add-quantity'),
@@ -251,7 +263,7 @@ class _FoodQuickAddSheetState extends State<_FoodQuickAddSheet> {
                 controller: _amountController,
                 unitLabels: [
                   for (final serving in widget.food.servings)
-                    foodSearchUnitLabel(l10n, serving.unit),
+                    foodSearchServingUnitLabel(l10n, serving),
                 ],
                 selectedUnitIndex: widget.food.servings.indexOf(_serving),
                 amountSemanticLabel: l10n.quickAddQuantity,
@@ -278,16 +290,18 @@ class _FoodQuickAddSheetState extends State<_FoodQuickAddSheet> {
               const SizedBox(height: AppSpacing.sm),
               YamQuickAmountPresets(
                 title: l10n.quickAddQuickSelect,
-                usualAmountLabel: l10n.quickAddUsualAmount(
-                  formatFoodSearchQuantity(
-                    context,
-                    widget.food.lastServing.unit,
-                    widget.food.lastAmount,
-                  ),
-                ),
+                usualAmountLabel: widget.food.hasUsualAmount
+                    ? l10n.quickAddUsualAmount(
+                        formatFoodSearchServingQuantity(
+                          context,
+                          widget.food.lastServing,
+                          widget.food.lastAmount,
+                        ),
+                      )
+                    : null,
                 labels: [
                   for (final preset in _serving.presets)
-                    formatFoodSearchQuantity(context, _serving.unit, preset),
+                    formatFoodSearchServingQuantity(context, _serving, preset),
                 ],
                 selectedIndex: selectedPresetIndex,
                 onSelected: (index) => _setAmount(_serving.presets[index]),
@@ -330,9 +344,25 @@ class _FoodQuickAddSheetState extends State<_FoodQuickAddSheet> {
     return index < 0 ? null : index;
   }
 
-  void _toggleFavorite() {
-    setState(() => _favorite = !_favorite);
-    widget.onFavoriteChanged(_favorite);
+  Future<void> _toggleFavorite() async {
+    final nextFavorite = !_favorite;
+    try {
+      await widget.onFavoriteChanged(nextFavorite);
+    } on Object {
+      if (mounted) {
+        setState(
+          () => _favoriteError = AppLocalizations.of(
+            context,
+          ).foodFavoriteSaveFailed,
+        );
+      }
+      return;
+    }
+    if (!mounted) return;
+    setState(() {
+      _favorite = nextFavorite;
+      _favoriteError = null;
+    });
     _dismissFavoriteFeedback?.call();
     final l10n = AppLocalizations.of(context);
     _dismissFavoriteFeedback = showYamSuccessSnackBar(
@@ -398,7 +428,11 @@ class _FoodQuickAddSheetState extends State<_FoodQuickAddSheet> {
         foodId: widget.food.id,
         name: widget.food.name,
         brand: widget.food.brand,
-        quantityLabel: formatFoodSearchQuantity(context, _serving.unit, amount),
+        quantityLabel: formatFoodSearchServingQuantity(
+          context,
+          _serving,
+          amount,
+        ),
         mealId: _mealId!,
         calories: nutrition.calories.round(),
         protein: nutrition.protein,

@@ -160,7 +160,7 @@ class YamQuickAmountPresets extends StatelessWidget {
   });
 
   final String title;
-  final String usualAmountLabel;
+  final String? usualAmountLabel;
   final List<String> labels;
   final int? selectedIndex;
   final ValueChanged<int> onSelected;
@@ -183,17 +183,19 @@ class YamQuickAmountPresets extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(width: AppSpacing.xs),
-            Expanded(
-              child: Text(
-                usualAmountLabel,
-                textAlign: TextAlign.end,
-                style: AppTypography.caption.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                  fontFeatures: AppTypography.tabularFigures,
+            if (usualAmountLabel != null) ...[
+              const SizedBox(width: AppSpacing.xs),
+              Expanded(
+                child: Text(
+                  usualAmountLabel!,
+                  textAlign: TextAlign.end,
+                  style: AppTypography.caption.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                    fontFeatures: AppTypography.tabularFigures,
+                  ),
                 ),
               ),
-            ),
+            ],
           ],
         ),
         const SizedBox(height: AppSpacing.xs),
