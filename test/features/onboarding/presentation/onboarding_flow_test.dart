@@ -59,6 +59,10 @@ void main() {
       find.byKey(const ValueKey('onboarding-current-weight')),
       '80,5',
     );
+    await tester.enterText(
+      find.byKey(const ValueKey('onboarding-target-weight')),
+      '72',
+    );
     await tester.tap(find.text('Продолжить'));
     await tester.pumpAndSettle();
     expect(tester.getTopLeft(find.byType(YamStepProgress)).dy, headerTop);
@@ -67,6 +71,20 @@ void main() {
       find.byKey(const ValueKey('onboarding-protein-slider')),
       findsOneWidget,
     );
+    await tester.enterText(
+      find.byKey(const ValueKey('onboarding-calories')),
+      '1950',
+    );
+    await tester.enterText(
+      find.byKey(const ValueKey('onboarding-protein')),
+      '140',
+    );
+    await tester.enterText(find.byKey(const ValueKey('onboarding-fat')), '65');
+    await tester.enterText(
+      find.byKey(const ValueKey('onboarding-carbs')),
+      '210',
+    );
+    await tester.pump();
     expect(find.textContaining('По БЖУ:'), findsOneWidget);
     expect(find.textContaining('+35'), findsOneWidget);
 

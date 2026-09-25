@@ -15,6 +15,7 @@ class SettingsScreen extends StatelessWidget {
     required this.themeMode,
     required this.onThemeModeChanged,
     this.profile,
+    this.currentWeightKg,
     super.key,
   });
 
@@ -23,6 +24,7 @@ class SettingsScreen extends StatelessWidget {
   final ThemeMode themeMode;
   final ValueChanged<ThemeMode> onThemeModeChanged;
   final SessionProfile? profile;
+  final double? currentWeightKg;
 
   @override
   Widget build(BuildContext context) {
@@ -32,16 +34,24 @@ class SettingsScreen extends StatelessWidget {
     final weightNumbers = NumberFormat.decimalPattern(locale.toLanguageTag())
       ..minimumFractionDigits = 0
       ..maximumFractionDigits = 1;
-    final goalsSummary = l10n.settingsGoalsSummary(
-      numbers.format(profile?.calorieTarget ?? 2200),
-      numbers.format(profile?.proteinTarget ?? 160),
-      numbers.format(profile?.fatTarget ?? 75),
-      numbers.format(profile?.carbsTarget ?? 230),
-    );
-    final weightSummary = l10n.settingsWeightSummary(
-      weightNumbers.format(profile?.currentWeightKg ?? 74.2),
-      weightNumbers.format(profile?.targetWeightKg ?? 72),
-    );
+    final goalsSummary = profile == null
+        ? l10n.settingsGoalsNotSet
+        : l10n.settingsGoalsSummary(
+            numbers.format(profile!.calorieTarget),
+            numbers.format(profile!.proteinTarget),
+            numbers.format(profile!.fatTarget),
+            numbers.format(profile!.carbsTarget),
+          );
+    final weightSummary = currentWeightKg == null && profile == null
+        ? l10n.settingsWeightNotSet
+        : l10n.settingsWeightSummary(
+            currentWeightKg == null
+                ? '—'
+                : weightNumbers.format(currentWeightKg),
+            profile == null
+                ? '—'
+                : weightNumbers.format(profile!.targetWeightKg),
+          );
 
     return Scaffold(
       body: SafeArea(

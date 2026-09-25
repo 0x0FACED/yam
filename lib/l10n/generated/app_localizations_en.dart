@@ -23,6 +23,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingGoalTitle => 'What would you like to change?';
 
   @override
+  String get onboardingGoalRequired => 'Choose a goal';
+
+  @override
+  String get onboardingSaveFailed => 'Could not save goals and weight';
+
+  @override
   String get onboardingGoalDescription =>
       'This helps set your daily calorie and macro goals';
 
@@ -152,6 +158,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get diaryConsumed => 'Consumed';
+
+  @override
+  String get diaryGoalNotSet => 'No goal set yet';
 
   @override
   String diaryCalorieGoalSuffix(String target) {
@@ -693,6 +702,181 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statisticsTitle => 'Statistics';
 
   @override
+  String get statsPeriod7 => '7D';
+
+  @override
+  String get statsPeriod30 => '30D';
+
+  @override
+  String get statsPeriod90 => '3M';
+
+  @override
+  String get statsPeriod365 => '1Y';
+
+  @override
+  String get statsPeriodAll => 'All';
+
+  @override
+  String get statsNoData => 'No entries yet';
+
+  @override
+  String get statsLoading => 'Loading statistics';
+
+  @override
+  String statsCurrentGoal(String value) {
+    return 'Current goal: $value';
+  }
+
+  @override
+  String get statsWeight => 'Weight';
+
+  @override
+  String get statsAverageCalories => 'Average calories';
+
+  @override
+  String get statsAverageProtein => 'Average protein';
+
+  @override
+  String get statsDaysInGoal => 'Days in goal';
+
+  @override
+  String get statsWeightChart => 'Body weight';
+
+  @override
+  String get statsCaloriesChart => 'Calories';
+
+  @override
+  String get statsAverageMacros => 'Average macros';
+
+  @override
+  String get statsRegularity => 'Regularity';
+
+  @override
+  String get statsFrequentFoods => 'Often eaten';
+
+  @override
+  String statsGoal(String value) {
+    return 'Goal: $value';
+  }
+
+  @override
+  String get statsDailyAverage => 'kcal/day';
+
+  @override
+  String get statsGramsPerDay => 'g/day';
+
+  @override
+  String statsPercentOfGoal(String percent) {
+    return '$percent% of goal';
+  }
+
+  @override
+  String statsInGoalCount(String within, String total) {
+    return '$within / $total';
+  }
+
+  @override
+  String statsLoggedDays(String days) {
+    return 'Days with food: $days';
+  }
+
+  @override
+  String statsDaysWithFood(String days) {
+    return 'Days: $days';
+  }
+
+  @override
+  String get statsNoWeight => 'No weight measurements yet';
+
+  @override
+  String get statsNoWeightInPeriod => 'No weight measurements in this period';
+
+  @override
+  String get statsNoWeightHint => 'Log your weight to see its changes.';
+
+  @override
+  String get statsNoNutrition => 'No food entries in this period';
+
+  @override
+  String get statsNoGoal => 'No goal set';
+
+  @override
+  String get statsNoGoalDays => 'Set a goal to track regularity.';
+
+  @override
+  String get statsNoFrequent => 'Foods from your diary will appear here.';
+
+  @override
+  String get statsAddWeight => 'Log weight';
+
+  @override
+  String get statsEditWeight => 'Edit weight entry';
+
+  @override
+  String get statsWeightDate => 'Measurement date';
+
+  @override
+  String get statsSaveWeight => 'Save weight';
+
+  @override
+  String get statsWeightClose => 'Close weight entry';
+
+  @override
+  String get statsDeleteWeight => 'Delete weight entry';
+
+  @override
+  String get statsInvalidWeight => 'Enter a weight greater than zero';
+
+  @override
+  String get statsWeightSaved => 'Weight saved';
+
+  @override
+  String get statsWeightDeleted => 'Weight entry deleted';
+
+  @override
+  String get statsWeightFailed => 'Could not change weight';
+
+  @override
+  String get statsGoalWithin => 'In goal';
+
+  @override
+  String get statsGoalBelow => 'Below';
+
+  @override
+  String get statsGoalAbove => 'Above';
+
+  @override
+  String get statsNoEntry => 'No entry';
+
+  @override
+  String statsWeightChange(String change) {
+    return '$change kg in this period';
+  }
+
+  @override
+  String statsWeightLastDate(String date) {
+    return 'Last: $date';
+  }
+
+  @override
+  String statsWindow(String start, String end) {
+    return 'Shown: $start – $end';
+  }
+
+  @override
+  String statsAveragePortion(String amount, String unit) {
+    return '~$amount $unit';
+  }
+
+  @override
+  String statsPercentOfTrackedDays(String percent) {
+    return '$percent% of logged days';
+  }
+
+  @override
+  String get statsBucketAverage => 'Average on logged days';
+
+  @override
   String get statisticsPrototypeMessage =>
       'Nutrition and weight trends will appear here.';
 
@@ -717,6 +901,12 @@ class AppLocalizationsEn extends AppLocalizations {
   ) {
     return '$calories kcal · P $protein · F $fat · C $carbs';
   }
+
+  @override
+  String get settingsGoalsNotSet => 'No goals set';
+
+  @override
+  String get settingsWeightNotSet => 'No weight recorded yet';
 
   @override
   String get settingsWeight => 'Weight';

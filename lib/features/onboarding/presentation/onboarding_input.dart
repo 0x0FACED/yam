@@ -16,7 +16,7 @@ class OnboardingInput {
        fatTarget = _parseInteger(fat, allowZero: true),
        carbsTarget = _parseInteger(carbs, allowZero: true);
 
-  final WeightGoal goal;
+  final WeightGoal? goal;
   final double? currentWeightKg;
   final double? targetWeightKg;
   final int? calorieTarget;
@@ -43,9 +43,9 @@ class OnboardingInput {
       validWeight ? targetWeightKg! - currentWeightKg! : null;
 
   SessionProfile? get profile {
-    if (!validWeight || !validNutrition) return null;
+    if (goal == null || !validWeight || !validNutrition) return null;
     return SessionProfile(
-      goal: goal,
+      goal: goal!,
       currentWeightKg: currentWeightKg!,
       targetWeightKg: targetWeightKg!,
       calorieTarget: calorieTarget!,

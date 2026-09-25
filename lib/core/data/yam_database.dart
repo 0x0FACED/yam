@@ -92,8 +92,57 @@ class DiaryEntries extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+@DataClassName('StoredGoalVersion')
+@TableIndex(
+  name: 'goal_versions_day',
+  columns: {#effectiveDay, #deletedAt, #createdAt},
+)
+class GoalVersions extends Table {
+  TextColumn get id => text()();
+  TextColumn get effectiveDay => text()();
+  TextColumn get goal => text()();
+  IntColumn get calorieTarget => integer()();
+  IntColumn get proteinTarget => integer()();
+  IntColumn get fatTarget => integer()();
+  IntColumn get carbsTarget => integer()();
+  RealColumn get targetWeightKg => real()();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+  DateTimeColumn get deletedAt => dateTime().nullable()();
+  TextColumn get deviceId => text()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+@DataClassName('StoredWeightEntry')
+@TableIndex(
+  name: 'weight_entries_day',
+  columns: {#localDay, #deletedAt, #createdAt},
+)
+class WeightEntries extends Table {
+  TextColumn get id => text()();
+  TextColumn get localDay => text()();
+  RealColumn get weightKg => real()();
+  TextColumn get source => text()();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+  DateTimeColumn get deletedAt => dateTime().nullable()();
+  TextColumn get deviceId => text()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
 @DriftDatabase(
-  tables: [UserFoods, UserServings, InstallationValues, DiaryEntries],
+  tables: [
+    UserFoods,
+    UserServings,
+    InstallationValues,
+    DiaryEntries,
+    GoalVersions,
+    WeightEntries,
+  ],
 )
 class YamDatabase extends _$YamDatabase {
   YamDatabase(super.executor);
@@ -102,7 +151,7 @@ class YamDatabase extends _$YamDatabase {
     : super(LazyDatabase(() async => driftDatabase(name: 'yam')));
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -117,6 +166,18 @@ class YamDatabase extends _$YamDatabase {
         await customStatement(
           'CREATE INDEX diary_entries_recent ON diary_entries '
           '(deleted_at, created_at)',
+        );
+      }
+      if (from < 3) {
+        await migrator.createTable(goalVersions);
+        await migrator.createTable(weightEntries);
+        await customStatement(
+          'CREATE INDEX goal_versions_day ON goal_versions '
+          '(effective_day, deleted_at, created_at)',
+        );
+        await customStatement(
+          'CREATE INDEX weight_entries_day ON weight_entries '
+          '(local_day, deleted_at, created_at)',
         );
       }
     },

@@ -23,6 +23,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get onboardingGoalTitle => 'Что хочешь изменить?';
 
   @override
+  String get onboardingGoalRequired => 'Выберите цель';
+
+  @override
+  String get onboardingSaveFailed => 'Не удалось сохранить цели и вес';
+
+  @override
   String get onboardingGoalDescription =>
       'Это определит баланс калорий и макронутриентов на каждый день';
 
@@ -151,6 +157,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get diaryConsumed => 'Съедено';
+
+  @override
+  String get diaryGoalNotSet => 'Цель пока не задана';
 
   @override
   String diaryCalorieGoalSuffix(String target) {
@@ -701,6 +710,181 @@ class AppLocalizationsRu extends AppLocalizations {
   String get statisticsTitle => 'Статистика';
 
   @override
+  String get statsPeriod7 => '7Д';
+
+  @override
+  String get statsPeriod30 => '30Д';
+
+  @override
+  String get statsPeriod90 => '3М';
+
+  @override
+  String get statsPeriod365 => '1Г';
+
+  @override
+  String get statsPeriodAll => 'Всё';
+
+  @override
+  String get statsNoData => 'Нет записей';
+
+  @override
+  String get statsLoading => 'Загружаем статистику';
+
+  @override
+  String statsCurrentGoal(String value) {
+    return 'Текущая цель: $value';
+  }
+
+  @override
+  String get statsWeight => 'Вес';
+
+  @override
+  String get statsAverageCalories => 'Средние калории';
+
+  @override
+  String get statsAverageProtein => 'Средний белок';
+
+  @override
+  String get statsDaysInGoal => 'Дни в цели';
+
+  @override
+  String get statsWeightChart => 'Вес тела';
+
+  @override
+  String get statsCaloriesChart => 'Калории';
+
+  @override
+  String get statsAverageMacros => 'Среднее БЖУ';
+
+  @override
+  String get statsRegularity => 'Регулярность';
+
+  @override
+  String get statsFrequentFoods => 'Часто в рационе';
+
+  @override
+  String statsGoal(String value) {
+    return 'Цель: $value';
+  }
+
+  @override
+  String get statsDailyAverage => 'ккал/день';
+
+  @override
+  String get statsGramsPerDay => 'г/день';
+
+  @override
+  String statsPercentOfGoal(String percent) {
+    return '$percent% от цели';
+  }
+
+  @override
+  String statsInGoalCount(String within, String total) {
+    return '$within / $total';
+  }
+
+  @override
+  String statsLoggedDays(String days) {
+    return 'Дней с едой: $days';
+  }
+
+  @override
+  String statsDaysWithFood(String days) {
+    return 'Дней: $days';
+  }
+
+  @override
+  String get statsNoWeight => 'Пока нет измерений веса';
+
+  @override
+  String get statsNoWeightInPeriod => 'В этом периоде нет измерений веса';
+
+  @override
+  String get statsNoWeightHint => 'Запишите вес, чтобы увидеть его изменение.';
+
+  @override
+  String get statsNoNutrition => 'Пока нет записей питания за этот период';
+
+  @override
+  String get statsNoGoal => 'Цель не задана';
+
+  @override
+  String get statsNoGoalDays => 'Задайте цель, чтобы видеть регулярность.';
+
+  @override
+  String get statsNoFrequent => 'Здесь появятся продукты из дневника.';
+
+  @override
+  String get statsAddWeight => 'Записать вес';
+
+  @override
+  String get statsEditWeight => 'Изменить взвешивание';
+
+  @override
+  String get statsWeightDate => 'Дата взвешивания';
+
+  @override
+  String get statsSaveWeight => 'Сохранить вес';
+
+  @override
+  String get statsWeightClose => 'Закрыть ввод веса';
+
+  @override
+  String get statsDeleteWeight => 'Удалить взвешивание';
+
+  @override
+  String get statsInvalidWeight => 'Введите вес больше нуля';
+
+  @override
+  String get statsWeightSaved => 'Вес сохранён';
+
+  @override
+  String get statsWeightDeleted => 'Взвешивание удалено';
+
+  @override
+  String get statsWeightFailed => 'Не удалось изменить вес';
+
+  @override
+  String get statsGoalWithin => 'В цели';
+
+  @override
+  String get statsGoalBelow => 'Недобор';
+
+  @override
+  String get statsGoalAbove => 'Превышение';
+
+  @override
+  String get statsNoEntry => 'Нет записи';
+
+  @override
+  String statsWeightChange(String change) {
+    return '$change кг за период';
+  }
+
+  @override
+  String statsWeightLastDate(String date) {
+    return 'Последнее: $date';
+  }
+
+  @override
+  String statsWindow(String start, String end) {
+    return 'Показано: $start — $end';
+  }
+
+  @override
+  String statsAveragePortion(String amount, String unit) {
+    return '~$amount $unit';
+  }
+
+  @override
+  String statsPercentOfTrackedDays(String percent) {
+    return '$percent% дней с едой';
+  }
+
+  @override
+  String get statsBucketAverage => 'Среднее за дни с записями';
+
+  @override
   String get statisticsPrototypeMessage =>
       'Здесь появятся тренды питания и веса.';
 
@@ -725,6 +909,12 @@ class AppLocalizationsRu extends AppLocalizations {
   ) {
     return '$calories ккал · Б $protein · Ж $fat · У $carbs';
   }
+
+  @override
+  String get settingsGoalsNotSet => 'Цели не заданы';
+
+  @override
+  String get settingsWeightNotSet => 'Вес пока не записан';
 
   @override
   String get settingsWeight => 'Вес';

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:yam/app/session/session_profile.dart';
@@ -16,12 +18,14 @@ import 'package:yam/l10n/generated/app_localizations.dart';
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({
     required this.initialProfile,
+    this.initialWeightKg,
     required this.onCompleted,
     super.key,
   });
 
-  final SessionProfile initialProfile;
-  final ValueChanged<SessionProfile> onCompleted;
+  final SessionProfile? initialProfile;
+  final double? initialWeightKg;
+  final FutureOr<void> Function(SessionProfile) onCompleted;
 
   @override
   State<OnboardingScreen> createState() => _OnboardingScreenState();
@@ -35,29 +39,38 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   late final TextEditingController _protein;
   late final TextEditingController _fat;
   late final TextEditingController _carbs;
-  late WeightGoal _goal;
+  WeightGoal? _goal;
   late OnboardingInput _input;
   int _step = 0;
   bool _weightErrors = false;
   bool _nutritionErrors = false;
   bool _transitioning = false;
   bool _localizedWeights = false;
+  bool _goalError = false;
+  bool _saving = false;
+  String? _saveError;
 
   @override
   void initState() {
     super.initState();
     final profile = widget.initialProfile;
-    _goal = profile.goal;
+    _goal = profile?.goal;
     _currentWeight = TextEditingController(
-      text: _weightText(profile.currentWeightKg),
+      text: profile?.currentWeightKg != null || widget.initialWeightKg != null
+          ? _weightText(profile?.currentWeightKg ?? widget.initialWeightKg!)
+          : '',
     );
     _targetWeight = TextEditingController(
-      text: _weightText(profile.targetWeightKg),
+      text: profile == null ? '' : _weightText(profile.targetWeightKg),
     );
-    _calories = TextEditingController(text: '${profile.calorieTarget}');
-    _protein = TextEditingController(text: '${profile.proteinTarget}');
-    _fat = TextEditingController(text: '${profile.fatTarget}');
-    _carbs = TextEditingController(text: '${profile.carbsTarget}');
+    _calories = TextEditingController(
+      text: profile?.calorieTarget.toString() ?? '',
+    );
+    _protein = TextEditingController(
+      text: profile?.proteinTarget.toString() ?? '',
+    );
+    _fat = TextEditingController(text: profile?.fatTarget.toString() ?? '');
+    _carbs = TextEditingController(text: profile?.carbsTarget.toString() ?? '');
     _refreshInput();
   }
 
@@ -131,9 +144,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     _transitioning = false;
   }
 
-  void _continue() {
-    if (_transitioning) return;
+  Future<void> _continue() async {
+    if (_transitioning || _saving) return;
     if (_step == 0) {
+      if (_goal == null) {
+        setState(() => _goalError = true);
+        return;
+      }
       _goToStep(1);
       return;
     }
@@ -152,7 +169,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final profile = _input.profile;
     if (profile != null) {
       FocusManager.instance.primaryFocus?.unfocus();
-      widget.onCompleted(profile);
+      setState(() {
+        _saving = true;
+        _saveError = null;
+      });
+      try {
+        await widget.onCompleted(profile);
+      } on Object {
+        if (mounted) {
+          setState(
+            () =>
+                _saveError = AppLocalizations.of(context).onboardingSaveFailed,
+          );
+        }
+      } finally {
+        if (mounted) setState(() => _saving = false);
+      }
     }
   }
 
@@ -226,15 +258,30 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       AppSpacing.md,
                       AppSpacing.lg,
                     ),
-                    child: YamPrimaryButton(
-                      label: _step == 2
-                          ? l10n.onboardingStart
-                          : l10n.onboardingContinue,
-                      trailingIcon: _step == 2
-                          ? null
-                          : Icons.arrow_forward_rounded,
-                      expanded: true,
-                      onPressed: _continue,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (_saveError != null)
+                          Text(
+                            _saveError!,
+                            style: AppTypography.caption.copyWith(
+                              color: Theme.of(context).colorScheme.error,
+                            ),
+                          ),
+                        YamPrimaryButton(
+                          label: _step == 2
+                              ? (_saving
+                                    ? l10n.createProductSaving
+                                    : l10n.onboardingStart)
+                              : l10n.onboardingContinue,
+                          trailingIcon: _step == 2
+                              ? null
+                              : Icons.arrow_forward_rounded,
+                          expanded: true,
+                          onPressed: _saving ? null : _continue,
+                          loading: _saving,
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -287,6 +334,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget _buildGoalChoices(AppLocalizations l10n) {
     return Column(
       children: [
+        if (_goalError) ...[
+          Text(
+            l10n.onboardingGoalRequired,
+            style: AppTypography.caption.copyWith(
+              color: Theme.of(context).colorScheme.error,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+        ],
         for (final goal in WeightGoal.values) ...[
           if (goal != WeightGoal.lose) const SizedBox(height: AppSpacing.md),
           YamChoiceCard(
@@ -309,6 +365,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             selected: _goal == goal,
             onPressed: () => setState(() {
               _goal = goal;
+              _goalError = false;
               _refreshInput();
             }),
           ),

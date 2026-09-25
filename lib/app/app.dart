@@ -9,9 +9,12 @@ import 'package:yam/app/theme/app_theme.dart';
 import 'package:yam/core/data/yam_database.dart';
 import 'package:yam/core/ui/motion/yam_entrance_reveal.dart';
 import 'package:yam/features/diary/data/diary_repository.dart';
+import 'package:yam/features/diary/domain/diary_entry.dart';
 import 'package:yam/features/startup/presentation/startup_artwork.dart';
 import 'package:yam/features/startup/presentation/startup_screen.dart';
 import 'package:yam/features/food_search/data/user_food_repository.dart';
+import 'package:yam/features/statistics/data/statistics_repository.dart';
+import 'package:yam/features/statistics/domain/statistics_models.dart';
 import 'package:yam/l10n/generated/app_localizations.dart';
 
 class YamApp extends StatefulWidget {
@@ -27,9 +30,15 @@ class _YamAppState extends State<YamApp> {
   late final GoRouter _router;
   late final ValueNotifier<ThemeMode> _themeMode;
   late final ValueNotifier<SessionProfile?> _profile;
+  late final ValueNotifier<double?> _currentWeight;
   late final YamDatabase _foodDatabase;
   late final UserFoodRepository _userFoods;
   late final DiaryRepository _diary;
+  late final StatisticsRepository _statistics;
+  StreamSubscription<List<GoalVersion>>? _goalsSubscription;
+  StreamSubscription<List<WeightRecord>>? _weightsSubscription;
+  List<GoalVersion> _goals = const [];
+  List<WeightRecord> _weights = const [];
   bool _startupComplete = false;
   int _entranceEpoch = 0;
 
@@ -38,25 +47,40 @@ class _YamAppState extends State<YamApp> {
     super.initState();
     _themeMode = ValueNotifier(ThemeMode.system);
     _profile = ValueNotifier<SessionProfile?>(null);
+    _currentWeight = ValueNotifier<double?>(null);
     _foodDatabase = YamDatabase.open();
     _userFoods = UserFoodRepository(_foodDatabase);
     _diary = DiaryRepository(_foodDatabase);
+    _statistics = StatisticsRepository(_foodDatabase);
+    _goalsSubscription = _statistics.watchGoals().listen((goals) {
+      _goals = goals;
+      _refreshProfile();
+    });
+    _weightsSubscription = _statistics.watchWeights().listen((weights) {
+      _weights = weights;
+      _refreshProfile();
+    });
     _router = createAppRouter(
       themeModeListenable: _themeMode,
       onThemeModeChanged: (mode) => _themeMode.value = mode,
       profileListenable: _profile,
+      weightListenable: _currentWeight,
       onProfileChanged: _saveProfile,
       userFoodRepository: _userFoods,
       diaryRepository: _diary,
+      statisticsRepository: _statistics,
     );
   }
 
   @override
   void dispose() {
     _router.dispose();
+    _goalsSubscription?.cancel();
+    _weightsSubscription?.cancel();
     unawaited(_foodDatabase.close());
     _themeMode.dispose();
     _profile.dispose();
+    _currentWeight.dispose();
     widget.startupArtwork?.dispose();
     super.dispose();
   }
@@ -105,8 +129,37 @@ class _YamAppState extends State<YamApp> {
     }
   }
 
-  void _saveProfile(SessionProfile profile) {
+  Future<void> _saveProfile(SessionProfile profile) async {
+    await _statistics.saveOnboarding(profile, DateTime.now());
+    if (!mounted) return;
     _profile.value = profile;
     if (mounted) setState(() => _entranceEpoch++);
+  }
+
+  void _refreshProfile() {
+    if (!mounted) return;
+    final today = diaryDayKey(DateTime.now());
+    final applicable = [
+      for (final goal in _goals)
+        if (diaryDayKey(goal.day).compareTo(today) <= 0) goal,
+    ];
+    final latest = applicable.isEmpty ? null : applicable.last;
+    final weights = [
+      for (final weight in _weights)
+        if (diaryDayKey(weight.day).compareTo(today) <= 0) weight,
+    ];
+    final currentKg = weights.isEmpty ? null : weights.last.kg;
+    _currentWeight.value = currentKg;
+    _profile.value = latest == null
+        ? null
+        : SessionProfile(
+            goal: latest.goal,
+            currentWeightKg: currentKg,
+            targetWeightKg: latest.targetWeightKg,
+            calorieTarget: latest.calorieTarget,
+            proteinTarget: latest.proteinTarget,
+            fatTarget: latest.fatTarget,
+            carbsTarget: latest.carbsTarget,
+          );
   }
 }

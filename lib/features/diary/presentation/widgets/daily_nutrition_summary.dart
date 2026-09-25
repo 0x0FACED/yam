@@ -21,14 +21,13 @@ class DailyNutritionSummary extends StatelessWidget {
     final locale = Localizations.localeOf(context).toLanguageTag();
     final numbers = NumberFormat.decimalPattern(locale);
     final consumed = numbers.format(day.consumedCalories);
-    final target = numbers.format(day.calorieTarget);
-    final difference = day.calorieTarget - day.consumedCalories;
-    final differenceLabel = difference >= 0
+    final target = day.calorieTarget;
+    final difference = target == null ? null : target - day.consumedCalories;
+    final differenceLabel = difference == null
+        ? l10n.diaryGoalNotSet
+        : difference >= 0
         ? l10n.diaryCaloriesRemaining(numbers.format(difference))
         : l10n.diaryCaloriesOverTarget(numbers.format(-difference));
-    final progress = day.calorieTarget == 0
-        ? 0.0
-        : day.consumedCalories / day.calorieTarget;
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
@@ -54,13 +53,15 @@ class DailyNutritionSummary extends StatelessWidget {
                   text: consumed,
                   style: AppTypography.prominentMetric.copyWith(fontSize: 24),
                 ),
-                TextSpan(
-                  text: ' ${l10n.diaryCalorieGoalSuffix(target)}',
-                  style: AppTypography.productTitle.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                    fontFeatures: AppTypography.tabularFigures,
+                if (target != null)
+                  TextSpan(
+                    text:
+                        ' ${l10n.diaryCalorieGoalSuffix(numbers.format(target))}',
+                    style: AppTypography.productTitle.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                      fontFeatures: AppTypography.tabularFigures,
+                    ),
                   ),
-                ),
               ],
             ),
           ),
@@ -68,7 +69,9 @@ class DailyNutritionSummary extends StatelessWidget {
           Text(
             differenceLabel,
             style: AppTypography.label.copyWith(
-              color: difference >= 0
+              color: difference == null
+                  ? theme.colorScheme.onSurfaceVariant
+                  : difference >= 0
                   ? theme.colorScheme.primary
                   : semanticColors.warning,
               fontWeight: FontWeight.w700,
@@ -76,13 +79,15 @@ class DailyNutritionSummary extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
-          YamProgressBar(
-            height: 8,
-            value: progress,
-            color: theme.colorScheme.primary,
-            trackColor: theme.colorScheme.surfaceContainer,
-            semanticValue: '$consumed ${l10n.diaryCalorieGoalSuffix(target)}',
-          ),
+          if (target != null)
+            YamProgressBar(
+              height: 8,
+              value: target == 0 ? 0 : day.consumedCalories / target,
+              color: theme.colorScheme.primary,
+              trackColor: theme.colorScheme.surfaceContainer,
+              semanticValue:
+                  '$consumed ${l10n.diaryCalorieGoalSuffix(numbers.format(target))}',
+            ),
           const SizedBox(height: AppSpacing.sm),
           LayoutBuilder(
             builder: (context, constraints) {
@@ -148,7 +153,7 @@ class _MacroProgress extends StatelessWidget {
 
   final String label;
   final int consumed;
-  final int target;
+  final int? target;
   final Color color;
 
   @override
@@ -157,11 +162,13 @@ class _MacroProgress extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final locale = Localizations.localeOf(context).toLanguageTag();
     final numbers = NumberFormat.decimalPattern(locale);
-    final value = target == 0 ? 0.0 : consumed / target;
-    final progressLabel = l10n.macroGramsProgress(
-      numbers.format(consumed),
-      numbers.format(target),
-    );
+    final value = target == null || target == 0 ? 0.0 : consumed / target!;
+    final progressLabel = target == null
+        ? '${numbers.format(consumed)} ${l10n.unitGrams}'
+        : l10n.macroGramsProgress(
+            numbers.format(consumed),
+            numbers.format(target),
+          );
 
     return Semantics(
       container: true,
@@ -187,14 +194,16 @@ class _MacroProgress extends StatelessWidget {
                 fontFeatures: AppTypography.tabularFigures,
               ),
             ),
-            const SizedBox(height: AppSpacing.xs),
-            YamProgressBar(
-              height: 5,
-              value: value,
-              color: color,
-              trackColor: color.withValues(alpha: 0.18),
-              semanticValue: progressLabel,
-            ),
+            if (target != null) ...[
+              const SizedBox(height: AppSpacing.xs),
+              YamProgressBar(
+                height: 5,
+                value: value,
+                color: color,
+                trackColor: color.withValues(alpha: 0.18),
+                semanticValue: progressLabel,
+              ),
+            ],
           ],
         ),
       ),

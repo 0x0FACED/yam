@@ -6,10 +6,10 @@
 ## Обновлено
 
 - Дата: 2026-09-25.
-- Стадия: visual implementation pass; Дневник, Food Search, Add Food sheet и
-  Settings реализованы по approved references.
-- Текущий статус: пользовательские продукты и записи Дневника хранятся в
-  SQLite v2; Дневник пуст при новом запуске и поддерживает edit/delete с Undo.
+- Стадия: local-first MVP; Дневник, Food Search, Add Food, Settings и
+  Statistics доступны в локальном приложении.
+- Текущий статус: продукты, Дневник, цели и вес хранятся в SQLite v3;
+  статистика строится из сохранённой истории без демо-данных.
 
 ## Авторитетные Источники
 
@@ -27,7 +27,7 @@
 - Упрощённый Food Search, реальные recent за текущую сессию и метаданные:
   `docs/adr/0012-food-search-interactions.md`. Он заменяет в текущем прототипе
   контракт one-tap quick add из ADR 0002/0007.
-- Онбординг по кнопке из Настроек, session-значения и motion:
+- Онбординг по кнопке из Настроек и motion до persistence:
   `docs/adr/0013-onboarding-session-and-motion.md`.
 - Неподвижный progress и независимые цели КБЖУ с подсказкой 4/9/4:
   `docs/adr/0014-onboarding-progress-and-macro-goals.md` уточняет ADR 0013.
@@ -42,6 +42,9 @@
 - `docs/adr/0018-persist-and-edit-diary-entries.md`: сохраняемый Дневник без
   демо-записей, точные снимки и edit bottom sheet; завершает in-memory
   ограничения ADR 0007/0012/0015 для записей и Recent.
+- `docs/adr/0019-real-statistics-and-persisted-goals.md`: статистика по реальным
+  данным, вес и версии целей в SQLite; заменяет сессионность и демо-значения
+  онбординга ADR 0013, не меняет session-only тему ADR 0009.
 - Performance-оптимизация до реальной проблемы отложена ADR 0008; обязательных
   profile-бенчмарков и числовых бюджетов у MVP нет.
 
@@ -49,31 +52,27 @@
 
 - Основные разделы: Дневник, Статистика, Настройки.
 - Onboarding: Цель -> Вес -> Цели питания; `/onboarding` — отдельный flow из
-  Настроек без изменения cold-start до появления persisted state.
+  Настроек, не навязывается при старте, первые числовые поля пусты.
 - Goals редактирует только kcal, белки, жиры, углеводы, текущий и целевой вес.
 - Hydration/water и account/profile UI не входят в текущий проход.
 - Barcode scanning не реализуется; в Create Product допустим ручной barcode.
 - Add Food action редактирования nutrition/name не показывается без маршрута.
-- Сохраняются свои продукты, порции, избранное и дневные записи; Recent
-  вычисляется из записей. Встроенный каталог остаётся fixture; remote API,
+- Сохраняются свои продукты, порции, избранное, дневные записи, вес и цели;
+  Recent вычисляется из записей. Builtin-каталог остаётся fixture; remote API,
   sync и account не строятся.
 
 ## Реализованная Основа
 
 - `lib/app/app.dart` запускает локализованный `MaterialApp.router` с System,
-  Light и Dark themes и существующим startup-intro; `SessionProfile` живёт
-  в `ValueNotifier` только до перезапуска, `YamEntranceScope` запускает
-  одноразовое мягкое проявление семантических блоков после интро/онбординга.
+  Light/Dark, startup-intro и `YamEntranceScope`. Профиль/вес загружаются из
+  SQLite в `ValueNotifier` и обновляют Diary/Settings; тема только в памяти.
 - `YamDatabase` в `lib/core/data/yam_database.dart` (Drift/SQLite) создаётся
-  в `YamApp` вместе с `UserFoodRepository` и `DiaryRepository`. Схема v2:
-  user foods, servings, diary entries и installation deviceId. Экспорт v1/v2,
-  сгенерированный schema helper и миграционный тест в `test/features/`;
-  UUID v7, UTC metadata и soft delete у всех сохранённых сущностей.
-- `startup_screen.dart` берёт фон интро из `Theme.scaffoldBackgroundColor`;
-  `startup_artwork.dart` заранее загружает SVG для обеих тем и заменяет только
-  тёмные ink-заливки на `AppColors.darkTextPrimary` в dark-версии. Для fallback
-  SVG используется тот же `ColorMapper`. Это следует ADR 0003; выбор темы
-  по-прежнему session-only по ADR 0009.
+  в `YamApp`; схема v3: продукты/порции, Дневник, `weight_entries`,
+  `goal_versions` и installation deviceId. Экспорты v1/v2/v3, генерация и
+  тесты миграций v1/v2→v3 — в `test/features/`. Persisted user records используют
+  UUID v7, UTC metadata, локальный календарный день и soft delete.
+- Startup использует фон темы и SVG для обеих тем по ADR 0003; тема остаётся
+  session-only по ADR 0009.
 - Нативный launch-фон совпадает с `AppTheme`: Android использует day/night
   `yam_launch_background` (включая Android 12+ splash), iOS — адаптивный
   `LaunchBackground.colorset` в `LaunchScreen.storyboard`.
@@ -108,14 +107,8 @@
   с ползунком (шаг 5 г, диапазон расширяется для введённых вручную значений).
   `YamNumberField` использует более крупную каноническую типографику и
   увеличенную поверхность для веса, ккал и значений БЖУ.
-- `YamRepeatIconButton` в `lib/core/ui/buttons/` делает одно изменение по тапу,
-  затем ускоряет повторение единичных шагов при удержании; прекращает его на
-  отпускании/свайпе/закрытии. `YamSnackBar` теперь подходит и для success без
-  действия: общий overlay presenter в `yam_snack_bar.dart` показывает его и
-  Undo поверх экранов/sheet. Оба пути используют fade-in 220 мс и fade-out
-  180 мс из `AppMotion`, у action-текста остаётся доступный Undo, success без
-  действия не перекрывает нажатия на sheet; при смене уведомления старое
-  заменяется без наложения.
+- `YamRepeatIconButton` ускоряет ±1 при удержании; `YamSnackBar` через общий
+  overlay показывает success и Undo поверх экранов/sheet по `AppMotion`.
 - Shared controls разделяют visual geometry и accessibility geometry: compact
   icon/chip presentation сохраняет touch target не меньше 44 dp; у
   `YamFilterChip` и `YamMealChip` ripple ограничен видимой pill-поверхностью.
@@ -135,8 +128,8 @@
   dates, 44+ dp controls и selection motion. Точка под сегодняшней датой
   сохраняется при выборе другого дня; область маркера зарезервирована у всех
   дат для стабильной высоты selector.
-- `daily_nutrition_summary.dart` показывает kcal, remaining/over-target state и
-  подписанные macro progress indicators в обеих темах.
+- `daily_nutrition_summary.dart` показывает kcal и macro progress при наличии
+  сохранённой цели; без неё нет вымышленной нормы 2200 ккал.
 - `meal_section.dart` форматирует feature-data для shared
   `YamMealSectionHeader` и `YamDiaryFoodRow`; верхний отступ карточки уменьшен,
   видимая контекстная «+» увеличена до 36 dp при 44+ dp hit target, калории
@@ -146,7 +139,7 @@
   нет. Контекстный и общий Add Food сохраняют точные записи через
   `DiaryRepository`; экран поиска остаётся открыт, Undo и подсветка последнего
   добавления работают. Итоги суммируют точные сохранённые нутриенты до
-  округления отображения. Цели по-прежнему из `SessionProfile` текущего запуска.
+  округления отображения. Цели приходят из сохранённой версии профиля.
 - Тап по записи открывает `edit_diary_entry_sheet.dart`: количество и единицы,
   приём пищи через `YamDropdown`, предпросмотр КБЖУ, Save и корзина. Удаление
   soft delete без диалога с Undo; закрытие sheet отменяет несохранённые правки.
@@ -155,14 +148,10 @@
 
 ## Остальной UI
 
-- `lib/features/onboarding/presentation/onboarding_screen.dart` реализует
-  три локализованных шага по эталонам (файлы 1 → 3 → 2). Фиксированная шапка
-  показывает единую плашку «Шаг X из 3» и плавно заполняющиеся сегменты;
-  перелистывается только контент. Back/Close остаются в одном слоте. Исходные
-  значения из HTML примеров, повторное открытие подставляет сессию; отмена не
-  сохраняет ввод. Ккал и БЖУ независимы: `onboarding_input.dart` вычисляет
-  только информативную энергию 4/9/4 и разницу с целью (демо +35 ккал), скрывая
-  подсказку при невалидном вводе. Inline-валидация остаётся.
+- `onboarding_screen.dart` сохраняет три локализованных шага с progress/reveal;
+  при первом открытии нет примеров из HTML. Завершение атомарно записывает
+  версию целей и первое/изменённое измерение веса через `StatisticsRepository`;
+  отмена ничего не сохраняет. Ккал и БЖУ независимы, подсказка 4/9/4 остаётся.
 - `lib/features/food_search/presentation/food_search_screen.dart` содержит
   compact search header, contextual meal selector, create action и три вкладки:
   Недавние (по умолчанию), Мои блюда и Избранное. Вход не открывает клавиатуру;
@@ -207,7 +196,7 @@
 - Удержание строки в «Моих блюдах» открывает локализованный диалог; подтверждение
   в `user_food_repository.dart` атомарно ставит `deletedAt` продукту и порциям,
   освобождает штрихкод и исключает продукт из поиска/избранного. Снимки
-  записей Дневника не изменяются. Схема БД теперь v2; тестовые старые ккал
+  записей Дневника не изменяются. Схема БД теперь v3; тестовые старые ккал
   специально не пересчитываются (ADR 0017, до релиза 1.0.0).
 - Общий entry point по-прежнему требует meal, meal-specific entry сохраняет
   preselection; пересчёт нутриентов и Undo сохранены по ADR 0007/0012/0015.
@@ -217,33 +206,38 @@
   About/version. Theme picker реально переключает System/Light/Dark на время
   текущего запуска через app-level `ValueNotifier<ThemeMode>` по ADR 0009.
 - В Goals-секции Settings есть действие «Пройти онбординг»; завершение
-  возвращает сюда и сразу обновляет summary веса и целей. Введённые цели
-  одновременно отражаются в Diary.
+  возвращает сюда и сразу обновляет сохранённые вес и цели в Settings/Diary;
+  при отсутствии данных показаны честные пустые подписи.
 - Units/language/goals/data rows не имитируют persistence или отсутствующие
   маршруты; export/delete явно помечены недоступными. Group surfaces, row
   density и 56 dp header выровнены по screen reference без тяжёлых outlines.
 - `YamSettingsRow` растягивает trailing-область до правого края; values больше
   не остаются около центра при коротком тексте.
-- Statistics пока остаётся route placeholder.
+- `lib/features/statistics/` показывает статистику 7/30/90/365 дней и «Всё»
+  по агрегированным `diary_entries`, `weight_entries`, `goal_versions`.
+  `StatisticsRepository` наблюдает локальные потоки, `statistics_models.dart`
+  вычисляет средние только за дни с едой и регулярность ±10% по цели на дату.
+  Карточки, CustomPainter-графики, БЖУ и heatmap используют Flutter tokens;
+  ввод/правка веса с датой и Undo — в `weight_entry_sheet.dart`. Пустые данные
+  не подменяются графиками. Тема, единицы/язык — по-прежнему session/system.
 - Отдельный Goals editor ещё не реализован.
 
 ## Проверка
 
 - `dart run build_runner build --delete-conflicting-outputs`, `flutter gen-l10n`,
-  `dart format`, `flutter analyze`, `git diff --check` — успешно. С разрешения
-  пользователя запущены только 5 прицельных файлов тестов (11 тестов):
-  миграция v1→v2 с продуктом, повторное открытие Дневника, edit/delete/Undo,
-  точность и прежний food repository — все прошли. UI-тесты не запускались;
-  визуальное поведение проверяется вручную.
+  `dart format`, `flutter analyze`, `git diff --check` — успешно. Четыре
+  прицельных файла (8 тестов) проверили миграции v1/v2→v3, реальные агрегаты,
+  сохранение целей/веса и прежний food repository; всё прошло. UI-тесты
+  не запускались по просьбе пользователя, визуальное поведение он проверяет сам.
 
 ## Следующее Действие
 
-- Вручную проверить добавление, редактирование и Undo записи после перезапуска
-  в обеих темах, включая крупный текст и выбор другого приёма пищи.
+- Вручную проверить статистику и sheet веса после записи питания/целей и
+  перезапуска: периоды, состояния пусто/с целью, светлую и тёмную темы.
 
 ## Блокеры
 
-- Тема, цели, вес и избранное builtin fixture по-прежнему живут в памяти.
+- Тема и избранное builtin fixture по-прежнему живут в памяти.
   Текущий Flutter SDK требует pinned Drift 2.31 / drift_flutter 0.2.4;
-  iOS сборка на Linux и ручная UI-проверка edit sheet не проводились.
-  Старые Diary/Food Search goldens не соответствуют обновлённым экранам.
+  iOS сборка на Linux и ручная UI-проверка статистики не проводились.
+  Старые Diary/Food Search/Settings goldens требуют пересъёмки после изменений.

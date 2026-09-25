@@ -13,10 +13,10 @@ class DiaryPrototypeDay {
     required this.meals,
   });
 
-  final int calorieTarget;
-  final int proteinTarget;
-  final int fatTarget;
-  final int carbsTarget;
+  final int? calorieTarget;
+  final int? proteinTarget;
+  final int? fatTarget;
+  final int? carbsTarget;
   final List<DiaryPrototypeMeal> meals;
 
   int get consumedCalories => meals
@@ -91,10 +91,10 @@ DiaryPrototypeDay buildDiaryPrototypeDay(
   Map<String, List<DiaryPrototypeEntry>> entriesByMeal = const {},
   SessionProfile? profile,
 }) => DiaryPrototypeDay(
-  calorieTarget: profile?.calorieTarget ?? 2200,
-  proteinTarget: profile?.proteinTarget ?? 160,
-  fatTarget: profile?.fatTarget ?? 75,
-  carbsTarget: profile?.carbsTarget ?? 230,
+  calorieTarget: profile?.calorieTarget,
+  proteinTarget: profile?.proteinTarget,
+  fatTarget: profile?.fatTarget,
+  carbsTarget: profile?.carbsTarget,
   meals: [
     DiaryPrototypeMeal(
       id: 'breakfast',

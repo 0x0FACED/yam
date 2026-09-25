@@ -122,6 +122,18 @@ abstract class AppLocalizations {
   /// **'What would you like to change?'**
   String get onboardingGoalTitle;
 
+  /// No description provided for @onboardingGoalRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a goal'**
+  String get onboardingGoalRequired;
+
+  /// No description provided for @onboardingSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save goals and weight'**
+  String get onboardingSaveFailed;
+
   /// No description provided for @onboardingGoalDescription.
   ///
   /// In en, this message translates to:
@@ -361,6 +373,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Consumed'**
   String get diaryConsumed;
+
+  /// No description provided for @diaryGoalNotSet.
+  ///
+  /// In en, this message translates to:
+  /// **'No goal set yet'**
+  String get diaryGoalNotSet;
 
   /// No description provided for @diaryCalorieGoalSuffix.
   ///
@@ -1274,6 +1292,312 @@ abstract class AppLocalizations {
   /// **'Statistics'**
   String get statisticsTitle;
 
+  /// No description provided for @statsPeriod7.
+  ///
+  /// In en, this message translates to:
+  /// **'7D'**
+  String get statsPeriod7;
+
+  /// No description provided for @statsPeriod30.
+  ///
+  /// In en, this message translates to:
+  /// **'30D'**
+  String get statsPeriod30;
+
+  /// No description provided for @statsPeriod90.
+  ///
+  /// In en, this message translates to:
+  /// **'3M'**
+  String get statsPeriod90;
+
+  /// No description provided for @statsPeriod365.
+  ///
+  /// In en, this message translates to:
+  /// **'1Y'**
+  String get statsPeriod365;
+
+  /// No description provided for @statsPeriodAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get statsPeriodAll;
+
+  /// No description provided for @statsNoData.
+  ///
+  /// In en, this message translates to:
+  /// **'No entries yet'**
+  String get statsNoData;
+
+  /// No description provided for @statsLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading statistics'**
+  String get statsLoading;
+
+  /// No description provided for @statsCurrentGoal.
+  ///
+  /// In en, this message translates to:
+  /// **'Current goal: {value}'**
+  String statsCurrentGoal(String value);
+
+  /// No description provided for @statsWeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight'**
+  String get statsWeight;
+
+  /// No description provided for @statsAverageCalories.
+  ///
+  /// In en, this message translates to:
+  /// **'Average calories'**
+  String get statsAverageCalories;
+
+  /// No description provided for @statsAverageProtein.
+  ///
+  /// In en, this message translates to:
+  /// **'Average protein'**
+  String get statsAverageProtein;
+
+  /// No description provided for @statsDaysInGoal.
+  ///
+  /// In en, this message translates to:
+  /// **'Days in goal'**
+  String get statsDaysInGoal;
+
+  /// No description provided for @statsWeightChart.
+  ///
+  /// In en, this message translates to:
+  /// **'Body weight'**
+  String get statsWeightChart;
+
+  /// No description provided for @statsCaloriesChart.
+  ///
+  /// In en, this message translates to:
+  /// **'Calories'**
+  String get statsCaloriesChart;
+
+  /// No description provided for @statsAverageMacros.
+  ///
+  /// In en, this message translates to:
+  /// **'Average macros'**
+  String get statsAverageMacros;
+
+  /// No description provided for @statsRegularity.
+  ///
+  /// In en, this message translates to:
+  /// **'Regularity'**
+  String get statsRegularity;
+
+  /// No description provided for @statsFrequentFoods.
+  ///
+  /// In en, this message translates to:
+  /// **'Often eaten'**
+  String get statsFrequentFoods;
+
+  /// No description provided for @statsGoal.
+  ///
+  /// In en, this message translates to:
+  /// **'Goal: {value}'**
+  String statsGoal(String value);
+
+  /// No description provided for @statsDailyAverage.
+  ///
+  /// In en, this message translates to:
+  /// **'kcal/day'**
+  String get statsDailyAverage;
+
+  /// No description provided for @statsGramsPerDay.
+  ///
+  /// In en, this message translates to:
+  /// **'g/day'**
+  String get statsGramsPerDay;
+
+  /// No description provided for @statsPercentOfGoal.
+  ///
+  /// In en, this message translates to:
+  /// **'{percent}% of goal'**
+  String statsPercentOfGoal(String percent);
+
+  /// No description provided for @statsInGoalCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{within} / {total}'**
+  String statsInGoalCount(String within, String total);
+
+  /// No description provided for @statsLoggedDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Days with food: {days}'**
+  String statsLoggedDays(String days);
+
+  /// No description provided for @statsDaysWithFood.
+  ///
+  /// In en, this message translates to:
+  /// **'Days: {days}'**
+  String statsDaysWithFood(String days);
+
+  /// No description provided for @statsNoWeight.
+  ///
+  /// In en, this message translates to:
+  /// **'No weight measurements yet'**
+  String get statsNoWeight;
+
+  /// No description provided for @statsNoWeightInPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'No weight measurements in this period'**
+  String get statsNoWeightInPeriod;
+
+  /// No description provided for @statsNoWeightHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Log your weight to see its changes.'**
+  String get statsNoWeightHint;
+
+  /// No description provided for @statsNoNutrition.
+  ///
+  /// In en, this message translates to:
+  /// **'No food entries in this period'**
+  String get statsNoNutrition;
+
+  /// No description provided for @statsNoGoal.
+  ///
+  /// In en, this message translates to:
+  /// **'No goal set'**
+  String get statsNoGoal;
+
+  /// No description provided for @statsNoGoalDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Set a goal to track regularity.'**
+  String get statsNoGoalDays;
+
+  /// No description provided for @statsNoFrequent.
+  ///
+  /// In en, this message translates to:
+  /// **'Foods from your diary will appear here.'**
+  String get statsNoFrequent;
+
+  /// No description provided for @statsAddWeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Log weight'**
+  String get statsAddWeight;
+
+  /// No description provided for @statsEditWeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit weight entry'**
+  String get statsEditWeight;
+
+  /// No description provided for @statsWeightDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Measurement date'**
+  String get statsWeightDate;
+
+  /// No description provided for @statsSaveWeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Save weight'**
+  String get statsSaveWeight;
+
+  /// No description provided for @statsWeightClose.
+  ///
+  /// In en, this message translates to:
+  /// **'Close weight entry'**
+  String get statsWeightClose;
+
+  /// No description provided for @statsDeleteWeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete weight entry'**
+  String get statsDeleteWeight;
+
+  /// No description provided for @statsInvalidWeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a weight greater than zero'**
+  String get statsInvalidWeight;
+
+  /// No description provided for @statsWeightSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight saved'**
+  String get statsWeightSaved;
+
+  /// No description provided for @statsWeightDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight entry deleted'**
+  String get statsWeightDeleted;
+
+  /// No description provided for @statsWeightFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not change weight'**
+  String get statsWeightFailed;
+
+  /// No description provided for @statsGoalWithin.
+  ///
+  /// In en, this message translates to:
+  /// **'In goal'**
+  String get statsGoalWithin;
+
+  /// No description provided for @statsGoalBelow.
+  ///
+  /// In en, this message translates to:
+  /// **'Below'**
+  String get statsGoalBelow;
+
+  /// No description provided for @statsGoalAbove.
+  ///
+  /// In en, this message translates to:
+  /// **'Above'**
+  String get statsGoalAbove;
+
+  /// No description provided for @statsNoEntry.
+  ///
+  /// In en, this message translates to:
+  /// **'No entry'**
+  String get statsNoEntry;
+
+  /// No description provided for @statsWeightChange.
+  ///
+  /// In en, this message translates to:
+  /// **'{change} kg in this period'**
+  String statsWeightChange(String change);
+
+  /// No description provided for @statsWeightLastDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Last: {date}'**
+  String statsWeightLastDate(String date);
+
+  /// No description provided for @statsWindow.
+  ///
+  /// In en, this message translates to:
+  /// **'Shown: {start} – {end}'**
+  String statsWindow(String start, String end);
+
+  /// No description provided for @statsAveragePortion.
+  ///
+  /// In en, this message translates to:
+  /// **'~{amount} {unit}'**
+  String statsAveragePortion(String amount, String unit);
+
+  /// No description provided for @statsPercentOfTrackedDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{percent}% of logged days'**
+  String statsPercentOfTrackedDays(String percent);
+
+  /// No description provided for @statsBucketAverage.
+  ///
+  /// In en, this message translates to:
+  /// **'Average on logged days'**
+  String get statsBucketAverage;
+
   /// No description provided for @statisticsPrototypeMessage.
   ///
   /// In en, this message translates to:
@@ -1314,6 +1638,18 @@ abstract class AppLocalizations {
     String fat,
     String carbs,
   );
+
+  /// No description provided for @settingsGoalsNotSet.
+  ///
+  /// In en, this message translates to:
+  /// **'No goals set'**
+  String get settingsGoalsNotSet;
+
+  /// No description provided for @settingsWeightNotSet.
+  ///
+  /// In en, this message translates to:
+  /// **'No weight recorded yet'**
+  String get settingsWeightNotSet;
 
   /// No description provided for @settingsWeight.
   ///

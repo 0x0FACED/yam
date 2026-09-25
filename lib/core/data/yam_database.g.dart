@@ -3091,6 +3091,1247 @@ class DiaryEntriesCompanion extends UpdateCompanion<StoredDiaryEntry> {
   }
 }
 
+class $GoalVersionsTable extends GoalVersions
+    with TableInfo<$GoalVersionsTable, StoredGoalVersion> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $GoalVersionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _effectiveDayMeta = const VerificationMeta(
+    'effectiveDay',
+  );
+  @override
+  late final GeneratedColumn<String> effectiveDay = GeneratedColumn<String>(
+    'effective_day',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _goalMeta = const VerificationMeta('goal');
+  @override
+  late final GeneratedColumn<String> goal = GeneratedColumn<String>(
+    'goal',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _calorieTargetMeta = const VerificationMeta(
+    'calorieTarget',
+  );
+  @override
+  late final GeneratedColumn<int> calorieTarget = GeneratedColumn<int>(
+    'calorie_target',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _proteinTargetMeta = const VerificationMeta(
+    'proteinTarget',
+  );
+  @override
+  late final GeneratedColumn<int> proteinTarget = GeneratedColumn<int>(
+    'protein_target',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _fatTargetMeta = const VerificationMeta(
+    'fatTarget',
+  );
+  @override
+  late final GeneratedColumn<int> fatTarget = GeneratedColumn<int>(
+    'fat_target',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _carbsTargetMeta = const VerificationMeta(
+    'carbsTarget',
+  );
+  @override
+  late final GeneratedColumn<int> carbsTarget = GeneratedColumn<int>(
+    'carbs_target',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _targetWeightKgMeta = const VerificationMeta(
+    'targetWeightKg',
+  );
+  @override
+  late final GeneratedColumn<double> targetWeightKg = GeneratedColumn<double>(
+    'target_weight_kg',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _deviceIdMeta = const VerificationMeta(
+    'deviceId',
+  );
+  @override
+  late final GeneratedColumn<String> deviceId = GeneratedColumn<String>(
+    'device_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    effectiveDay,
+    goal,
+    calorieTarget,
+    proteinTarget,
+    fatTarget,
+    carbsTarget,
+    targetWeightKg,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    deviceId,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'goal_versions';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<StoredGoalVersion> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('effective_day')) {
+      context.handle(
+        _effectiveDayMeta,
+        effectiveDay.isAcceptableOrUnknown(
+          data['effective_day']!,
+          _effectiveDayMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_effectiveDayMeta);
+    }
+    if (data.containsKey('goal')) {
+      context.handle(
+        _goalMeta,
+        goal.isAcceptableOrUnknown(data['goal']!, _goalMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_goalMeta);
+    }
+    if (data.containsKey('calorie_target')) {
+      context.handle(
+        _calorieTargetMeta,
+        calorieTarget.isAcceptableOrUnknown(
+          data['calorie_target']!,
+          _calorieTargetMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_calorieTargetMeta);
+    }
+    if (data.containsKey('protein_target')) {
+      context.handle(
+        _proteinTargetMeta,
+        proteinTarget.isAcceptableOrUnknown(
+          data['protein_target']!,
+          _proteinTargetMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_proteinTargetMeta);
+    }
+    if (data.containsKey('fat_target')) {
+      context.handle(
+        _fatTargetMeta,
+        fatTarget.isAcceptableOrUnknown(data['fat_target']!, _fatTargetMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_fatTargetMeta);
+    }
+    if (data.containsKey('carbs_target')) {
+      context.handle(
+        _carbsTargetMeta,
+        carbsTarget.isAcceptableOrUnknown(
+          data['carbs_target']!,
+          _carbsTargetMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_carbsTargetMeta);
+    }
+    if (data.containsKey('target_weight_kg')) {
+      context.handle(
+        _targetWeightKgMeta,
+        targetWeightKg.isAcceptableOrUnknown(
+          data['target_weight_kg']!,
+          _targetWeightKgMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_targetWeightKgMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    if (data.containsKey('device_id')) {
+      context.handle(
+        _deviceIdMeta,
+        deviceId.isAcceptableOrUnknown(data['device_id']!, _deviceIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_deviceIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  StoredGoalVersion map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return StoredGoalVersion(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      effectiveDay: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}effective_day'],
+      )!,
+      goal: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}goal'],
+      )!,
+      calorieTarget: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}calorie_target'],
+      )!,
+      proteinTarget: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}protein_target'],
+      )!,
+      fatTarget: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}fat_target'],
+      )!,
+      carbsTarget: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}carbs_target'],
+      )!,
+      targetWeightKg: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}target_weight_kg'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+      deviceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}device_id'],
+      )!,
+    );
+  }
+
+  @override
+  $GoalVersionsTable createAlias(String alias) {
+    return $GoalVersionsTable(attachedDatabase, alias);
+  }
+}
+
+class StoredGoalVersion extends DataClass
+    implements Insertable<StoredGoalVersion> {
+  final String id;
+  final String effectiveDay;
+  final String goal;
+  final int calorieTarget;
+  final int proteinTarget;
+  final int fatTarget;
+  final int carbsTarget;
+  final double targetWeightKg;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? deletedAt;
+  final String deviceId;
+  const StoredGoalVersion({
+    required this.id,
+    required this.effectiveDay,
+    required this.goal,
+    required this.calorieTarget,
+    required this.proteinTarget,
+    required this.fatTarget,
+    required this.carbsTarget,
+    required this.targetWeightKg,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+    required this.deviceId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['effective_day'] = Variable<String>(effectiveDay);
+    map['goal'] = Variable<String>(goal);
+    map['calorie_target'] = Variable<int>(calorieTarget);
+    map['protein_target'] = Variable<int>(proteinTarget);
+    map['fat_target'] = Variable<int>(fatTarget);
+    map['carbs_target'] = Variable<int>(carbsTarget);
+    map['target_weight_kg'] = Variable<double>(targetWeightKg);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    map['device_id'] = Variable<String>(deviceId);
+    return map;
+  }
+
+  GoalVersionsCompanion toCompanion(bool nullToAbsent) {
+    return GoalVersionsCompanion(
+      id: Value(id),
+      effectiveDay: Value(effectiveDay),
+      goal: Value(goal),
+      calorieTarget: Value(calorieTarget),
+      proteinTarget: Value(proteinTarget),
+      fatTarget: Value(fatTarget),
+      carbsTarget: Value(carbsTarget),
+      targetWeightKg: Value(targetWeightKg),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+      deviceId: Value(deviceId),
+    );
+  }
+
+  factory StoredGoalVersion.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return StoredGoalVersion(
+      id: serializer.fromJson<String>(json['id']),
+      effectiveDay: serializer.fromJson<String>(json['effectiveDay']),
+      goal: serializer.fromJson<String>(json['goal']),
+      calorieTarget: serializer.fromJson<int>(json['calorieTarget']),
+      proteinTarget: serializer.fromJson<int>(json['proteinTarget']),
+      fatTarget: serializer.fromJson<int>(json['fatTarget']),
+      carbsTarget: serializer.fromJson<int>(json['carbsTarget']),
+      targetWeightKg: serializer.fromJson<double>(json['targetWeightKg']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      deviceId: serializer.fromJson<String>(json['deviceId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'effectiveDay': serializer.toJson<String>(effectiveDay),
+      'goal': serializer.toJson<String>(goal),
+      'calorieTarget': serializer.toJson<int>(calorieTarget),
+      'proteinTarget': serializer.toJson<int>(proteinTarget),
+      'fatTarget': serializer.toJson<int>(fatTarget),
+      'carbsTarget': serializer.toJson<int>(carbsTarget),
+      'targetWeightKg': serializer.toJson<double>(targetWeightKg),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'deviceId': serializer.toJson<String>(deviceId),
+    };
+  }
+
+  StoredGoalVersion copyWith({
+    String? id,
+    String? effectiveDay,
+    String? goal,
+    int? calorieTarget,
+    int? proteinTarget,
+    int? fatTarget,
+    int? carbsTarget,
+    double? targetWeightKg,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+    String? deviceId,
+  }) => StoredGoalVersion(
+    id: id ?? this.id,
+    effectiveDay: effectiveDay ?? this.effectiveDay,
+    goal: goal ?? this.goal,
+    calorieTarget: calorieTarget ?? this.calorieTarget,
+    proteinTarget: proteinTarget ?? this.proteinTarget,
+    fatTarget: fatTarget ?? this.fatTarget,
+    carbsTarget: carbsTarget ?? this.carbsTarget,
+    targetWeightKg: targetWeightKg ?? this.targetWeightKg,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    deviceId: deviceId ?? this.deviceId,
+  );
+  StoredGoalVersion copyWithCompanion(GoalVersionsCompanion data) {
+    return StoredGoalVersion(
+      id: data.id.present ? data.id.value : this.id,
+      effectiveDay: data.effectiveDay.present
+          ? data.effectiveDay.value
+          : this.effectiveDay,
+      goal: data.goal.present ? data.goal.value : this.goal,
+      calorieTarget: data.calorieTarget.present
+          ? data.calorieTarget.value
+          : this.calorieTarget,
+      proteinTarget: data.proteinTarget.present
+          ? data.proteinTarget.value
+          : this.proteinTarget,
+      fatTarget: data.fatTarget.present ? data.fatTarget.value : this.fatTarget,
+      carbsTarget: data.carbsTarget.present
+          ? data.carbsTarget.value
+          : this.carbsTarget,
+      targetWeightKg: data.targetWeightKg.present
+          ? data.targetWeightKg.value
+          : this.targetWeightKg,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      deviceId: data.deviceId.present ? data.deviceId.value : this.deviceId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('StoredGoalVersion(')
+          ..write('id: $id, ')
+          ..write('effectiveDay: $effectiveDay, ')
+          ..write('goal: $goal, ')
+          ..write('calorieTarget: $calorieTarget, ')
+          ..write('proteinTarget: $proteinTarget, ')
+          ..write('fatTarget: $fatTarget, ')
+          ..write('carbsTarget: $carbsTarget, ')
+          ..write('targetWeightKg: $targetWeightKg, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('deviceId: $deviceId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    effectiveDay,
+    goal,
+    calorieTarget,
+    proteinTarget,
+    fatTarget,
+    carbsTarget,
+    targetWeightKg,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    deviceId,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is StoredGoalVersion &&
+          other.id == this.id &&
+          other.effectiveDay == this.effectiveDay &&
+          other.goal == this.goal &&
+          other.calorieTarget == this.calorieTarget &&
+          other.proteinTarget == this.proteinTarget &&
+          other.fatTarget == this.fatTarget &&
+          other.carbsTarget == this.carbsTarget &&
+          other.targetWeightKg == this.targetWeightKg &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt &&
+          other.deviceId == this.deviceId);
+}
+
+class GoalVersionsCompanion extends UpdateCompanion<StoredGoalVersion> {
+  final Value<String> id;
+  final Value<String> effectiveDay;
+  final Value<String> goal;
+  final Value<int> calorieTarget;
+  final Value<int> proteinTarget;
+  final Value<int> fatTarget;
+  final Value<int> carbsTarget;
+  final Value<double> targetWeightKg;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> deletedAt;
+  final Value<String> deviceId;
+  final Value<int> rowid;
+  const GoalVersionsCompanion({
+    this.id = const Value.absent(),
+    this.effectiveDay = const Value.absent(),
+    this.goal = const Value.absent(),
+    this.calorieTarget = const Value.absent(),
+    this.proteinTarget = const Value.absent(),
+    this.fatTarget = const Value.absent(),
+    this.carbsTarget = const Value.absent(),
+    this.targetWeightKg = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.deviceId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  GoalVersionsCompanion.insert({
+    required String id,
+    required String effectiveDay,
+    required String goal,
+    required int calorieTarget,
+    required int proteinTarget,
+    required int fatTarget,
+    required int carbsTarget,
+    required double targetWeightKg,
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.deletedAt = const Value.absent(),
+    required String deviceId,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       effectiveDay = Value(effectiveDay),
+       goal = Value(goal),
+       calorieTarget = Value(calorieTarget),
+       proteinTarget = Value(proteinTarget),
+       fatTarget = Value(fatTarget),
+       carbsTarget = Value(carbsTarget),
+       targetWeightKg = Value(targetWeightKg),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt),
+       deviceId = Value(deviceId);
+  static Insertable<StoredGoalVersion> custom({
+    Expression<String>? id,
+    Expression<String>? effectiveDay,
+    Expression<String>? goal,
+    Expression<int>? calorieTarget,
+    Expression<int>? proteinTarget,
+    Expression<int>? fatTarget,
+    Expression<int>? carbsTarget,
+    Expression<double>? targetWeightKg,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+    Expression<String>? deviceId,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (effectiveDay != null) 'effective_day': effectiveDay,
+      if (goal != null) 'goal': goal,
+      if (calorieTarget != null) 'calorie_target': calorieTarget,
+      if (proteinTarget != null) 'protein_target': proteinTarget,
+      if (fatTarget != null) 'fat_target': fatTarget,
+      if (carbsTarget != null) 'carbs_target': carbsTarget,
+      if (targetWeightKg != null) 'target_weight_kg': targetWeightKg,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (deviceId != null) 'device_id': deviceId,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  GoalVersionsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? effectiveDay,
+    Value<String>? goal,
+    Value<int>? calorieTarget,
+    Value<int>? proteinTarget,
+    Value<int>? fatTarget,
+    Value<int>? carbsTarget,
+    Value<double>? targetWeightKg,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? deletedAt,
+    Value<String>? deviceId,
+    Value<int>? rowid,
+  }) {
+    return GoalVersionsCompanion(
+      id: id ?? this.id,
+      effectiveDay: effectiveDay ?? this.effectiveDay,
+      goal: goal ?? this.goal,
+      calorieTarget: calorieTarget ?? this.calorieTarget,
+      proteinTarget: proteinTarget ?? this.proteinTarget,
+      fatTarget: fatTarget ?? this.fatTarget,
+      carbsTarget: carbsTarget ?? this.carbsTarget,
+      targetWeightKg: targetWeightKg ?? this.targetWeightKg,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      deviceId: deviceId ?? this.deviceId,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (effectiveDay.present) {
+      map['effective_day'] = Variable<String>(effectiveDay.value);
+    }
+    if (goal.present) {
+      map['goal'] = Variable<String>(goal.value);
+    }
+    if (calorieTarget.present) {
+      map['calorie_target'] = Variable<int>(calorieTarget.value);
+    }
+    if (proteinTarget.present) {
+      map['protein_target'] = Variable<int>(proteinTarget.value);
+    }
+    if (fatTarget.present) {
+      map['fat_target'] = Variable<int>(fatTarget.value);
+    }
+    if (carbsTarget.present) {
+      map['carbs_target'] = Variable<int>(carbsTarget.value);
+    }
+    if (targetWeightKg.present) {
+      map['target_weight_kg'] = Variable<double>(targetWeightKg.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (deviceId.present) {
+      map['device_id'] = Variable<String>(deviceId.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('GoalVersionsCompanion(')
+          ..write('id: $id, ')
+          ..write('effectiveDay: $effectiveDay, ')
+          ..write('goal: $goal, ')
+          ..write('calorieTarget: $calorieTarget, ')
+          ..write('proteinTarget: $proteinTarget, ')
+          ..write('fatTarget: $fatTarget, ')
+          ..write('carbsTarget: $carbsTarget, ')
+          ..write('targetWeightKg: $targetWeightKg, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $WeightEntriesTable extends WeightEntries
+    with TableInfo<$WeightEntriesTable, StoredWeightEntry> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $WeightEntriesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _localDayMeta = const VerificationMeta(
+    'localDay',
+  );
+  @override
+  late final GeneratedColumn<String> localDay = GeneratedColumn<String>(
+    'local_day',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _weightKgMeta = const VerificationMeta(
+    'weightKg',
+  );
+  @override
+  late final GeneratedColumn<double> weightKg = GeneratedColumn<double>(
+    'weight_kg',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sourceMeta = const VerificationMeta('source');
+  @override
+  late final GeneratedColumn<String> source = GeneratedColumn<String>(
+    'source',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _deviceIdMeta = const VerificationMeta(
+    'deviceId',
+  );
+  @override
+  late final GeneratedColumn<String> deviceId = GeneratedColumn<String>(
+    'device_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    localDay,
+    weightKg,
+    source,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    deviceId,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'weight_entries';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<StoredWeightEntry> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('local_day')) {
+      context.handle(
+        _localDayMeta,
+        localDay.isAcceptableOrUnknown(data['local_day']!, _localDayMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_localDayMeta);
+    }
+    if (data.containsKey('weight_kg')) {
+      context.handle(
+        _weightKgMeta,
+        weightKg.isAcceptableOrUnknown(data['weight_kg']!, _weightKgMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_weightKgMeta);
+    }
+    if (data.containsKey('source')) {
+      context.handle(
+        _sourceMeta,
+        source.isAcceptableOrUnknown(data['source']!, _sourceMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sourceMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    if (data.containsKey('device_id')) {
+      context.handle(
+        _deviceIdMeta,
+        deviceId.isAcceptableOrUnknown(data['device_id']!, _deviceIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_deviceIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  StoredWeightEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return StoredWeightEntry(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      localDay: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}local_day'],
+      )!,
+      weightKg: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}weight_kg'],
+      )!,
+      source: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+      deviceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}device_id'],
+      )!,
+    );
+  }
+
+  @override
+  $WeightEntriesTable createAlias(String alias) {
+    return $WeightEntriesTable(attachedDatabase, alias);
+  }
+}
+
+class StoredWeightEntry extends DataClass
+    implements Insertable<StoredWeightEntry> {
+  final String id;
+  final String localDay;
+  final double weightKg;
+  final String source;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? deletedAt;
+  final String deviceId;
+  const StoredWeightEntry({
+    required this.id,
+    required this.localDay,
+    required this.weightKg,
+    required this.source,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+    required this.deviceId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['local_day'] = Variable<String>(localDay);
+    map['weight_kg'] = Variable<double>(weightKg);
+    map['source'] = Variable<String>(source);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    map['device_id'] = Variable<String>(deviceId);
+    return map;
+  }
+
+  WeightEntriesCompanion toCompanion(bool nullToAbsent) {
+    return WeightEntriesCompanion(
+      id: Value(id),
+      localDay: Value(localDay),
+      weightKg: Value(weightKg),
+      source: Value(source),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+      deviceId: Value(deviceId),
+    );
+  }
+
+  factory StoredWeightEntry.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return StoredWeightEntry(
+      id: serializer.fromJson<String>(json['id']),
+      localDay: serializer.fromJson<String>(json['localDay']),
+      weightKg: serializer.fromJson<double>(json['weightKg']),
+      source: serializer.fromJson<String>(json['source']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      deviceId: serializer.fromJson<String>(json['deviceId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'localDay': serializer.toJson<String>(localDay),
+      'weightKg': serializer.toJson<double>(weightKg),
+      'source': serializer.toJson<String>(source),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'deviceId': serializer.toJson<String>(deviceId),
+    };
+  }
+
+  StoredWeightEntry copyWith({
+    String? id,
+    String? localDay,
+    double? weightKg,
+    String? source,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+    String? deviceId,
+  }) => StoredWeightEntry(
+    id: id ?? this.id,
+    localDay: localDay ?? this.localDay,
+    weightKg: weightKg ?? this.weightKg,
+    source: source ?? this.source,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    deviceId: deviceId ?? this.deviceId,
+  );
+  StoredWeightEntry copyWithCompanion(WeightEntriesCompanion data) {
+    return StoredWeightEntry(
+      id: data.id.present ? data.id.value : this.id,
+      localDay: data.localDay.present ? data.localDay.value : this.localDay,
+      weightKg: data.weightKg.present ? data.weightKg.value : this.weightKg,
+      source: data.source.present ? data.source.value : this.source,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      deviceId: data.deviceId.present ? data.deviceId.value : this.deviceId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('StoredWeightEntry(')
+          ..write('id: $id, ')
+          ..write('localDay: $localDay, ')
+          ..write('weightKg: $weightKg, ')
+          ..write('source: $source, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('deviceId: $deviceId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    localDay,
+    weightKg,
+    source,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    deviceId,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is StoredWeightEntry &&
+          other.id == this.id &&
+          other.localDay == this.localDay &&
+          other.weightKg == this.weightKg &&
+          other.source == this.source &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt &&
+          other.deviceId == this.deviceId);
+}
+
+class WeightEntriesCompanion extends UpdateCompanion<StoredWeightEntry> {
+  final Value<String> id;
+  final Value<String> localDay;
+  final Value<double> weightKg;
+  final Value<String> source;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> deletedAt;
+  final Value<String> deviceId;
+  final Value<int> rowid;
+  const WeightEntriesCompanion({
+    this.id = const Value.absent(),
+    this.localDay = const Value.absent(),
+    this.weightKg = const Value.absent(),
+    this.source = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.deviceId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  WeightEntriesCompanion.insert({
+    required String id,
+    required String localDay,
+    required double weightKg,
+    required String source,
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.deletedAt = const Value.absent(),
+    required String deviceId,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       localDay = Value(localDay),
+       weightKg = Value(weightKg),
+       source = Value(source),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt),
+       deviceId = Value(deviceId);
+  static Insertable<StoredWeightEntry> custom({
+    Expression<String>? id,
+    Expression<String>? localDay,
+    Expression<double>? weightKg,
+    Expression<String>? source,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+    Expression<String>? deviceId,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (localDay != null) 'local_day': localDay,
+      if (weightKg != null) 'weight_kg': weightKg,
+      if (source != null) 'source': source,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (deviceId != null) 'device_id': deviceId,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  WeightEntriesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? localDay,
+    Value<double>? weightKg,
+    Value<String>? source,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? deletedAt,
+    Value<String>? deviceId,
+    Value<int>? rowid,
+  }) {
+    return WeightEntriesCompanion(
+      id: id ?? this.id,
+      localDay: localDay ?? this.localDay,
+      weightKg: weightKg ?? this.weightKg,
+      source: source ?? this.source,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      deviceId: deviceId ?? this.deviceId,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (localDay.present) {
+      map['local_day'] = Variable<String>(localDay.value);
+    }
+    if (weightKg.present) {
+      map['weight_kg'] = Variable<double>(weightKg.value);
+    }
+    if (source.present) {
+      map['source'] = Variable<String>(source.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (deviceId.present) {
+      map['device_id'] = Variable<String>(deviceId.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WeightEntriesCompanion(')
+          ..write('id: $id, ')
+          ..write('localDay: $localDay, ')
+          ..write('weightKg: $weightKg, ')
+          ..write('source: $source, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$YamDatabase extends GeneratedDatabase {
   _$YamDatabase(QueryExecutor e) : super(e);
   $YamDatabaseManager get managers => $YamDatabaseManager(this);
@@ -3099,6 +4340,8 @@ abstract class _$YamDatabase extends GeneratedDatabase {
   late final $InstallationValuesTable installationValues =
       $InstallationValuesTable(this);
   late final $DiaryEntriesTable diaryEntries = $DiaryEntriesTable(this);
+  late final $GoalVersionsTable goalVersions = $GoalVersionsTable(this);
+  late final $WeightEntriesTable weightEntries = $WeightEntriesTable(this);
   late final Index userFoodsHistory = Index(
     'user_foods_history',
     'CREATE INDEX user_foods_history ON user_foods (deleted_at, created_at)',
@@ -3119,6 +4362,14 @@ abstract class _$YamDatabase extends GeneratedDatabase {
     'diary_entries_recent',
     'CREATE INDEX diary_entries_recent ON diary_entries (deleted_at, created_at)',
   );
+  late final Index goalVersionsDay = Index(
+    'goal_versions_day',
+    'CREATE INDEX goal_versions_day ON goal_versions (effective_day, deleted_at, created_at)',
+  );
+  late final Index weightEntriesDay = Index(
+    'weight_entries_day',
+    'CREATE INDEX weight_entries_day ON weight_entries (local_day, deleted_at, created_at)',
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3128,11 +4379,15 @@ abstract class _$YamDatabase extends GeneratedDatabase {
     userServings,
     installationValues,
     diaryEntries,
+    goalVersions,
+    weightEntries,
     userFoodsHistory,
     userFoodsName,
     userServingsFood,
     diaryEntriesDay,
     diaryEntriesRecent,
+    goalVersionsDay,
+    weightEntriesDay,
   ];
 }
 
@@ -4825,6 +6080,614 @@ typedef $$DiaryEntriesTableProcessedTableManager =
       StoredDiaryEntry,
       PrefetchHooks Function()
     >;
+typedef $$GoalVersionsTableCreateCompanionBuilder =
+    GoalVersionsCompanion Function({
+      required String id,
+      required String effectiveDay,
+      required String goal,
+      required int calorieTarget,
+      required int proteinTarget,
+      required int fatTarget,
+      required int carbsTarget,
+      required double targetWeightKg,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<DateTime?> deletedAt,
+      required String deviceId,
+      Value<int> rowid,
+    });
+typedef $$GoalVersionsTableUpdateCompanionBuilder =
+    GoalVersionsCompanion Function({
+      Value<String> id,
+      Value<String> effectiveDay,
+      Value<String> goal,
+      Value<int> calorieTarget,
+      Value<int> proteinTarget,
+      Value<int> fatTarget,
+      Value<int> carbsTarget,
+      Value<double> targetWeightKg,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<DateTime?> deletedAt,
+      Value<String> deviceId,
+      Value<int> rowid,
+    });
+
+class $$GoalVersionsTableFilterComposer
+    extends Composer<_$YamDatabase, $GoalVersionsTable> {
+  $$GoalVersionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get effectiveDay => $composableBuilder(
+    column: $table.effectiveDay,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get goal => $composableBuilder(
+    column: $table.goal,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get calorieTarget => $composableBuilder(
+    column: $table.calorieTarget,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get proteinTarget => $composableBuilder(
+    column: $table.proteinTarget,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get fatTarget => $composableBuilder(
+    column: $table.fatTarget,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get carbsTarget => $composableBuilder(
+    column: $table.carbsTarget,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get targetWeightKg => $composableBuilder(
+    column: $table.targetWeightKg,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$GoalVersionsTableOrderingComposer
+    extends Composer<_$YamDatabase, $GoalVersionsTable> {
+  $$GoalVersionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get effectiveDay => $composableBuilder(
+    column: $table.effectiveDay,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get goal => $composableBuilder(
+    column: $table.goal,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get calorieTarget => $composableBuilder(
+    column: $table.calorieTarget,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get proteinTarget => $composableBuilder(
+    column: $table.proteinTarget,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get fatTarget => $composableBuilder(
+    column: $table.fatTarget,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get carbsTarget => $composableBuilder(
+    column: $table.carbsTarget,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get targetWeightKg => $composableBuilder(
+    column: $table.targetWeightKg,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$GoalVersionsTableAnnotationComposer
+    extends Composer<_$YamDatabase, $GoalVersionsTable> {
+  $$GoalVersionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get effectiveDay => $composableBuilder(
+    column: $table.effectiveDay,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get goal =>
+      $composableBuilder(column: $table.goal, builder: (column) => column);
+
+  GeneratedColumn<int> get calorieTarget => $composableBuilder(
+    column: $table.calorieTarget,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get proteinTarget => $composableBuilder(
+    column: $table.proteinTarget,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get fatTarget =>
+      $composableBuilder(column: $table.fatTarget, builder: (column) => column);
+
+  GeneratedColumn<int> get carbsTarget => $composableBuilder(
+    column: $table.carbsTarget,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get targetWeightKg => $composableBuilder(
+    column: $table.targetWeightKg,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get deviceId =>
+      $composableBuilder(column: $table.deviceId, builder: (column) => column);
+}
+
+class $$GoalVersionsTableTableManager
+    extends
+        RootTableManager<
+          _$YamDatabase,
+          $GoalVersionsTable,
+          StoredGoalVersion,
+          $$GoalVersionsTableFilterComposer,
+          $$GoalVersionsTableOrderingComposer,
+          $$GoalVersionsTableAnnotationComposer,
+          $$GoalVersionsTableCreateCompanionBuilder,
+          $$GoalVersionsTableUpdateCompanionBuilder,
+          (
+            StoredGoalVersion,
+            BaseReferences<
+              _$YamDatabase,
+              $GoalVersionsTable,
+              StoredGoalVersion
+            >,
+          ),
+          StoredGoalVersion,
+          PrefetchHooks Function()
+        > {
+  $$GoalVersionsTableTableManager(_$YamDatabase db, $GoalVersionsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$GoalVersionsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$GoalVersionsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$GoalVersionsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> effectiveDay = const Value.absent(),
+                Value<String> goal = const Value.absent(),
+                Value<int> calorieTarget = const Value.absent(),
+                Value<int> proteinTarget = const Value.absent(),
+                Value<int> fatTarget = const Value.absent(),
+                Value<int> carbsTarget = const Value.absent(),
+                Value<double> targetWeightKg = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<String> deviceId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => GoalVersionsCompanion(
+                id: id,
+                effectiveDay: effectiveDay,
+                goal: goal,
+                calorieTarget: calorieTarget,
+                proteinTarget: proteinTarget,
+                fatTarget: fatTarget,
+                carbsTarget: carbsTarget,
+                targetWeightKg: targetWeightKg,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                deviceId: deviceId,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String effectiveDay,
+                required String goal,
+                required int calorieTarget,
+                required int proteinTarget,
+                required int fatTarget,
+                required int carbsTarget,
+                required double targetWeightKg,
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<DateTime?> deletedAt = const Value.absent(),
+                required String deviceId,
+                Value<int> rowid = const Value.absent(),
+              }) => GoalVersionsCompanion.insert(
+                id: id,
+                effectiveDay: effectiveDay,
+                goal: goal,
+                calorieTarget: calorieTarget,
+                proteinTarget: proteinTarget,
+                fatTarget: fatTarget,
+                carbsTarget: carbsTarget,
+                targetWeightKg: targetWeightKg,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                deviceId: deviceId,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$GoalVersionsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$YamDatabase,
+      $GoalVersionsTable,
+      StoredGoalVersion,
+      $$GoalVersionsTableFilterComposer,
+      $$GoalVersionsTableOrderingComposer,
+      $$GoalVersionsTableAnnotationComposer,
+      $$GoalVersionsTableCreateCompanionBuilder,
+      $$GoalVersionsTableUpdateCompanionBuilder,
+      (
+        StoredGoalVersion,
+        BaseReferences<_$YamDatabase, $GoalVersionsTable, StoredGoalVersion>,
+      ),
+      StoredGoalVersion,
+      PrefetchHooks Function()
+    >;
+typedef $$WeightEntriesTableCreateCompanionBuilder =
+    WeightEntriesCompanion Function({
+      required String id,
+      required String localDay,
+      required double weightKg,
+      required String source,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<DateTime?> deletedAt,
+      required String deviceId,
+      Value<int> rowid,
+    });
+typedef $$WeightEntriesTableUpdateCompanionBuilder =
+    WeightEntriesCompanion Function({
+      Value<String> id,
+      Value<String> localDay,
+      Value<double> weightKg,
+      Value<String> source,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<DateTime?> deletedAt,
+      Value<String> deviceId,
+      Value<int> rowid,
+    });
+
+class $$WeightEntriesTableFilterComposer
+    extends Composer<_$YamDatabase, $WeightEntriesTable> {
+  $$WeightEntriesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get localDay => $composableBuilder(
+    column: $table.localDay,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get weightKg => $composableBuilder(
+    column: $table.weightKg,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get source => $composableBuilder(
+    column: $table.source,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$WeightEntriesTableOrderingComposer
+    extends Composer<_$YamDatabase, $WeightEntriesTable> {
+  $$WeightEntriesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get localDay => $composableBuilder(
+    column: $table.localDay,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get weightKg => $composableBuilder(
+    column: $table.weightKg,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get source => $composableBuilder(
+    column: $table.source,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$WeightEntriesTableAnnotationComposer
+    extends Composer<_$YamDatabase, $WeightEntriesTable> {
+  $$WeightEntriesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get localDay =>
+      $composableBuilder(column: $table.localDay, builder: (column) => column);
+
+  GeneratedColumn<double> get weightKg =>
+      $composableBuilder(column: $table.weightKg, builder: (column) => column);
+
+  GeneratedColumn<String> get source =>
+      $composableBuilder(column: $table.source, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get deviceId =>
+      $composableBuilder(column: $table.deviceId, builder: (column) => column);
+}
+
+class $$WeightEntriesTableTableManager
+    extends
+        RootTableManager<
+          _$YamDatabase,
+          $WeightEntriesTable,
+          StoredWeightEntry,
+          $$WeightEntriesTableFilterComposer,
+          $$WeightEntriesTableOrderingComposer,
+          $$WeightEntriesTableAnnotationComposer,
+          $$WeightEntriesTableCreateCompanionBuilder,
+          $$WeightEntriesTableUpdateCompanionBuilder,
+          (
+            StoredWeightEntry,
+            BaseReferences<
+              _$YamDatabase,
+              $WeightEntriesTable,
+              StoredWeightEntry
+            >,
+          ),
+          StoredWeightEntry,
+          PrefetchHooks Function()
+        > {
+  $$WeightEntriesTableTableManager(_$YamDatabase db, $WeightEntriesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$WeightEntriesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$WeightEntriesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$WeightEntriesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> localDay = const Value.absent(),
+                Value<double> weightKg = const Value.absent(),
+                Value<String> source = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<String> deviceId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => WeightEntriesCompanion(
+                id: id,
+                localDay: localDay,
+                weightKg: weightKg,
+                source: source,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                deviceId: deviceId,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String localDay,
+                required double weightKg,
+                required String source,
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<DateTime?> deletedAt = const Value.absent(),
+                required String deviceId,
+                Value<int> rowid = const Value.absent(),
+              }) => WeightEntriesCompanion.insert(
+                id: id,
+                localDay: localDay,
+                weightKg: weightKg,
+                source: source,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                deviceId: deviceId,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$WeightEntriesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$YamDatabase,
+      $WeightEntriesTable,
+      StoredWeightEntry,
+      $$WeightEntriesTableFilterComposer,
+      $$WeightEntriesTableOrderingComposer,
+      $$WeightEntriesTableAnnotationComposer,
+      $$WeightEntriesTableCreateCompanionBuilder,
+      $$WeightEntriesTableUpdateCompanionBuilder,
+      (
+        StoredWeightEntry,
+        BaseReferences<_$YamDatabase, $WeightEntriesTable, StoredWeightEntry>,
+      ),
+      StoredWeightEntry,
+      PrefetchHooks Function()
+    >;
 
 class $YamDatabaseManager {
   final _$YamDatabase _db;
@@ -4837,4 +6700,8 @@ class $YamDatabaseManager {
       $$InstallationValuesTableTableManager(_db, _db.installationValues);
   $$DiaryEntriesTableTableManager get diaryEntries =>
       $$DiaryEntriesTableTableManager(_db, _db.diaryEntries);
+  $$GoalVersionsTableTableManager get goalVersions =>
+      $$GoalVersionsTableTableManager(_db, _db.goalVersions);
+  $$WeightEntriesTableTableManager get weightEntries =>
+      $$WeightEntriesTableTableManager(_db, _db.weightEntries);
 }
