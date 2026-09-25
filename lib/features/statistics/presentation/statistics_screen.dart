@@ -246,9 +246,13 @@ class _StatisticsScreenState extends State<StatisticsScreen>
     return formatter.format(value);
   }
 
-  String _date(DateTime day) => DateFormat.MMMd(
-    Localizations.localeOf(context).toLanguageTag(),
-  ).format(day);
+  String _date(DateTime day) {
+    final locale = Localizations.localeOf(context).toLanguageTag();
+    return (day.year == _today.year
+            ? DateFormat.MMMd(locale)
+            : DateFormat.yMMMd(locale))
+        .format(day);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -482,18 +486,10 @@ class _StatisticsScreenState extends State<StatisticsScreen>
   }
 
   Widget _summary(StatisticsSnapshot data, AppLocalizations l10n) {
-    final latest = [
-      for (final entry in _weights)
-        if (!entry.day.isAfter(_today)) entry,
-    ].lastOrNull;
+    final latest = data.latestRecordedWeight;
     final goal = data.latestGoal;
     final semantic = AppSemanticColors.of(context);
-    final proteinPercent =
-        data.averageProtein == null ||
-            data.averageProteinTarget == null ||
-            data.averageProteinTarget == 0
-        ? null
-        : data.averageProtein! / data.averageProteinTarget! * 100;
+    final proteinPercent = data.averageProteinPercent;
     final items = [
       (
         l10n.statsWeight,
@@ -568,10 +564,7 @@ class _StatisticsScreenState extends State<StatisticsScreen>
 
   Widget _weightCard(StatisticsSnapshot data, AppLocalizations l10n) {
     final theme = Theme.of(context);
-    final latest = [
-      for (final w in _weights)
-        if (!w.day.isAfter(_today)) w,
-    ].lastOrNull;
+    final latest = data.latestRecordedWeight;
     return _StatsPanel(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -999,7 +992,7 @@ class _StatisticsScreenState extends State<StatisticsScreen>
                               ),
                               Text(
                                 l10n.statsPercentOfTrackedDays(
-                                  _format(food.days * 100 / data.days.length),
+                                  _format(data.frequencyPercent(food)),
                                 ),
                                 textAlign: TextAlign.end,
                                 style: AppTypography.caption.copyWith(

@@ -138,7 +138,7 @@ class _WeightEntrySheetState extends State<_WeightEntrySheet> {
                     ),
                   YamIconButton(
                     icon: Icons.close_rounded,
-                      tooltip: l10n.statsWeightClose,
+                    tooltip: l10n.statsWeightClose,
                     surface: false,
                     onPressed: () => Navigator.of(context).pop(),
                   ),

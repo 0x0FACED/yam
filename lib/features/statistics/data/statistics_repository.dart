@@ -214,15 +214,17 @@ class StatisticsRepository {
     required double kg,
   }) async {
     _validateWeight(day, kg);
-    final updated = await (database.update(
-      database.weightEntries,
-    )..where((row) => row.id.equals(record.id) & row.deletedAt.isNull())).write(
-      WeightEntriesCompanion(
-        localDay: Value(diaryDayKey(day)),
-        weightKg: Value(kg),
-        updatedAt: Value(DateTime.now().toUtc()),
-      ),
-    );
+    final updated =
+        await (database.update(database.weightEntries)..where(
+              (row) => row.id.equals(record.id) & row.deletedAt.isNull(),
+            ))
+            .write(
+              WeightEntriesCompanion(
+                localDay: Value(diaryDayKey(day)),
+                weightKg: Value(kg),
+                updatedAt: Value(DateTime.now().toUtc()),
+              ),
+            );
     if (updated == 0) throw StateError('Weight entry no longer exists');
   }
 

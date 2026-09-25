@@ -110,6 +110,7 @@ class StatisticsSnapshot {
     required this.days,
     required this.heatmap,
     required this.weights,
+    required this.latestRecordedWeight,
     required this.frequentlyEaten,
     required this.calorieBuckets,
     required this.withinGoalDays,
@@ -129,6 +130,7 @@ class StatisticsSnapshot {
   final List<TrackedDay> days;
   final List<RegularityCell> heatmap;
   final List<WeightRecord> weights;
+  final WeightRecord? latestRecordedWeight;
   final List<FrequentFood> frequentlyEaten;
   final List<ChartBucket> calorieBuckets;
   final int withinGoalDays;
@@ -144,6 +146,16 @@ class StatisticsSnapshot {
 
   double? get withinGoalPercent =>
       goalEvaluatedDays == 0 ? null : withinGoalDays * 100 / goalEvaluatedDays;
+
+  double? get averageProteinPercent =>
+      averageProtein == null ||
+          averageProteinTarget == null ||
+          averageProteinTarget == 0
+      ? null
+      : averageProtein! * 100 / averageProteinTarget!;
+
+  double? frequencyPercent(FrequentFood food) =>
+      days.isEmpty ? null : food.days * 100 / days.length;
 
   WeightRecord? get latestWeight => weights.isEmpty ? null : weights.last;
 
@@ -184,6 +196,17 @@ StatisticsSnapshot calculateStatistics({
   };
   final plottedWeights = weightPerDay.values.toList()
     ..sort((a, b) => a.day.compareTo(b.day));
+  WeightRecord? latestRecordedWeight;
+  for (final weight in weightEntries) {
+    if (diaryDayKey(weight.day).compareTo(endKey) > 0) continue;
+    final previous = latestRecordedWeight;
+    if (previous == null ||
+        diaryDayKey(weight.day).compareTo(diaryDayKey(previous.day)) > 0 ||
+        (diaryDayKey(weight.day) == diaryDayKey(previous.day) &&
+            weight.id.compareTo(previous.id) > 0)) {
+      latestRecordedWeight = weight;
+    }
+  }
 
   var goalIndex = 0;
   GoalVersion? activeGoal;
@@ -256,6 +279,7 @@ StatisticsSnapshot calculateStatistics({
     days: tracked,
     heatmap: heatmap,
     weights: plottedWeights,
+    latestRecordedWeight: latestRecordedWeight,
     frequentlyEaten: frequentFoods,
     calorieBuckets: bucketCalories(sortedNutrition, period),
     withinGoalDays: within,

@@ -122,10 +122,7 @@ class _WeightPainter extends CustomPainter {
 
     final points = [
       for (var i = 0; i < weights.length; i++)
-        Offset(
-          _weightFraction(weights, i) * size.width,
-          yFor(weights[i].kg),
-        ),
+        Offset(_weightFraction(weights, i) * size.width, yFor(weights[i].kg)),
     ];
     final path = Path()..moveTo(points.first.dx, points.first.dy);
     for (final point in points.skip(1)) {
@@ -158,8 +155,8 @@ class _WeightPainter extends CustomPainter {
 
 double _weightFraction(List<WeightRecord> weights, int index) {
   if (weights.length == 1) return 0.5;
-  DateTime date(WeightRecord record) => DateTime.utc(
-    record.day.year, record.day.month, record.day.day);
+  DateTime date(WeightRecord record) =>
+      DateTime.utc(record.day.year, record.day.month, record.day.day);
   final first = date(weights.first);
   final duration = date(weights.last).difference(first).inDays;
   if (duration == 0) return 0.5;

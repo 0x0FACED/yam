@@ -30,6 +30,7 @@ void main() {
       );
       await repository.saveOnboarding(first, firstDay);
       await repository.saveOnboarding(first, firstDay);
+      await repository.saveOnboarding(first, DateTime(2020, 9, 21));
       expect(await repository.watchGoals().first, hasLength(1));
       expect(await repository.watchWeights().first, hasLength(1));
 
