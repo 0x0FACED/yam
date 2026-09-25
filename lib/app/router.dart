@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:yam/app/navigation/adaptive_navigation_shell.dart';
 import 'package:yam/app/session/session_profile.dart';
 import 'package:yam/app/theme/app_spacing.dart';
+import 'package:yam/features/diary/data/diary_repository.dart';
 import 'package:yam/features/diary/presentation/diary_screen.dart';
 import 'package:yam/features/food_search/presentation/create_product_stub_screen.dart';
 import 'package:yam/features/food_search/presentation/create_product_screen.dart';
@@ -21,6 +22,7 @@ GoRouter createAppRouter({
   ValueListenable<SessionProfile?>? profileListenable,
   ValueChanged<SessionProfile>? onProfileChanged,
   UserFoodRepository? userFoodRepository,
+  DiaryRepository? diaryRepository,
 }) {
   return GoRouter(
     initialLocation: '/diary',
@@ -38,11 +40,17 @@ GoRouter createAppRouter({
                   if (profileListenable case final listenable?) {
                     return ValueListenableBuilder<SessionProfile?>(
                       valueListenable: listenable,
-                      builder: (context, profile, child) =>
-                          DiaryScreen(today: diaryToday, profile: profile),
+                      builder: (context, profile, child) => DiaryScreen(
+                        today: diaryToday,
+                        profile: profile,
+                        repository: diaryRepository,
+                      ),
                     );
                   }
-                  return DiaryScreen(today: diaryToday);
+                  return DiaryScreen(
+                    today: diaryToday,
+                    repository: diaryRepository,
+                  );
                 },
               ),
             ],
@@ -105,6 +113,7 @@ GoRouter createAppRouter({
           return FoodSearchScreen(
             arguments: arguments,
             userFoodRepository: userFoodRepository,
+            diaryRepository: diaryRepository,
           );
         },
         routes: [

@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:yam/features/food_search/data/user_food_database.dart';
+import 'package:yam/core/data/yam_database.dart';
 import 'package:yam/features/food_search/data/user_food_repository.dart';
 import 'package:yam/features/food_search/domain/custom_food.dart';
 
@@ -12,7 +12,6 @@ const example = CustomFoodDraft(
   basis: CustomFoodBasis.grams,
   basisAmount: 80,
   displayBasis: CustomFoodDisplayBasis.perServing,
-  energyKcal: 292.8,
   proteinG: 9.84,
   fatG: 4.88,
   carbsG: 47.6,
@@ -39,7 +38,7 @@ void main() {
       final dir = await Directory.systemTemp.createTemp('yam-food-test-');
       addTearDown(() => dir.delete(recursive: true));
       final path = '${dir.path}/foods.sqlite';
-      final database = UserFoodDatabase(NativeDatabase(File(path)));
+      final database = YamDatabase(NativeDatabase(File(path)));
       final repository = UserFoodRepository(database);
 
       final id = await repository.create(example);
@@ -47,14 +46,14 @@ void main() {
       await repository.setFavorite(id, true);
       await database.close();
 
-      final reopened = UserFoodDatabase(NativeDatabase(File(path)));
+      final reopened = YamDatabase(NativeDatabase(File(path)));
       addTearDown(reopened.close);
       final foods = await UserFoodRepository(reopened).watchFoods().first;
       expect(foods, hasLength(1));
       expect(foods.single.food.name, 'Homemade oats');
       expect(foods.single.food.barcode, '00012345');
       expect(foods.single.food.isFavorite, isTrue);
-      expect(foods.single.food.energyKcal, 292.8);
+      expect(foods.single.food.energyKcal, closeTo(273.68, 0.000001));
       expect(foods.single.food.basisAmount, 80);
       expect(foods.single.servings, hasLength(2));
       expect(foods.single.servings.first.foodId, id);
@@ -63,13 +62,13 @@ void main() {
       expect(
         (await reopened.customSelect('PRAGMA user_version').getSingle())
             .read<int>('user_version'),
-        1,
+        2,
       );
     },
   );
 
   test('invalid equivalences cannot create a partial product', () async {
-    final database = UserFoodDatabase(NativeDatabase.memory());
+    final database = YamDatabase(NativeDatabase.memory());
     addTearDown(database.close);
     final repository = UserFoodRepository(database);
     final invalid = CustomFoodDraft(
@@ -78,7 +77,6 @@ void main() {
       basis: example.basis,
       basisAmount: example.basisAmount,
       displayBasis: example.displayBasis,
-      energyKcal: example.energyKcal,
       proteinG: example.proteinG,
       fatG: example.fatG,
       carbsG: example.carbsG,
@@ -87,5 +85,50 @@ void main() {
 
     await expectLater(repository.create(invalid), throwsArgumentError);
     expect(await repository.watchFoods().first, isEmpty);
+  });
+
+  test('soft delete hides food and servings and frees its barcode', () async {
+    final dir = await Directory.systemTemp.createTemp('yam-delete-test-');
+    addTearDown(() => dir.delete(recursive: true));
+    final path = '${dir.path}/foods.sqlite';
+    final database = YamDatabase(NativeDatabase(File(path)));
+    final repository = UserFoodRepository(database);
+
+    final id = await repository.create(example);
+    await repository.setFavorite(id, true);
+    await repository.delete(id);
+    expect(await repository.loadFoods(), isEmpty);
+    expect(await repository.barcodeExists(example.barcode!), isFalse);
+
+    final deletedFood = await (database.select(
+      database.userFoods,
+    )..where((food) => food.id.equals(id))).getSingle();
+    final deletedServings = await (database.select(
+      database.userServings,
+    )..where((serving) => serving.foodId.equals(id))).get();
+    expect(deletedFood.deletedAt, isNotNull);
+    expect(deletedFood.updatedAt, deletedFood.deletedAt);
+    expect(deletedFood.barcode, isNull);
+    expect(deletedServings, hasLength(2));
+    expect(
+      deletedServings.every((serving) => serving.deletedAt != null),
+      isTrue,
+    );
+    expect(
+      deletedServings.every(
+        (serving) => serving.updatedAt == serving.deletedAt,
+      ),
+      isTrue,
+    );
+
+    final recreatedId = await repository.create(example);
+    expect(recreatedId, isNot(id));
+    await database.close();
+
+    final reopened = YamDatabase(NativeDatabase(File(path)));
+    addTearDown(reopened.close);
+    final foods = await UserFoodRepository(reopened).loadFoods();
+    expect(foods.map((saved) => saved.food.id), [recreatedId]);
+    expect(foods.single.food.barcode, example.barcode);
   });
 }

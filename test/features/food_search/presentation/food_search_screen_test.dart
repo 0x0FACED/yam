@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yam/app/router.dart';
@@ -8,6 +9,8 @@ import 'package:yam/app/theme/app_scroll_behavior.dart';
 import 'package:yam/app/theme/app_theme.dart';
 import 'package:yam/core/ui/feedback/yam_snack_bar.dart';
 import 'package:yam/core/ui/food/yam_quantity_control.dart';
+import 'package:yam/features/diary/data/diary_repository.dart';
+import 'package:yam/core/data/yam_database.dart';
 import 'package:yam/features/diary/presentation/widgets/daily_nutrition_summary.dart';
 import 'package:yam/features/food_search/presentation/food_search_prototype_data.dart';
 import 'package:yam/features/food_search/presentation/food_search_screen.dart';
@@ -92,7 +95,9 @@ void main() {
     tester,
   ) async {
     await _setWindowSize(tester, const Size(390, 844));
-    final router = createAppRouter();
+    final database = YamDatabase(NativeDatabase.memory());
+    addTearDown(database.close);
+    final router = createAppRouter(diaryRepository: DiaryRepository(database));
     addTearDown(router.dispose);
     await tester.pumpWidget(_RouterTestApp(router: router));
     await tester.pumpAndSettle();
@@ -120,7 +125,7 @@ void main() {
           .widget<DailyNutritionSummary>(find.byType(DailyNutritionSummary))
           .day
           .consumedCalories,
-      2245,
+      405,
     );
 
     await tester.tap(find.byTooltip('Add food to Breakfast'));

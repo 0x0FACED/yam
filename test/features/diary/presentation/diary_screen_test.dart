@@ -8,7 +8,7 @@ import 'package:yam/features/diary/presentation/diary_screen.dart';
 import 'package:yam/l10n/generated/app_localizations.dart';
 
 void main() {
-  testWidgets('shows the populated current day and empty adjacent day', (
+  testWidgets('shows an empty current day and empty adjacent day', (
     tester,
   ) async {
     await _setWindowSize(tester, const Size(390, 844));
@@ -18,7 +18,8 @@ void main() {
 
     expect(find.text('Сегодня'), findsOneWidget);
     expect(find.text('Завтрак'), findsOneWidget);
-    expect(find.text('Яйца куриные вареные'), findsOneWidget);
+    expect(find.text('Яйца куриные вареные'), findsNothing);
+    expect(find.text('Пока ничего нет'), findsWidgets);
     expect(find.byKey(const ValueKey('diary-today-marker')), findsOneWidget);
     final summaryTop = tester.getTopLeft(find.text('Съедено')).dy;
 
@@ -54,7 +55,7 @@ void main() {
     await tester.tap(find.byTooltip('Return to today'));
     await tester.pump();
     expect(find.byKey(const ValueKey('diary-today-marker')), findsOneWidget);
-    expect(find.text('Boiled eggs'), findsOneWidget);
+    expect(find.text('Boiled eggs'), findsNothing);
   });
 
   testWidgets('diary restores the native Android stretch overscroll', (
@@ -162,35 +163,10 @@ void main() {
 
     expect(find.text('YAM'), findsOneWidget);
     expect(find.text('Consumed'), findsOneWidget);
-    expect(find.text('Buckwheat porridge'), findsOneWidget);
+    expect(find.text('Buckwheat porridge'), findsNothing);
     expect(find.text('Water'), findsNothing);
     expect(find.byIcon(Icons.person), findsNothing);
     expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('diary rows expose a visible pressed selection state', (
-    tester,
-  ) async {
-    await _setWindowSize(tester, const Size(390, 844));
-    await tester.pumpWidget(const _DiaryTestApp(locale: Locale('en')));
-
-    final entry = find.text('Boiled eggs');
-    await tester.scrollUntilVisible(
-      entry,
-      200,
-      scrollable: find.descendant(
-        of: find.byKey(const ValueKey('diary-scroll-view')),
-        matching: find.byType(Scrollable),
-      ),
-    );
-    await tester.tap(entry);
-    await tester.pump();
-
-    final highlighted = tester.widget<AnimatedContainer>(
-      find.ancestor(of: entry, matching: find.byType(AnimatedContainer)).first,
-    );
-    final decoration = highlighted.decoration! as BoxDecoration;
-    expect(decoration.color, AppTheme.light.colorScheme.primaryContainer);
   });
 }
 

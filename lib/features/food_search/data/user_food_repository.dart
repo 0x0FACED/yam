@@ -1,6 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
-import 'package:yam/features/food_search/data/user_food_database.dart';
+import 'package:yam/core/data/yam_database.dart';
 import 'package:yam/features/food_search/domain/custom_food.dart';
 
 class SavedUserFood {
@@ -14,7 +14,7 @@ class UserFoodRepository {
   UserFoodRepository(this.database, {Uuid? uuid})
     : _uuid = uuid ?? const Uuid();
 
-  final UserFoodDatabase database;
+  final YamDatabase database;
   final Uuid _uuid;
 
   Stream<List<SavedUserFood>> watchFoods() {
@@ -63,7 +63,7 @@ class UserFoodRepository {
     final id = _uuid.v7();
     final now = DateTime.now().toUtc();
     await database.transaction(() async {
-      final deviceId = await _deviceId();
+      final deviceId = await database.installationDeviceId(_uuid);
       await database
           .into(database.userFoods)
           .insert(
@@ -129,21 +129,26 @@ class UserFoodRepository {
     );
   }
 
-  Future<String> _deviceId() async {
-    const key = 'deviceId';
-    final existing = await (database.select(
-      database.installationValues,
-    )..where((entry) => entry.key.equals(key))).getSingleOrNull();
-    if (existing != null) return existing.value;
-
-    await database
-        .into(database.installationValues)
-        .insert(
-          InstallationValuesCompanion.insert(key: key, value: _uuid.v7()),
-          mode: InsertMode.insertOrIgnore,
-        );
-    return (await (database.select(
-      database.installationValues,
-    )..where((entry) => entry.key.equals(key))).getSingle()).value;
+  Future<void> delete(String id) async {
+    final now = DateTime.now().toUtc();
+    await database.transaction(() async {
+      final updated =
+          await (database.update(database.userFoods)
+                ..where((food) => food.id.equals(id) & food.deletedAt.isNull()))
+              .write(
+                UserFoodsCompanion(
+                  deletedAt: Value(now),
+                  updatedAt: Value(now),
+                  barcode: const Value(null),
+                ),
+              );
+      if (updated == 0) return;
+      await (database.update(database.userServings)..where(
+            (serving) => serving.foodId.equals(id) & serving.deletedAt.isNull(),
+          ))
+          .write(
+            UserServingsCompanion(deletedAt: Value(now), updatedAt: Value(now)),
+          );
+    });
   }
 }

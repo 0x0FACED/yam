@@ -8,6 +8,12 @@ enum CustomFoodDisplayBasis {
 
 enum CustomServingUnit { serving, piece, glass, scoop }
 
+double energyKcalFromMacros({
+  required double proteinG,
+  required double fatG,
+  required double carbsG,
+}) => proteinG * 4 + fatG * 9 + carbsG * 4;
+
 class CustomServingDraft {
   const CustomServingDraft({
     required this.unit,
@@ -31,7 +37,6 @@ class CustomFoodDraft {
     required this.basis,
     required this.basisAmount,
     required this.displayBasis,
-    required this.energyKcal,
     required this.proteinG,
     required this.fatG,
     required this.carbsG,
@@ -47,11 +52,13 @@ class CustomFoodDraft {
   final CustomFoodBasis basis;
   final double basisAmount;
   final CustomFoodDisplayBasis displayBasis;
-  final double energyKcal;
   final double proteinG;
   final double fatG;
   final double carbsG;
   final List<CustomServingDraft> servings;
+
+  double get energyKcal =>
+      energyKcalFromMacros(proteinG: proteinG, fatG: fatG, carbsG: carbsG);
 
   void validate() {
     if (name.trim().isEmpty ||
@@ -75,10 +82,10 @@ class CustomFoodDraft {
       throw ArgumentError('Nutrition per serving requires its equivalent');
     }
     if ([
-      energyKcal,
       proteinG,
       fatG,
       carbsG,
+      energyKcal,
     ].any((value) => !value.isFinite || value < 0)) {
       throw ArgumentError('Nutrition cannot be negative or non-finite');
     }

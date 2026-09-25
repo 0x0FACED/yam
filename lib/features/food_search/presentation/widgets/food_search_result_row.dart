@@ -9,12 +9,14 @@ class FoodSearchResultRow extends StatelessWidget {
     required this.food,
     required this.favorite,
     required this.onOpen,
+    this.onDelete,
     super.key,
   });
 
   final FoodSearchPrototypeFood food;
   final bool favorite;
   final VoidCallback onOpen;
+  final VoidCallback? onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +45,8 @@ class FoodSearchResultRow extends StatelessWidget {
       favoriteLabel: l10n.foodSearchFavorites,
       openKey: ValueKey('food-result-${food.id}'),
       onPressed: onOpen,
+      onLongPress: onDelete,
+      longPressLabel: onDelete == null ? null : l10n.createProductDeleteAction,
     );
   }
 }

@@ -11,6 +11,13 @@ String formatFoodSearchNumber(BuildContext context, num value) {
   return formatter.format(value);
 }
 
+String editableFoodSearchNumber(double value) => value == value.roundToDouble()
+    ? value.toInt().toString()
+    : value
+          .toStringAsFixed(3)
+          .replaceFirst(RegExp(r'0+$'), '')
+          .replaceFirst(RegExp(r'\.$'), '');
+
 String formatFoodSearchQuantity(
   BuildContext context,
   FoodSearchPrototypeUnit unit,

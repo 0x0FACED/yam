@@ -173,6 +173,7 @@ class YamIconButton extends StatelessWidget {
     this.iconSize = 18,
     this.visualSize,
     this.visualBorderRadius,
+    this.destructive = false,
     super.key,
   });
 
@@ -184,6 +185,7 @@ class YamIconButton extends StatelessWidget {
   final double iconSize;
   final double? visualSize;
   final double? visualBorderRadius;
+  final bool destructive;
 
   @override
   Widget build(BuildContext context) {
@@ -215,7 +217,9 @@ class YamIconButton extends StatelessWidget {
             child: Icon(
               this.icon,
               size: iconSize,
-              color: onPressed == null
+              color: destructive
+                  ? theme.colorScheme.error
+                  : onPressed == null
                   ? theme.colorScheme.onSurfaceVariant
                   : selected
                   ? theme.colorScheme.primary
@@ -232,7 +236,9 @@ class YamIconButton extends StatelessWidget {
         style: IconButton.styleFrom(
           minimumSize: const Size.square(44),
           maximumSize: const Size.square(44),
-          foregroundColor: selected
+          foregroundColor: destructive
+              ? theme.colorScheme.error
+              : selected
               ? theme.colorScheme.primary
               : theme.colorScheme.onSurface,
           disabledForegroundColor: theme.colorScheme.onSurfaceVariant,

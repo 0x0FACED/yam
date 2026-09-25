@@ -223,6 +223,34 @@ class AppLocalizationsRu extends AppLocalizations {
   String get diaryNoFoods => 'Пока ничего нет';
 
   @override
+  String get diaryEditEntry => 'Редактировать запись';
+
+  @override
+  String get diaryEditSave => 'Сохранить изменения';
+
+  @override
+  String get diaryEditClose => 'Закрыть редактирование';
+
+  @override
+  String get diaryDeleteEntry => 'Удалить запись';
+
+  @override
+  String diaryEntryDeleted(String food) {
+    return 'Запись «$food» удалена';
+  }
+
+  @override
+  String diaryEntryUpdated(String food) {
+    return 'Запись «$food» изменена';
+  }
+
+  @override
+  String get diarySaveFailed => 'Не удалось сохранить запись';
+
+  @override
+  String get diaryDeleteFailed => 'Не удалось удалить запись';
+
+  @override
   String get foodSearchTitle => 'Добавить еду';
 
   @override
@@ -285,7 +313,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get createProductNutrition => 'Пищевая ценность';
 
   @override
-  String get createProductCalories => 'Калории';
+  String createProductCalculatedCalories(String calories) {
+    return 'По БЖУ: $calories ккал';
+  }
 
   @override
   String get createProductServings => 'Дополнительные единицы';
@@ -337,6 +367,31 @@ class AppLocalizationsRu extends AppLocalizations {
   String createProductSaved(String food) {
     return 'Продукт «$food» сохранён';
   }
+
+  @override
+  String get createProductDeleteTitle => 'Удалить продукт?';
+
+  @override
+  String createProductDeleteMessage(String food) {
+    return '«$food» исчезнет из ваших блюд, поиска и избранного.';
+  }
+
+  @override
+  String get createProductDelete => 'Удалить';
+
+  @override
+  String get createProductDeleteCancel => 'Отмена';
+
+  @override
+  String get createProductDeleteAction => 'Удалить продукт';
+
+  @override
+  String createProductDeleted(String food) {
+    return 'Продукт «$food» удалён';
+  }
+
+  @override
+  String get createProductDeleteFailed => 'Не удалось удалить продукт';
 
   @override
   String get createProductUnitServing => 'Порция';

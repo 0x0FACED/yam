@@ -6,8 +6,10 @@ import 'package:yam/app/theme/app_typography.dart';
 import 'package:yam/core/ui/buttons/yam_buttons.dart';
 import 'package:yam/core/ui/feedback/yam_snack_bar.dart';
 import 'package:yam/core/ui/food/yam_quantity_control.dart';
+import 'package:yam/core/ui/selection/yam_dropdown.dart';
 import 'package:yam/core/ui/selection/yam_selection_controls.dart';
 import 'package:yam/features/food_search/presentation/food_search_format.dart';
+import 'package:yam/features/food_search/presentation/diary_food_adapter.dart';
 import 'package:yam/features/food_search/presentation/food_search_meals.dart';
 import 'package:yam/features/food_search/presentation/food_search_prototype_data.dart';
 import 'package:yam/l10n/generated/app_localizations.dart';
@@ -70,7 +72,7 @@ class _FoodQuickAddSheetState extends State<_FoodQuickAddSheet> {
     _amount = widget.food.lastAmount;
     _referenceQuantity = _serving.baseAmount * widget.food.lastAmount;
     _amountController = TextEditingController(
-      text: _editableNumber(widget.food.lastAmount),
+      text: editableFoodSearchNumber(widget.food.lastAmount),
     );
     _mealId = widget.initialMealId;
     _favorite = widget.favorite;
@@ -152,36 +154,37 @@ class _FoodQuickAddSheetState extends State<_FoodQuickAddSheet> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        MenuAnchor(
-                          menuChildren: [
+                        YamDropdown<String>(
+                          value: _mealId,
+                          options: [
                             for (final meal in meals)
-                              MenuItemButton(
+                              YamDropdownOption(
                                 key: ValueKey('quick-add-meal-${meal.id}'),
-                                leadingIcon: Icon(meal.icon, size: 18),
-                                onPressed: () {
-                                  setState(() => _mealId = meal.id);
-                                },
-                                child: Text(meal.name),
+                                value: meal.id,
+                                label: meal.name,
+                                icon: meal.icon,
                               ),
                           ],
-                          builder: (context, controller, child) {
-                            return YamMealChip(
-                              key: const ValueKey('quick-add-meal'),
-                              icon:
-                                  selectedMeal?.icon ??
-                                  Icons.restaurant_menu_rounded,
-                              label: selectedMeal == null
-                                  ? l10n.foodSearchChooseMeal
-                                  : l10n.quickAddSelectedMeal(
-                                      selectedMeal.name,
-                                    ),
-                              active: selectedMeal != null,
-                              maxWidth: 280,
-                              onPressed: controller.isOpen
-                                  ? controller.close
-                                  : controller.open,
-                            );
-                          },
+                          onSelected: (mealId) =>
+                              setState(() => _mealId = mealId),
+                          triggerBuilder:
+                              (context, toggle, focusNode, isOpen) =>
+                                  YamMealChip(
+                                    key: const ValueKey('quick-add-meal'),
+                                    icon:
+                                        selectedMeal?.icon ??
+                                        Icons.restaurant_menu_rounded,
+                                    label: selectedMeal == null
+                                        ? l10n.foodSearchChooseMeal
+                                        : l10n.quickAddSelectedMeal(
+                                            selectedMeal.name,
+                                          ),
+                                    active: selectedMeal != null,
+                                    maxWidth: 280,
+                                    focusNode: focusNode,
+                                    focused: focusNode.hasFocus || isOpen,
+                                    onPressed: toggle,
+                                  ),
                         ),
                         if (_attemptedSubmit && selectedMeal == null) ...[
                           const SizedBox(height: AppSpacing.xxs),
@@ -408,7 +411,9 @@ class _FoodQuickAddSheetState extends State<_FoodQuickAddSheet> {
   void _setControllerAmount(double amount, {double? referenceQuantity}) {
     _amount = amount;
     _referenceQuantity = referenceQuantity ?? amount * _serving.baseAmount;
-    final text = _editableNumber(amount).replaceAll('.', _decimalSeparator);
+    final text = editableFoodSearchNumber(
+      amount,
+    ).replaceAll('.', _decimalSeparator);
     _amountController.value = TextEditingValue(
       text: text,
       selection: TextSelection.collapsed(offset: text.length),
@@ -438,16 +443,15 @@ class _FoodQuickAddSheetState extends State<_FoodQuickAddSheet> {
         protein: nutrition.protein,
         fat: nutrition.fat,
         carbs: nutrition.carbs,
+        snapshot: diarySnapshotForFood(widget.food),
+        servingId: _serving.id,
+        amount: amount,
+        canonicalQuantity:
+            _referenceQuantity! *
+            (widget.food.referenceUnit == FoodSearchPrototypeUnit.pieces
+                ? widget.food.gramsPerReferenceUnit!
+                : 1),
       ),
     );
   }
-}
-
-String _editableNumber(double value) {
-  return value == value.roundToDouble()
-      ? value.toInt().toString()
-      : value
-            .toStringAsFixed(3)
-            .replaceFirst(RegExp(r'0+$'), '')
-            .replaceFirst(RegExp(r'\.$'), '');
 }

@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'user_food_database.dart';
+part of 'yam_database.dart';
 
 // ignore_for_file: type=lint
 class $UserFoodsTable extends UserFoods
@@ -1782,13 +1782,1323 @@ class InstallationValuesCompanion extends UpdateCompanion<InstallationValue> {
   }
 }
 
-abstract class _$UserFoodDatabase extends GeneratedDatabase {
-  _$UserFoodDatabase(QueryExecutor e) : super(e);
-  $UserFoodDatabaseManager get managers => $UserFoodDatabaseManager(this);
+class $DiaryEntriesTable extends DiaryEntries
+    with TableInfo<$DiaryEntriesTable, StoredDiaryEntry> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DiaryEntriesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _diaryDayMeta = const VerificationMeta(
+    'diaryDay',
+  );
+  @override
+  late final GeneratedColumn<String> diaryDay = GeneratedColumn<String>(
+    'diary_day',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _mealIdMeta = const VerificationMeta('mealId');
+  @override
+  late final GeneratedColumn<String> mealId = GeneratedColumn<String>(
+    'meal_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _foodIdMeta = const VerificationMeta('foodId');
+  @override
+  late final GeneratedColumn<String> foodId = GeneratedColumn<String>(
+    'food_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _foodNameMeta = const VerificationMeta(
+    'foodName',
+  );
+  @override
+  late final GeneratedColumn<String> foodName = GeneratedColumn<String>(
+    'food_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _brandMeta = const VerificationMeta('brand');
+  @override
+  late final GeneratedColumn<String> brand = GeneratedColumn<String>(
+    'brand',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _baseUnitMeta = const VerificationMeta(
+    'baseUnit',
+  );
+  @override
+  late final GeneratedColumn<String> baseUnit = GeneratedColumn<String>(
+    'base_unit',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _basisAmountMeta = const VerificationMeta(
+    'basisAmount',
+  );
+  @override
+  late final GeneratedColumn<double> basisAmount = GeneratedColumn<double>(
+    'basis_amount',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _kcalPerBasisMeta = const VerificationMeta(
+    'kcalPerBasis',
+  );
+  @override
+  late final GeneratedColumn<double> kcalPerBasis = GeneratedColumn<double>(
+    'kcal_per_basis',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _proteinPerBasisMeta = const VerificationMeta(
+    'proteinPerBasis',
+  );
+  @override
+  late final GeneratedColumn<double> proteinPerBasis = GeneratedColumn<double>(
+    'protein_per_basis',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _fatPerBasisMeta = const VerificationMeta(
+    'fatPerBasis',
+  );
+  @override
+  late final GeneratedColumn<double> fatPerBasis = GeneratedColumn<double>(
+    'fat_per_basis',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _carbsPerBasisMeta = const VerificationMeta(
+    'carbsPerBasis',
+  );
+  @override
+  late final GeneratedColumn<double> carbsPerBasis = GeneratedColumn<double>(
+    'carbs_per_basis',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _servingsSnapshotMeta = const VerificationMeta(
+    'servingsSnapshot',
+  );
+  @override
+  late final GeneratedColumn<String> servingsSnapshot = GeneratedColumn<String>(
+    'servings_snapshot',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _servingIdMeta = const VerificationMeta(
+    'servingId',
+  );
+  @override
+  late final GeneratedColumn<String> servingId = GeneratedColumn<String>(
+    'serving_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _amountMeta = const VerificationMeta('amount');
+  @override
+  late final GeneratedColumn<double> amount = GeneratedColumn<double>(
+    'amount',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _canonicalQuantityMeta = const VerificationMeta(
+    'canonicalQuantity',
+  );
+  @override
+  late final GeneratedColumn<double> canonicalQuantity =
+      GeneratedColumn<double>(
+        'canonical_quantity',
+        aliasedName,
+        false,
+        type: DriftSqlType.double,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _energyKcalMeta = const VerificationMeta(
+    'energyKcal',
+  );
+  @override
+  late final GeneratedColumn<double> energyKcal = GeneratedColumn<double>(
+    'energy_kcal',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _proteinGMeta = const VerificationMeta(
+    'proteinG',
+  );
+  @override
+  late final GeneratedColumn<double> proteinG = GeneratedColumn<double>(
+    'protein_g',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _fatGMeta = const VerificationMeta('fatG');
+  @override
+  late final GeneratedColumn<double> fatG = GeneratedColumn<double>(
+    'fat_g',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _carbsGMeta = const VerificationMeta('carbsG');
+  @override
+  late final GeneratedColumn<double> carbsG = GeneratedColumn<double>(
+    'carbs_g',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _deviceIdMeta = const VerificationMeta(
+    'deviceId',
+  );
+  @override
+  late final GeneratedColumn<String> deviceId = GeneratedColumn<String>(
+    'device_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    diaryDay,
+    mealId,
+    foodId,
+    foodName,
+    brand,
+    baseUnit,
+    basisAmount,
+    kcalPerBasis,
+    proteinPerBasis,
+    fatPerBasis,
+    carbsPerBasis,
+    servingsSnapshot,
+    servingId,
+    amount,
+    canonicalQuantity,
+    energyKcal,
+    proteinG,
+    fatG,
+    carbsG,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    deviceId,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'diary_entries';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<StoredDiaryEntry> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('diary_day')) {
+      context.handle(
+        _diaryDayMeta,
+        diaryDay.isAcceptableOrUnknown(data['diary_day']!, _diaryDayMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_diaryDayMeta);
+    }
+    if (data.containsKey('meal_id')) {
+      context.handle(
+        _mealIdMeta,
+        mealId.isAcceptableOrUnknown(data['meal_id']!, _mealIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_mealIdMeta);
+    }
+    if (data.containsKey('food_id')) {
+      context.handle(
+        _foodIdMeta,
+        foodId.isAcceptableOrUnknown(data['food_id']!, _foodIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_foodIdMeta);
+    }
+    if (data.containsKey('food_name')) {
+      context.handle(
+        _foodNameMeta,
+        foodName.isAcceptableOrUnknown(data['food_name']!, _foodNameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_foodNameMeta);
+    }
+    if (data.containsKey('brand')) {
+      context.handle(
+        _brandMeta,
+        brand.isAcceptableOrUnknown(data['brand']!, _brandMeta),
+      );
+    }
+    if (data.containsKey('base_unit')) {
+      context.handle(
+        _baseUnitMeta,
+        baseUnit.isAcceptableOrUnknown(data['base_unit']!, _baseUnitMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_baseUnitMeta);
+    }
+    if (data.containsKey('basis_amount')) {
+      context.handle(
+        _basisAmountMeta,
+        basisAmount.isAcceptableOrUnknown(
+          data['basis_amount']!,
+          _basisAmountMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_basisAmountMeta);
+    }
+    if (data.containsKey('kcal_per_basis')) {
+      context.handle(
+        _kcalPerBasisMeta,
+        kcalPerBasis.isAcceptableOrUnknown(
+          data['kcal_per_basis']!,
+          _kcalPerBasisMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_kcalPerBasisMeta);
+    }
+    if (data.containsKey('protein_per_basis')) {
+      context.handle(
+        _proteinPerBasisMeta,
+        proteinPerBasis.isAcceptableOrUnknown(
+          data['protein_per_basis']!,
+          _proteinPerBasisMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_proteinPerBasisMeta);
+    }
+    if (data.containsKey('fat_per_basis')) {
+      context.handle(
+        _fatPerBasisMeta,
+        fatPerBasis.isAcceptableOrUnknown(
+          data['fat_per_basis']!,
+          _fatPerBasisMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_fatPerBasisMeta);
+    }
+    if (data.containsKey('carbs_per_basis')) {
+      context.handle(
+        _carbsPerBasisMeta,
+        carbsPerBasis.isAcceptableOrUnknown(
+          data['carbs_per_basis']!,
+          _carbsPerBasisMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_carbsPerBasisMeta);
+    }
+    if (data.containsKey('servings_snapshot')) {
+      context.handle(
+        _servingsSnapshotMeta,
+        servingsSnapshot.isAcceptableOrUnknown(
+          data['servings_snapshot']!,
+          _servingsSnapshotMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_servingsSnapshotMeta);
+    }
+    if (data.containsKey('serving_id')) {
+      context.handle(
+        _servingIdMeta,
+        servingId.isAcceptableOrUnknown(data['serving_id']!, _servingIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_servingIdMeta);
+    }
+    if (data.containsKey('amount')) {
+      context.handle(
+        _amountMeta,
+        amount.isAcceptableOrUnknown(data['amount']!, _amountMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_amountMeta);
+    }
+    if (data.containsKey('canonical_quantity')) {
+      context.handle(
+        _canonicalQuantityMeta,
+        canonicalQuantity.isAcceptableOrUnknown(
+          data['canonical_quantity']!,
+          _canonicalQuantityMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_canonicalQuantityMeta);
+    }
+    if (data.containsKey('energy_kcal')) {
+      context.handle(
+        _energyKcalMeta,
+        energyKcal.isAcceptableOrUnknown(data['energy_kcal']!, _energyKcalMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_energyKcalMeta);
+    }
+    if (data.containsKey('protein_g')) {
+      context.handle(
+        _proteinGMeta,
+        proteinG.isAcceptableOrUnknown(data['protein_g']!, _proteinGMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_proteinGMeta);
+    }
+    if (data.containsKey('fat_g')) {
+      context.handle(
+        _fatGMeta,
+        fatG.isAcceptableOrUnknown(data['fat_g']!, _fatGMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_fatGMeta);
+    }
+    if (data.containsKey('carbs_g')) {
+      context.handle(
+        _carbsGMeta,
+        carbsG.isAcceptableOrUnknown(data['carbs_g']!, _carbsGMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_carbsGMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    if (data.containsKey('device_id')) {
+      context.handle(
+        _deviceIdMeta,
+        deviceId.isAcceptableOrUnknown(data['device_id']!, _deviceIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_deviceIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  StoredDiaryEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return StoredDiaryEntry(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      diaryDay: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}diary_day'],
+      )!,
+      mealId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}meal_id'],
+      )!,
+      foodId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}food_id'],
+      )!,
+      foodName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}food_name'],
+      )!,
+      brand: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}brand'],
+      ),
+      baseUnit: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}base_unit'],
+      )!,
+      basisAmount: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}basis_amount'],
+      )!,
+      kcalPerBasis: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}kcal_per_basis'],
+      )!,
+      proteinPerBasis: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}protein_per_basis'],
+      )!,
+      fatPerBasis: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}fat_per_basis'],
+      )!,
+      carbsPerBasis: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}carbs_per_basis'],
+      )!,
+      servingsSnapshot: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}servings_snapshot'],
+      )!,
+      servingId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}serving_id'],
+      )!,
+      amount: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}amount'],
+      )!,
+      canonicalQuantity: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}canonical_quantity'],
+      )!,
+      energyKcal: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}energy_kcal'],
+      )!,
+      proteinG: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}protein_g'],
+      )!,
+      fatG: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}fat_g'],
+      )!,
+      carbsG: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}carbs_g'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+      deviceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}device_id'],
+      )!,
+    );
+  }
+
+  @override
+  $DiaryEntriesTable createAlias(String alias) {
+    return $DiaryEntriesTable(attachedDatabase, alias);
+  }
+}
+
+class StoredDiaryEntry extends DataClass
+    implements Insertable<StoredDiaryEntry> {
+  final String id;
+  final String diaryDay;
+  final String mealId;
+  final String foodId;
+  final String foodName;
+  final String? brand;
+  final String baseUnit;
+  final double basisAmount;
+  final double kcalPerBasis;
+  final double proteinPerBasis;
+  final double fatPerBasis;
+  final double carbsPerBasis;
+  final String servingsSnapshot;
+  final String servingId;
+  final double amount;
+  final double canonicalQuantity;
+  final double energyKcal;
+  final double proteinG;
+  final double fatG;
+  final double carbsG;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? deletedAt;
+  final String deviceId;
+  const StoredDiaryEntry({
+    required this.id,
+    required this.diaryDay,
+    required this.mealId,
+    required this.foodId,
+    required this.foodName,
+    this.brand,
+    required this.baseUnit,
+    required this.basisAmount,
+    required this.kcalPerBasis,
+    required this.proteinPerBasis,
+    required this.fatPerBasis,
+    required this.carbsPerBasis,
+    required this.servingsSnapshot,
+    required this.servingId,
+    required this.amount,
+    required this.canonicalQuantity,
+    required this.energyKcal,
+    required this.proteinG,
+    required this.fatG,
+    required this.carbsG,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+    required this.deviceId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['diary_day'] = Variable<String>(diaryDay);
+    map['meal_id'] = Variable<String>(mealId);
+    map['food_id'] = Variable<String>(foodId);
+    map['food_name'] = Variable<String>(foodName);
+    if (!nullToAbsent || brand != null) {
+      map['brand'] = Variable<String>(brand);
+    }
+    map['base_unit'] = Variable<String>(baseUnit);
+    map['basis_amount'] = Variable<double>(basisAmount);
+    map['kcal_per_basis'] = Variable<double>(kcalPerBasis);
+    map['protein_per_basis'] = Variable<double>(proteinPerBasis);
+    map['fat_per_basis'] = Variable<double>(fatPerBasis);
+    map['carbs_per_basis'] = Variable<double>(carbsPerBasis);
+    map['servings_snapshot'] = Variable<String>(servingsSnapshot);
+    map['serving_id'] = Variable<String>(servingId);
+    map['amount'] = Variable<double>(amount);
+    map['canonical_quantity'] = Variable<double>(canonicalQuantity);
+    map['energy_kcal'] = Variable<double>(energyKcal);
+    map['protein_g'] = Variable<double>(proteinG);
+    map['fat_g'] = Variable<double>(fatG);
+    map['carbs_g'] = Variable<double>(carbsG);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    map['device_id'] = Variable<String>(deviceId);
+    return map;
+  }
+
+  DiaryEntriesCompanion toCompanion(bool nullToAbsent) {
+    return DiaryEntriesCompanion(
+      id: Value(id),
+      diaryDay: Value(diaryDay),
+      mealId: Value(mealId),
+      foodId: Value(foodId),
+      foodName: Value(foodName),
+      brand: brand == null && nullToAbsent
+          ? const Value.absent()
+          : Value(brand),
+      baseUnit: Value(baseUnit),
+      basisAmount: Value(basisAmount),
+      kcalPerBasis: Value(kcalPerBasis),
+      proteinPerBasis: Value(proteinPerBasis),
+      fatPerBasis: Value(fatPerBasis),
+      carbsPerBasis: Value(carbsPerBasis),
+      servingsSnapshot: Value(servingsSnapshot),
+      servingId: Value(servingId),
+      amount: Value(amount),
+      canonicalQuantity: Value(canonicalQuantity),
+      energyKcal: Value(energyKcal),
+      proteinG: Value(proteinG),
+      fatG: Value(fatG),
+      carbsG: Value(carbsG),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+      deviceId: Value(deviceId),
+    );
+  }
+
+  factory StoredDiaryEntry.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return StoredDiaryEntry(
+      id: serializer.fromJson<String>(json['id']),
+      diaryDay: serializer.fromJson<String>(json['diaryDay']),
+      mealId: serializer.fromJson<String>(json['mealId']),
+      foodId: serializer.fromJson<String>(json['foodId']),
+      foodName: serializer.fromJson<String>(json['foodName']),
+      brand: serializer.fromJson<String?>(json['brand']),
+      baseUnit: serializer.fromJson<String>(json['baseUnit']),
+      basisAmount: serializer.fromJson<double>(json['basisAmount']),
+      kcalPerBasis: serializer.fromJson<double>(json['kcalPerBasis']),
+      proteinPerBasis: serializer.fromJson<double>(json['proteinPerBasis']),
+      fatPerBasis: serializer.fromJson<double>(json['fatPerBasis']),
+      carbsPerBasis: serializer.fromJson<double>(json['carbsPerBasis']),
+      servingsSnapshot: serializer.fromJson<String>(json['servingsSnapshot']),
+      servingId: serializer.fromJson<String>(json['servingId']),
+      amount: serializer.fromJson<double>(json['amount']),
+      canonicalQuantity: serializer.fromJson<double>(json['canonicalQuantity']),
+      energyKcal: serializer.fromJson<double>(json['energyKcal']),
+      proteinG: serializer.fromJson<double>(json['proteinG']),
+      fatG: serializer.fromJson<double>(json['fatG']),
+      carbsG: serializer.fromJson<double>(json['carbsG']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      deviceId: serializer.fromJson<String>(json['deviceId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'diaryDay': serializer.toJson<String>(diaryDay),
+      'mealId': serializer.toJson<String>(mealId),
+      'foodId': serializer.toJson<String>(foodId),
+      'foodName': serializer.toJson<String>(foodName),
+      'brand': serializer.toJson<String?>(brand),
+      'baseUnit': serializer.toJson<String>(baseUnit),
+      'basisAmount': serializer.toJson<double>(basisAmount),
+      'kcalPerBasis': serializer.toJson<double>(kcalPerBasis),
+      'proteinPerBasis': serializer.toJson<double>(proteinPerBasis),
+      'fatPerBasis': serializer.toJson<double>(fatPerBasis),
+      'carbsPerBasis': serializer.toJson<double>(carbsPerBasis),
+      'servingsSnapshot': serializer.toJson<String>(servingsSnapshot),
+      'servingId': serializer.toJson<String>(servingId),
+      'amount': serializer.toJson<double>(amount),
+      'canonicalQuantity': serializer.toJson<double>(canonicalQuantity),
+      'energyKcal': serializer.toJson<double>(energyKcal),
+      'proteinG': serializer.toJson<double>(proteinG),
+      'fatG': serializer.toJson<double>(fatG),
+      'carbsG': serializer.toJson<double>(carbsG),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'deviceId': serializer.toJson<String>(deviceId),
+    };
+  }
+
+  StoredDiaryEntry copyWith({
+    String? id,
+    String? diaryDay,
+    String? mealId,
+    String? foodId,
+    String? foodName,
+    Value<String?> brand = const Value.absent(),
+    String? baseUnit,
+    double? basisAmount,
+    double? kcalPerBasis,
+    double? proteinPerBasis,
+    double? fatPerBasis,
+    double? carbsPerBasis,
+    String? servingsSnapshot,
+    String? servingId,
+    double? amount,
+    double? canonicalQuantity,
+    double? energyKcal,
+    double? proteinG,
+    double? fatG,
+    double? carbsG,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+    String? deviceId,
+  }) => StoredDiaryEntry(
+    id: id ?? this.id,
+    diaryDay: diaryDay ?? this.diaryDay,
+    mealId: mealId ?? this.mealId,
+    foodId: foodId ?? this.foodId,
+    foodName: foodName ?? this.foodName,
+    brand: brand.present ? brand.value : this.brand,
+    baseUnit: baseUnit ?? this.baseUnit,
+    basisAmount: basisAmount ?? this.basisAmount,
+    kcalPerBasis: kcalPerBasis ?? this.kcalPerBasis,
+    proteinPerBasis: proteinPerBasis ?? this.proteinPerBasis,
+    fatPerBasis: fatPerBasis ?? this.fatPerBasis,
+    carbsPerBasis: carbsPerBasis ?? this.carbsPerBasis,
+    servingsSnapshot: servingsSnapshot ?? this.servingsSnapshot,
+    servingId: servingId ?? this.servingId,
+    amount: amount ?? this.amount,
+    canonicalQuantity: canonicalQuantity ?? this.canonicalQuantity,
+    energyKcal: energyKcal ?? this.energyKcal,
+    proteinG: proteinG ?? this.proteinG,
+    fatG: fatG ?? this.fatG,
+    carbsG: carbsG ?? this.carbsG,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    deviceId: deviceId ?? this.deviceId,
+  );
+  StoredDiaryEntry copyWithCompanion(DiaryEntriesCompanion data) {
+    return StoredDiaryEntry(
+      id: data.id.present ? data.id.value : this.id,
+      diaryDay: data.diaryDay.present ? data.diaryDay.value : this.diaryDay,
+      mealId: data.mealId.present ? data.mealId.value : this.mealId,
+      foodId: data.foodId.present ? data.foodId.value : this.foodId,
+      foodName: data.foodName.present ? data.foodName.value : this.foodName,
+      brand: data.brand.present ? data.brand.value : this.brand,
+      baseUnit: data.baseUnit.present ? data.baseUnit.value : this.baseUnit,
+      basisAmount: data.basisAmount.present
+          ? data.basisAmount.value
+          : this.basisAmount,
+      kcalPerBasis: data.kcalPerBasis.present
+          ? data.kcalPerBasis.value
+          : this.kcalPerBasis,
+      proteinPerBasis: data.proteinPerBasis.present
+          ? data.proteinPerBasis.value
+          : this.proteinPerBasis,
+      fatPerBasis: data.fatPerBasis.present
+          ? data.fatPerBasis.value
+          : this.fatPerBasis,
+      carbsPerBasis: data.carbsPerBasis.present
+          ? data.carbsPerBasis.value
+          : this.carbsPerBasis,
+      servingsSnapshot: data.servingsSnapshot.present
+          ? data.servingsSnapshot.value
+          : this.servingsSnapshot,
+      servingId: data.servingId.present ? data.servingId.value : this.servingId,
+      amount: data.amount.present ? data.amount.value : this.amount,
+      canonicalQuantity: data.canonicalQuantity.present
+          ? data.canonicalQuantity.value
+          : this.canonicalQuantity,
+      energyKcal: data.energyKcal.present
+          ? data.energyKcal.value
+          : this.energyKcal,
+      proteinG: data.proteinG.present ? data.proteinG.value : this.proteinG,
+      fatG: data.fatG.present ? data.fatG.value : this.fatG,
+      carbsG: data.carbsG.present ? data.carbsG.value : this.carbsG,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      deviceId: data.deviceId.present ? data.deviceId.value : this.deviceId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('StoredDiaryEntry(')
+          ..write('id: $id, ')
+          ..write('diaryDay: $diaryDay, ')
+          ..write('mealId: $mealId, ')
+          ..write('foodId: $foodId, ')
+          ..write('foodName: $foodName, ')
+          ..write('brand: $brand, ')
+          ..write('baseUnit: $baseUnit, ')
+          ..write('basisAmount: $basisAmount, ')
+          ..write('kcalPerBasis: $kcalPerBasis, ')
+          ..write('proteinPerBasis: $proteinPerBasis, ')
+          ..write('fatPerBasis: $fatPerBasis, ')
+          ..write('carbsPerBasis: $carbsPerBasis, ')
+          ..write('servingsSnapshot: $servingsSnapshot, ')
+          ..write('servingId: $servingId, ')
+          ..write('amount: $amount, ')
+          ..write('canonicalQuantity: $canonicalQuantity, ')
+          ..write('energyKcal: $energyKcal, ')
+          ..write('proteinG: $proteinG, ')
+          ..write('fatG: $fatG, ')
+          ..write('carbsG: $carbsG, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('deviceId: $deviceId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hashAll([
+    id,
+    diaryDay,
+    mealId,
+    foodId,
+    foodName,
+    brand,
+    baseUnit,
+    basisAmount,
+    kcalPerBasis,
+    proteinPerBasis,
+    fatPerBasis,
+    carbsPerBasis,
+    servingsSnapshot,
+    servingId,
+    amount,
+    canonicalQuantity,
+    energyKcal,
+    proteinG,
+    fatG,
+    carbsG,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    deviceId,
+  ]);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is StoredDiaryEntry &&
+          other.id == this.id &&
+          other.diaryDay == this.diaryDay &&
+          other.mealId == this.mealId &&
+          other.foodId == this.foodId &&
+          other.foodName == this.foodName &&
+          other.brand == this.brand &&
+          other.baseUnit == this.baseUnit &&
+          other.basisAmount == this.basisAmount &&
+          other.kcalPerBasis == this.kcalPerBasis &&
+          other.proteinPerBasis == this.proteinPerBasis &&
+          other.fatPerBasis == this.fatPerBasis &&
+          other.carbsPerBasis == this.carbsPerBasis &&
+          other.servingsSnapshot == this.servingsSnapshot &&
+          other.servingId == this.servingId &&
+          other.amount == this.amount &&
+          other.canonicalQuantity == this.canonicalQuantity &&
+          other.energyKcal == this.energyKcal &&
+          other.proteinG == this.proteinG &&
+          other.fatG == this.fatG &&
+          other.carbsG == this.carbsG &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt &&
+          other.deviceId == this.deviceId);
+}
+
+class DiaryEntriesCompanion extends UpdateCompanion<StoredDiaryEntry> {
+  final Value<String> id;
+  final Value<String> diaryDay;
+  final Value<String> mealId;
+  final Value<String> foodId;
+  final Value<String> foodName;
+  final Value<String?> brand;
+  final Value<String> baseUnit;
+  final Value<double> basisAmount;
+  final Value<double> kcalPerBasis;
+  final Value<double> proteinPerBasis;
+  final Value<double> fatPerBasis;
+  final Value<double> carbsPerBasis;
+  final Value<String> servingsSnapshot;
+  final Value<String> servingId;
+  final Value<double> amount;
+  final Value<double> canonicalQuantity;
+  final Value<double> energyKcal;
+  final Value<double> proteinG;
+  final Value<double> fatG;
+  final Value<double> carbsG;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> deletedAt;
+  final Value<String> deviceId;
+  final Value<int> rowid;
+  const DiaryEntriesCompanion({
+    this.id = const Value.absent(),
+    this.diaryDay = const Value.absent(),
+    this.mealId = const Value.absent(),
+    this.foodId = const Value.absent(),
+    this.foodName = const Value.absent(),
+    this.brand = const Value.absent(),
+    this.baseUnit = const Value.absent(),
+    this.basisAmount = const Value.absent(),
+    this.kcalPerBasis = const Value.absent(),
+    this.proteinPerBasis = const Value.absent(),
+    this.fatPerBasis = const Value.absent(),
+    this.carbsPerBasis = const Value.absent(),
+    this.servingsSnapshot = const Value.absent(),
+    this.servingId = const Value.absent(),
+    this.amount = const Value.absent(),
+    this.canonicalQuantity = const Value.absent(),
+    this.energyKcal = const Value.absent(),
+    this.proteinG = const Value.absent(),
+    this.fatG = const Value.absent(),
+    this.carbsG = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.deviceId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  DiaryEntriesCompanion.insert({
+    required String id,
+    required String diaryDay,
+    required String mealId,
+    required String foodId,
+    required String foodName,
+    this.brand = const Value.absent(),
+    required String baseUnit,
+    required double basisAmount,
+    required double kcalPerBasis,
+    required double proteinPerBasis,
+    required double fatPerBasis,
+    required double carbsPerBasis,
+    required String servingsSnapshot,
+    required String servingId,
+    required double amount,
+    required double canonicalQuantity,
+    required double energyKcal,
+    required double proteinG,
+    required double fatG,
+    required double carbsG,
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.deletedAt = const Value.absent(),
+    required String deviceId,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       diaryDay = Value(diaryDay),
+       mealId = Value(mealId),
+       foodId = Value(foodId),
+       foodName = Value(foodName),
+       baseUnit = Value(baseUnit),
+       basisAmount = Value(basisAmount),
+       kcalPerBasis = Value(kcalPerBasis),
+       proteinPerBasis = Value(proteinPerBasis),
+       fatPerBasis = Value(fatPerBasis),
+       carbsPerBasis = Value(carbsPerBasis),
+       servingsSnapshot = Value(servingsSnapshot),
+       servingId = Value(servingId),
+       amount = Value(amount),
+       canonicalQuantity = Value(canonicalQuantity),
+       energyKcal = Value(energyKcal),
+       proteinG = Value(proteinG),
+       fatG = Value(fatG),
+       carbsG = Value(carbsG),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt),
+       deviceId = Value(deviceId);
+  static Insertable<StoredDiaryEntry> custom({
+    Expression<String>? id,
+    Expression<String>? diaryDay,
+    Expression<String>? mealId,
+    Expression<String>? foodId,
+    Expression<String>? foodName,
+    Expression<String>? brand,
+    Expression<String>? baseUnit,
+    Expression<double>? basisAmount,
+    Expression<double>? kcalPerBasis,
+    Expression<double>? proteinPerBasis,
+    Expression<double>? fatPerBasis,
+    Expression<double>? carbsPerBasis,
+    Expression<String>? servingsSnapshot,
+    Expression<String>? servingId,
+    Expression<double>? amount,
+    Expression<double>? canonicalQuantity,
+    Expression<double>? energyKcal,
+    Expression<double>? proteinG,
+    Expression<double>? fatG,
+    Expression<double>? carbsG,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+    Expression<String>? deviceId,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (diaryDay != null) 'diary_day': diaryDay,
+      if (mealId != null) 'meal_id': mealId,
+      if (foodId != null) 'food_id': foodId,
+      if (foodName != null) 'food_name': foodName,
+      if (brand != null) 'brand': brand,
+      if (baseUnit != null) 'base_unit': baseUnit,
+      if (basisAmount != null) 'basis_amount': basisAmount,
+      if (kcalPerBasis != null) 'kcal_per_basis': kcalPerBasis,
+      if (proteinPerBasis != null) 'protein_per_basis': proteinPerBasis,
+      if (fatPerBasis != null) 'fat_per_basis': fatPerBasis,
+      if (carbsPerBasis != null) 'carbs_per_basis': carbsPerBasis,
+      if (servingsSnapshot != null) 'servings_snapshot': servingsSnapshot,
+      if (servingId != null) 'serving_id': servingId,
+      if (amount != null) 'amount': amount,
+      if (canonicalQuantity != null) 'canonical_quantity': canonicalQuantity,
+      if (energyKcal != null) 'energy_kcal': energyKcal,
+      if (proteinG != null) 'protein_g': proteinG,
+      if (fatG != null) 'fat_g': fatG,
+      if (carbsG != null) 'carbs_g': carbsG,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (deviceId != null) 'device_id': deviceId,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  DiaryEntriesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? diaryDay,
+    Value<String>? mealId,
+    Value<String>? foodId,
+    Value<String>? foodName,
+    Value<String?>? brand,
+    Value<String>? baseUnit,
+    Value<double>? basisAmount,
+    Value<double>? kcalPerBasis,
+    Value<double>? proteinPerBasis,
+    Value<double>? fatPerBasis,
+    Value<double>? carbsPerBasis,
+    Value<String>? servingsSnapshot,
+    Value<String>? servingId,
+    Value<double>? amount,
+    Value<double>? canonicalQuantity,
+    Value<double>? energyKcal,
+    Value<double>? proteinG,
+    Value<double>? fatG,
+    Value<double>? carbsG,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? deletedAt,
+    Value<String>? deviceId,
+    Value<int>? rowid,
+  }) {
+    return DiaryEntriesCompanion(
+      id: id ?? this.id,
+      diaryDay: diaryDay ?? this.diaryDay,
+      mealId: mealId ?? this.mealId,
+      foodId: foodId ?? this.foodId,
+      foodName: foodName ?? this.foodName,
+      brand: brand ?? this.brand,
+      baseUnit: baseUnit ?? this.baseUnit,
+      basisAmount: basisAmount ?? this.basisAmount,
+      kcalPerBasis: kcalPerBasis ?? this.kcalPerBasis,
+      proteinPerBasis: proteinPerBasis ?? this.proteinPerBasis,
+      fatPerBasis: fatPerBasis ?? this.fatPerBasis,
+      carbsPerBasis: carbsPerBasis ?? this.carbsPerBasis,
+      servingsSnapshot: servingsSnapshot ?? this.servingsSnapshot,
+      servingId: servingId ?? this.servingId,
+      amount: amount ?? this.amount,
+      canonicalQuantity: canonicalQuantity ?? this.canonicalQuantity,
+      energyKcal: energyKcal ?? this.energyKcal,
+      proteinG: proteinG ?? this.proteinG,
+      fatG: fatG ?? this.fatG,
+      carbsG: carbsG ?? this.carbsG,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      deviceId: deviceId ?? this.deviceId,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (diaryDay.present) {
+      map['diary_day'] = Variable<String>(diaryDay.value);
+    }
+    if (mealId.present) {
+      map['meal_id'] = Variable<String>(mealId.value);
+    }
+    if (foodId.present) {
+      map['food_id'] = Variable<String>(foodId.value);
+    }
+    if (foodName.present) {
+      map['food_name'] = Variable<String>(foodName.value);
+    }
+    if (brand.present) {
+      map['brand'] = Variable<String>(brand.value);
+    }
+    if (baseUnit.present) {
+      map['base_unit'] = Variable<String>(baseUnit.value);
+    }
+    if (basisAmount.present) {
+      map['basis_amount'] = Variable<double>(basisAmount.value);
+    }
+    if (kcalPerBasis.present) {
+      map['kcal_per_basis'] = Variable<double>(kcalPerBasis.value);
+    }
+    if (proteinPerBasis.present) {
+      map['protein_per_basis'] = Variable<double>(proteinPerBasis.value);
+    }
+    if (fatPerBasis.present) {
+      map['fat_per_basis'] = Variable<double>(fatPerBasis.value);
+    }
+    if (carbsPerBasis.present) {
+      map['carbs_per_basis'] = Variable<double>(carbsPerBasis.value);
+    }
+    if (servingsSnapshot.present) {
+      map['servings_snapshot'] = Variable<String>(servingsSnapshot.value);
+    }
+    if (servingId.present) {
+      map['serving_id'] = Variable<String>(servingId.value);
+    }
+    if (amount.present) {
+      map['amount'] = Variable<double>(amount.value);
+    }
+    if (canonicalQuantity.present) {
+      map['canonical_quantity'] = Variable<double>(canonicalQuantity.value);
+    }
+    if (energyKcal.present) {
+      map['energy_kcal'] = Variable<double>(energyKcal.value);
+    }
+    if (proteinG.present) {
+      map['protein_g'] = Variable<double>(proteinG.value);
+    }
+    if (fatG.present) {
+      map['fat_g'] = Variable<double>(fatG.value);
+    }
+    if (carbsG.present) {
+      map['carbs_g'] = Variable<double>(carbsG.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (deviceId.present) {
+      map['device_id'] = Variable<String>(deviceId.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DiaryEntriesCompanion(')
+          ..write('id: $id, ')
+          ..write('diaryDay: $diaryDay, ')
+          ..write('mealId: $mealId, ')
+          ..write('foodId: $foodId, ')
+          ..write('foodName: $foodName, ')
+          ..write('brand: $brand, ')
+          ..write('baseUnit: $baseUnit, ')
+          ..write('basisAmount: $basisAmount, ')
+          ..write('kcalPerBasis: $kcalPerBasis, ')
+          ..write('proteinPerBasis: $proteinPerBasis, ')
+          ..write('fatPerBasis: $fatPerBasis, ')
+          ..write('carbsPerBasis: $carbsPerBasis, ')
+          ..write('servingsSnapshot: $servingsSnapshot, ')
+          ..write('servingId: $servingId, ')
+          ..write('amount: $amount, ')
+          ..write('canonicalQuantity: $canonicalQuantity, ')
+          ..write('energyKcal: $energyKcal, ')
+          ..write('proteinG: $proteinG, ')
+          ..write('fatG: $fatG, ')
+          ..write('carbsG: $carbsG, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+abstract class _$YamDatabase extends GeneratedDatabase {
+  _$YamDatabase(QueryExecutor e) : super(e);
+  $YamDatabaseManager get managers => $YamDatabaseManager(this);
   late final $UserFoodsTable userFoods = $UserFoodsTable(this);
   late final $UserServingsTable userServings = $UserServingsTable(this);
   late final $InstallationValuesTable installationValues =
       $InstallationValuesTable(this);
+  late final $DiaryEntriesTable diaryEntries = $DiaryEntriesTable(this);
   late final Index userFoodsHistory = Index(
     'user_foods_history',
     'CREATE INDEX user_foods_history ON user_foods (deleted_at, created_at)',
@@ -1801,6 +3111,14 @@ abstract class _$UserFoodDatabase extends GeneratedDatabase {
     'user_servings_food',
     'CREATE INDEX user_servings_food ON user_servings (food_id, deleted_at)',
   );
+  late final Index diaryEntriesDay = Index(
+    'diary_entries_day',
+    'CREATE INDEX diary_entries_day ON diary_entries (diary_day, deleted_at, meal_id)',
+  );
+  late final Index diaryEntriesRecent = Index(
+    'diary_entries_recent',
+    'CREATE INDEX diary_entries_recent ON diary_entries (deleted_at, created_at)',
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -1809,9 +3127,12 @@ abstract class _$UserFoodDatabase extends GeneratedDatabase {
     userFoods,
     userServings,
     installationValues,
+    diaryEntries,
     userFoodsHistory,
     userFoodsName,
     userServingsFood,
+    diaryEntriesDay,
+    diaryEntriesRecent,
   ];
 }
 
@@ -1859,19 +3180,14 @@ typedef $$UserFoodsTableUpdateCompanionBuilder =
     });
 
 final class $$UserFoodsTableReferences
-    extends
-        BaseReferences<_$UserFoodDatabase, $UserFoodsTable, StoredUserFood> {
+    extends BaseReferences<_$YamDatabase, $UserFoodsTable, StoredUserFood> {
   $$UserFoodsTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
   static MultiTypedResultKey<$UserServingsTable, List<StoredUserServing>>
-  _userServingsRefsTable(_$UserFoodDatabase db) =>
-      MultiTypedResultKey.fromTable(
-        db.userServings,
-        aliasName: $_aliasNameGenerator(
-          db.userFoods.id,
-          db.userServings.foodId,
-        ),
-      );
+  _userServingsRefsTable(_$YamDatabase db) => MultiTypedResultKey.fromTable(
+    db.userServings,
+    aliasName: $_aliasNameGenerator(db.userFoods.id, db.userServings.foodId),
+  );
 
   $$UserServingsTableProcessedTableManager get userServingsRefs {
     final manager = $$UserServingsTableTableManager(
@@ -1887,7 +3203,7 @@ final class $$UserFoodsTableReferences
 }
 
 class $$UserFoodsTableFilterComposer
-    extends Composer<_$UserFoodDatabase, $UserFoodsTable> {
+    extends Composer<_$YamDatabase, $UserFoodsTable> {
   $$UserFoodsTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -2007,7 +3323,7 @@ class $$UserFoodsTableFilterComposer
 }
 
 class $$UserFoodsTableOrderingComposer
-    extends Composer<_$UserFoodDatabase, $UserFoodsTable> {
+    extends Composer<_$YamDatabase, $UserFoodsTable> {
   $$UserFoodsTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -2102,7 +3418,7 @@ class $$UserFoodsTableOrderingComposer
 }
 
 class $$UserFoodsTableAnnotationComposer
-    extends Composer<_$UserFoodDatabase, $UserFoodsTable> {
+    extends Composer<_$YamDatabase, $UserFoodsTable> {
   $$UserFoodsTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -2198,7 +3514,7 @@ class $$UserFoodsTableAnnotationComposer
 class $$UserFoodsTableTableManager
     extends
         RootTableManager<
-          _$UserFoodDatabase,
+          _$YamDatabase,
           $UserFoodsTable,
           StoredUserFood,
           $$UserFoodsTableFilterComposer,
@@ -2210,7 +3526,7 @@ class $$UserFoodsTableTableManager
           StoredUserFood,
           PrefetchHooks Function({bool userServingsRefs})
         > {
-  $$UserFoodsTableTableManager(_$UserFoodDatabase db, $UserFoodsTable table)
+  $$UserFoodsTableTableManager(_$YamDatabase db, $UserFoodsTable table)
     : super(
         TableManagerState(
           db: db,
@@ -2345,7 +3661,7 @@ class $$UserFoodsTableTableManager
 
 typedef $$UserFoodsTableProcessedTableManager =
     ProcessedTableManager<
-      _$UserFoodDatabase,
+      _$YamDatabase,
       $UserFoodsTable,
       StoredUserFood,
       $$UserFoodsTableFilterComposer,
@@ -2388,14 +3704,10 @@ typedef $$UserServingsTableUpdateCompanionBuilder =
 
 final class $$UserServingsTableReferences
     extends
-        BaseReferences<
-          _$UserFoodDatabase,
-          $UserServingsTable,
-          StoredUserServing
-        > {
+        BaseReferences<_$YamDatabase, $UserServingsTable, StoredUserServing> {
   $$UserServingsTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
-  static $UserFoodsTable _foodIdTable(_$UserFoodDatabase db) =>
+  static $UserFoodsTable _foodIdTable(_$YamDatabase db) =>
       db.userFoods.createAlias(
         $_aliasNameGenerator(db.userServings.foodId, db.userFoods.id),
       );
@@ -2416,7 +3728,7 @@ final class $$UserServingsTableReferences
 }
 
 class $$UserServingsTableFilterComposer
-    extends Composer<_$UserFoodDatabase, $UserServingsTable> {
+    extends Composer<_$YamDatabase, $UserServingsTable> {
   $$UserServingsTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -2494,7 +3806,7 @@ class $$UserServingsTableFilterComposer
 }
 
 class $$UserServingsTableOrderingComposer
-    extends Composer<_$UserFoodDatabase, $UserServingsTable> {
+    extends Composer<_$YamDatabase, $UserServingsTable> {
   $$UserServingsTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -2572,7 +3884,7 @@ class $$UserServingsTableOrderingComposer
 }
 
 class $$UserServingsTableAnnotationComposer
-    extends Composer<_$UserFoodDatabase, $UserServingsTable> {
+    extends Composer<_$YamDatabase, $UserServingsTable> {
   $$UserServingsTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -2638,7 +3950,7 @@ class $$UserServingsTableAnnotationComposer
 class $$UserServingsTableTableManager
     extends
         RootTableManager<
-          _$UserFoodDatabase,
+          _$YamDatabase,
           $UserServingsTable,
           StoredUserServing,
           $$UserServingsTableFilterComposer,
@@ -2650,10 +3962,8 @@ class $$UserServingsTableTableManager
           StoredUserServing,
           PrefetchHooks Function({bool foodId})
         > {
-  $$UserServingsTableTableManager(
-    _$UserFoodDatabase db,
-    $UserServingsTable table,
-  ) : super(
+  $$UserServingsTableTableManager(_$YamDatabase db, $UserServingsTable table)
+    : super(
         TableManagerState(
           db: db,
           table: table,
@@ -2770,7 +4080,7 @@ class $$UserServingsTableTableManager
 
 typedef $$UserServingsTableProcessedTableManager =
     ProcessedTableManager<
-      _$UserFoodDatabase,
+      _$YamDatabase,
       $UserServingsTable,
       StoredUserServing,
       $$UserServingsTableFilterComposer,
@@ -2796,7 +4106,7 @@ typedef $$InstallationValuesTableUpdateCompanionBuilder =
     });
 
 class $$InstallationValuesTableFilterComposer
-    extends Composer<_$UserFoodDatabase, $InstallationValuesTable> {
+    extends Composer<_$YamDatabase, $InstallationValuesTable> {
   $$InstallationValuesTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -2816,7 +4126,7 @@ class $$InstallationValuesTableFilterComposer
 }
 
 class $$InstallationValuesTableOrderingComposer
-    extends Composer<_$UserFoodDatabase, $InstallationValuesTable> {
+    extends Composer<_$YamDatabase, $InstallationValuesTable> {
   $$InstallationValuesTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -2836,7 +4146,7 @@ class $$InstallationValuesTableOrderingComposer
 }
 
 class $$InstallationValuesTableAnnotationComposer
-    extends Composer<_$UserFoodDatabase, $InstallationValuesTable> {
+    extends Composer<_$YamDatabase, $InstallationValuesTable> {
   $$InstallationValuesTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -2854,7 +4164,7 @@ class $$InstallationValuesTableAnnotationComposer
 class $$InstallationValuesTableTableManager
     extends
         RootTableManager<
-          _$UserFoodDatabase,
+          _$YamDatabase,
           $InstallationValuesTable,
           InstallationValue,
           $$InstallationValuesTableFilterComposer,
@@ -2865,7 +4175,7 @@ class $$InstallationValuesTableTableManager
           (
             InstallationValue,
             BaseReferences<
-              _$UserFoodDatabase,
+              _$YamDatabase,
               $InstallationValuesTable,
               InstallationValue
             >,
@@ -2874,7 +4184,7 @@ class $$InstallationValuesTableTableManager
           PrefetchHooks Function()
         > {
   $$InstallationValuesTableTableManager(
-    _$UserFoodDatabase db,
+    _$YamDatabase db,
     $InstallationValuesTable table,
   ) : super(
         TableManagerState(
@@ -2919,7 +4229,7 @@ class $$InstallationValuesTableTableManager
 
 typedef $$InstallationValuesTableProcessedTableManager =
     ProcessedTableManager<
-      _$UserFoodDatabase,
+      _$YamDatabase,
       $InstallationValuesTable,
       InstallationValue,
       $$InstallationValuesTableFilterComposer,
@@ -2930,7 +4240,7 @@ typedef $$InstallationValuesTableProcessedTableManager =
       (
         InstallationValue,
         BaseReferences<
-          _$UserFoodDatabase,
+          _$YamDatabase,
           $InstallationValuesTable,
           InstallationValue
         >,
@@ -2938,14 +4248,593 @@ typedef $$InstallationValuesTableProcessedTableManager =
       InstallationValue,
       PrefetchHooks Function()
     >;
+typedef $$DiaryEntriesTableCreateCompanionBuilder =
+    DiaryEntriesCompanion Function({
+      required String id,
+      required String diaryDay,
+      required String mealId,
+      required String foodId,
+      required String foodName,
+      Value<String?> brand,
+      required String baseUnit,
+      required double basisAmount,
+      required double kcalPerBasis,
+      required double proteinPerBasis,
+      required double fatPerBasis,
+      required double carbsPerBasis,
+      required String servingsSnapshot,
+      required String servingId,
+      required double amount,
+      required double canonicalQuantity,
+      required double energyKcal,
+      required double proteinG,
+      required double fatG,
+      required double carbsG,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<DateTime?> deletedAt,
+      required String deviceId,
+      Value<int> rowid,
+    });
+typedef $$DiaryEntriesTableUpdateCompanionBuilder =
+    DiaryEntriesCompanion Function({
+      Value<String> id,
+      Value<String> diaryDay,
+      Value<String> mealId,
+      Value<String> foodId,
+      Value<String> foodName,
+      Value<String?> brand,
+      Value<String> baseUnit,
+      Value<double> basisAmount,
+      Value<double> kcalPerBasis,
+      Value<double> proteinPerBasis,
+      Value<double> fatPerBasis,
+      Value<double> carbsPerBasis,
+      Value<String> servingsSnapshot,
+      Value<String> servingId,
+      Value<double> amount,
+      Value<double> canonicalQuantity,
+      Value<double> energyKcal,
+      Value<double> proteinG,
+      Value<double> fatG,
+      Value<double> carbsG,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<DateTime?> deletedAt,
+      Value<String> deviceId,
+      Value<int> rowid,
+    });
 
-class $UserFoodDatabaseManager {
-  final _$UserFoodDatabase _db;
-  $UserFoodDatabaseManager(this._db);
+class $$DiaryEntriesTableFilterComposer
+    extends Composer<_$YamDatabase, $DiaryEntriesTable> {
+  $$DiaryEntriesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get diaryDay => $composableBuilder(
+    column: $table.diaryDay,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get mealId => $composableBuilder(
+    column: $table.mealId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get foodId => $composableBuilder(
+    column: $table.foodId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get foodName => $composableBuilder(
+    column: $table.foodName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get brand => $composableBuilder(
+    column: $table.brand,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get baseUnit => $composableBuilder(
+    column: $table.baseUnit,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get basisAmount => $composableBuilder(
+    column: $table.basisAmount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get kcalPerBasis => $composableBuilder(
+    column: $table.kcalPerBasis,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get proteinPerBasis => $composableBuilder(
+    column: $table.proteinPerBasis,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get fatPerBasis => $composableBuilder(
+    column: $table.fatPerBasis,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get carbsPerBasis => $composableBuilder(
+    column: $table.carbsPerBasis,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get servingsSnapshot => $composableBuilder(
+    column: $table.servingsSnapshot,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get servingId => $composableBuilder(
+    column: $table.servingId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get amount => $composableBuilder(
+    column: $table.amount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get canonicalQuantity => $composableBuilder(
+    column: $table.canonicalQuantity,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get energyKcal => $composableBuilder(
+    column: $table.energyKcal,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get proteinG => $composableBuilder(
+    column: $table.proteinG,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get fatG => $composableBuilder(
+    column: $table.fatG,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get carbsG => $composableBuilder(
+    column: $table.carbsG,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$DiaryEntriesTableOrderingComposer
+    extends Composer<_$YamDatabase, $DiaryEntriesTable> {
+  $$DiaryEntriesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get diaryDay => $composableBuilder(
+    column: $table.diaryDay,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get mealId => $composableBuilder(
+    column: $table.mealId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get foodId => $composableBuilder(
+    column: $table.foodId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get foodName => $composableBuilder(
+    column: $table.foodName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get brand => $composableBuilder(
+    column: $table.brand,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get baseUnit => $composableBuilder(
+    column: $table.baseUnit,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get basisAmount => $composableBuilder(
+    column: $table.basisAmount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get kcalPerBasis => $composableBuilder(
+    column: $table.kcalPerBasis,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get proteinPerBasis => $composableBuilder(
+    column: $table.proteinPerBasis,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get fatPerBasis => $composableBuilder(
+    column: $table.fatPerBasis,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get carbsPerBasis => $composableBuilder(
+    column: $table.carbsPerBasis,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get servingsSnapshot => $composableBuilder(
+    column: $table.servingsSnapshot,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get servingId => $composableBuilder(
+    column: $table.servingId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get amount => $composableBuilder(
+    column: $table.amount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get canonicalQuantity => $composableBuilder(
+    column: $table.canonicalQuantity,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get energyKcal => $composableBuilder(
+    column: $table.energyKcal,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get proteinG => $composableBuilder(
+    column: $table.proteinG,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get fatG => $composableBuilder(
+    column: $table.fatG,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get carbsG => $composableBuilder(
+    column: $table.carbsG,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$DiaryEntriesTableAnnotationComposer
+    extends Composer<_$YamDatabase, $DiaryEntriesTable> {
+  $$DiaryEntriesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get diaryDay =>
+      $composableBuilder(column: $table.diaryDay, builder: (column) => column);
+
+  GeneratedColumn<String> get mealId =>
+      $composableBuilder(column: $table.mealId, builder: (column) => column);
+
+  GeneratedColumn<String> get foodId =>
+      $composableBuilder(column: $table.foodId, builder: (column) => column);
+
+  GeneratedColumn<String> get foodName =>
+      $composableBuilder(column: $table.foodName, builder: (column) => column);
+
+  GeneratedColumn<String> get brand =>
+      $composableBuilder(column: $table.brand, builder: (column) => column);
+
+  GeneratedColumn<String> get baseUnit =>
+      $composableBuilder(column: $table.baseUnit, builder: (column) => column);
+
+  GeneratedColumn<double> get basisAmount => $composableBuilder(
+    column: $table.basisAmount,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get kcalPerBasis => $composableBuilder(
+    column: $table.kcalPerBasis,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get proteinPerBasis => $composableBuilder(
+    column: $table.proteinPerBasis,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get fatPerBasis => $composableBuilder(
+    column: $table.fatPerBasis,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get carbsPerBasis => $composableBuilder(
+    column: $table.carbsPerBasis,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get servingsSnapshot => $composableBuilder(
+    column: $table.servingsSnapshot,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get servingId =>
+      $composableBuilder(column: $table.servingId, builder: (column) => column);
+
+  GeneratedColumn<double> get amount =>
+      $composableBuilder(column: $table.amount, builder: (column) => column);
+
+  GeneratedColumn<double> get canonicalQuantity => $composableBuilder(
+    column: $table.canonicalQuantity,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get energyKcal => $composableBuilder(
+    column: $table.energyKcal,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get proteinG =>
+      $composableBuilder(column: $table.proteinG, builder: (column) => column);
+
+  GeneratedColumn<double> get fatG =>
+      $composableBuilder(column: $table.fatG, builder: (column) => column);
+
+  GeneratedColumn<double> get carbsG =>
+      $composableBuilder(column: $table.carbsG, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get deviceId =>
+      $composableBuilder(column: $table.deviceId, builder: (column) => column);
+}
+
+class $$DiaryEntriesTableTableManager
+    extends
+        RootTableManager<
+          _$YamDatabase,
+          $DiaryEntriesTable,
+          StoredDiaryEntry,
+          $$DiaryEntriesTableFilterComposer,
+          $$DiaryEntriesTableOrderingComposer,
+          $$DiaryEntriesTableAnnotationComposer,
+          $$DiaryEntriesTableCreateCompanionBuilder,
+          $$DiaryEntriesTableUpdateCompanionBuilder,
+          (
+            StoredDiaryEntry,
+            BaseReferences<_$YamDatabase, $DiaryEntriesTable, StoredDiaryEntry>,
+          ),
+          StoredDiaryEntry,
+          PrefetchHooks Function()
+        > {
+  $$DiaryEntriesTableTableManager(_$YamDatabase db, $DiaryEntriesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DiaryEntriesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DiaryEntriesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$DiaryEntriesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> diaryDay = const Value.absent(),
+                Value<String> mealId = const Value.absent(),
+                Value<String> foodId = const Value.absent(),
+                Value<String> foodName = const Value.absent(),
+                Value<String?> brand = const Value.absent(),
+                Value<String> baseUnit = const Value.absent(),
+                Value<double> basisAmount = const Value.absent(),
+                Value<double> kcalPerBasis = const Value.absent(),
+                Value<double> proteinPerBasis = const Value.absent(),
+                Value<double> fatPerBasis = const Value.absent(),
+                Value<double> carbsPerBasis = const Value.absent(),
+                Value<String> servingsSnapshot = const Value.absent(),
+                Value<String> servingId = const Value.absent(),
+                Value<double> amount = const Value.absent(),
+                Value<double> canonicalQuantity = const Value.absent(),
+                Value<double> energyKcal = const Value.absent(),
+                Value<double> proteinG = const Value.absent(),
+                Value<double> fatG = const Value.absent(),
+                Value<double> carbsG = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<String> deviceId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => DiaryEntriesCompanion(
+                id: id,
+                diaryDay: diaryDay,
+                mealId: mealId,
+                foodId: foodId,
+                foodName: foodName,
+                brand: brand,
+                baseUnit: baseUnit,
+                basisAmount: basisAmount,
+                kcalPerBasis: kcalPerBasis,
+                proteinPerBasis: proteinPerBasis,
+                fatPerBasis: fatPerBasis,
+                carbsPerBasis: carbsPerBasis,
+                servingsSnapshot: servingsSnapshot,
+                servingId: servingId,
+                amount: amount,
+                canonicalQuantity: canonicalQuantity,
+                energyKcal: energyKcal,
+                proteinG: proteinG,
+                fatG: fatG,
+                carbsG: carbsG,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                deviceId: deviceId,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String diaryDay,
+                required String mealId,
+                required String foodId,
+                required String foodName,
+                Value<String?> brand = const Value.absent(),
+                required String baseUnit,
+                required double basisAmount,
+                required double kcalPerBasis,
+                required double proteinPerBasis,
+                required double fatPerBasis,
+                required double carbsPerBasis,
+                required String servingsSnapshot,
+                required String servingId,
+                required double amount,
+                required double canonicalQuantity,
+                required double energyKcal,
+                required double proteinG,
+                required double fatG,
+                required double carbsG,
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<DateTime?> deletedAt = const Value.absent(),
+                required String deviceId,
+                Value<int> rowid = const Value.absent(),
+              }) => DiaryEntriesCompanion.insert(
+                id: id,
+                diaryDay: diaryDay,
+                mealId: mealId,
+                foodId: foodId,
+                foodName: foodName,
+                brand: brand,
+                baseUnit: baseUnit,
+                basisAmount: basisAmount,
+                kcalPerBasis: kcalPerBasis,
+                proteinPerBasis: proteinPerBasis,
+                fatPerBasis: fatPerBasis,
+                carbsPerBasis: carbsPerBasis,
+                servingsSnapshot: servingsSnapshot,
+                servingId: servingId,
+                amount: amount,
+                canonicalQuantity: canonicalQuantity,
+                energyKcal: energyKcal,
+                proteinG: proteinG,
+                fatG: fatG,
+                carbsG: carbsG,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                deviceId: deviceId,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$DiaryEntriesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$YamDatabase,
+      $DiaryEntriesTable,
+      StoredDiaryEntry,
+      $$DiaryEntriesTableFilterComposer,
+      $$DiaryEntriesTableOrderingComposer,
+      $$DiaryEntriesTableAnnotationComposer,
+      $$DiaryEntriesTableCreateCompanionBuilder,
+      $$DiaryEntriesTableUpdateCompanionBuilder,
+      (
+        StoredDiaryEntry,
+        BaseReferences<_$YamDatabase, $DiaryEntriesTable, StoredDiaryEntry>,
+      ),
+      StoredDiaryEntry,
+      PrefetchHooks Function()
+    >;
+
+class $YamDatabaseManager {
+  final _$YamDatabase _db;
+  $YamDatabaseManager(this._db);
   $$UserFoodsTableTableManager get userFoods =>
       $$UserFoodsTableTableManager(_db, _db.userFoods);
   $$UserServingsTableTableManager get userServings =>
       $$UserServingsTableTableManager(_db, _db.userServings);
   $$InstallationValuesTableTableManager get installationValues =>
       $$InstallationValuesTableTableManager(_db, _db.installationValues);
+  $$DiaryEntriesTableTableManager get diaryEntries =>
+      $$DiaryEntriesTableTableManager(_db, _db.diaryEntries);
 }

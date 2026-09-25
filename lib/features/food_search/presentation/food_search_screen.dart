@@ -10,6 +10,8 @@ import 'package:yam/core/ui/feedback/yam_snack_bar.dart';
 import 'package:yam/core/ui/feedback/yam_feedback_state.dart';
 import 'package:yam/core/ui/forms/yam_search_field.dart';
 import 'package:yam/core/ui/selection/yam_selection_controls.dart';
+import 'package:yam/features/diary/data/diary_repository.dart';
+import 'package:yam/features/diary/domain/diary_entry.dart';
 import 'package:yam/features/food_search/presentation/food_search_meals.dart';
 import 'package:yam/features/food_search/presentation/custom_food_adapter.dart';
 import 'package:yam/features/food_search/data/user_food_repository.dart';
@@ -24,11 +26,13 @@ class FoodSearchScreen extends StatefulWidget {
   const FoodSearchScreen({
     this.arguments = const FoodSearchPrototypeArguments(),
     this.userFoodRepository,
+    this.diaryRepository,
     super.key,
   });
 
   final FoodSearchPrototypeArguments arguments;
   final UserFoodRepository? userFoodRepository;
+  final DiaryRepository? diaryRepository;
 
   @override
   State<FoodSearchScreen> createState() => _FoodSearchScreenState();
@@ -40,6 +44,7 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
   final _searchController = TextEditingController();
   final _searchFocusNode = FocusNode();
   StreamSubscription<List<SavedUserFood>>? _savedFoodSubscription;
+  StreamSubscription<List<String>>? _recentSubscription;
   List<SavedUserFood> _savedFoods = const [];
   late List<String> _recentFoodIds;
   late Set<String> _favoriteOverrides;
@@ -60,6 +65,16 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
     _selectedMealId = widget.arguments.initialMealId;
     _catalogState = widget.arguments.initialCatalogState;
     _recentFoodIds = List.of(widget.arguments.recentFoodIds);
+    _recentSubscription = widget.diaryRepository?.watchRecentFoodIds().listen((
+      ids,
+    ) {
+      if (mounted) {
+        setState(() {
+          _recentFoodIds = ids;
+          _updateVisibleFoods();
+        });
+      }
+    });
     _favoriteOverrides = Set.of(widget.arguments.favoriteOverrides);
     _savedFoodSubscription = widget.userFoodRepository?.watchFoods().listen((
       foods,
@@ -85,6 +100,7 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
   @override
   void dispose() {
     _savedFoodSubscription?.cancel();
+    _recentSubscription?.cancel();
     _searchController.dispose();
     _searchFocusNode.dispose();
     super.dispose();
@@ -188,7 +204,12 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
       case _FoodSearchTab.recent:
         return _buildSingleTabSlivers(l10n.foodSearchRecent, _recent, l10n);
       case _FoodSearchTab.myDishes:
-        return _buildSingleTabSlivers(l10n.foodSearchMyDishes, _myDishes, l10n);
+        return _buildSingleTabSlivers(
+          l10n.foodSearchMyDishes,
+          _myDishes,
+          l10n,
+          allowDelete: true,
+        );
       case _FoodSearchTab.favorites:
         return _buildSingleTabSlivers(
           l10n.foodSearchFavorites,
@@ -201,8 +222,9 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
   List<Widget> _buildSingleTabSlivers(
     String title,
     List<FoodSearchPrototypeFood> foods,
-    AppLocalizations l10n,
-  ) {
+    AppLocalizations l10n, {
+    bool allowDelete = false,
+  }) {
     if (foods.isEmpty) {
       return [
         SliverFillRemaining(
@@ -216,7 +238,7 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
       ];
     }
     return [
-      ..._buildSection(title, foods),
+      ..._buildSection(title, foods, allowDelete: allowDelete),
       const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xl)),
     ];
   }
@@ -295,8 +317,9 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
 
   List<Widget> _buildSection(
     String title,
-    List<FoodSearchPrototypeFood> foods,
-  ) {
+    List<FoodSearchPrototypeFood> foods, {
+    bool allowDelete = false,
+  }) {
     if (foods.isEmpty) {
       return const [];
     }
@@ -304,18 +327,66 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
       SliverToBoxAdapter(child: _SectionHeader(title: title)),
       SliverList.builder(
         itemCount: foods.length,
-        itemBuilder: (context, index) => _buildFoodRow(foods[index]),
+        itemBuilder: (context, index) =>
+            _buildFoodRow(foods[index], allowDelete: allowDelete),
       ),
     ];
   }
 
-  Widget _buildFoodRow(FoodSearchPrototypeFood food) {
+  Widget _buildFoodRow(
+    FoodSearchPrototypeFood food, {
+    bool allowDelete = false,
+  }) {
     return FoodSearchResultRow(
       key: ValueKey('food-row-${food.id}'),
       food: food,
       favorite: _isFavorite(food),
       onOpen: () => _openQuickAdd(food),
+      onDelete:
+          allowDelete &&
+              food.source == FoodSearchPrototypeSource.userCreated &&
+              widget.userFoodRepository != null
+          ? () => _confirmDelete(food)
+          : null,
     );
+  }
+
+  Future<void> _confirmDelete(FoodSearchPrototypeFood food) async {
+    final repository = widget.userFoodRepository;
+    if (repository == null) return;
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.createProductDeleteTitle),
+        content: Text(l10n.createProductDeleteMessage(food.name)),
+        actions: [
+          YamTextButton(
+            label: l10n.createProductDeleteCancel,
+            onPressed: () => Navigator.of(context).pop(false),
+          ),
+          YamTextButton(
+            label: l10n.createProductDelete,
+            tone: YamTextButtonTone.destructive,
+            onPressed: () => Navigator.of(context).pop(true),
+          ),
+        ],
+      ),
+    );
+    if (!mounted || confirmed != true) return;
+    try {
+      await repository.delete(food.id);
+      if (!mounted) return;
+      showYamSuccessSnackBar(
+        context: context,
+        message: l10n.createProductDeleted(food.name),
+      );
+    } on Object {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.createProductDeleteFailed)));
+    }
   }
 
   void _selectTab(_FoodSearchTab tab) {
@@ -447,7 +518,31 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
     );
     if (!mounted || result == null) return;
 
-    final undoDiary = widget.arguments.onFoodAdded?.call(result);
+    final repository = widget.diaryRepository;
+    String? entryId;
+    try {
+      if (repository != null) {
+        entryId = await repository.create(
+          DiaryEntryDraft(
+            day: widget.arguments.diaryDay ?? DateTime.now(),
+            mealId: result.mealId,
+            food: result.snapshot,
+            servingId: result.servingId,
+            amount: result.amount,
+            canonicalQuantity: result.canonicalQuantity,
+          ),
+        );
+        widget.arguments.onEntryCreated?.call(entryId);
+      }
+    } on Object {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context).diarySaveFailed)),
+        );
+      }
+      return;
+    }
+    if (!mounted) return;
     final previousRecent = List<String>.of(_recentFoodIds);
     setState(() {
       _selectedMealId = result.mealId;
@@ -467,7 +562,9 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
       ),
       undoLabel: l10n.actionUndo,
       onUndo: () {
-        undoDiary?.call();
+        if (repository != null && entryId != null) {
+          unawaited(_undoAddedEntry(repository, entryId));
+        }
         if (mounted) {
           setState(() {
             _recentFoodIds = previousRecent;
@@ -476,6 +573,17 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
         }
       },
     );
+  }
+
+  Future<void> _undoAddedEntry(DiaryRepository repository, String id) async {
+    try {
+      await repository.delete(id);
+    } on Object {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context).diaryDeleteFailed)),
+      );
+    }
   }
 
   Future<void> _openCreateFood() async {

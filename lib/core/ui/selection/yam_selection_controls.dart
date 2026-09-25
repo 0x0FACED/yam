@@ -102,6 +102,8 @@ class YamMealChip extends StatelessWidget {
     required this.onPressed,
     this.active = true,
     this.maxWidth = 280,
+    this.focusNode,
+    this.focused = false,
     super.key,
   });
 
@@ -110,6 +112,8 @@ class YamMealChip extends StatelessWidget {
   final VoidCallback? onPressed;
   final bool active;
   final double maxWidth;
+  final FocusNode? focusNode;
+  final bool focused;
 
   @override
   Widget build(BuildContext context) {
@@ -134,7 +138,11 @@ class YamMealChip extends StatelessWidget {
                   color: active
                       ? theme.colorScheme.surfaceContainer
                       : theme.scaffoldBackgroundColor,
-                  border: Border.all(color: theme.colorScheme.outlineVariant),
+                  border: Border.all(
+                    color: focused
+                        ? theme.colorScheme.primary
+                        : theme.colorScheme.outlineVariant,
+                  ),
                   borderRadius: BorderRadius.circular(AppRadius.pill),
                 ),
                 child: Material(
@@ -142,6 +150,7 @@ class YamMealChip extends StatelessWidget {
                   borderRadius: BorderRadius.circular(AppRadius.pill),
                   clipBehavior: Clip.antiAlias,
                   child: InkWell(
+                    focusNode: focusNode,
                     onTap: onPressed,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(

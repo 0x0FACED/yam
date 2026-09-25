@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:yam/features/diary/domain/diary_entry.dart';
 
 const foodSearchRecentLimit = 4;
 
@@ -128,16 +129,18 @@ class FoodSearchPrototypeArguments {
     this.initialMealId,
     this.initialCatalogState = FoodSearchPrototypeCatalogState.ready,
     this.recentFoodIds = const [],
+    this.diaryDay,
+    this.onEntryCreated,
     this.favoriteOverrides = const {},
-    this.onFoodAdded,
     this.onFavoritesChanged,
   });
 
   final String? initialMealId;
   final FoodSearchPrototypeCatalogState initialCatalogState;
   final List<String> recentFoodIds;
+  final DateTime? diaryDay;
+  final ValueChanged<String>? onEntryCreated;
   final Set<String> favoriteOverrides;
-  final VoidCallback Function(FoodAddPrototypeResult result)? onFoodAdded;
   final ValueChanged<Set<String>>? onFavoritesChanged;
 }
 
@@ -152,6 +155,10 @@ class FoodAddPrototypeResult {
     required this.protein,
     required this.fat,
     required this.carbs,
+    required this.snapshot,
+    required this.servingId,
+    required this.amount,
+    required this.canonicalQuantity,
     this.brand,
   });
 
@@ -164,6 +171,10 @@ class FoodAddPrototypeResult {
   final double protein;
   final double fat;
   final double carbs;
+  final DiaryFoodSnapshot snapshot;
+  final String servingId;
+  final double amount;
+  final double canonicalQuantity;
 }
 
 List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {

@@ -7,7 +7,9 @@ import 'package:yam/app/theme/app_spacing.dart';
 import 'package:yam/app/theme/app_typography.dart';
 import 'package:yam/core/ui/buttons/yam_buttons.dart';
 import 'package:yam/core/ui/forms/yam_number_field.dart';
+import 'package:yam/core/ui/forms/yam_select_field.dart';
 import 'package:yam/core/ui/forms/yam_text_field.dart';
+import 'package:yam/core/ui/selection/yam_dropdown.dart';
 import 'package:yam/core/ui/selection/yam_selection_controls.dart';
 import 'package:yam/features/food_search/data/user_food_repository.dart';
 import 'package:yam/features/food_search/domain/custom_food.dart';
@@ -41,7 +43,6 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
   final _name = TextEditingController();
   final _brand = TextEditingController();
   final _barcode = TextEditingController();
-  final _energy = TextEditingController();
   final _protein = TextEditingController();
   final _fat = TextEditingController();
   final _carbs = TextEditingController();
@@ -65,7 +66,6 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
       _name,
       _brand,
       _barcode,
-      _energy,
       _protein,
       _fat,
       _carbs,
@@ -86,7 +86,9 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
   }
 
   void _changed(String _) {
-    if (_attempted) setState(() => _errors = _validate());
+    setState(() {
+      if (_attempted) _errors = _validate();
+    });
   }
 
   Map<String, String> _validate() {
@@ -96,7 +98,6 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
       errors['name'] = l10n.createProductNameRequired;
     }
     for (final field in {
-      'energy': _energy,
       'protein': _protein,
       'fat': _fat,
       'carbs': _carbs,
@@ -104,6 +105,12 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
       if (_number(field.value.text, zeroAllowed: true) == null) {
         errors[field.key] = l10n.createProductInvalidNumber;
       }
+    }
+    if (errors['protein'] == null &&
+        errors['fat'] == null &&
+        errors['carbs'] == null &&
+        _calculatedEnergy == null) {
+      errors['carbs'] = l10n.createProductInvalidNumber;
     }
     if (_displayBasis == CustomFoodDisplayBasis.perServing &&
         _number(_servingSize.text) == null) {
@@ -138,7 +145,6 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
       basis: basis,
       basisAmount: basisAmount,
       displayBasis: _displayBasis,
-      energyKcal: _number(_energy.text, zeroAllowed: true)!,
       proteinG: _number(_protein.text, zeroAllowed: true)!,
       fatG: _number(_fat.text, zeroAllowed: true)!,
       carbsG: _number(_carbs.text, zeroAllowed: true)!,
@@ -162,6 +168,19 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
           ),
       ],
     );
+  }
+
+  double? get _calculatedEnergy {
+    final protein = _number(_protein.text, zeroAllowed: true);
+    final fat = _number(_fat.text, zeroAllowed: true);
+    final carbs = _number(_carbs.text, zeroAllowed: true);
+    if (protein == null || fat == null || carbs == null) return null;
+    final energy = energyKcalFromMacros(
+      proteinG: protein,
+      fatG: fat,
+      carbsG: carbs,
+    );
+    return energy.isFinite ? energy : null;
   }
 
   Future<void> _save() async {
@@ -302,35 +321,22 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
                           controller: _brand,
                         ),
                         const SizedBox(height: AppSpacing.md),
-                        Text(
-                          l10n.createProductCategory,
-                          style: AppTypography.label.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.xs),
-                        MenuAnchor(
-                          menuChildren: [
+                        YamSelectField<FoodSearchPrototypeCategory>(
+                          fieldKey: const ValueKey('create-food-category'),
+                          label: l10n.createProductCategory,
+                          value: _category,
+                          items: [
                             for (final category
                                 in FoodSearchPrototypeCategory.values)
-                              MenuItemButton(
-                                onPressed: () =>
-                                    setState(() => _category = category),
-                                child: Text(
-                                  foodSearchCategoryLabel(l10n, category),
-                                ),
+                              YamDropdownOption(
+                                value: category,
+                                label: foodSearchCategoryLabel(l10n, category),
                               ),
                           ],
-                          builder: (context, controller, _) => YamMealChip(
-                            key: const ValueKey('create-food-category'),
-                            icon: Icons.category_outlined,
-                            label: foodSearchCategoryLabel(l10n, _category),
-                            onPressed: controller.isOpen
-                                ? controller.close
-                                : controller.open,
-                          ),
+                          onChanged: (category) =>
+                              setState(() => _category = category),
                         ),
-                        const SizedBox(height: AppSpacing.lg),
+                        const SizedBox(height: AppSpacing.sm),
                         Divider(color: theme.colorScheme.outlineVariant),
                         const SizedBox(height: AppSpacing.sm),
                         Text(
@@ -406,17 +412,6 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
                           ),
                         ],
                         const SizedBox(height: AppSpacing.md),
-                        YamNumberField(
-                          fieldKey: const ValueKey('create-food-calories'),
-                          label: l10n.createProductCalories,
-                          unit: l10n.unitKilocalories,
-                          controller: _energy,
-                          onChanged: _changed,
-                          decimal: true,
-                          style: YamNumberFieldStyle.compact,
-                          errorText: _errors['energy'],
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
                         LayoutBuilder(
                           builder: (context, constraints) {
                             final stacked =
@@ -479,6 +474,17 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
                                   );
                           },
                         ),
+                        if (_calculatedEnergy case final energy?) ...[
+                          const SizedBox(height: AppSpacing.sm),
+                          Text(
+                            l10n.createProductCalculatedCalories(
+                              formatFoodSearchNumber(context, energy),
+                            ),
+                            style: AppTypography.label.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
                         const SizedBox(height: AppSpacing.lg),
                         Divider(color: theme.colorScheme.outlineVariant),
                         const SizedBox(height: AppSpacing.sm),

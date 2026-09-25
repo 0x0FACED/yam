@@ -224,6 +224,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diaryNoFoods => 'No foods yet';
 
   @override
+  String get diaryEditEntry => 'Edit entry';
+
+  @override
+  String get diaryEditSave => 'Save changes';
+
+  @override
+  String get diaryEditClose => 'Close editing';
+
+  @override
+  String get diaryDeleteEntry => 'Delete entry';
+
+  @override
+  String diaryEntryDeleted(String food) {
+    return '$food deleted from diary';
+  }
+
+  @override
+  String diaryEntryUpdated(String food) {
+    return '$food updated in diary';
+  }
+
+  @override
+  String get diarySaveFailed => 'Could not save diary entry';
+
+  @override
+  String get diaryDeleteFailed => 'Could not delete diary entry';
+
+  @override
   String get foodSearchTitle => 'Add food';
 
   @override
@@ -286,7 +314,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get createProductNutrition => 'Nutrition facts';
 
   @override
-  String get createProductCalories => 'Calories';
+  String createProductCalculatedCalories(String calories) {
+    return 'From macros: $calories kcal';
+  }
 
   @override
   String get createProductServings => 'Additional units';
@@ -338,6 +368,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String createProductSaved(String food) {
     return '$food saved';
   }
+
+  @override
+  String get createProductDeleteTitle => 'Delete food?';
+
+  @override
+  String createProductDeleteMessage(String food) {
+    return '$food will disappear from My dishes, search and favorites.';
+  }
+
+  @override
+  String get createProductDelete => 'Delete';
+
+  @override
+  String get createProductDeleteCancel => 'Cancel';
+
+  @override
+  String get createProductDeleteAction => 'Delete food';
+
+  @override
+  String createProductDeleted(String food) {
+    return '$food deleted';
+  }
+
+  @override
+  String get createProductDeleteFailed => 'Could not delete food';
 
   @override
   String get createProductUnitServing => 'Serving';

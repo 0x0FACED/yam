@@ -3,41 +3,41 @@ import 'package:yam/features/diary/presentation/diary_prototype_data.dart';
 import 'package:yam/l10n/generated/app_localizations_en.dart';
 
 void main() {
-  test('derives summary and meal totals from visible entries', () {
-    final day = buildDiaryPrototypeDay(
-      AppLocalizationsEn(),
-      includeEntries: true,
-    );
+  test('a new day has no invented entries', () {
+    final day = buildDiaryPrototypeDay(AppLocalizationsEn());
 
-    expect(day.meals.map((meal) => meal.calories), [482, 711, 512, 135]);
-    expect(day.consumedCalories, 1840);
-    expect(day.protein, 126);
-    expect(day.fat, 61);
-    expect(day.carbs, 184);
+    expect(day.meals, hasLength(4));
+    expect(day.meals.every((meal) => meal.entries.isEmpty), isTrue);
+    expect(day.consumedCalories, 0);
   });
 
-  test('includes presentation additions in every derived total', () {
+  test('derived totals use exact stored nutrition before rounding', () {
     final day = buildDiaryPrototypeDay(
       AppLocalizationsEn(),
-      includeEntries: true,
-      additionalEntries: const {
+      entriesByMeal: const {
         'breakfast': [
           DiaryPrototypeEntry(
-            id: 'added',
-            name: 'Added food',
-            quantity: '50 g',
-            calories: 100,
-            protein: 4.5,
-            fat: 2.5,
-            carbs: 8.5,
+            id: 'first',
+            name: 'Oats',
+            quantity: '40 g',
+            calories: 2,
+            exactCalories: 1.6,
+            protein: 1.4,
+          ),
+          DiaryPrototypeEntry(
+            id: 'second',
+            name: 'Milk',
+            quantity: '20 ml',
+            calories: 2,
+            exactCalories: 1.6,
+            protein: 1.4,
           ),
         ],
       },
     );
 
-    expect(day.consumedCalories, 1940);
-    expect(day.protein, 131);
-    expect(day.fat, 64);
-    expect(day.carbs, 193);
+    expect(day.meals.first.calories, 3);
+    expect(day.consumedCalories, 3);
+    expect(day.protein, 3);
   });
 }

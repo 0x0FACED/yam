@@ -476,6 +476,54 @@ abstract class AppLocalizations {
   /// **'No foods yet'**
   String get diaryNoFoods;
 
+  /// No description provided for @diaryEditEntry.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit entry'**
+  String get diaryEditEntry;
+
+  /// No description provided for @diaryEditSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save changes'**
+  String get diaryEditSave;
+
+  /// No description provided for @diaryEditClose.
+  ///
+  /// In en, this message translates to:
+  /// **'Close editing'**
+  String get diaryEditClose;
+
+  /// No description provided for @diaryDeleteEntry.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete entry'**
+  String get diaryDeleteEntry;
+
+  /// No description provided for @diaryEntryDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'{food} deleted from diary'**
+  String diaryEntryDeleted(String food);
+
+  /// No description provided for @diaryEntryUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'{food} updated in diary'**
+  String diaryEntryUpdated(String food);
+
+  /// No description provided for @diarySaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save diary entry'**
+  String get diarySaveFailed;
+
+  /// No description provided for @diaryDeleteFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not delete diary entry'**
+  String get diaryDeleteFailed;
+
   /// No description provided for @foodSearchTitle.
   ///
   /// In en, this message translates to:
@@ -596,11 +644,11 @@ abstract class AppLocalizations {
   /// **'Nutrition facts'**
   String get createProductNutrition;
 
-  /// No description provided for @createProductCalories.
+  /// No description provided for @createProductCalculatedCalories.
   ///
   /// In en, this message translates to:
-  /// **'Calories'**
-  String get createProductCalories;
+  /// **'From macros: {calories} kcal'**
+  String createProductCalculatedCalories(String calories);
 
   /// No description provided for @createProductServings.
   ///
@@ -697,6 +745,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{food} saved'**
   String createProductSaved(String food);
+
+  /// No description provided for @createProductDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete food?'**
+  String get createProductDeleteTitle;
+
+  /// No description provided for @createProductDeleteMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'{food} will disappear from My dishes, search and favorites.'**
+  String createProductDeleteMessage(String food);
+
+  /// No description provided for @createProductDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get createProductDelete;
+
+  /// No description provided for @createProductDeleteCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get createProductDeleteCancel;
+
+  /// No description provided for @createProductDeleteAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete food'**
+  String get createProductDeleteAction;
+
+  /// No description provided for @createProductDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'{food} deleted'**
+  String createProductDeleted(String food);
+
+  /// No description provided for @createProductDeleteFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not delete food'**
+  String get createProductDeleteFailed;
 
   /// No description provided for @createProductUnitServing.
   ///

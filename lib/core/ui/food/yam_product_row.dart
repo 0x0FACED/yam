@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:yam/app/theme/app_semantic_colors.dart';
 import 'package:yam/app/theme/app_spacing.dart';
 import 'package:yam/app/theme/app_typography.dart';
@@ -15,12 +16,14 @@ class YamProductRow extends StatelessWidget {
     required this.carbsLabel,
     required this.carbsValue,
     required this.onPressed,
+    this.onLongPress,
+    this.longPressLabel,
     this.favorite = false,
     this.favoriteLabel,
     this.openKey,
     this.showDivider = true,
     super.key,
-  });
+  }) : assert(onLongPress == null || longPressLabel != null);
 
   final String name;
   final String metadataLabel;
@@ -34,6 +37,8 @@ class YamProductRow extends StatelessWidget {
   final bool favorite;
   final String? favoriteLabel;
   final VoidCallback onPressed;
+  final VoidCallback? onLongPress;
+  final String? longPressLabel;
   final Key? openKey;
   final bool showDivider;
 
@@ -48,94 +53,100 @@ class YamProductRow extends StatelessWidget {
       children: [
         Material(
           color: Colors.transparent,
-          child: InkWell(
-            key: openKey,
-            onTap: onPressed,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(minHeight: 72),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md,
-                  vertical: AppSpacing.sm,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        if (favorite) ...[
-                          Semantics(
-                            label: favoriteLabel,
-                            child: ExcludeSemantics(
-                              child: Icon(
-                                Icons.star_rounded,
-                                size: 16,
-                                color: theme.colorScheme.primary,
+          child: Semantics(
+            customSemanticsActions: onLongPress == null
+                ? null
+                : {CustomSemanticsAction(label: longPressLabel!): onLongPress!},
+            child: InkWell(
+              key: openKey,
+              onTap: onPressed,
+              onLongPress: onLongPress,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: 72),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                    vertical: AppSpacing.sm,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          if (favorite) ...[
+                            Semantics(
+                              label: favoriteLabel,
+                              child: ExcludeSemantics(
+                                child: Icon(
+                                  Icons.star_rounded,
+                                  size: 16,
+                                  color: theme.colorScheme.primary,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: AppSpacing.xs),
+                          ],
+                          Expanded(
+                            child: Text(
+                              name,
+                              maxLines: largeText ? 2 : 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppTypography.productTitle.copyWith(
+                                color: theme.colorScheme.onSurface,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ),
-                          const SizedBox(width: AppSpacing.xs),
                         ],
-                        Expanded(
-                          child: Text(
-                            name,
-                            maxLines: largeText ? 2 : 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: AppTypography.productTitle.copyWith(
+                      ),
+                      const SizedBox(height: AppSpacing.xxs),
+                      Text(
+                        metadataLabel,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTypography.caption.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.xs),
+                      Wrap(
+                        spacing: AppSpacing.xs,
+                        runSpacing: AppSpacing.xxs,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          Text(
+                            calorieLabel,
+                            style: AppTypography.caption.copyWith(
                               color: theme.colorScheme.onSurface,
                               fontWeight: FontWeight.w600,
+                              fontFeatures: AppTypography.tabularFigures,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.xxs),
-                    Text(
-                      metadataLabel,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppTypography.caption.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
+                          Text(
+                            '•',
+                            style: AppTypography.caption.copyWith(
+                              color: theme.colorScheme.outline,
+                            ),
+                          ),
+                          _MacroValue(
+                            label: proteinLabel,
+                            value: proteinValue,
+                            color: semanticColors.protein,
+                          ),
+                          _MacroValue(
+                            label: fatLabel,
+                            value: fatValue,
+                            color: semanticColors.fat,
+                          ),
+                          _MacroValue(
+                            label: carbsLabel,
+                            value: carbsValue,
+                            color: semanticColors.carbs,
+                          ),
+                        ],
                       ),
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Wrap(
-                      spacing: AppSpacing.xs,
-                      runSpacing: AppSpacing.xxs,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [
-                        Text(
-                          calorieLabel,
-                          style: AppTypography.caption.copyWith(
-                            color: theme.colorScheme.onSurface,
-                            fontWeight: FontWeight.w600,
-                            fontFeatures: AppTypography.tabularFigures,
-                          ),
-                        ),
-                        Text(
-                          '•',
-                          style: AppTypography.caption.copyWith(
-                            color: theme.colorScheme.outline,
-                          ),
-                        ),
-                        _MacroValue(
-                          label: proteinLabel,
-                          value: proteinValue,
-                          color: semanticColors.protein,
-                        ),
-                        _MacroValue(
-                          label: fatLabel,
-                          value: fatValue,
-                          color: semanticColors.fat,
-                        ),
-                        _MacroValue(
-                          label: carbsLabel,
-                          value: carbsValue,
-                          color: semanticColors.carbs,
-                        ),
-                      ],
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
