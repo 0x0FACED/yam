@@ -14,6 +14,8 @@ import 'package:yam/features/diary/domain/diary_entry.dart';
 import 'package:yam/features/startup/presentation/startup_artwork.dart';
 import 'package:yam/features/startup/presentation/startup_screen.dart';
 import 'package:yam/features/food_search/data/user_food_repository.dart';
+import 'package:yam/features/food_search/data/open_food_facts_client.dart';
+import 'package:yam/features/food_search/data/remote_food_repository.dart';
 import 'package:yam/features/statistics/data/statistics_repository.dart';
 import 'package:yam/features/statistics/domain/statistics_models.dart';
 import 'package:yam/l10n/generated/app_localizations.dart';
@@ -36,6 +38,8 @@ class _YamAppState extends State<YamApp> {
   late final ValueNotifier<OnboardingAccess> _onboardingAccess;
   late final YamDatabase _foodDatabase;
   late final UserFoodRepository _userFoods;
+  late final RemoteFoodRepository _remoteFoods;
+  late final OpenFoodFactsHttpClient _openFoodFacts;
   late final DiaryRepository _diary;
   late final StatisticsRepository _statistics;
   StreamSubscription<List<GoalVersion>>? _goalsSubscription;
@@ -57,6 +61,8 @@ class _YamAppState extends State<YamApp> {
     _onboardingAccess = ValueNotifier(OnboardingAccess.loading);
     _foodDatabase = widget.database ?? YamDatabase.open();
     _userFoods = UserFoodRepository(_foodDatabase);
+    _remoteFoods = RemoteFoodRepository(_foodDatabase);
+    _openFoodFacts = OpenFoodFactsHttpClient();
     _diary = DiaryRepository(_foodDatabase);
     _statistics = StatisticsRepository(_foodDatabase);
     _listenToProfile();
@@ -69,6 +75,8 @@ class _YamAppState extends State<YamApp> {
       weightListenable: _currentWeight,
       onProfileChanged: _saveProfile,
       userFoodRepository: _userFoods,
+      remoteFoodRepository: _remoteFoods,
+      openFoodFactsClient: _openFoodFacts,
       diaryRepository: _diary,
       statisticsRepository: _statistics,
     );
@@ -77,6 +85,7 @@ class _YamAppState extends State<YamApp> {
   @override
   void dispose() {
     _router.dispose();
+    _openFoodFacts.close();
     _goalsSubscription?.cancel();
     _weightsSubscription?.cancel();
     if (widget.database == null) unawaited(_foodDatabase.close());

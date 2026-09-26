@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:yam/app/theme/app_motion.dart';
 import 'package:yam/app/theme/app_spacing.dart';
 import 'package:yam/app/theme/app_typography.dart';
@@ -15,6 +16,10 @@ import 'package:yam/features/diary/domain/diary_entry.dart';
 import 'package:yam/features/food_search/presentation/food_search_meals.dart';
 import 'package:yam/features/food_search/presentation/custom_food_adapter.dart';
 import 'package:yam/features/food_search/data/user_food_repository.dart';
+import 'package:yam/features/food_search/data/open_food_facts_client.dart';
+import 'package:yam/features/food_search/data/remote_food_repository.dart';
+import 'package:yam/features/food_search/presentation/remote_food_adapter.dart';
+import 'package:yam/core/data/yam_database.dart';
 import 'package:yam/features/food_search/presentation/food_search_prototype_data.dart';
 import 'package:yam/features/food_search/presentation/widgets/food_quick_add_sheet.dart';
 import 'package:yam/features/food_search/presentation/widgets/food_search_result_row.dart';
@@ -22,16 +27,22 @@ import 'package:yam/l10n/generated/app_localizations.dart';
 
 enum _FoodSearchTab { recent, myDishes, favorites }
 
+enum _RemoteSearchState { idle, shortQuery, loading, ready, error }
+
 class FoodSearchScreen extends StatefulWidget {
   const FoodSearchScreen({
     this.arguments = const FoodSearchPrototypeArguments(),
     this.userFoodRepository,
+    this.remoteFoodRepository,
+    this.openFoodFactsClient,
     this.diaryRepository,
     super.key,
   });
 
   final FoodSearchPrototypeArguments arguments;
   final UserFoodRepository? userFoodRepository;
+  final RemoteFoodRepository? remoteFoodRepository;
+  final OpenFoodFactsSearchClient? openFoodFactsClient;
   final DiaryRepository? diaryRepository;
 
   @override
@@ -44,8 +55,17 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
   final _searchController = TextEditingController();
   final _searchFocusNode = FocusNode();
   StreamSubscription<List<SavedUserFood>>? _savedFoodSubscription;
+  StreamSubscription<List<StoredRemoteFood>>? _remoteFoodSubscription;
   StreamSubscription<List<String>>? _recentSubscription;
   List<SavedUserFood> _savedFoods = const [];
+  List<StoredRemoteFood> _savedRemoteFoods = const [];
+  List<OpenFoodFactsProduct> _remoteResults = const [];
+  _RemoteSearchState _remoteState = _RemoteSearchState.idle;
+  Timer? _remoteDebounce;
+  int _remoteGeneration = 0;
+
+  static const _minRemoteQueryLength = 3;
+  static const _remoteDelay = Duration(milliseconds: 650);
   late List<String> _recentFoodIds;
   late Set<String> _favoriteOverrides;
 
@@ -55,6 +75,8 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
   List<FoodSearchPrototypeFood> _recent = const [];
   List<FoodSearchPrototypeFood> _myDishes = const [];
   List<FoodSearchPrototypeFood> _favorites = const [];
+  bool _recentHasRemoteFood = false;
+  bool _favoritesHaveRemoteFood = false;
   late FoodSearchPrototypeCatalogState _catalogState;
   _FoodSearchTab _selectedTab = _FoodSearchTab.recent;
   String? _selectedMealId;
@@ -85,6 +107,15 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
         _refreshFoods();
       });
     });
+    _remoteFoodSubscription = widget.remoteFoodRepository?.watchFoods().listen((
+      foods,
+    ) {
+      if (!mounted) return;
+      setState(() {
+        _savedRemoteFoods = foods;
+        _refreshFoods();
+      });
+    });
   }
 
   @override
@@ -100,7 +131,10 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
   @override
   void dispose() {
     _savedFoodSubscription?.cancel();
+    _remoteFoodSubscription?.cancel();
     _recentSubscription?.cancel();
+    _remoteDebounce?.cancel();
+    _remoteGeneration++;
     _searchController.dispose();
     _searchFocusNode.dispose();
     super.dispose();
@@ -112,6 +146,12 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
     _foods = [
       ...buildFoodSearchPrototypeFoods(locale),
       ...adaptUserFoods(_savedFoods, AppLocalizations.of(context)),
+      for (final remote in _savedRemoteFoods)
+        adaptRemoteFood(
+          productFromStoredRemoteFood(remote),
+          favorite: remote.isFavorite,
+          lastAmount: remote.lastAmount,
+        ),
     ];
     _updateVisibleFoods();
   }
@@ -140,7 +180,7 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
                   selectedMeal: selectedMeal,
                   selectedTab: _selectedTab,
                   onBack: () => Navigator.of(context).maybePop(),
-                  onSearchChanged: (_) => setState(_updateVisibleFoods),
+                  onSearchChanged: _onSearchChanged,
                   onClearSearch: _clearSearch,
                   onSelectMeal: _selectMeal,
                   onCreateFood: _openCreateFood,
@@ -202,7 +242,12 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
   List<Widget> _buildLandingSlivers(AppLocalizations l10n) {
     switch (_selectedTab) {
       case _FoodSearchTab.recent:
-        return _buildSingleTabSlivers(l10n.foodSearchRecent, _recent, l10n);
+        return _buildSingleTabSlivers(
+          l10n.foodSearchRecent,
+          _recent,
+          l10n,
+          showRemoteAttribution: _recentHasRemoteFood,
+        );
       case _FoodSearchTab.myDishes:
         return _buildSingleTabSlivers(
           l10n.foodSearchMyDishes,
@@ -215,6 +260,7 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
           l10n.foodSearchFavorites,
           _favorites,
           l10n,
+          showRemoteAttribution: _favoritesHaveRemoteFood,
         );
     }
   }
@@ -224,6 +270,7 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
     List<FoodSearchPrototypeFood> foods,
     AppLocalizations l10n, {
     bool allowDelete = false,
+    bool showRemoteAttribution = false,
   }) {
     if (foods.isEmpty) {
       return [
@@ -239,12 +286,15 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
     }
     return [
       ..._buildSection(title, foods, allowDelete: allowDelete),
+      if (showRemoteAttribution)
+        SliverToBoxAdapter(child: _buildRemoteAttribution(l10n)),
       const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xl)),
     ];
   }
 
   List<Widget> _buildResultSlivers(AppLocalizations l10n) {
-    if (_results.isEmpty) {
+    final remoteEnabled = widget.openFoodFactsClient != null;
+    if (_results.isEmpty && !remoteEnabled) {
       return [
         SliverFillRemaining(
           hasScrollBody: false,
@@ -261,14 +311,110 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
       ];
     }
 
+    final remoteFoods = [
+      for (final result in _remoteResults)
+        adaptRemoteFood(result, favorite: _remoteFavorite(result.code)),
+    ];
     return [
-      SliverToBoxAdapter(child: _SectionHeader(title: l10n.foodSearchResults)),
-      SliverList.builder(
-        itemCount: _results.length,
-        itemBuilder: (context, index) => _buildFoodRow(_results[index]),
-      ),
+      if (_results.isNotEmpty)
+        ..._buildSection(l10n.foodSearchResults, _results),
+      if (remoteEnabled) ...[
+        SliverToBoxAdapter(
+          child: _SectionHeader(title: l10n.foodSearchOpenFoodFacts),
+        ),
+        if (remoteFoods.isNotEmpty)
+          SliverList.builder(
+            itemCount: remoteFoods.length,
+            itemBuilder: (context, index) => _buildFoodRow(remoteFoods[index]),
+          ),
+        if (_remoteState == _RemoteSearchState.loading)
+          SliverToBoxAdapter(
+            child: Semantics(
+              liveRegion: true,
+              label: l10n.foodSearchRemoteLoading,
+              child: const YamProductRowSkeleton(),
+            ),
+          ),
+        if (_remoteState == _RemoteSearchState.shortQuery ||
+            (_remoteState == _RemoteSearchState.ready && remoteFoods.isEmpty) ||
+            _remoteState == _RemoteSearchState.error)
+          SliverToBoxAdapter(child: _buildRemoteFeedback(l10n)),
+        SliverToBoxAdapter(child: _buildRemoteAttribution(l10n)),
+      ],
       const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xl)),
     ];
+  }
+
+  Widget _buildRemoteFeedback(AppLocalizations l10n) {
+    final error = _remoteState == _RemoteSearchState.error;
+    final message = switch (_remoteState) {
+      _RemoteSearchState.shortQuery => l10n.foodSearchRemoteShortQuery,
+      _RemoteSearchState.error => l10n.foodSearchRemoteError,
+      _ => l10n.foodSearchRemoteEmpty,
+    };
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm,
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              message,
+              style: AppTypography.caption.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+          if (error)
+            YamTextButton(
+              key: const ValueKey('food-search-off-retry'),
+              label: l10n.actionRetry,
+              icon: Icons.refresh_rounded,
+              onPressed: _retryRemote,
+              tone: YamTextButtonTone.accent,
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRemoteAttribution(AppLocalizations l10n) => Padding(
+    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+    child: Wrap(
+      children: [
+        YamTextButton(
+          label: l10n.foodSearchRemoteAttribution,
+          onPressed: () => unawaited(
+            _openRemoteLink(Uri.https('world.openfoodfacts.org', '/')),
+          ),
+        ),
+        YamTextButton(
+          label: l10n.foodSearchRemoteLicense,
+          onPressed: () => unawaited(
+            _openRemoteLink(
+              Uri.https('opendatacommons.org', '/licenses/odbl/1.0/'),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+
+  Future<void> _openRemoteLink(Uri url) async {
+    try {
+      if (await launchUrl(url, mode: LaunchMode.externalApplication)) return;
+    } on Object {
+      // Keep the local search usable if no browser is available.
+    }
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context).foodSearchRemoteLinkError),
+        ),
+      );
+    }
   }
 
   List<Widget> _buildLoadingSlivers(AppLocalizations l10n) {
@@ -351,6 +497,54 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
     );
   }
 
+  void _onSearchChanged(String _) {
+    setState(_updateVisibleFoods);
+    _scheduleRemote();
+  }
+
+  void _scheduleRemote({bool immediate = false}) {
+    _remoteDebounce?.cancel();
+    final generation = ++_remoteGeneration;
+    final query = _searchController.text.trim();
+    if (widget.openFoodFactsClient == null) return;
+    setState(() {
+      _remoteResults = const [];
+      _remoteState = query.isEmpty
+          ? _RemoteSearchState.idle
+          : query.runes.length < _minRemoteQueryLength
+          ? _RemoteSearchState.shortQuery
+          : _RemoteSearchState.loading;
+    });
+    if (_remoteState != _RemoteSearchState.loading) return;
+    if (immediate) {
+      unawaited(_loadRemote(query, generation));
+    } else {
+      _remoteDebounce = Timer(
+        _remoteDelay,
+        () => unawaited(_loadRemote(query, generation)),
+      );
+    }
+  }
+
+  void _retryRemote() => _scheduleRemote(immediate: true);
+
+  Future<void> _loadRemote(String query, int generation) async {
+    try {
+      final results = await widget.openFoodFactsClient!.search(
+        query,
+        Localizations.localeOf(context).languageCode,
+      );
+      if (!mounted || generation != _remoteGeneration) return;
+      setState(() {
+        _remoteResults = results;
+        _remoteState = _RemoteSearchState.ready;
+      });
+    } on Object {
+      if (!mounted || generation != _remoteGeneration) return;
+      setState(() => _remoteState = _RemoteSearchState.error);
+    }
+  }
+
   Future<void> _confirmDelete(FoodSearchPrototypeFood food) async {
     final repository = widget.userFoodRepository;
     if (repository == null) return;
@@ -419,12 +613,51 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
         .where((food) => food.source == FoodSearchPrototypeSource.userCreated)
         .toList(growable: false);
     _favorites = _foods.where(_isFavorite).toList(growable: false);
+    _recentHasRemoteFood = _recent.any(
+      (food) => food.source == FoodSearchPrototypeSource.openFoodFacts,
+    );
+    _favoritesHaveRemoteFood = _favorites.any(
+      (food) => food.source == FoodSearchPrototypeSource.openFoodFacts,
+    );
   }
 
   bool _isFavorite(FoodSearchPrototypeFood food) =>
-      _favoriteOverrides.contains(food.id) != food.favorite;
+      food.source == FoodSearchPrototypeSource.openFoodFacts
+      ? _remoteFavorite(food.id.substring(4))
+      : _favoriteOverrides.contains(food.id) != food.favorite;
+
+  bool _remoteFavorite(String code) => _savedRemoteFoods.any(
+    (saved) => saved.sourceCode == code && saved.isFavorite,
+  );
+
+  OpenFoodFactsProduct _offProductFor(FoodSearchPrototypeFood food) {
+    final code = food.id.substring(4);
+    // Use the food opened in the sheet, even if the search changed meanwhile.
+    return OpenFoodFactsProduct(
+      code: code,
+      name: food.name,
+      brand: food.brand,
+      category: food.category.name,
+      energyKcal: food.nutrition.calories,
+      proteinG: food.nutrition.protein,
+      fatG: food.nutrition.fat,
+      carbsG: food.nutrition.carbs,
+    );
+  }
 
   Future<void> _setFavorite(FoodSearchPrototypeFood food, bool favorite) async {
+    if (food.source == FoodSearchPrototypeSource.openFoodFacts) {
+      final repository = widget.remoteFoodRepository!;
+      await repository.setFavorite(_offProductFor(food), favorite);
+      final foods = await repository.loadFoods();
+      if (mounted) {
+        setState(() {
+          _savedRemoteFoods = foods;
+          _refreshFoods();
+        });
+      }
+      return;
+    }
     final repository = widget.userFoodRepository;
     if (food.source == FoodSearchPrototypeSource.userCreated &&
         repository != null) {
@@ -454,6 +687,7 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
   void _clearSearch() {
     _searchController.clear();
     setState(_updateVisibleFoods);
+    _scheduleRemote();
     _searchFocusNode.requestFocus();
   }
 
@@ -522,16 +756,24 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
     String? entryId;
     try {
       if (repository != null) {
-        entryId = await repository.create(
-          DiaryEntryDraft(
-            day: widget.arguments.diaryDay ?? DateTime.now(),
-            mealId: result.mealId,
-            food: result.snapshot,
-            servingId: result.servingId,
-            amount: result.amount,
-            canonicalQuantity: result.canonicalQuantity,
-          ),
+        final draft = DiaryEntryDraft(
+          day: widget.arguments.diaryDay ?? DateTime.now(),
+          mealId: result.mealId,
+          food: result.snapshot,
+          servingId: result.servingId,
+          amount: result.amount,
+          canonicalQuantity: result.canonicalQuantity,
         );
+        entryId = food.source == FoodSearchPrototypeSource.openFoodFacts
+            ? await widget.remoteFoodRepository!.addToDiary(
+                _offProductFor(food),
+                draft,
+              )
+            : await repository.create(draft);
+        if (food.source == FoodSearchPrototypeSource.openFoodFacts) {
+          _savedRemoteFoods = await widget.remoteFoodRepository!.loadFoods();
+          if (mounted) setState(_refreshFoods);
+        }
         widget.arguments.onEntryCreated?.call(entryId);
       }
     } on Object {
@@ -599,6 +841,7 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
       _selectedTab = _FoodSearchTab.myDishes;
       _refreshFoods();
     });
+    _scheduleRemote();
     final name = saved.firstWhere((food) => food.food.id == id).food.name;
     showYamSuccessSnackBar(
       context: context,

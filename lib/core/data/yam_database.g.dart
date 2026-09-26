@@ -4332,6 +4332,1007 @@ class WeightEntriesCompanion extends UpdateCompanion<StoredWeightEntry> {
   }
 }
 
+class $RemoteFoodsTable extends RemoteFoods
+    with TableInfo<$RemoteFoodsTable, StoredRemoteFood> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $RemoteFoodsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sourceMeta = const VerificationMeta('source');
+  @override
+  late final GeneratedColumn<String> source = GeneratedColumn<String>(
+    'source',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sourceCodeMeta = const VerificationMeta(
+    'sourceCode',
+  );
+  @override
+  late final GeneratedColumn<String> sourceCode = GeneratedColumn<String>(
+    'source_code',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _brandMeta = const VerificationMeta('brand');
+  @override
+  late final GeneratedColumn<String> brand = GeneratedColumn<String>(
+    'brand',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _categoryMeta = const VerificationMeta(
+    'category',
+  );
+  @override
+  late final GeneratedColumn<String> category = GeneratedColumn<String>(
+    'category',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _basisUnitMeta = const VerificationMeta(
+    'basisUnit',
+  );
+  @override
+  late final GeneratedColumn<String> basisUnit = GeneratedColumn<String>(
+    'basis_unit',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _basisAmountMeta = const VerificationMeta(
+    'basisAmount',
+  );
+  @override
+  late final GeneratedColumn<double> basisAmount = GeneratedColumn<double>(
+    'basis_amount',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _energyKcalMeta = const VerificationMeta(
+    'energyKcal',
+  );
+  @override
+  late final GeneratedColumn<double> energyKcal = GeneratedColumn<double>(
+    'energy_kcal',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _proteinGMeta = const VerificationMeta(
+    'proteinG',
+  );
+  @override
+  late final GeneratedColumn<double> proteinG = GeneratedColumn<double>(
+    'protein_g',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _fatGMeta = const VerificationMeta('fatG');
+  @override
+  late final GeneratedColumn<double> fatG = GeneratedColumn<double>(
+    'fat_g',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _carbsGMeta = const VerificationMeta('carbsG');
+  @override
+  late final GeneratedColumn<double> carbsG = GeneratedColumn<double>(
+    'carbs_g',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _lastAmountMeta = const VerificationMeta(
+    'lastAmount',
+  );
+  @override
+  late final GeneratedColumn<double> lastAmount = GeneratedColumn<double>(
+    'last_amount',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(100),
+  );
+  static const VerificationMeta _isFavoriteMeta = const VerificationMeta(
+    'isFavorite',
+  );
+  @override
+  late final GeneratedColumn<bool> isFavorite = GeneratedColumn<bool>(
+    'is_favorite',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_favorite" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _deviceIdMeta = const VerificationMeta(
+    'deviceId',
+  );
+  @override
+  late final GeneratedColumn<String> deviceId = GeneratedColumn<String>(
+    'device_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    source,
+    sourceCode,
+    name,
+    brand,
+    category,
+    basisUnit,
+    basisAmount,
+    energyKcal,
+    proteinG,
+    fatG,
+    carbsG,
+    lastAmount,
+    isFavorite,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    deviceId,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'remote_foods';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<StoredRemoteFood> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('source')) {
+      context.handle(
+        _sourceMeta,
+        source.isAcceptableOrUnknown(data['source']!, _sourceMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sourceMeta);
+    }
+    if (data.containsKey('source_code')) {
+      context.handle(
+        _sourceCodeMeta,
+        sourceCode.isAcceptableOrUnknown(data['source_code']!, _sourceCodeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sourceCodeMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('brand')) {
+      context.handle(
+        _brandMeta,
+        brand.isAcceptableOrUnknown(data['brand']!, _brandMeta),
+      );
+    }
+    if (data.containsKey('category')) {
+      context.handle(
+        _categoryMeta,
+        category.isAcceptableOrUnknown(data['category']!, _categoryMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_categoryMeta);
+    }
+    if (data.containsKey('basis_unit')) {
+      context.handle(
+        _basisUnitMeta,
+        basisUnit.isAcceptableOrUnknown(data['basis_unit']!, _basisUnitMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_basisUnitMeta);
+    }
+    if (data.containsKey('basis_amount')) {
+      context.handle(
+        _basisAmountMeta,
+        basisAmount.isAcceptableOrUnknown(
+          data['basis_amount']!,
+          _basisAmountMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_basisAmountMeta);
+    }
+    if (data.containsKey('energy_kcal')) {
+      context.handle(
+        _energyKcalMeta,
+        energyKcal.isAcceptableOrUnknown(data['energy_kcal']!, _energyKcalMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_energyKcalMeta);
+    }
+    if (data.containsKey('protein_g')) {
+      context.handle(
+        _proteinGMeta,
+        proteinG.isAcceptableOrUnknown(data['protein_g']!, _proteinGMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_proteinGMeta);
+    }
+    if (data.containsKey('fat_g')) {
+      context.handle(
+        _fatGMeta,
+        fatG.isAcceptableOrUnknown(data['fat_g']!, _fatGMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_fatGMeta);
+    }
+    if (data.containsKey('carbs_g')) {
+      context.handle(
+        _carbsGMeta,
+        carbsG.isAcceptableOrUnknown(data['carbs_g']!, _carbsGMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_carbsGMeta);
+    }
+    if (data.containsKey('last_amount')) {
+      context.handle(
+        _lastAmountMeta,
+        lastAmount.isAcceptableOrUnknown(data['last_amount']!, _lastAmountMeta),
+      );
+    }
+    if (data.containsKey('is_favorite')) {
+      context.handle(
+        _isFavoriteMeta,
+        isFavorite.isAcceptableOrUnknown(data['is_favorite']!, _isFavoriteMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    if (data.containsKey('device_id')) {
+      context.handle(
+        _deviceIdMeta,
+        deviceId.isAcceptableOrUnknown(data['device_id']!, _deviceIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_deviceIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {source, sourceCode},
+  ];
+  @override
+  StoredRemoteFood map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return StoredRemoteFood(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      source: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source'],
+      )!,
+      sourceCode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source_code'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      brand: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}brand'],
+      ),
+      category: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}category'],
+      )!,
+      basisUnit: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}basis_unit'],
+      )!,
+      basisAmount: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}basis_amount'],
+      )!,
+      energyKcal: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}energy_kcal'],
+      )!,
+      proteinG: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}protein_g'],
+      )!,
+      fatG: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}fat_g'],
+      )!,
+      carbsG: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}carbs_g'],
+      )!,
+      lastAmount: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}last_amount'],
+      )!,
+      isFavorite: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_favorite'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+      deviceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}device_id'],
+      )!,
+    );
+  }
+
+  @override
+  $RemoteFoodsTable createAlias(String alias) {
+    return $RemoteFoodsTable(attachedDatabase, alias);
+  }
+}
+
+class StoredRemoteFood extends DataClass
+    implements Insertable<StoredRemoteFood> {
+  final String id;
+  final String source;
+  final String sourceCode;
+  final String name;
+  final String? brand;
+  final String category;
+  final String basisUnit;
+  final double basisAmount;
+  final double energyKcal;
+  final double proteinG;
+  final double fatG;
+  final double carbsG;
+  final double lastAmount;
+  final bool isFavorite;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? deletedAt;
+  final String deviceId;
+  const StoredRemoteFood({
+    required this.id,
+    required this.source,
+    required this.sourceCode,
+    required this.name,
+    this.brand,
+    required this.category,
+    required this.basisUnit,
+    required this.basisAmount,
+    required this.energyKcal,
+    required this.proteinG,
+    required this.fatG,
+    required this.carbsG,
+    required this.lastAmount,
+    required this.isFavorite,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+    required this.deviceId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['source'] = Variable<String>(source);
+    map['source_code'] = Variable<String>(sourceCode);
+    map['name'] = Variable<String>(name);
+    if (!nullToAbsent || brand != null) {
+      map['brand'] = Variable<String>(brand);
+    }
+    map['category'] = Variable<String>(category);
+    map['basis_unit'] = Variable<String>(basisUnit);
+    map['basis_amount'] = Variable<double>(basisAmount);
+    map['energy_kcal'] = Variable<double>(energyKcal);
+    map['protein_g'] = Variable<double>(proteinG);
+    map['fat_g'] = Variable<double>(fatG);
+    map['carbs_g'] = Variable<double>(carbsG);
+    map['last_amount'] = Variable<double>(lastAmount);
+    map['is_favorite'] = Variable<bool>(isFavorite);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    map['device_id'] = Variable<String>(deviceId);
+    return map;
+  }
+
+  RemoteFoodsCompanion toCompanion(bool nullToAbsent) {
+    return RemoteFoodsCompanion(
+      id: Value(id),
+      source: Value(source),
+      sourceCode: Value(sourceCode),
+      name: Value(name),
+      brand: brand == null && nullToAbsent
+          ? const Value.absent()
+          : Value(brand),
+      category: Value(category),
+      basisUnit: Value(basisUnit),
+      basisAmount: Value(basisAmount),
+      energyKcal: Value(energyKcal),
+      proteinG: Value(proteinG),
+      fatG: Value(fatG),
+      carbsG: Value(carbsG),
+      lastAmount: Value(lastAmount),
+      isFavorite: Value(isFavorite),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+      deviceId: Value(deviceId),
+    );
+  }
+
+  factory StoredRemoteFood.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return StoredRemoteFood(
+      id: serializer.fromJson<String>(json['id']),
+      source: serializer.fromJson<String>(json['source']),
+      sourceCode: serializer.fromJson<String>(json['sourceCode']),
+      name: serializer.fromJson<String>(json['name']),
+      brand: serializer.fromJson<String?>(json['brand']),
+      category: serializer.fromJson<String>(json['category']),
+      basisUnit: serializer.fromJson<String>(json['basisUnit']),
+      basisAmount: serializer.fromJson<double>(json['basisAmount']),
+      energyKcal: serializer.fromJson<double>(json['energyKcal']),
+      proteinG: serializer.fromJson<double>(json['proteinG']),
+      fatG: serializer.fromJson<double>(json['fatG']),
+      carbsG: serializer.fromJson<double>(json['carbsG']),
+      lastAmount: serializer.fromJson<double>(json['lastAmount']),
+      isFavorite: serializer.fromJson<bool>(json['isFavorite']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      deviceId: serializer.fromJson<String>(json['deviceId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'source': serializer.toJson<String>(source),
+      'sourceCode': serializer.toJson<String>(sourceCode),
+      'name': serializer.toJson<String>(name),
+      'brand': serializer.toJson<String?>(brand),
+      'category': serializer.toJson<String>(category),
+      'basisUnit': serializer.toJson<String>(basisUnit),
+      'basisAmount': serializer.toJson<double>(basisAmount),
+      'energyKcal': serializer.toJson<double>(energyKcal),
+      'proteinG': serializer.toJson<double>(proteinG),
+      'fatG': serializer.toJson<double>(fatG),
+      'carbsG': serializer.toJson<double>(carbsG),
+      'lastAmount': serializer.toJson<double>(lastAmount),
+      'isFavorite': serializer.toJson<bool>(isFavorite),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'deviceId': serializer.toJson<String>(deviceId),
+    };
+  }
+
+  StoredRemoteFood copyWith({
+    String? id,
+    String? source,
+    String? sourceCode,
+    String? name,
+    Value<String?> brand = const Value.absent(),
+    String? category,
+    String? basisUnit,
+    double? basisAmount,
+    double? energyKcal,
+    double? proteinG,
+    double? fatG,
+    double? carbsG,
+    double? lastAmount,
+    bool? isFavorite,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+    String? deviceId,
+  }) => StoredRemoteFood(
+    id: id ?? this.id,
+    source: source ?? this.source,
+    sourceCode: sourceCode ?? this.sourceCode,
+    name: name ?? this.name,
+    brand: brand.present ? brand.value : this.brand,
+    category: category ?? this.category,
+    basisUnit: basisUnit ?? this.basisUnit,
+    basisAmount: basisAmount ?? this.basisAmount,
+    energyKcal: energyKcal ?? this.energyKcal,
+    proteinG: proteinG ?? this.proteinG,
+    fatG: fatG ?? this.fatG,
+    carbsG: carbsG ?? this.carbsG,
+    lastAmount: lastAmount ?? this.lastAmount,
+    isFavorite: isFavorite ?? this.isFavorite,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    deviceId: deviceId ?? this.deviceId,
+  );
+  StoredRemoteFood copyWithCompanion(RemoteFoodsCompanion data) {
+    return StoredRemoteFood(
+      id: data.id.present ? data.id.value : this.id,
+      source: data.source.present ? data.source.value : this.source,
+      sourceCode: data.sourceCode.present
+          ? data.sourceCode.value
+          : this.sourceCode,
+      name: data.name.present ? data.name.value : this.name,
+      brand: data.brand.present ? data.brand.value : this.brand,
+      category: data.category.present ? data.category.value : this.category,
+      basisUnit: data.basisUnit.present ? data.basisUnit.value : this.basisUnit,
+      basisAmount: data.basisAmount.present
+          ? data.basisAmount.value
+          : this.basisAmount,
+      energyKcal: data.energyKcal.present
+          ? data.energyKcal.value
+          : this.energyKcal,
+      proteinG: data.proteinG.present ? data.proteinG.value : this.proteinG,
+      fatG: data.fatG.present ? data.fatG.value : this.fatG,
+      carbsG: data.carbsG.present ? data.carbsG.value : this.carbsG,
+      lastAmount: data.lastAmount.present
+          ? data.lastAmount.value
+          : this.lastAmount,
+      isFavorite: data.isFavorite.present
+          ? data.isFavorite.value
+          : this.isFavorite,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      deviceId: data.deviceId.present ? data.deviceId.value : this.deviceId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('StoredRemoteFood(')
+          ..write('id: $id, ')
+          ..write('source: $source, ')
+          ..write('sourceCode: $sourceCode, ')
+          ..write('name: $name, ')
+          ..write('brand: $brand, ')
+          ..write('category: $category, ')
+          ..write('basisUnit: $basisUnit, ')
+          ..write('basisAmount: $basisAmount, ')
+          ..write('energyKcal: $energyKcal, ')
+          ..write('proteinG: $proteinG, ')
+          ..write('fatG: $fatG, ')
+          ..write('carbsG: $carbsG, ')
+          ..write('lastAmount: $lastAmount, ')
+          ..write('isFavorite: $isFavorite, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('deviceId: $deviceId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    source,
+    sourceCode,
+    name,
+    brand,
+    category,
+    basisUnit,
+    basisAmount,
+    energyKcal,
+    proteinG,
+    fatG,
+    carbsG,
+    lastAmount,
+    isFavorite,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    deviceId,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is StoredRemoteFood &&
+          other.id == this.id &&
+          other.source == this.source &&
+          other.sourceCode == this.sourceCode &&
+          other.name == this.name &&
+          other.brand == this.brand &&
+          other.category == this.category &&
+          other.basisUnit == this.basisUnit &&
+          other.basisAmount == this.basisAmount &&
+          other.energyKcal == this.energyKcal &&
+          other.proteinG == this.proteinG &&
+          other.fatG == this.fatG &&
+          other.carbsG == this.carbsG &&
+          other.lastAmount == this.lastAmount &&
+          other.isFavorite == this.isFavorite &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt &&
+          other.deviceId == this.deviceId);
+}
+
+class RemoteFoodsCompanion extends UpdateCompanion<StoredRemoteFood> {
+  final Value<String> id;
+  final Value<String> source;
+  final Value<String> sourceCode;
+  final Value<String> name;
+  final Value<String?> brand;
+  final Value<String> category;
+  final Value<String> basisUnit;
+  final Value<double> basisAmount;
+  final Value<double> energyKcal;
+  final Value<double> proteinG;
+  final Value<double> fatG;
+  final Value<double> carbsG;
+  final Value<double> lastAmount;
+  final Value<bool> isFavorite;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> deletedAt;
+  final Value<String> deviceId;
+  final Value<int> rowid;
+  const RemoteFoodsCompanion({
+    this.id = const Value.absent(),
+    this.source = const Value.absent(),
+    this.sourceCode = const Value.absent(),
+    this.name = const Value.absent(),
+    this.brand = const Value.absent(),
+    this.category = const Value.absent(),
+    this.basisUnit = const Value.absent(),
+    this.basisAmount = const Value.absent(),
+    this.energyKcal = const Value.absent(),
+    this.proteinG = const Value.absent(),
+    this.fatG = const Value.absent(),
+    this.carbsG = const Value.absent(),
+    this.lastAmount = const Value.absent(),
+    this.isFavorite = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.deviceId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  RemoteFoodsCompanion.insert({
+    required String id,
+    required String source,
+    required String sourceCode,
+    required String name,
+    this.brand = const Value.absent(),
+    required String category,
+    required String basisUnit,
+    required double basisAmount,
+    required double energyKcal,
+    required double proteinG,
+    required double fatG,
+    required double carbsG,
+    this.lastAmount = const Value.absent(),
+    this.isFavorite = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.deletedAt = const Value.absent(),
+    required String deviceId,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       source = Value(source),
+       sourceCode = Value(sourceCode),
+       name = Value(name),
+       category = Value(category),
+       basisUnit = Value(basisUnit),
+       basisAmount = Value(basisAmount),
+       energyKcal = Value(energyKcal),
+       proteinG = Value(proteinG),
+       fatG = Value(fatG),
+       carbsG = Value(carbsG),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt),
+       deviceId = Value(deviceId);
+  static Insertable<StoredRemoteFood> custom({
+    Expression<String>? id,
+    Expression<String>? source,
+    Expression<String>? sourceCode,
+    Expression<String>? name,
+    Expression<String>? brand,
+    Expression<String>? category,
+    Expression<String>? basisUnit,
+    Expression<double>? basisAmount,
+    Expression<double>? energyKcal,
+    Expression<double>? proteinG,
+    Expression<double>? fatG,
+    Expression<double>? carbsG,
+    Expression<double>? lastAmount,
+    Expression<bool>? isFavorite,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+    Expression<String>? deviceId,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (source != null) 'source': source,
+      if (sourceCode != null) 'source_code': sourceCode,
+      if (name != null) 'name': name,
+      if (brand != null) 'brand': brand,
+      if (category != null) 'category': category,
+      if (basisUnit != null) 'basis_unit': basisUnit,
+      if (basisAmount != null) 'basis_amount': basisAmount,
+      if (energyKcal != null) 'energy_kcal': energyKcal,
+      if (proteinG != null) 'protein_g': proteinG,
+      if (fatG != null) 'fat_g': fatG,
+      if (carbsG != null) 'carbs_g': carbsG,
+      if (lastAmount != null) 'last_amount': lastAmount,
+      if (isFavorite != null) 'is_favorite': isFavorite,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (deviceId != null) 'device_id': deviceId,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  RemoteFoodsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? source,
+    Value<String>? sourceCode,
+    Value<String>? name,
+    Value<String?>? brand,
+    Value<String>? category,
+    Value<String>? basisUnit,
+    Value<double>? basisAmount,
+    Value<double>? energyKcal,
+    Value<double>? proteinG,
+    Value<double>? fatG,
+    Value<double>? carbsG,
+    Value<double>? lastAmount,
+    Value<bool>? isFavorite,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? deletedAt,
+    Value<String>? deviceId,
+    Value<int>? rowid,
+  }) {
+    return RemoteFoodsCompanion(
+      id: id ?? this.id,
+      source: source ?? this.source,
+      sourceCode: sourceCode ?? this.sourceCode,
+      name: name ?? this.name,
+      brand: brand ?? this.brand,
+      category: category ?? this.category,
+      basisUnit: basisUnit ?? this.basisUnit,
+      basisAmount: basisAmount ?? this.basisAmount,
+      energyKcal: energyKcal ?? this.energyKcal,
+      proteinG: proteinG ?? this.proteinG,
+      fatG: fatG ?? this.fatG,
+      carbsG: carbsG ?? this.carbsG,
+      lastAmount: lastAmount ?? this.lastAmount,
+      isFavorite: isFavorite ?? this.isFavorite,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      deviceId: deviceId ?? this.deviceId,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (source.present) {
+      map['source'] = Variable<String>(source.value);
+    }
+    if (sourceCode.present) {
+      map['source_code'] = Variable<String>(sourceCode.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (brand.present) {
+      map['brand'] = Variable<String>(brand.value);
+    }
+    if (category.present) {
+      map['category'] = Variable<String>(category.value);
+    }
+    if (basisUnit.present) {
+      map['basis_unit'] = Variable<String>(basisUnit.value);
+    }
+    if (basisAmount.present) {
+      map['basis_amount'] = Variable<double>(basisAmount.value);
+    }
+    if (energyKcal.present) {
+      map['energy_kcal'] = Variable<double>(energyKcal.value);
+    }
+    if (proteinG.present) {
+      map['protein_g'] = Variable<double>(proteinG.value);
+    }
+    if (fatG.present) {
+      map['fat_g'] = Variable<double>(fatG.value);
+    }
+    if (carbsG.present) {
+      map['carbs_g'] = Variable<double>(carbsG.value);
+    }
+    if (lastAmount.present) {
+      map['last_amount'] = Variable<double>(lastAmount.value);
+    }
+    if (isFavorite.present) {
+      map['is_favorite'] = Variable<bool>(isFavorite.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (deviceId.present) {
+      map['device_id'] = Variable<String>(deviceId.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RemoteFoodsCompanion(')
+          ..write('id: $id, ')
+          ..write('source: $source, ')
+          ..write('sourceCode: $sourceCode, ')
+          ..write('name: $name, ')
+          ..write('brand: $brand, ')
+          ..write('category: $category, ')
+          ..write('basisUnit: $basisUnit, ')
+          ..write('basisAmount: $basisAmount, ')
+          ..write('energyKcal: $energyKcal, ')
+          ..write('proteinG: $proteinG, ')
+          ..write('fatG: $fatG, ')
+          ..write('carbsG: $carbsG, ')
+          ..write('lastAmount: $lastAmount, ')
+          ..write('isFavorite: $isFavorite, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$YamDatabase extends GeneratedDatabase {
   _$YamDatabase(QueryExecutor e) : super(e);
   $YamDatabaseManager get managers => $YamDatabaseManager(this);
@@ -4342,6 +5343,7 @@ abstract class _$YamDatabase extends GeneratedDatabase {
   late final $DiaryEntriesTable diaryEntries = $DiaryEntriesTable(this);
   late final $GoalVersionsTable goalVersions = $GoalVersionsTable(this);
   late final $WeightEntriesTable weightEntries = $WeightEntriesTable(this);
+  late final $RemoteFoodsTable remoteFoods = $RemoteFoodsTable(this);
   late final Index userFoodsHistory = Index(
     'user_foods_history',
     'CREATE INDEX user_foods_history ON user_foods (deleted_at, created_at)',
@@ -4370,6 +5372,14 @@ abstract class _$YamDatabase extends GeneratedDatabase {
     'weight_entries_day',
     'CREATE INDEX weight_entries_day ON weight_entries (local_day, deleted_at, created_at)',
   );
+  late final Index remoteFoodsName = Index(
+    'remote_foods_name',
+    'CREATE INDEX remote_foods_name ON remote_foods (name)',
+  );
+  late final Index remoteFoodsFavorites = Index(
+    'remote_foods_favorites',
+    'CREATE INDEX remote_foods_favorites ON remote_foods (is_favorite, deleted_at)',
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -4381,6 +5391,7 @@ abstract class _$YamDatabase extends GeneratedDatabase {
     diaryEntries,
     goalVersions,
     weightEntries,
+    remoteFoods,
     userFoodsHistory,
     userFoodsName,
     userServingsFood,
@@ -4388,6 +5399,8 @@ abstract class _$YamDatabase extends GeneratedDatabase {
     diaryEntriesRecent,
     goalVersionsDay,
     weightEntriesDay,
+    remoteFoodsName,
+    remoteFoodsFavorites,
   ];
 }
 
@@ -6688,6 +7701,463 @@ typedef $$WeightEntriesTableProcessedTableManager =
       StoredWeightEntry,
       PrefetchHooks Function()
     >;
+typedef $$RemoteFoodsTableCreateCompanionBuilder =
+    RemoteFoodsCompanion Function({
+      required String id,
+      required String source,
+      required String sourceCode,
+      required String name,
+      Value<String?> brand,
+      required String category,
+      required String basisUnit,
+      required double basisAmount,
+      required double energyKcal,
+      required double proteinG,
+      required double fatG,
+      required double carbsG,
+      Value<double> lastAmount,
+      Value<bool> isFavorite,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<DateTime?> deletedAt,
+      required String deviceId,
+      Value<int> rowid,
+    });
+typedef $$RemoteFoodsTableUpdateCompanionBuilder =
+    RemoteFoodsCompanion Function({
+      Value<String> id,
+      Value<String> source,
+      Value<String> sourceCode,
+      Value<String> name,
+      Value<String?> brand,
+      Value<String> category,
+      Value<String> basisUnit,
+      Value<double> basisAmount,
+      Value<double> energyKcal,
+      Value<double> proteinG,
+      Value<double> fatG,
+      Value<double> carbsG,
+      Value<double> lastAmount,
+      Value<bool> isFavorite,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<DateTime?> deletedAt,
+      Value<String> deviceId,
+      Value<int> rowid,
+    });
+
+class $$RemoteFoodsTableFilterComposer
+    extends Composer<_$YamDatabase, $RemoteFoodsTable> {
+  $$RemoteFoodsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get source => $composableBuilder(
+    column: $table.source,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sourceCode => $composableBuilder(
+    column: $table.sourceCode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get brand => $composableBuilder(
+    column: $table.brand,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get category => $composableBuilder(
+    column: $table.category,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get basisUnit => $composableBuilder(
+    column: $table.basisUnit,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get basisAmount => $composableBuilder(
+    column: $table.basisAmount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get energyKcal => $composableBuilder(
+    column: $table.energyKcal,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get proteinG => $composableBuilder(
+    column: $table.proteinG,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get fatG => $composableBuilder(
+    column: $table.fatG,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get carbsG => $composableBuilder(
+    column: $table.carbsG,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get lastAmount => $composableBuilder(
+    column: $table.lastAmount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isFavorite => $composableBuilder(
+    column: $table.isFavorite,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$RemoteFoodsTableOrderingComposer
+    extends Composer<_$YamDatabase, $RemoteFoodsTable> {
+  $$RemoteFoodsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get source => $composableBuilder(
+    column: $table.source,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get sourceCode => $composableBuilder(
+    column: $table.sourceCode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get brand => $composableBuilder(
+    column: $table.brand,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get category => $composableBuilder(
+    column: $table.category,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get basisUnit => $composableBuilder(
+    column: $table.basisUnit,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get basisAmount => $composableBuilder(
+    column: $table.basisAmount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get energyKcal => $composableBuilder(
+    column: $table.energyKcal,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get proteinG => $composableBuilder(
+    column: $table.proteinG,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get fatG => $composableBuilder(
+    column: $table.fatG,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get carbsG => $composableBuilder(
+    column: $table.carbsG,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get lastAmount => $composableBuilder(
+    column: $table.lastAmount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isFavorite => $composableBuilder(
+    column: $table.isFavorite,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$RemoteFoodsTableAnnotationComposer
+    extends Composer<_$YamDatabase, $RemoteFoodsTable> {
+  $$RemoteFoodsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get source =>
+      $composableBuilder(column: $table.source, builder: (column) => column);
+
+  GeneratedColumn<String> get sourceCode => $composableBuilder(
+    column: $table.sourceCode,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get brand =>
+      $composableBuilder(column: $table.brand, builder: (column) => column);
+
+  GeneratedColumn<String> get category =>
+      $composableBuilder(column: $table.category, builder: (column) => column);
+
+  GeneratedColumn<String> get basisUnit =>
+      $composableBuilder(column: $table.basisUnit, builder: (column) => column);
+
+  GeneratedColumn<double> get basisAmount => $composableBuilder(
+    column: $table.basisAmount,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get energyKcal => $composableBuilder(
+    column: $table.energyKcal,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get proteinG =>
+      $composableBuilder(column: $table.proteinG, builder: (column) => column);
+
+  GeneratedColumn<double> get fatG =>
+      $composableBuilder(column: $table.fatG, builder: (column) => column);
+
+  GeneratedColumn<double> get carbsG =>
+      $composableBuilder(column: $table.carbsG, builder: (column) => column);
+
+  GeneratedColumn<double> get lastAmount => $composableBuilder(
+    column: $table.lastAmount,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isFavorite => $composableBuilder(
+    column: $table.isFavorite,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get deviceId =>
+      $composableBuilder(column: $table.deviceId, builder: (column) => column);
+}
+
+class $$RemoteFoodsTableTableManager
+    extends
+        RootTableManager<
+          _$YamDatabase,
+          $RemoteFoodsTable,
+          StoredRemoteFood,
+          $$RemoteFoodsTableFilterComposer,
+          $$RemoteFoodsTableOrderingComposer,
+          $$RemoteFoodsTableAnnotationComposer,
+          $$RemoteFoodsTableCreateCompanionBuilder,
+          $$RemoteFoodsTableUpdateCompanionBuilder,
+          (
+            StoredRemoteFood,
+            BaseReferences<_$YamDatabase, $RemoteFoodsTable, StoredRemoteFood>,
+          ),
+          StoredRemoteFood,
+          PrefetchHooks Function()
+        > {
+  $$RemoteFoodsTableTableManager(_$YamDatabase db, $RemoteFoodsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$RemoteFoodsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$RemoteFoodsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$RemoteFoodsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> source = const Value.absent(),
+                Value<String> sourceCode = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String?> brand = const Value.absent(),
+                Value<String> category = const Value.absent(),
+                Value<String> basisUnit = const Value.absent(),
+                Value<double> basisAmount = const Value.absent(),
+                Value<double> energyKcal = const Value.absent(),
+                Value<double> proteinG = const Value.absent(),
+                Value<double> fatG = const Value.absent(),
+                Value<double> carbsG = const Value.absent(),
+                Value<double> lastAmount = const Value.absent(),
+                Value<bool> isFavorite = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<String> deviceId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => RemoteFoodsCompanion(
+                id: id,
+                source: source,
+                sourceCode: sourceCode,
+                name: name,
+                brand: brand,
+                category: category,
+                basisUnit: basisUnit,
+                basisAmount: basisAmount,
+                energyKcal: energyKcal,
+                proteinG: proteinG,
+                fatG: fatG,
+                carbsG: carbsG,
+                lastAmount: lastAmount,
+                isFavorite: isFavorite,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                deviceId: deviceId,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String source,
+                required String sourceCode,
+                required String name,
+                Value<String?> brand = const Value.absent(),
+                required String category,
+                required String basisUnit,
+                required double basisAmount,
+                required double energyKcal,
+                required double proteinG,
+                required double fatG,
+                required double carbsG,
+                Value<double> lastAmount = const Value.absent(),
+                Value<bool> isFavorite = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<DateTime?> deletedAt = const Value.absent(),
+                required String deviceId,
+                Value<int> rowid = const Value.absent(),
+              }) => RemoteFoodsCompanion.insert(
+                id: id,
+                source: source,
+                sourceCode: sourceCode,
+                name: name,
+                brand: brand,
+                category: category,
+                basisUnit: basisUnit,
+                basisAmount: basisAmount,
+                energyKcal: energyKcal,
+                proteinG: proteinG,
+                fatG: fatG,
+                carbsG: carbsG,
+                lastAmount: lastAmount,
+                isFavorite: isFavorite,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                deviceId: deviceId,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$RemoteFoodsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$YamDatabase,
+      $RemoteFoodsTable,
+      StoredRemoteFood,
+      $$RemoteFoodsTableFilterComposer,
+      $$RemoteFoodsTableOrderingComposer,
+      $$RemoteFoodsTableAnnotationComposer,
+      $$RemoteFoodsTableCreateCompanionBuilder,
+      $$RemoteFoodsTableUpdateCompanionBuilder,
+      (
+        StoredRemoteFood,
+        BaseReferences<_$YamDatabase, $RemoteFoodsTable, StoredRemoteFood>,
+      ),
+      StoredRemoteFood,
+      PrefetchHooks Function()
+    >;
 
 class $YamDatabaseManager {
   final _$YamDatabase _db;
@@ -6704,4 +8174,6 @@ class $YamDatabaseManager {
       $$GoalVersionsTableTableManager(_db, _db.goalVersions);
   $$WeightEntriesTableTableManager get weightEntries =>
       $$WeightEntriesTableTableManager(_db, _db.weightEntries);
+  $$RemoteFoodsTableTableManager get remoteFoods =>
+      $$RemoteFoodsTableTableManager(_db, _db.remoteFoods);
 }

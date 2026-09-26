@@ -444,6 +444,33 @@ class AppLocalizationsRu extends AppLocalizations {
   String get foodSearchResults => 'Результаты поиска';
 
   @override
+  String get foodSearchOpenFoodFacts => 'Open Food Facts';
+
+  @override
+  String get foodSearchRemoteLoading => 'Ищем в Open Food Facts';
+
+  @override
+  String get foodSearchRemoteShortQuery =>
+      'Введите не менее 3 символов для поиска в Open Food Facts.';
+
+  @override
+  String get foodSearchRemoteEmpty =>
+      'В Open Food Facts нет продуктов с полными данными для добавления.';
+
+  @override
+  String get foodSearchRemoteError =>
+      'Open Food Facts недоступен. Локальные продукты по-прежнему доступны.';
+
+  @override
+  String get foodSearchRemoteAttribution => 'Данные: Open Food Facts';
+
+  @override
+  String get foodSearchRemoteLicense => 'Лицензия ODbL';
+
+  @override
+  String get foodSearchRemoteLinkError => 'Не удалось открыть ссылку.';
+
+  @override
   String get foodSearchNoResultsTitle => 'Ничего не нашли';
 
   @override

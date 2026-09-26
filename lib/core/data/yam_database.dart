@@ -134,6 +134,38 @@ class WeightEntries extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+@DataClassName('StoredRemoteFood')
+@TableIndex(name: 'remote_foods_name', columns: {#name})
+@TableIndex(name: 'remote_foods_favorites', columns: {#isFavorite, #deletedAt})
+class RemoteFoods extends Table {
+  TextColumn get id => text()();
+  TextColumn get source => text()();
+  TextColumn get sourceCode => text()();
+  TextColumn get name => text()();
+  TextColumn get brand => text().nullable()();
+  TextColumn get category => text()();
+  TextColumn get basisUnit => text()();
+  RealColumn get basisAmount => real()();
+  RealColumn get energyKcal => real()();
+  RealColumn get proteinG => real()();
+  RealColumn get fatG => real()();
+  RealColumn get carbsG => real()();
+  RealColumn get lastAmount => real().withDefault(const Constant(100))();
+  BoolColumn get isFavorite => boolean().withDefault(const Constant(false))();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+  DateTimeColumn get deletedAt => dateTime().nullable()();
+  TextColumn get deviceId => text()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+
+  @override
+  List<Set<Column>> get uniqueKeys => [
+    {source, sourceCode},
+  ];
+}
+
 @DriftDatabase(
   tables: [
     UserFoods,
@@ -142,6 +174,7 @@ class WeightEntries extends Table {
     DiaryEntries,
     GoalVersions,
     WeightEntries,
+    RemoteFoods,
   ],
 )
 class YamDatabase extends _$YamDatabase {
@@ -151,7 +184,7 @@ class YamDatabase extends _$YamDatabase {
     : super(LazyDatabase(() async => driftDatabase(name: 'yam')));
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -178,6 +211,16 @@ class YamDatabase extends _$YamDatabase {
         await customStatement(
           'CREATE INDEX weight_entries_day ON weight_entries '
           '(local_day, deleted_at, created_at)',
+        );
+      }
+      if (from < 4) {
+        await migrator.createTable(remoteFoods);
+        await customStatement(
+          'CREATE INDEX remote_foods_name ON remote_foods (name)',
+        );
+        await customStatement(
+          'CREATE INDEX remote_foods_favorites ON remote_foods '
+          '(is_favorite, deleted_at)',
         );
       }
     },

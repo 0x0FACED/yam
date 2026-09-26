@@ -11,6 +11,8 @@ import 'package:yam/features/diary/presentation/diary_screen.dart';
 import 'package:yam/features/food_search/presentation/create_product_stub_screen.dart';
 import 'package:yam/features/food_search/presentation/create_product_screen.dart';
 import 'package:yam/features/food_search/data/user_food_repository.dart';
+import 'package:yam/features/food_search/data/open_food_facts_client.dart';
+import 'package:yam/features/food_search/data/remote_food_repository.dart';
 import 'package:yam/features/food_search/presentation/food_search_prototype_data.dart';
 import 'package:yam/features/food_search/presentation/food_search_screen.dart';
 import 'package:yam/features/onboarding/presentation/onboarding_screen.dart';
@@ -29,6 +31,8 @@ GoRouter createAppRouter({
   FutureOr<void> Function(SessionProfile)? onProfileChanged,
   ValueListenable<double?>? weightListenable,
   UserFoodRepository? userFoodRepository,
+  RemoteFoodRepository? remoteFoodRepository,
+  OpenFoodFactsSearchClient? openFoodFactsClient,
   DiaryRepository? diaryRepository,
   StatisticsRepository? statisticsRepository,
 }) {
@@ -159,6 +163,8 @@ GoRouter createAppRouter({
           return FoodSearchScreen(
             arguments: arguments,
             userFoodRepository: userFoodRepository,
+            remoteFoodRepository: remoteFoodRepository,
+            openFoodFactsClient: openFoodFactsClient,
             diaryRepository: diaryRepository,
           );
         },

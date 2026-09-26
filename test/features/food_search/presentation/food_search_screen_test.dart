@@ -132,6 +132,8 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Whey protein'), findsOneWidget);
     expect(find.text('Rolled oats'), findsOneWidget);
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump(const Duration(milliseconds: 1));
   });
 
   testWidgets('favorites toggle from the sheet stays visible on search', (

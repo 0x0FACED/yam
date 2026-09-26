@@ -24,7 +24,7 @@ enum FoodSearchPrototypeCategory {
   drinks,
 }
 
-enum FoodSearchPrototypeSource { localCatalog, userCreated }
+enum FoodSearchPrototypeSource { localCatalog, userCreated, openFoodFacts }
 
 enum FoodSearchPrototypeCatalogState { ready, loading, error }
 

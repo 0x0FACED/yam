@@ -444,6 +444,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get foodSearchResults => 'Search results';
 
   @override
+  String get foodSearchOpenFoodFacts => 'Open Food Facts';
+
+  @override
+  String get foodSearchRemoteLoading => 'Searching Open Food Facts';
+
+  @override
+  String get foodSearchRemoteShortQuery =>
+      'Enter at least 3 characters to search Open Food Facts.';
+
+  @override
+  String get foodSearchRemoteEmpty =>
+      'No addable products found on Open Food Facts.';
+
+  @override
+  String get foodSearchRemoteError =>
+      'Open Food Facts is unavailable. Your local foods are still here.';
+
+  @override
+  String get foodSearchRemoteAttribution => 'Data: Open Food Facts';
+
+  @override
+  String get foodSearchRemoteLicense => 'ODbL license';
+
+  @override
+  String get foodSearchRemoteLinkError => 'Could not open the link.';
+
+  @override
   String get foodSearchNoResultsTitle => 'Nothing found';
 
   @override

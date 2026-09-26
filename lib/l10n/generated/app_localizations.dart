@@ -884,6 +884,54 @@ abstract class AppLocalizations {
   /// **'Search results'**
   String get foodSearchResults;
 
+  /// No description provided for @foodSearchOpenFoodFacts.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Food Facts'**
+  String get foodSearchOpenFoodFacts;
+
+  /// No description provided for @foodSearchRemoteLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Searching Open Food Facts'**
+  String get foodSearchRemoteLoading;
+
+  /// No description provided for @foodSearchRemoteShortQuery.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter at least 3 characters to search Open Food Facts.'**
+  String get foodSearchRemoteShortQuery;
+
+  /// No description provided for @foodSearchRemoteEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No addable products found on Open Food Facts.'**
+  String get foodSearchRemoteEmpty;
+
+  /// No description provided for @foodSearchRemoteError.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Food Facts is unavailable. Your local foods are still here.'**
+  String get foodSearchRemoteError;
+
+  /// No description provided for @foodSearchRemoteAttribution.
+  ///
+  /// In en, this message translates to:
+  /// **'Data: Open Food Facts'**
+  String get foodSearchRemoteAttribution;
+
+  /// No description provided for @foodSearchRemoteLicense.
+  ///
+  /// In en, this message translates to:
+  /// **'ODbL license'**
+  String get foodSearchRemoteLicense;
+
+  /// No description provided for @foodSearchRemoteLinkError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open the link.'**
+  String get foodSearchRemoteLinkError;
+
   /// No description provided for @foodSearchNoResultsTitle.
   ///
   /// In en, this message translates to:
