@@ -110,6 +110,24 @@ abstract class AppLocalizations {
   /// **'YAM is starting'**
   String get startupLoadingLabel;
 
+  /// No description provided for @startupDataLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Opening local data'**
+  String get startupDataLoading;
+
+  /// No description provided for @startupDataErrorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open local data'**
+  String get startupDataErrorTitle;
+
+  /// No description provided for @startupDataErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Try loading the local database again.'**
+  String get startupDataErrorMessage;
+
   /// No description provided for @onboardingStepOf.
   ///
   /// In en, this message translates to:

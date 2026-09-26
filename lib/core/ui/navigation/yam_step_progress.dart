@@ -13,6 +13,7 @@ class YamStepProgress extends StatelessWidget {
     required this.leadingTooltip,
     required this.leadingIcon,
     required this.onLeadingPressed,
+    this.showLeading = true,
     super.key,
   });
 
@@ -22,6 +23,7 @@ class YamStepProgress extends StatelessWidget {
   final String leadingTooltip;
   final IconData leadingIcon;
   final VoidCallback onLeadingPressed;
+  final bool showLeading;
 
   @override
   Widget build(BuildContext context) {
@@ -34,13 +36,16 @@ class YamStepProgress extends StatelessWidget {
       children: [
         Row(
           children: [
-            YamIconButton(
-              icon: leadingIcon,
-              tooltip: leadingTooltip,
-              onPressed: onLeadingPressed,
-              surface: false,
-              iconSize: 20,
-            ),
+            if (showLeading)
+              YamIconButton(
+                icon: leadingIcon,
+                tooltip: leadingTooltip,
+                onPressed: onLeadingPressed,
+                surface: false,
+                iconSize: 20,
+              )
+            else
+              const SizedBox.square(dimension: 44),
             Expanded(
               child: Center(
                 child: DecoratedBox(

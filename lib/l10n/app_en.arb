@@ -5,6 +5,9 @@
     "description": "Application name"
   },
   "startupLoadingLabel": "YAM is starting",
+  "startupDataLoading": "Opening local data",
+  "startupDataErrorTitle": "Could not open local data",
+  "startupDataErrorMessage": "Try loading the local database again.",
   "@startupLoadingLabel": {
     "description": "Screen reader label for the animated startup screen"
   },

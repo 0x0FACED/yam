@@ -19,12 +19,16 @@ class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({
     required this.initialProfile,
     this.initialWeightKg,
+    this.requiredFirstRun = false,
+    this.onClose,
     required this.onCompleted,
     super.key,
   });
 
   final SessionProfile? initialProfile;
   final double? initialWeightKg;
+  final bool requiredFirstRun;
+  final VoidCallback? onClose;
   final FutureOr<void> Function(SessionProfile) onCompleted;
 
   @override
@@ -192,7 +196,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return PopScope(
-      canPop: _step == 0,
+      canPop: !widget.requiredFirstRun && _step == 0,
       onPopInvokedWithResult: (didPop, _) {
         if (!didPop && _step > 0) _goToStep(_step - 1);
       },
@@ -220,8 +224,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       leadingIcon: _step == 0
                           ? Icons.close_rounded
                           : Icons.arrow_back_rounded,
+                      showLeading: _step > 0 || !widget.requiredFirstRun,
                       onLeadingPressed: _step == 0
-                          ? () => Navigator.of(context).maybePop()
+                          ? (widget.onClose ??
+                                () => Navigator.of(context).maybePop())
                           : () => _goToStep(_step - 1),
                     ),
                   ),
@@ -269,6 +275,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             ),
                           ),
                         YamPrimaryButton(
+                          key: const ValueKey('onboarding-continue'),
                           label: _step == 2
                               ? (_saving
                                     ? l10n.createProductSaving

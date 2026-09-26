@@ -1,15 +1,33 @@
+import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:yam/app/app.dart';
 import 'package:yam/app/theme/app_motion.dart';
 import 'package:yam/app/theme/app_theme.dart';
+import 'package:yam/app/session/session_profile.dart';
+import 'package:yam/core/data/yam_database.dart';
 import 'package:yam/features/settings/presentation/settings_screen.dart';
+import 'package:yam/features/statistics/data/statistics_repository.dart';
 import 'package:yam/l10n/generated/app_localizations.dart';
 
 void main() {
   testWidgets('changes the app theme for the current session', (tester) async {
     await _setWindowSize(tester, const Size(390, 844));
-    await tester.pumpWidget(const YamApp());
+    final database = YamDatabase(NativeDatabase.memory());
+    addTearDown(database.close);
+    await StatisticsRepository(database).saveOnboarding(
+      const SessionProfile(
+        goal: WeightGoal.maintain,
+        currentWeightKg: 72,
+        targetWeightKg: 72,
+        calorieTarget: 2000,
+        proteinTarget: 100,
+        fatTarget: 60,
+        carbsTarget: 220,
+      ),
+      DateTime.now(),
+    );
+    await tester.pumpWidget(YamApp(database: database));
     await tester.pump(const Duration(milliseconds: 1));
     await tester.pump(AppMotion.logoIntro);
     await tester.pumpAndSettle();
@@ -29,6 +47,8 @@ void main() {
     final settingsContext = tester.element(find.byType(SettingsScreen));
     expect(Theme.of(settingsContext).brightness, Brightness.dark);
     expect(find.text('Dark'), findsOneWidget);
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump(const Duration(milliseconds: 1));
   });
 
   testWidgets('supports large text and exposes only implemented actions', (

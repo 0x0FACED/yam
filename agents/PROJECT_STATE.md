@@ -9,7 +9,8 @@
 - Стадия: local-first MVP; Дневник, Food Search, Add Food, Settings и
   Statistics доступны в локальном приложении.
 - Текущий статус: продукты, Дневник, цели и вес хранятся в SQLite v3;
-  статистика строится из сохранённой истории без демо-данных.
+  статистика строится из сохранённой истории. Первый запуск теперь требует
+  завершения онбординга, затем открывается Дневник.
 
 ## Авторитетные Источники
 
@@ -45,6 +46,9 @@
 - `docs/adr/0019-real-statistics-and-persisted-goals.md`: статистика по реальным
   данным, вес и версии целей в SQLite; заменяет сессионность и демо-значения
   онбординга ADR 0013, не меняет session-only тему ADR 0009.
+- `docs/adr/0020-required-first-launch-onboarding.md` заменяет решение ADR
+  0013/0019 не показывать онбординг при первом запуске; повторный вход из
+  Настроек по-прежнему можно отменить.
 - Performance-оптимизация до реальной проблемы отложена ADR 0008; обязательных
   profile-бенчмарков и числовых бюджетов у MVP нет.
 
@@ -52,7 +56,8 @@
 
 - Основные разделы: Дневник, Статистика, Настройки.
 - Onboarding: Цель -> Вес -> Цели питания; `/onboarding` — отдельный flow из
-  Настроек, не навязывается при старте, первые числовые поля пусты.
+  Настроек и обязательный первый flow; до сохранения целей основные маршруты
+  заблокированы. Первые числовые поля пусты.
 - Goals редактирует только kcal, белки, жиры, углеводы, текущий и целевой вес.
 - Hydration/water и account/profile UI не входят в текущий проход.
 - Barcode scanning не реализуется; в Create Product допустим ручной barcode.
@@ -66,6 +71,9 @@
 - `lib/app/app.dart` запускает локализованный `MaterialApp.router` с System,
   Light/Dark, startup-intro и `YamEntranceScope`. Профиль/вес загружаются из
   SQLite в `ValueNotifier` и обновляют Diary/Settings; тема только в памяти.
+  `OnboardingAccess` ждёт первичных потоков целей и веса: при отсутствии
+  активных `goal_versions` нужен онбординг; ошибка БД ведёт в retry state,
+  а не в форму как будто данные пусты. Отдельного флага в схеме нет.
 - `YamDatabase` в `lib/core/data/yam_database.dart` (Drift/SQLite) создаётся
   в `YamApp`; схема v3: продукты/порции, Дневник, `weight_entries`,
   `goal_versions` и installation deviceId. Экспорты v1/v2/v3, генерация и
@@ -78,6 +86,8 @@
   `LaunchBackground.colorset` в `LaunchScreen.storyboard`.
 - `lib/app/router.dart` использует `StatefulShellRoute.indexedStack` для Diary,
   Statistics и Settings; `/add-food` и `/onboarding` — task-screen над shell.
+  GoRouter redirect до окончания первого онбординга блокирует все основные
+  маршруты. `/startup-check` показывает локализованную загрузку/Retry.
 - До 800 dp используется `NavigationBar`, от 800 dp `NavigationRail`, от 1200 dp
   extended rail. Diary ограничен шириной 1120 dp и переходит в две колонки при
   1040 dp доступного content width.
@@ -109,9 +119,6 @@
   увеличенную поверхность для веса, ккал и значений БЖУ.
 - `YamRepeatIconButton` ускоряет ±1 при удержании; `YamSnackBar` через общий
   overlay показывает success и Undo поверх экранов/sheet по `AppMotion`.
-- Shared controls разделяют visual geometry и accessibility geometry: compact
-  icon/chip presentation сохраняет touch target не меньше 44 dp; у
-  `YamFilterChip` и `YamMealChip` ripple ограничен видимой pill-поверхностью.
 
 ## Дневник
 
@@ -130,11 +137,9 @@
   дат для стабильной высоты selector.
 - `daily_nutrition_summary.dart` показывает kcal и macro progress при наличии
   сохранённой цели; без неё нет вымышленной нормы 2200 ккал.
-- `meal_section.dart` форматирует feature-data для shared
-  `YamMealSectionHeader` и `YamDiaryFoodRow`; верхний отступ карточки уменьшен,
-  видимая контекстная «+» увеличена до 36 dp при 44+ dp hit target, калории
-  разделены на число и приглушённую единицу. Adaptive large-text layout,
-  contextual add и tappable highlight state сохранены.
+- `meal_section.dart` форматирует сохранённые записи для shared
+  `YamMealSectionHeader` и `YamDiaryFoodRow`; add/highlight и крупный текст
+  поддерживаются.
 - `DiaryScreen` подписывается на выбранный локальный день; никаких демо-записей
   нет. Контекстный и общий Add Food сохраняют точные записи через
   `DiaryRepository`; экран поиска остаётся открыт, Undo и подсветка последнего
@@ -151,7 +156,8 @@
 - `onboarding_screen.dart` сохраняет три локализованных шага с progress/reveal;
   при первом открытии нет примеров из HTML. Завершение атомарно записывает
   версию целей и первое/изменённое измерение веса через `StatisticsRepository`;
-  отмена ничего не сохраняет. Ккал и БЖУ независимы, подсказка 4/9/4 остаётся.
+  обязательный flow нельзя закрыть или обойти Back, из Настроек можно отменить.
+  Ккал и БЖУ независимы, подсказка 4/9/4 остаётся.
 - `lib/features/food_search/presentation/food_search_screen.dart` содержит
   compact search header, contextual meal selector, create action и три вкладки:
   Недавние (по умолчанию), Мои блюда и Избранное. Вход не открывает клавиатуру;
@@ -211,8 +217,6 @@
 - Units/language/goals/data rows не имитируют persistence или отсутствующие
   маршруты; export/delete явно помечены недоступными. Group surfaces, row
   density и 56 dp header выровнены по screen reference без тяжёлых outlines.
-- `YamSettingsRow` растягивает trailing-область до правого края; values больше
-  не остаются около центра при коротком тексте.
 - `lib/features/statistics/` показывает статистику 7/30/90/365 дней и «Всё»
   по агрегированным `diary_entries`, `weight_entries`, `goal_versions`.
   `StatisticsRepository` наблюдает локальные потоки, `statistics_models.dart`
@@ -224,21 +228,22 @@
 
 ## Проверка
 
-- `dart run build_runner build --delete-conflicting-outputs`, `flutter gen-l10n`,
-  `dart format`, `flutter analyze`, `git diff --check` — успешно. Четыре
-  прицельных файла (8 тестов) проверили миграции v1/v2→v3, реальные агрегаты,
-  сохранение целей/веса и прежний food repository; всё прошло. Один widget
-  smoke-тест проверил обновление статистики после записи в SQLite. Остальной
-  визуальный UI пользователь проверяет вручную.
+- `flutter gen-l10n`, `dart format`, `flutter analyze`, `git diff --check` —
+  успешно. Два route/widget-теста проверили обязательный flow, повторный вход
+  из Settings и Retry; прицельный тест БД подтвердил, что удаление веса не
+  сбрасывает цели. Settings theme test после загрузки сохранённого профиля
+  прошёл. Полный UI suite/goldens не запускались; визуальную приёмку делает
+  пользователь вручную.
 
 ## Следующее Действие
 
-- Вручную проверить статистику и sheet веса после записи питания/целей и
-  перезапуска: периоды, состояния пусто/с целью, светлую и тёмную темы.
+- Исправить переход Дневника на новый локальный день после полуночи/возврата
+  из фона, сохраняя вручную выбранную историческую дату.
 
 ## Блокеры
 
 - Тема и избранное builtin fixture по-прежнему живут в памяти.
   Текущий Flutter SDK требует pinned Drift 2.31 / drift_flutter 0.2.4;
-  iOS сборка на Linux и ручная UI-проверка статистики не проводились.
+  export/import отсутствует, поэтому нет встроенного восстановления данных.
+  iOS сборка на Linux и ручная проверка первого запуска не проводились.
   Старые Diary/Food Search/Settings goldens требуют пересъёмки после изменений.

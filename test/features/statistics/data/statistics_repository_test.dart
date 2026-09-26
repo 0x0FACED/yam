@@ -60,6 +60,11 @@ void main() {
         WeightRecord(id: id, day: DateTime(2020, 9, 24), kg: 73.5),
       );
       expect((await stored.watchWeights().first).length, 3);
+      for (final weight in await stored.watchWeights().first) {
+        await stored.deleteWeight(weight.id);
+      }
+      expect(await stored.watchWeights().first, isEmpty);
+      expect(await stored.watchGoals().first, hasLength(2));
     },
   );
 

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:yam/app/onboarding_access.dart';
 import 'package:yam/app/router.dart';
 import 'package:yam/app/session/session_profile.dart';
 import 'package:yam/app/theme/app_scroll_behavior.dart';
@@ -18,9 +19,10 @@ import 'package:yam/features/statistics/domain/statistics_models.dart';
 import 'package:yam/l10n/generated/app_localizations.dart';
 
 class YamApp extends StatefulWidget {
-  const YamApp({this.startupArtwork, super.key});
+  const YamApp({this.startupArtwork, this.database, super.key});
 
   final StartupArtwork? startupArtwork;
+  final YamDatabase? database;
 
   @override
   State<YamApp> createState() => _YamAppState();
@@ -31,6 +33,7 @@ class _YamAppState extends State<YamApp> {
   late final ValueNotifier<ThemeMode> _themeMode;
   late final ValueNotifier<SessionProfile?> _profile;
   late final ValueNotifier<double?> _currentWeight;
+  late final ValueNotifier<OnboardingAccess> _onboardingAccess;
   late final YamDatabase _foodDatabase;
   late final UserFoodRepository _userFoods;
   late final DiaryRepository _diary;
@@ -39,6 +42,9 @@ class _YamAppState extends State<YamApp> {
   StreamSubscription<List<WeightRecord>>? _weightsSubscription;
   List<GoalVersion> _goals = const [];
   List<WeightRecord> _weights = const [];
+  bool _goalsLoaded = false;
+  bool _weightsLoaded = false;
+  int _profileEpoch = 0;
   bool _startupComplete = false;
   int _entranceEpoch = 0;
 
@@ -48,22 +54,18 @@ class _YamAppState extends State<YamApp> {
     _themeMode = ValueNotifier(ThemeMode.system);
     _profile = ValueNotifier<SessionProfile?>(null);
     _currentWeight = ValueNotifier<double?>(null);
-    _foodDatabase = YamDatabase.open();
+    _onboardingAccess = ValueNotifier(OnboardingAccess.loading);
+    _foodDatabase = widget.database ?? YamDatabase.open();
     _userFoods = UserFoodRepository(_foodDatabase);
     _diary = DiaryRepository(_foodDatabase);
     _statistics = StatisticsRepository(_foodDatabase);
-    _goalsSubscription = _statistics.watchGoals().listen((goals) {
-      _goals = goals;
-      _refreshProfile();
-    });
-    _weightsSubscription = _statistics.watchWeights().listen((weights) {
-      _weights = weights;
-      _refreshProfile();
-    });
+    _listenToProfile();
     _router = createAppRouter(
       themeModeListenable: _themeMode,
       onThemeModeChanged: (mode) => _themeMode.value = mode,
       profileListenable: _profile,
+      onboardingAccessListenable: _onboardingAccess,
+      onRetryProfileLoad: _listenToProfile,
       weightListenable: _currentWeight,
       onProfileChanged: _saveProfile,
       userFoodRepository: _userFoods,
@@ -77,10 +79,11 @@ class _YamAppState extends State<YamApp> {
     _router.dispose();
     _goalsSubscription?.cancel();
     _weightsSubscription?.cancel();
-    unawaited(_foodDatabase.close());
+    if (widget.database == null) unawaited(_foodDatabase.close());
     _themeMode.dispose();
     _profile.dispose();
     _currentWeight.dispose();
+    _onboardingAccess.dispose();
     widget.startupArtwork?.dispose();
     super.dispose();
   }
@@ -133,7 +136,58 @@ class _YamAppState extends State<YamApp> {
     await _statistics.saveOnboarding(profile, DateTime.now());
     if (!mounted) return;
     _profile.value = profile;
+    _onboardingAccess.value = OnboardingAccess.ready;
     if (mounted) setState(() => _entranceEpoch++);
+  }
+
+  void _listenToProfile() {
+    final epoch = ++_profileEpoch;
+    _goalsSubscription?.cancel();
+    _weightsSubscription?.cancel();
+    _goalsLoaded = false;
+    _weightsLoaded = false;
+    _onboardingAccess.value = OnboardingAccess.loading;
+    _goalsSubscription = _statistics.watchGoals().listen(
+      (goals) {
+        if (!mounted || epoch != _profileEpoch) return;
+        _goals = goals;
+        _goalsLoaded = true;
+        _refreshProfile();
+        _resolveOnboardingAccess();
+      },
+      onError: (Object error, StackTrace stackTrace) {
+        if (epoch == _profileEpoch) _profileLoadFailed(error, stackTrace);
+      },
+    );
+    _weightsSubscription = _statistics.watchWeights().listen(
+      (weights) {
+        if (!mounted || epoch != _profileEpoch) return;
+        _weights = weights;
+        _weightsLoaded = true;
+        _refreshProfile();
+        _resolveOnboardingAccess();
+      },
+      onError: (Object error, StackTrace stackTrace) {
+        if (epoch == _profileEpoch) _profileLoadFailed(error, stackTrace);
+      },
+    );
+  }
+
+  void _profileLoadFailed(Object error, StackTrace stackTrace) {
+    if (mounted) _onboardingAccess.value = OnboardingAccess.failure;
+  }
+
+  void _resolveOnboardingAccess() {
+    if (!_goalsLoaded ||
+        !_weightsLoaded ||
+        _onboardingAccess.value == OnboardingAccess.failure) {
+      return;
+    }
+    if (_goals.isNotEmpty) {
+      _onboardingAccess.value = OnboardingAccess.ready;
+    } else if (_onboardingAccess.value != OnboardingAccess.ready) {
+      _onboardingAccess.value = OnboardingAccess.needsOnboarding;
+    }
   }
 
   void _refreshProfile() {

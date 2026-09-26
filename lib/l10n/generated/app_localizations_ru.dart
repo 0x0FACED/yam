@@ -15,6 +15,16 @@ class AppLocalizationsRu extends AppLocalizations {
   String get startupLoadingLabel => 'YAM запускается';
 
   @override
+  String get startupDataLoading => 'Открываем локальные данные';
+
+  @override
+  String get startupDataErrorTitle => 'Не удалось открыть данные';
+
+  @override
+  String get startupDataErrorMessage =>
+      'Попробуйте повторить загрузку локальной базы данных.';
+
+  @override
   String onboardingStepOf(int step, int total) {
     return 'Шаг $step из $total';
   }
