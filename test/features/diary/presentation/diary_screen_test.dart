@@ -215,6 +215,33 @@ void main() {
       expect(find.text('23'), findsWidgets);
       expect(tester.takeException(), isNull);
     });
+
+    testWidgets('selected today stays legible in ${theme.brightness}', (
+      tester,
+    ) async {
+      await _setWindowSize(tester, const Size(390, 844));
+      final today = DateTime.now();
+      await tester.pumpWidget(
+        _DiaryTestApp(locale: const Locale('en'), today: today, theme: theme),
+      );
+
+      await tester.tap(
+        find
+            .ancestor(of: find.text('Today'), matching: find.byType(InkWell))
+            .first,
+      );
+      await tester.pumpAndSettle();
+
+      final selectedToday = find.descendant(
+        of: find.byType(DatePickerDialog),
+        matching: find.text('${today.day}'),
+      );
+      expect(selectedToday, findsOneWidget);
+      expect(
+        tester.widget<Text>(selectedToday).style?.color,
+        theme.colorScheme.onPrimary,
+      );
+    });
   }
 }
 

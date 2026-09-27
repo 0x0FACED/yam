@@ -116,7 +116,6 @@ abstract final class AppTheme {
         surfaceTintColor: Colors.transparent,
         headerBackgroundColor: colorScheme.surfaceContainer,
         headerForegroundColor: colorScheme.onSurface,
-        todayForegroundColor: WidgetStateProperty.all(colorScheme.primary),
         todayBorder: BorderSide(color: colorScheme.primary),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.card),
