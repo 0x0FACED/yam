@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:yam/core/data/yam_database.dart';
@@ -131,4 +132,95 @@ void main() {
     expect(foods.map((saved) => saved.food.id), [recreatedId]);
     expect(foods.single.food.barcode, example.barcode);
   });
+
+  test(
+    'brands from both local catalogs are normalized and prefix-matched',
+    () async {
+      final database = YamDatabase(NativeDatabase.memory());
+      addTearDown(database.close);
+      final repository = UserFoodRepository(database);
+      final now = DateTime.now().toUtc();
+
+      Future<String> addUserBrand(String? brand) => repository.create(
+        CustomFoodDraft(
+          name: 'Food ${brand ?? 'empty'}',
+          brand: brand,
+          category: 'other',
+          basis: CustomFoodBasis.grams,
+          basisAmount: 100,
+          displayBasis: CustomFoodDisplayBasis.perHundredGrams,
+          proteinG: 1,
+          fatG: 1,
+          carbsG: 1,
+          servings: const [],
+        ),
+      );
+
+      Future<void> addRemoteBrand(
+        String id,
+        String? brand, {
+        bool deleted = false,
+      }) => database
+          .into(database.remoteFoods)
+          .insert(
+            RemoteFoodsCompanion.insert(
+              id: id,
+              source: 'off',
+              sourceCode: id,
+              name: 'Cached $id',
+              category: 'other',
+              basisUnit: 'grams',
+              basisAmount: 100,
+              energyKcal: 40,
+              proteinG: 1,
+              fatG: 1,
+              carbsG: 1,
+              createdAt: now,
+              updatedAt: now,
+              deviceId: 'test-device',
+              brand: Value(brand),
+              deletedAt: Value(deleted ? now : null),
+            ),
+          );
+
+      await addUserBrand('  Мистраль  ');
+      await addUserBrand(' Nordic ');
+      final removed = await addUserBrand('Removed');
+      await repository.delete(removed);
+      await addUserBrand('   ');
+      await addRemoteBrand('1', 'nordic');
+      await addRemoteBrand('2', 'Nora');
+      await addRemoteBrand('3', '  ');
+      await addRemoteBrand('4', 'No longer here', deleted: true);
+
+      final brands = await repository.loadBrands();
+      expect(brands, ['Nora', 'Nordic', 'Мистраль']);
+      expect(UserFoodRepository.matchingBrands(brands, ' no '), [
+        'Nora',
+        'Nordic',
+      ]);
+      expect(UserFoodRepository.matchingBrands(brands, 'МИ'), ['Мистраль']);
+      expect(UserFoodRepository.matchingBrands(brands, 'n', limit: 1), [
+        'Nora',
+      ]);
+      expect(UserFoodRepository.matchingBrands(brands, ' '), isEmpty);
+      expect(
+        UserFoodRepository.matchingBrands([
+          'N1',
+          'N2',
+          'N3',
+          'N4',
+          'N5',
+          'N6',
+        ], 'n'),
+        ['N1', 'N2', 'N3', 'N4', 'N5'],
+      );
+
+      await addUserBrand('New Brand');
+      expect(
+        UserFoodRepository.matchingBrands(await repository.loadBrands(), 'new'),
+        ['New Brand'],
+      );
+    },
+  );
 }

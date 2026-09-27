@@ -8,7 +8,6 @@ import 'package:yam/core/ui/buttons/yam_buttons.dart';
 class YamMealSectionHeader extends StatelessWidget {
   const YamMealSectionHeader({
     required this.mealName,
-    required this.timeLabel,
     required this.calorieValue,
     required this.calorieUnit,
     required this.addTooltip,
@@ -17,7 +16,6 @@ class YamMealSectionHeader extends StatelessWidget {
   });
 
   final String mealName;
-  final String timeLabel;
   final String calorieValue;
   final String calorieUnit;
   final String addTooltip;
@@ -27,37 +25,13 @@ class YamMealSectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final largeText = MediaQuery.textScalerOf(context).scale(14) > 20;
-    final title = Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Flexible(
-          child: Text(
-            mealName,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: AppTypography.sectionTitle.copyWith(
-              color: theme.colorScheme.onSurface,
-            ),
-          ),
-        ),
-        const SizedBox(width: AppSpacing.xs),
-        DecoratedBox(
-          decoration: BoxDecoration(
-            color: theme.colorScheme.surfaceContainer,
-            borderRadius: BorderRadius.circular(AppRadius.small),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            child: Text(
-              timeLabel,
-              style: AppTypography.caption.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-                fontFeatures: AppTypography.tabularFigures,
-              ),
-            ),
-          ),
-        ),
-      ],
+    final title = Text(
+      mealName,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: AppTypography.sectionTitle.copyWith(
+        color: theme.colorScheme.onSurface,
+      ),
     );
     final actions = Row(
       mainAxisSize: MainAxisSize.min,

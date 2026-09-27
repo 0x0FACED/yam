@@ -35,13 +35,11 @@ class DiaryPrototypeMeal {
   const DiaryPrototypeMeal({
     required this.id,
     required this.name,
-    required this.time,
     required this.entries,
   });
 
   final String id;
   final String name;
-  final TimeOfDay time;
   final List<DiaryPrototypeEntry> entries;
 
   double get exactCalories => entries.fold<double>(
@@ -99,25 +97,21 @@ DiaryPrototypeDay buildDiaryPrototypeDay(
     DiaryPrototypeMeal(
       id: 'breakfast',
       name: l10n.mealBreakfast,
-      time: const TimeOfDay(hour: 8, minute: 30),
       entries: entriesByMeal['breakfast'] ?? const [],
     ),
     DiaryPrototypeMeal(
       id: 'lunch',
       name: l10n.mealLunch,
-      time: const TimeOfDay(hour: 13, minute: 15),
       entries: entriesByMeal['lunch'] ?? const [],
     ),
     DiaryPrototypeMeal(
       id: 'dinner',
       name: l10n.mealDinner,
-      time: const TimeOfDay(hour: 19, minute: 20),
       entries: entriesByMeal['dinner'] ?? const [],
     ),
     DiaryPrototypeMeal(
       id: 'snacks',
       name: l10n.mealSnacks,
-      time: const TimeOfDay(hour: 16, minute: 40),
       entries: entriesByMeal['snacks'] ?? const [],
     ),
   ],

@@ -4,7 +4,7 @@
 
 ## Обновлено
 
-- Дата: 2026-09-26.
+- Дата: 2026-09-28.
 - Стадия: local-first MVP с необязательным поиском Open Food Facts (OFF).
 - SQLite `yam` имеет schema v4. Локальные данные и Дневник работают без сети;
   онбординг обязателен при первом запуске.
@@ -21,6 +21,8 @@
   отдельный quick add или verified badge.
 - Остальной продуктовый и data contract: ADR 0001/0002/0015/0016/0017/0018/
   0019/0020 и соответствующие разделы `agents/PROJECT_BLUEPRINT.md`.
+- `docs/adr/0022-local-brand-suggestions.md`: подсказки из локальных брендов
+  UserFoods/RemoteFoods без изменения схемы; произвольный ввод сохраняется.
 
 ## Реализовано
 
@@ -57,6 +59,16 @@
   имени, базиса, порций и точных нутриентов; изменение OFF-кэша не пересчитывает
   историю. Recent берётся из реальных записей SQLite. Обычный flow Diary,
   edit sheet и статистика сохранены.
+- `diary_prototype_data.dart`, `meal_section.dart` и `yam_diary_rows.dart`:
+  фиктивное время убрано из модели и заголовков приёмов в узкой/широкой
+  компоновке. `lib/app/theme/app_theme.dart` задаёт поверхности, контраст и
+  форму стандартного календаря через DatePickerTheme для Light и Dark;
+  правила выбора дат не менялись.
+- `user_food_repository.dart` читает бренды неудалённых UserFoods и RemoteFoods,
+  обрезает пробелы, объединяет варианты без учёта регистра и выдаёт до пяти
+  отсортированных префиксных совпадений. `create_product_screen.dart` использует
+  RawAutocomplete поверх существующего YamTextField: мышь/касание/клавиатура,
+  свободный ввод; при следующем открытии формы сохранённый бренд доступен.
 - RU/EN UI строки — в ARB с generated l10n. Для внешних ссылок добавлен
   `url_launcher`; Android main manifest разрешает INTERNET, macOS sandbox —
   исходящие соединения.
@@ -74,6 +86,14 @@
   не запускались.
 - `flutter analyze` и `git diff --check` — успешно. Для Flutter-тестов в этой
   среде требовалось задать `NO_PROXY=localhost,127.0.0.1`.
+- После изменений выполнены `dart format` и `flutter analyze` (без замечаний);
+  целевые тесты `diary_screen`, `diary_prototype_data`, `yam_components`,
+  `user_food_repository`, `create_product_screen` прошли (27 тестов). Тесты
+  проверяют темы календаря, оба размера Дневника, сортировку/удаление брендов,
+  выбор подсказки касанием и клавиатурой, свободный ввод. Запуск Linux
+  с `NO_PROXY=localhost,127.0.0.1 flutter run -d linux --no-pub --trace-startup`
+  прошёл до первого кадра. Настройки темы и взаимодействия проверены
+  widget-тестами; ручная интерактивная приёмка Light/Dark ещё не проведена.
 
 ## Следующее Действие
 
@@ -85,4 +105,5 @@
 - Тема и избранное встроенных fixture пока сессионные; export/import нет.
   Текущий Flutter SDK требует pinned Drift 2.31 / drift_flutter 0.2.4.
   iOS build на Linux и ручная проверка OFF на устройствах не проводились.
-  Старые Diary/Food Search/Settings goldens требуют пересъёмки.
+  Старые Diary/Food Search/Settings goldens требуют пересъёмки. Ручную приёмку
+  Light/Dark календаря и брендов на устройстве ещё нужно провести.

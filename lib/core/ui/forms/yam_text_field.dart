@@ -13,6 +13,8 @@ class YamTextField extends StatelessWidget {
     this.keyboardType,
     this.inputFormatters,
     this.onChanged,
+    this.onSubmitted,
+    this.focusNode,
     this.fieldKey,
     super.key,
   });
@@ -24,6 +26,8 @@ class YamTextField extends StatelessWidget {
   final TextInputType? keyboardType;
   final List<TextInputFormatter>? inputFormatters;
   final ValueChanged<String>? onChanged;
+  final ValueChanged<String>? onSubmitted;
+  final FocusNode? focusNode;
   final Key? fieldKey;
 
   @override
@@ -40,9 +44,11 @@ class YamTextField extends StatelessWidget {
         TextField(
           key: fieldKey,
           controller: controller,
+          focusNode: focusNode,
           keyboardType: keyboardType,
           inputFormatters: inputFormatters,
           onChanged: onChanged,
+          onSubmitted: onSubmitted,
           style: AppTypography.productTitle.copyWith(color: colors.onSurface),
           decoration: InputDecoration(
             hintText: hintText,

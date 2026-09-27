@@ -34,7 +34,7 @@ void main() {
     await tester.tap(find.byTooltip('Вернуться к сегодняшнему дню'));
     await tester.pump();
 
-    expect(find.text('Яйца куриные вареные'), findsOneWidget);
+    expect(find.text('Яйца куриные вареные'), findsNothing);
     expect(tester.getTopLeft(find.text('Съедено')).dy, summaryTop);
   });
 
@@ -168,6 +168,54 @@ void main() {
     expect(find.byIcon(Icons.person), findsNothing);
     expect(tester.takeException(), isNull);
   });
+
+  for (final layout in [const Size(390, 844), const Size(1280, 900)]) {
+    testWidgets('meal headers have no placeholder times at $layout', (
+      tester,
+    ) async {
+      await _setWindowSize(tester, layout);
+      await tester.pumpWidget(const _DiaryTestApp(locale: Locale('en')));
+      await tester.dragUntilVisible(
+        find.text('Snacks'),
+        find.byKey(const ValueKey('diary-scroll-view')),
+        const Offset(0, -200),
+      );
+      expect(find.text('Snacks'), findsOneWidget);
+      for (final time in ['8:30', '13:15', '19:20', '16:40']) {
+        expect(find.text(time), findsNothing);
+      }
+    });
+  }
+
+  for (final theme in [AppTheme.light, AppTheme.dark]) {
+    testWidgets('calendar uses YAM surfaces in ${theme.brightness}', (
+      tester,
+    ) async {
+      await _setWindowSize(tester, const Size(390, 844));
+      await tester.pumpWidget(
+        _DiaryTestApp(
+          locale: const Locale('en'),
+          today: DateTime(2026, 9, 23),
+          theme: theme,
+        ),
+      );
+
+      await tester.tap(
+        find
+            .ancestor(of: find.text('Today'), matching: find.byType(InkWell))
+            .first,
+      );
+      await tester.pumpAndSettle();
+      final context = tester.element(find.byType(DatePickerDialog));
+      final picker = DatePickerTheme.of(context);
+      expect(picker.backgroundColor, theme.colorScheme.surface);
+      expect(picker.headerBackgroundColor, theme.colorScheme.surfaceContainer);
+      expect(picker.headerForegroundColor, theme.colorScheme.onSurface);
+      expect(picker.todayBorder?.color, theme.colorScheme.primary);
+      expect(find.text('23'), findsWidgets);
+      expect(tester.takeException(), isNull);
+    });
+  }
 }
 
 class _DiaryRouterTestApp extends StatelessWidget {

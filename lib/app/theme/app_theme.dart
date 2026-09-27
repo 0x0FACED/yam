@@ -111,6 +111,18 @@ abstract final class AppTheme {
           ),
         ),
       ),
+      datePickerTheme: DatePickerThemeData(
+        backgroundColor: colorScheme.surface,
+        surfaceTintColor: Colors.transparent,
+        headerBackgroundColor: colorScheme.surfaceContainer,
+        headerForegroundColor: colorScheme.onSurface,
+        todayForegroundColor: WidgetStateProperty.all(colorScheme.primary),
+        todayBorder: BorderSide(color: colorScheme.primary),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.card),
+          side: BorderSide(color: colorScheme.outlineVariant),
+        ),
+      ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: colorScheme.surface,

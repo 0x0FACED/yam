@@ -62,7 +62,6 @@ void main() {
       _TestApp(
         child: YamMealSectionHeader(
           mealName: 'Breakfast',
-          timeLabel: '8:30',
           calorieValue: '482',
           calorieUnit: 'kcal',
           addTooltip: 'Add to breakfast',

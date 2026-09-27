@@ -93,13 +93,8 @@ class _MealHeader extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final locale = Localizations.localeOf(context).toLanguageTag();
     final calories = NumberFormat.decimalPattern(locale).format(meal.calories);
-    final time = MaterialLocalizations.of(context).formatTimeOfDay(
-      meal.time,
-      alwaysUse24HourFormat: MediaQuery.alwaysUse24HourFormatOf(context),
-    );
     return YamMealSectionHeader(
       mealName: meal.name,
-      timeLabel: time,
       calorieValue: calories,
       calorieUnit: l10n.unitKilocalories,
       addTooltip: l10n.diaryAddFoodToMeal(meal.name),

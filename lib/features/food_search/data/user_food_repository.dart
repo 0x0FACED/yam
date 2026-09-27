@@ -49,6 +49,51 @@ class UserFoodRepository {
 
   Future<List<SavedUserFood>> loadFoods() => watchFoods().first;
 
+  Future<List<String>> loadBrands() async {
+    final userQuery = database.selectOnly(database.userFoods)
+      ..addColumns([database.userFoods.brand])
+      ..where(database.userFoods.deletedAt.isNull());
+    final remoteQuery = database.selectOnly(database.remoteFoods)
+      ..addColumns([database.remoteFoods.brand])
+      ..where(database.remoteFoods.deletedAt.isNull());
+    final userRows = await userQuery.get();
+    final remoteRows = await remoteQuery.get();
+    final brandsByKey = <String, String>{};
+
+    for (final brand in [
+      ...userRows.map((row) => row.read(database.userFoods.brand)),
+      ...remoteRows.map((row) => row.read(database.remoteFoods.brand)),
+    ]) {
+      final trimmed = brand?.trim();
+      if (trimmed == null || trimmed.isEmpty) continue;
+      final key = trimmed.toLowerCase();
+      final existing = brandsByKey[key];
+      if (existing == null || trimmed.compareTo(existing) < 0) {
+        brandsByKey[key] = trimmed;
+      }
+    }
+
+    final brands = brandsByKey.values.toList()
+      ..sort((a, b) {
+        final order = a.toLowerCase().compareTo(b.toLowerCase());
+        return order != 0 ? order : a.compareTo(b);
+      });
+    return brands;
+  }
+
+  static List<String> matchingBrands(
+    List<String> brands,
+    String prefix, {
+    int limit = 5,
+  }) {
+    final query = prefix.trim().toLowerCase();
+    if (query.isEmpty || limit <= 0) return const [];
+    return brands
+        .where((brand) => brand.toLowerCase().startsWith(query))
+        .take(limit)
+        .toList();
+  }
+
   Future<bool> barcodeExists(String barcode) async {
     final existing =
         await (database.select(database.userFoods)..where(

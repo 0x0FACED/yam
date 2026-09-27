@@ -42,6 +42,7 @@ class _ServingEditor {
 class _CreateProductScreenState extends State<CreateProductScreen> {
   final _name = TextEditingController();
   final _brand = TextEditingController();
+  final _brandFocus = FocusNode();
   final _barcode = TextEditingController();
   final _protein = TextEditingController();
   final _fat = TextEditingController();
@@ -56,9 +57,29 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
   bool _attempted = false;
   bool _saving = false;
   String? _saveError;
+  late Future<List<String>> _brands;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBrands();
+  }
+
+  @override
+  void didUpdateWidget(CreateProductScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.repository != widget.repository) _loadBrands();
+  }
+
+  void _loadBrands() {
+    _brands = widget.repository.loadBrands().catchError(
+      (Object _) => <String>[],
+    );
+  }
 
   @override
   void dispose() {
+    _brandFocus.dispose();
     for (final serving in _servings) {
       serving.dispose();
     }
@@ -315,10 +336,93 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
                           onChanged: _changed,
                         ),
                         const SizedBox(height: AppSpacing.md),
-                        YamTextField(
-                          label: l10n.createProductBrand,
-                          hintText: l10n.createProductBrandHint,
-                          controller: _brand,
+                        RawAutocomplete<String>(
+                          textEditingController: _brand,
+                          focusNode: _brandFocus,
+                          displayStringForOption: (brand) => brand,
+                          optionsBuilder: (value) async =>
+                              UserFoodRepository.matchingBrands(
+                                await _brands,
+                                value.text,
+                              ),
+                          fieldViewBuilder:
+                              (context, controller, focusNode, onSubmitted) =>
+                                  YamTextField(
+                                    fieldKey: const ValueKey(
+                                      'create-food-brand',
+                                    ),
+                                    label: l10n.createProductBrand,
+                                    hintText: l10n.createProductBrandHint,
+                                    controller: controller,
+                                    focusNode: focusNode,
+                                    onSubmitted: (_) => onSubmitted(),
+                                  ),
+                          optionsViewBuilder: (context, onSelected, options) {
+                            final candidates = options.toList();
+                            return Align(
+                              alignment: Alignment.topLeft,
+                              child: Material(
+                                color: theme.colorScheme.surface,
+                                shape: RoundedRectangleBorder(
+                                  side: BorderSide(
+                                    color: theme.colorScheme.outlineVariant,
+                                  ),
+                                  borderRadius: BorderRadius.circular(
+                                    AppRadius.control,
+                                  ),
+                                ),
+                                clipBehavior: Clip.antiAlias,
+                                child: ConstrainedBox(
+                                  constraints: const BoxConstraints(
+                                    maxHeight: AppSpacing.xxl * 5,
+                                  ),
+                                  child: ListView.builder(
+                                    padding: EdgeInsets.zero,
+                                    shrinkWrap: true,
+                                    itemCount: candidates.length,
+                                    itemBuilder: (context, index) {
+                                      final candidate = candidates[index];
+                                      final highlighted =
+                                          AutocompleteHighlightedOption.of(
+                                            context,
+                                          ) ==
+                                          index;
+                                      return Material(
+                                        color: highlighted
+                                            ? theme.colorScheme.primaryContainer
+                                            : Colors.transparent,
+                                        child: InkWell(
+                                          onTap: () => onSelected(candidate),
+                                          child: ConstrainedBox(
+                                            constraints: const BoxConstraints(
+                                              minHeight: 48,
+                                            ),
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: AppSpacing.md,
+                                                    vertical: AppSpacing.sm,
+                                                  ),
+                                              child: Text(
+                                                candidate,
+                                                style: AppTypography
+                                                    .productTitle
+                                                    .copyWith(
+                                                      color: theme
+                                                          .colorScheme
+                                                          .onSurface,
+                                                    ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
                         ),
                         const SizedBox(height: AppSpacing.md),
                         YamSelectField<FoodSearchPrototypeCategory>(
