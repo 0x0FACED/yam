@@ -47,7 +47,33 @@ class UserFoodRepository {
     });
   }
 
-  Future<List<SavedUserFood>> loadFoods() => watchFoods().first;
+  Future<List<SavedUserFood>> loadFoods() => database.transaction(() async {
+    final foods =
+        await (database.select(database.userFoods)
+              ..where((food) => food.deletedAt.isNull())
+              ..orderBy([(food) => OrderingTerm.desc(food.createdAt)]))
+            .get();
+    if (foods.isEmpty) return const [];
+
+    final servings =
+        await (database.select(database.userServings)..where(
+              (serving) =>
+                  serving.foodId.isIn([for (final food in foods) food.id]) &
+                  serving.deletedAt.isNull(),
+            ))
+            .get();
+    final servingsByFood = <String, List<StoredUserServing>>{};
+    for (final serving in servings) {
+      (servingsByFood[serving.foodId] ??= []).add(serving);
+    }
+    return [
+      for (final food in foods)
+        SavedUserFood(
+          food,
+          List.unmodifiable(servingsByFood[food.id] ?? const []),
+        ),
+    ];
+  });
 
   Future<List<String>> loadBrands() async {
     final userQuery = database.selectOnly(database.userFoods)
@@ -94,13 +120,13 @@ class UserFoodRepository {
         .toList();
   }
 
-  Future<bool> barcodeExists(String barcode) async {
+  Future<bool> barcodeExists(String barcode, {String? excludingFoodId}) async {
     final existing =
         await (database.select(database.userFoods)..where(
               (food) => food.barcode.equals(barcode) & food.deletedAt.isNull(),
             ))
             .getSingleOrNull();
-    return existing != null;
+    return existing != null && existing.id != excludingFoodId;
   }
 
   Future<String> create(CustomFoodDraft draft) async {
@@ -161,6 +187,129 @@ class UserFoodRepository {
       }
     });
     return id;
+  }
+
+  Future<bool> update(String id, CustomFoodDraft draft) async {
+    final now = DateTime.now().toUtc();
+
+    return database.transaction(() async {
+      final food =
+          await (database.select(database.userFoods)
+                ..where((food) => food.id.equals(id) & food.deletedAt.isNull()))
+              .getSingleOrNull();
+      if (food == null) return false;
+      draft.validate();
+      final activeServings =
+          await (database.select(database.userServings)..where(
+                (serving) =>
+                    serving.foodId.equals(id) & serving.deletedAt.isNull(),
+              ))
+              .get();
+      final servingsById = {
+        for (final serving in activeServings) serving.id: serving,
+      };
+      final requestedIds = <String>{};
+      for (final serving in draft.servings) {
+        final existingId = serving.existingId;
+        if (existingId != null && !requestedIds.add(existingId)) {
+          throw ArgumentError('A serving ID cannot be used more than once');
+        }
+      }
+      if (requestedIds.any(
+        (servingId) => !servingsById.containsKey(servingId),
+      )) {
+        throw ArgumentError('Serving does not belong to this active food');
+      }
+
+      final hasNewServings = draft.servings.any(
+        (serving) => serving.existingId == null,
+      );
+      final deviceId = hasNewServings
+          ? await database.installationDeviceId(_uuid)
+          : null;
+
+      await (database.update(
+        database.userFoods,
+      )..where((food) => food.id.equals(id) & food.deletedAt.isNull())).write(
+        UserFoodsCompanion(
+          name: Value(draft.name.trim()),
+          category: Value(draft.category),
+          brand: Value(
+            draft.brand?.trim().isEmpty == true ? null : draft.brand?.trim(),
+          ),
+          barcode: Value(
+            draft.barcode?.trim().isEmpty == true
+                ? null
+                : draft.barcode?.trim(),
+          ),
+          basisUnit: Value(draft.basis.name),
+          basisAmount: Value(draft.basisAmount),
+          displayBasis: Value(draft.displayBasis.name),
+          energyKcal: Value(draft.energyKcal),
+          proteinG: Value(draft.proteinG),
+          fatG: Value(draft.fatG),
+          carbsG: Value(draft.carbsG),
+          updatedAt: Value(now),
+        ),
+      );
+
+      for (final serving in draft.servings) {
+        final label = serving.label?.trim().isEmpty == true
+            ? null
+            : serving.label?.trim();
+        final existingId = serving.existingId;
+        if (existingId == null) {
+          await database
+              .into(database.userServings)
+              .insert(
+                UserServingsCompanion.insert(
+                  id: _uuid.v7(),
+                  foodId: id,
+                  unit: serving.unit.name,
+                  label: Value(label),
+                  baseAmount: serving.baseAmount,
+                  defaultAmount: serving.defaultAmount,
+                  createdAt: now,
+                  updatedAt: now,
+                  deviceId: deviceId!,
+                ),
+              );
+          continue;
+        }
+
+        final existing = servingsById[existingId]!;
+        if (existing.unit != serving.unit.name ||
+            existing.label != label ||
+            existing.baseAmount != serving.baseAmount ||
+            existing.defaultAmount != serving.defaultAmount) {
+          await (database.update(database.userServings)..where(
+                (row) => row.id.equals(existingId) & row.foodId.equals(id),
+              ))
+              .write(
+                UserServingsCompanion(
+                  unit: Value(serving.unit.name),
+                  label: Value(label),
+                  baseAmount: Value(serving.baseAmount),
+                  defaultAmount: Value(serving.defaultAmount),
+                  updatedAt: Value(now),
+                ),
+              );
+        }
+      }
+
+      final removedServingIds = activeServings
+          .map((serving) => serving.id)
+          .where((servingId) => !requestedIds.contains(servingId))
+          .toList();
+      if (removedServingIds.isNotEmpty) {
+        await (database.update(
+          database.userServings,
+        )..where((serving) => serving.id.isIn(removedServingIds))).write(
+          UserServingsCompanion(deletedAt: Value(now), updatedAt: Value(now)),
+        );
+      }
+      return true;
+    });
   }
 
   Future<void> setFavorite(String id, bool favorite) async {

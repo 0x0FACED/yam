@@ -614,6 +614,12 @@ abstract class AppLocalizations {
   /// **'Create food'**
   String get foodSearchCreateFood;
 
+  /// No description provided for @createProductEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit food'**
+  String get createProductEditTitle;
+
   /// No description provided for @createProductName.
   ///
   /// In en, this message translates to:
@@ -734,6 +740,12 @@ abstract class AppLocalizations {
   /// **'Save food'**
   String get createProductSave;
 
+  /// No description provided for @createProductUpdate.
+  ///
+  /// In en, this message translates to:
+  /// **'Save changes'**
+  String get createProductUpdate;
+
   /// No description provided for @createProductSaving.
   ///
   /// In en, this message translates to:
@@ -781,6 +793,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{food} saved'**
   String createProductSaved(String food);
+
+  /// No description provided for @createProductUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated {food}'**
+  String createProductUpdated(String food);
+
+  /// No description provided for @createProductMore.
+  ///
+  /// In en, this message translates to:
+  /// **'More'**
+  String get createProductMore;
+
+  /// No description provided for @createProductEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get createProductEdit;
 
   /// No description provided for @createProductDeleteTitle.
   ///

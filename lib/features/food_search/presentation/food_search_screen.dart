@@ -483,17 +483,17 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
     FoodSearchPrototypeFood food, {
     bool allowDelete = false,
   }) {
+    final editable =
+        allowDelete &&
+        food.source == FoodSearchPrototypeSource.userCreated &&
+        widget.userFoodRepository != null;
     return FoodSearchResultRow(
       key: ValueKey('food-row-${food.id}'),
       food: food,
       favorite: _isFavorite(food),
       onOpen: () => _openQuickAdd(food),
-      onDelete:
-          allowDelete &&
-              food.source == FoodSearchPrototypeSource.userCreated &&
-              widget.userFoodRepository != null
-          ? () => _confirmDelete(food)
-          : null,
+      onEdit: editable ? () => _openEditFood(food.id) : null,
+      onDelete: editable ? () => _confirmDelete(food) : null,
     );
   }
 
@@ -826,6 +826,36 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
         SnackBar(content: Text(AppLocalizations.of(context).diaryDeleteFailed)),
       );
     }
+  }
+
+  Future<void> _openEditFood(String foodId) async {
+    final repository = widget.userFoodRepository;
+    if (repository == null) return;
+    final initialFood = _savedFoods
+        .where((saved) => saved.food.id == foodId)
+        .firstOrNull;
+    if (initialFood == null) return;
+
+    final id = await context.push<String>('/add-food/edit', extra: initialFood);
+    if (!mounted || id == null) return;
+    final saved = await repository.loadFoods();
+    if (!mounted) return;
+    final updated = saved.where((food) => food.food.id == id).firstOrNull;
+    if (updated == null) return;
+    setState(() {
+      _savedFoods = saved;
+      _searchController.clear();
+      _searchFocusNode.unfocus();
+      _selectedTab = _FoodSearchTab.myDishes;
+      _refreshFoods();
+    });
+    _scheduleRemote();
+    showYamSuccessSnackBar(
+      context: context,
+      message: AppLocalizations.of(
+        context,
+      ).createProductUpdated(updated.food.name),
+    );
   }
 
   Future<void> _openCreateFood() async {

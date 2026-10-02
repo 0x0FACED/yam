@@ -10,11 +10,17 @@ import 'package:yam/app/theme/app_theme.dart';
 import 'package:yam/core/ui/feedback/yam_snack_bar.dart';
 import 'package:yam/core/ui/food/yam_quantity_control.dart';
 import 'package:yam/features/diary/data/diary_repository.dart';
+import 'package:yam/features/diary/domain/diary_entry.dart';
 import 'package:yam/core/data/yam_database.dart';
 import 'package:yam/features/diary/presentation/widgets/daily_nutrition_summary.dart';
 import 'package:yam/features/food_search/presentation/food_search_prototype_data.dart';
+import 'package:yam/features/food_search/data/user_food_repository.dart';
+import 'package:yam/features/food_search/domain/custom_food.dart';
+import 'package:yam/features/food_search/presentation/custom_food_adapter.dart';
+import 'package:yam/features/food_search/presentation/diary_food_adapter.dart';
 import 'package:yam/features/food_search/presentation/food_search_screen.dart';
 import 'package:yam/l10n/generated/app_localizations.dart';
+import 'package:yam/l10n/generated/app_localizations_en.dart';
 
 void main() {
   testWidgets('requires a meal before completing quick add', (tester) async {
@@ -431,17 +437,255 @@ void main() {
     await tester.pump();
     expect(find.text('84'), findsOneWidget);
   });
+  testWidgets(
+    'My dishes edit preserves old diary entries and updates new ones',
+    (tester) async {
+      await _setWindowSize(tester, const Size(390, 844));
+      final database = YamDatabase(NativeDatabase.memory());
+      addTearDown(database.close);
+      final repository = UserFoodRepository(database);
+      final id = await repository.create(
+        const CustomFoodDraft(
+          name: 'Oat cup',
+          category: 'grains',
+          brand: 'Old brand',
+          basis: CustomFoodBasis.grams,
+          basisAmount: 75,
+          displayBasis: CustomFoodDisplayBasis.perServing,
+          proteinG: 9.875,
+          fatG: 4.125,
+          carbsG: 16.75,
+          servings: [
+            CustomServingDraft(
+              unit: CustomServingUnit.serving,
+              baseAmount: 75,
+              defaultAmount: 1,
+            ),
+            CustomServingDraft(
+              unit: CustomServingUnit.piece,
+              baseAmount: 40,
+              defaultAmount: 2,
+            ),
+          ],
+        ),
+      );
+      await repository.setFavorite(id, true);
+      final diary = DiaryRepository(database);
+      final day = DateTime(2026, 9, 28);
+      final original = (await repository.loadFoods()).single;
+      final oldEntryId = await diary.create(
+        DiaryEntryDraft(
+          day: day,
+          mealId: 'breakfast',
+          food: diarySnapshotForFood(
+            adaptUserFood(original, AppLocalizationsEn()),
+          ),
+          servingId: original.servings
+              .singleWhere((serving) => serving.unit == 'serving')
+              .id,
+          amount: 1,
+          canonicalQuantity: 75,
+        ),
+      );
+      final router = createAppRouter(
+        userFoodRepository: repository,
+        diaryRepository: diary,
+      );
+      addTearDown(router.dispose);
+      await tester.pumpWidget(_RouterTestApp(router: router));
+      await tester.pumpAndSettle();
+      unawaited(
+        router.push<void>(
+          '/add-food',
+          extra: FoodSearchPrototypeArguments(
+            initialMealId: 'breakfast',
+            diaryDay: day,
+            recentFoodIds: [id],
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final menu = find.byKey(ValueKey('food-actions-$id'));
+      final row = find.byKey(ValueKey('food-result-$id'));
+      expect(row, findsOneWidget);
+      expect(menu, findsNothing);
+      await tester.tap(find.byKey(const ValueKey('food-search-tab-myDishes')));
+      await tester.pumpAndSettle();
+      expect(menu, findsOneWidget);
+      await tester.tap(menu);
+      await tester.pumpAndSettle();
+      expect(find.text('Edit'), findsOneWidget);
+      expect(find.text('Delete'), findsOneWidget);
+      await tester.tap(find.text('Edit'));
+      await tester.pumpAndSettle();
+
+      String fieldValue(String key) =>
+          tester.widget<TextField>(find.byKey(ValueKey(key))).controller!.text;
+      expect(fieldValue('create-food-name'), 'Oat cup');
+      expect(fieldValue('create-food-brand'), 'Old brand');
+      expect(fieldValue('create-serving-size'), '75.0');
+      expect(fieldValue('create-food-protein'), '9.875');
+      expect(fieldValue('create-serving-0-amount'), '40.0');
+
+      for (final entry in {
+        'create-food-name': 'Updated oats',
+        'create-food-brand': 'New brand',
+        'create-food-protein': '10.125',
+        'create-food-fat': '5.375',
+        'create-food-carbs': '22.625',
+        'create-serving-0-amount': '43.875',
+      }.entries) {
+        final field = find.byKey(ValueKey(entry.key));
+        await tester.ensureVisible(field);
+        await tester.enterText(field, entry.value);
+      }
+      await tester.tap(find.text('Save changes'));
+      await tester.pumpAndSettle();
+      expect(find.byKey(ValueKey('food-result-$id')), findsOneWidget);
+      expect(find.text('Updated oats'), findsOneWidget);
+      expect(find.text('Updated Updated oats'), findsOneWidget);
+      expect(menu, findsOneWidget);
+
+      await tester.longPress(row);
+      await tester.pumpAndSettle();
+      expect(find.text('Delete food?'), findsOneWidget);
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+      expect(row, findsOneWidget);
+
+      await tester.tap(row);
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('quick-add-submit')), findsOneWidget);
+      await tester.tap(find.byKey(const ValueKey('quick-add-submit')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('food-search-field')), findsOneWidget);
+
+      await tester.tap(find.byKey(const ValueKey('food-search-tab-favorites')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(ValueKey('food-result-$id')), findsOneWidget);
+      expect(menu, findsNothing);
+      await tester.enterText(
+        find.byKey(const ValueKey('food-search-field')),
+        'Updated',
+      );
+      await tester.pump();
+      expect(find.byKey(ValueKey('food-result-$id')), findsOneWidget);
+      expect(menu, findsNothing);
+
+      final saved = await (database.select(
+        database.userFoods,
+      )..where((food) => food.id.equals(id))).getSingle();
+      expect(saved.name, 'Updated oats');
+      expect(saved.brand, 'New brand');
+      expect(saved.isFavorite, isTrue);
+      expect(saved.proteinG, 10.125);
+      expect(saved.fatG, 5.375);
+      expect(saved.carbsG, 22.625);
+      final servings = await (database.select(
+        database.userServings,
+      )..where((serving) => serving.foodId.equals(id))).get();
+      expect(
+        servings.singleWhere((serving) => serving.unit == 'piece').baseAmount,
+        43.875,
+      );
+      final diaryRows = await (database.select(
+        database.diaryEntries,
+      )..where((entry) => entry.foodId.equals(id))).get();
+      expect(diaryRows, hasLength(2));
+      final historical = diaryRows.singleWhere(
+        (entry) => entry.id == oldEntryId,
+      );
+      final added = diaryRows.singleWhere((entry) => entry.id != oldEntryId);
+      expect(historical.foodName, 'Oat cup');
+      expect(historical.brand, 'Old brand');
+      expect(historical.energyKcal, 143.625);
+      expect(added.foodName, 'Updated oats');
+      expect(added.brand, 'New brand');
+      expect(added.energyKcal, 179.375);
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump(const Duration(milliseconds: 1));
+    },
+  );
+  testWidgets('Russian edit saves and invalid edit URLs return to search', (
+    tester,
+  ) async {
+    await _setWindowSize(tester, const Size(390, 844));
+    final database = YamDatabase(NativeDatabase.memory());
+    addTearDown(database.close);
+    final repository = UserFoodRepository(database);
+    final id = await repository.create(
+      const CustomFoodDraft(
+        name: 'Молоко',
+        category: 'dairy',
+        basis: CustomFoodBasis.milliliters,
+        basisAmount: 100,
+        displayBasis: CustomFoodDisplayBasis.perHundredMilliliters,
+        proteinG: 3,
+        fatG: 2,
+        carbsG: 5,
+        servings: [],
+      ),
+    );
+    final saved = (await repository.loadFoods()).single;
+    final router = createAppRouter(userFoodRepository: repository);
+    addTearDown(router.dispose);
+    await tester.pumpWidget(
+      _RouterTestApp(router: router, locale: const Locale('ru')),
+    );
+    await tester.pumpAndSettle();
+    unawaited(router.push<void>('/add-food'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('food-search-tab-myDishes')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(ValueKey('food-actions-$id')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Изменить'));
+    await tester.pumpAndSettle();
+    expect(find.text('Изменить продукт'), findsOneWidget);
+    await tester.enterText(
+      find.byKey(const ValueKey('create-food-name')),
+      'Новое молоко',
+    );
+    await tester.tap(find.text('Сохранить изменения'));
+    await tester.pumpAndSettle();
+    expect(find.byKey(ValueKey('food-result-$id')), findsOneWidget);
+    expect(find.text('Продукт «Новое молоко» обновлён'), findsOneWidget);
+
+    router.go('/add-food/edit');
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('food-search-field')), findsOneWidget);
+    expect(find.text('Изменить продукт'), findsNothing);
+    router.go('/add-food/edit', extra: 'invalid');
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('food-search-field')), findsOneWidget);
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump(const Duration(milliseconds: 1));
+
+    final noRepositoryRouter = createAppRouter();
+    addTearDown(noRepositoryRouter.dispose);
+    await tester.pumpWidget(
+      _RouterTestApp(router: noRepositoryRouter, locale: const Locale('ru')),
+    );
+    await tester.pumpAndSettle();
+    noRepositoryRouter.go('/add-food/edit', extra: saved);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('food-search-field')), findsOneWidget);
+    expect(find.text('Изменить продукт'), findsNothing);
+  });
 }
 
 class _RouterTestApp extends StatelessWidget {
-  const _RouterTestApp({required this.router});
+  const _RouterTestApp({required this.router, this.locale});
 
   final GoRouter router;
+  final Locale? locale;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
       routerConfig: router,
+      locale: locale,
       theme: AppTheme.light,
       scrollBehavior: const AppScrollBehavior(),
       localizationsDelegates: AppLocalizations.localizationsDelegates,

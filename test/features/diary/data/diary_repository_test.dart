@@ -164,4 +164,119 @@ void main() {
     expect(after.nutrition.kcal, 123.75);
     expect(after.mealId, 'dinner');
   });
+  test(
+    'editing a user food updates future entries, not diary snapshots',
+    () async {
+      final db = YamDatabase(NativeDatabase.memory());
+      addTearDown(db.close);
+      final catalog = UserFoodRepository(db);
+      final diary = DiaryRepository(db);
+      final foodId = await catalog.create(
+        const CustomFoodDraft(
+          name: 'Homemade bar',
+          brand: 'Old brand',
+          category: 'other',
+          basis: CustomFoodBasis.grams,
+          basisAmount: 80,
+          displayBasis: CustomFoodDisplayBasis.perServing,
+          proteinG: 10,
+          fatG: 5,
+          carbsG: 20,
+          servings: [
+            CustomServingDraft(
+              unit: CustomServingUnit.serving,
+              baseAmount: 80,
+              defaultAmount: 1,
+            ),
+          ],
+        ),
+      );
+      final oldSaved = (await catalog.loadFoods()).single;
+      final servingId = oldSaved.servings.single.id;
+      final day = DateTime(2026, 9, 28);
+      final oldEntryId = await diary.create(
+        DiaryEntryDraft(
+          day: day,
+          mealId: 'breakfast',
+          food: diarySnapshotForFood(
+            adaptUserFood(oldSaved, AppLocalizationsEn()),
+          ),
+          servingId: servingId,
+          amount: 1,
+          canonicalQuantity: 80,
+        ),
+      );
+
+      expect(
+        await catalog.update(
+          foodId,
+          CustomFoodDraft(
+            name: 'Updated bar',
+            brand: 'New brand',
+            category: 'other',
+            basis: CustomFoodBasis.grams,
+            basisAmount: 90,
+            displayBasis: CustomFoodDisplayBasis.perServing,
+            proteinG: 20,
+            fatG: 7,
+            carbsG: 30,
+            servings: [
+              CustomServingDraft(
+                existingId: servingId,
+                unit: CustomServingUnit.serving,
+                baseAmount: 90,
+                defaultAmount: 1,
+              ),
+            ],
+          ),
+        ),
+        isTrue,
+      );
+      final updatedSaved = (await catalog.loadFoods()).single;
+      final newEntryId = await diary.create(
+        DiaryEntryDraft(
+          day: day,
+          mealId: 'dinner',
+          food: diarySnapshotForFood(
+            adaptUserFood(updatedSaved, AppLocalizationsEn()),
+          ),
+          servingId: servingId,
+          amount: 1,
+          canonicalQuantity: 90,
+        ),
+      );
+      final entries = await diary.watchDay(day).first;
+      final oldEntry = entries.singleWhere((entry) => entry.id == oldEntryId);
+      final newEntry = entries.singleWhere((entry) => entry.id == newEntryId);
+
+      expect(oldEntry.food.foodId, foodId);
+      expect(newEntry.food.foodId, foodId);
+      expect(oldEntry.food.name, 'Homemade bar');
+      expect(oldEntry.food.brand, 'Old brand');
+      expect(oldEntry.food.basisAmount, 80);
+      expect(
+        oldEntry.food.servings
+            .singleWhere((serving) => serving.id == servingId)
+            .baseAmount,
+        80,
+      );
+      expect(oldEntry.nutrition.kcal, 165);
+      expect(oldEntry.nutrition.protein, 10);
+      expect(oldEntry.nutrition.fat, 5);
+      expect(oldEntry.nutrition.carbs, 20);
+      expect(newEntry.food.name, 'Updated bar');
+      expect(newEntry.food.brand, 'New brand');
+      expect(newEntry.food.basisAmount, 90);
+      expect(
+        newEntry.food.servings
+            .singleWhere((serving) => serving.id == servingId)
+            .baseAmount,
+        90,
+      );
+      expect(newEntry.nutrition.kcal, 263);
+      expect(newEntry.nutrition.protein, 20);
+      expect(newEntry.nutrition.fat, 7);
+      expect(newEntry.nutrition.carbs, 30);
+    },
+  );
 }

@@ -88,6 +88,7 @@
   "foodSearchSelectMealTitle": "Куда добавить продукт?",
   "foodSearchMealRequired": "Сначала выберите приём пищи",
   "foodSearchCreateFood": "Создать продукт",
+  "createProductEditTitle": "Изменить продукт",
   "createProductName": "Название продукта",
   "createProductNameHint": "Например, овсяные хлопья",
   "createProductBrand": "Бренд",
@@ -109,6 +110,7 @@
   "createProductRemoveServing": "Удалить единицу",
   "createProductBarcode": "Штрихкод (необязательно)",
   "createProductSave": "Сохранить продукт",
+  "createProductUpdate": "Сохранить изменения",
   "createProductSaving": "Сохранение…",
   "createProductNameRequired": "Укажите название",
   "createProductInvalidNumber": "Введите число не меньше нуля",
@@ -117,6 +119,12 @@
   "createProductDuplicateBarcode": "Продукт с таким штрихкодом уже есть",
   "createProductSaveFailed": "Не удалось сохранить продукт",
   "createProductSaved": "Продукт «{food}» сохранён",
+  "createProductUpdated": "Продукт «{food}» обновлён",
+  "@createProductUpdated": {
+    "placeholders": {"food": {"type": "String"}}
+  },
+  "createProductMore": "Ещё",
+  "createProductEdit": "Изменить",
   "createProductDeleteTitle": "Удалить продукт?",
   "createProductDeleteMessage": "«{food}» исчезнет из ваших блюд, поиска и избранного.",
   "@createProductDeleteMessage": {"placeholders": {"food": {"type": "String"}}},

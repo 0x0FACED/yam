@@ -11,25 +11,33 @@ import 'package:yam/core/ui/forms/yam_select_field.dart';
 import 'package:yam/core/ui/forms/yam_text_field.dart';
 import 'package:yam/core/ui/selection/yam_dropdown.dart';
 import 'package:yam/core/ui/selection/yam_selection_controls.dart';
+import 'package:yam/core/data/yam_database.dart';
 import 'package:yam/features/food_search/data/user_food_repository.dart';
 import 'package:yam/features/food_search/domain/custom_food.dart';
 import 'package:yam/features/food_search/presentation/food_search_format.dart';
 import 'package:yam/features/food_search/presentation/food_search_prototype_data.dart';
 import 'package:yam/l10n/generated/app_localizations.dart';
 
-class CreateProductScreen extends StatefulWidget {
-  const CreateProductScreen({required this.repository, super.key});
+class UserFoodFormScreen extends StatefulWidget {
+  const UserFoodFormScreen({
+    required this.repository,
+    this.initialFood,
+    super.key,
+  });
 
   final UserFoodRepository repository;
+  final SavedUserFood? initialFood;
 
   @override
-  State<CreateProductScreen> createState() => _CreateProductScreenState();
+  State<UserFoodFormScreen> createState() => _UserFoodFormScreenState();
 }
 
 class _ServingEditor {
-  _ServingEditor(this.unit);
+  _ServingEditor(this.unit, {this.existingId, this.defaultAmount = 1});
 
   final CustomServingUnit unit;
+  final String? existingId;
+  final double defaultAmount;
   final name = TextEditingController();
   final amount = TextEditingController();
 
@@ -39,7 +47,7 @@ class _ServingEditor {
   }
 }
 
-class _CreateProductScreenState extends State<CreateProductScreen> {
+class _UserFoodFormScreenState extends State<UserFoodFormScreen> {
   final _name = TextEditingController();
   final _brand = TextEditingController();
   final _brandFocus = FocusNode();
@@ -49,6 +57,9 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
   final _carbs = TextEditingController();
   final _servingSize = TextEditingController();
   final List<_ServingEditor> _servings = [];
+  String? _basisServingId;
+  String? _basisServingLabel;
+  double _basisServingDefaultAmount = 1;
 
   FoodSearchPrototypeCategory _category = FoodSearchPrototypeCategory.other;
   CustomFoodDisplayBasis _displayBasis = CustomFoodDisplayBasis.perHundredGrams;
@@ -62,19 +73,87 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
   @override
   void initState() {
     super.initState();
+    _populateInitialFood();
     _loadBrands();
   }
 
   @override
-  void didUpdateWidget(CreateProductScreen oldWidget) {
+  void didUpdateWidget(UserFoodFormScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.repository != widget.repository) _loadBrands();
+    if (oldWidget.initialFood?.food.id != widget.initialFood?.food.id) {
+      _populateInitialFood();
+    }
   }
 
   void _loadBrands() {
     _brands = widget.repository.loadBrands().catchError(
       (Object _) => <String>[],
     );
+  }
+
+  void _populateInitialFood() {
+    for (final serving in _servings) {
+      serving.dispose();
+    }
+    _servings.clear();
+    _name.clear();
+    _brand.clear();
+    _barcode.clear();
+    _protein.clear();
+    _fat.clear();
+    _carbs.clear();
+    _servingSize.clear();
+    _category = FoodSearchPrototypeCategory.other;
+    _displayBasis = CustomFoodDisplayBasis.perHundredGrams;
+    _servingBasis = CustomFoodBasis.grams;
+    _basisServingId = null;
+    _basisServingLabel = null;
+    _basisServingDefaultAmount = 1;
+    _errors = const {};
+    _attempted = false;
+    _saveError = null;
+
+    final initialFood = widget.initialFood;
+    if (initialFood == null) return;
+
+    final food = initialFood.food;
+    _name.text = food.name;
+    _brand.text = food.brand ?? '';
+    _barcode.text = food.barcode ?? '';
+    _protein.text = food.proteinG.toString();
+    _fat.text = food.fatG.toString();
+    _carbs.text = food.carbsG.toString();
+    _category = FoodSearchPrototypeCategory.values.byName(food.category);
+    _displayBasis = CustomFoodDisplayBasis.values.byName(food.displayBasis);
+    _servingBasis = CustomFoodBasis.values.byName(food.basisUnit);
+    _servingSize.text = food.basisAmount.toString();
+
+    StoredUserServing? basisServing;
+    if (_displayBasis == CustomFoodDisplayBasis.perServing) {
+      for (final serving in initialFood.servings) {
+        if (serving.unit == CustomServingUnit.serving.name &&
+            serving.baseAmount == food.basisAmount) {
+          basisServing = serving;
+          break;
+        }
+      }
+    }
+    _basisServingId = basisServing?.id;
+    _basisServingLabel = basisServing?.label;
+    _basisServingDefaultAmount = basisServing?.defaultAmount ?? 1;
+
+    for (final serving in initialFood.servings) {
+      if (serving.id == basisServing?.id) continue;
+      final editor = _ServingEditor(
+        CustomServingUnit.values.byName(serving.unit),
+        existingId: serving.id,
+        defaultAmount: serving.defaultAmount,
+      );
+      editor.name.text = serving.label ?? '';
+      editor.amount.text = serving.baseAmount.toString();
+      _servings.add(editor);
+    }
   }
 
   @override
@@ -173,19 +252,20 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
         if (_displayBasis == CustomFoodDisplayBasis.perServing)
           CustomServingDraft(
             unit: CustomServingUnit.serving,
+            label: _basisServingLabel,
+            existingId: _basisServingId,
             baseAmount: basisAmount,
-            defaultAmount: 1,
+            defaultAmount: _basisServingDefaultAmount,
           ),
         for (final serving in _servings)
           CustomServingDraft(
             unit: serving.unit,
-            label:
-                serving.unit == CustomServingUnit.serving &&
-                    serving.name.text.trim().isNotEmpty
-                ? serving.name.text.trim()
-                : null,
+            label: serving.name.text.trim().isEmpty
+                ? null
+                : serving.name.text.trim(),
+            existingId: serving.existingId,
             baseAmount: _number(serving.amount.text)!,
-            defaultAmount: 1,
+            defaultAmount: serving.defaultAmount,
           ),
       ],
     );
@@ -217,8 +297,12 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
     setState(() => _saving = true);
     try {
       final draft = _draft();
+      final foodId = widget.initialFood?.food.id;
       if (draft.barcode != null &&
-          await widget.repository.barcodeExists(draft.barcode!)) {
+          await widget.repository.barcodeExists(
+            draft.barcode!,
+            excludingFoodId: foodId,
+          )) {
         if (mounted) {
           setState(() {
             _errors = {
@@ -231,7 +315,22 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
         }
         return;
       }
-      final id = await widget.repository.create(draft);
+
+      final String id;
+      if (foodId == null) {
+        id = await widget.repository.create(draft);
+      } else {
+        if (!await widget.repository.update(foodId, draft)) {
+          if (mounted) {
+            setState(() {
+              _saving = false;
+              _saveError = AppLocalizations.of(context).createProductSaveFailed;
+            });
+          }
+          return;
+        }
+        id = foodId;
+      }
       if (mounted) context.pop(id);
     } on Object {
       if (mounted) {
@@ -308,7 +407,9 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
                       ),
                       const SizedBox(width: AppSpacing.xs),
                       Text(
-                        l10n.foodSearchCreateFood,
+                        widget.initialFood == null
+                            ? l10n.foodSearchCreateFood
+                            : l10n.createProductEditTitle,
                         style: AppTypography.sectionTitle.copyWith(
                           color: theme.colorScheme.onSurface,
                         ),
@@ -650,7 +751,9 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
                       YamPrimaryButton(
                         label: _saving
                             ? l10n.createProductSaving
-                            : l10n.createProductSave,
+                            : widget.initialFood == null
+                            ? l10n.createProductSave
+                            : l10n.createProductUpdate,
                         onPressed: _saving ? null : _save,
                         expanded: true,
                         loading: _saving,

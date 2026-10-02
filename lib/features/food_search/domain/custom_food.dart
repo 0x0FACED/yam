@@ -20,6 +20,7 @@ class CustomServingDraft {
     required this.baseAmount,
     required this.defaultAmount,
     this.label,
+    this.existingId,
   });
 
   final CustomServingUnit unit;
@@ -28,6 +29,7 @@ class CustomServingDraft {
   /// Grams or milliliters represented by one selected unit.
   final double baseAmount;
   final double defaultAmount;
+  final String? existingId;
 }
 
 class CustomFoodDraft {

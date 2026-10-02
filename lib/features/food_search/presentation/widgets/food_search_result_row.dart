@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:yam/app/theme/app_spacing.dart';
 import 'package:yam/core/ui/food/yam_product_row.dart';
 import 'package:yam/features/food_search/presentation/food_search_format.dart';
 import 'package:yam/features/food_search/presentation/food_search_prototype_data.dart';
 import 'package:yam/l10n/generated/app_localizations.dart';
+
+enum _FoodRowAction { edit, delete }
 
 class FoodSearchResultRow extends StatelessWidget {
   const FoodSearchResultRow({
@@ -10,6 +13,7 @@ class FoodSearchResultRow extends StatelessWidget {
     required this.favorite,
     required this.onOpen,
     this.onDelete,
+    this.onEdit,
     super.key,
   });
 
@@ -17,6 +21,7 @@ class FoodSearchResultRow extends StatelessWidget {
   final bool favorite;
   final VoidCallback onOpen;
   final VoidCallback? onDelete;
+  final VoidCallback? onEdit;
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +33,7 @@ class FoodSearchResultRow extends StatelessWidget {
           food.referenceUnit,
           food.referenceAmount,
         );
-    return YamProductRow(
+    final productRow = YamProductRow(
       name: food.name,
       metadataLabel: formatFoodSearchMetadata(l10n, food),
       calorieLabel: l10n.foodSearchCaloriesPerReference(
@@ -47,6 +52,45 @@ class FoodSearchResultRow extends StatelessWidget {
       onPressed: onOpen,
       onLongPress: onDelete,
       longPressLabel: onDelete == null ? null : l10n.createProductDeleteAction,
+      showDivider: onEdit == null,
+    );
+    if (onEdit == null) return productRow;
+
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(child: productRow),
+            Padding(
+              padding: const EdgeInsets.only(right: AppSpacing.xs),
+              child: PopupMenuButton<_FoodRowAction>(
+                key: ValueKey('food-actions-${food.id}'),
+                tooltip: l10n.createProductMore,
+                icon: const Icon(Icons.more_horiz_rounded),
+                onSelected: (action) {
+                  switch (action) {
+                    case _FoodRowAction.edit:
+                      onEdit!();
+                    case _FoodRowAction.delete:
+                      onDelete!();
+                  }
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: _FoodRowAction.edit,
+                    child: Text(l10n.createProductEdit),
+                  ),
+                  PopupMenuItem(
+                    value: _FoodRowAction.delete,
+                    child: Text(l10n.createProductDelete),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const Divider(height: 1),
+      ],
     );
   }
 }

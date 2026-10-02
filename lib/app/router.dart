@@ -9,7 +9,7 @@ import 'package:yam/app/session/session_profile.dart';
 import 'package:yam/features/diary/data/diary_repository.dart';
 import 'package:yam/features/diary/presentation/diary_screen.dart';
 import 'package:yam/features/food_search/presentation/create_product_stub_screen.dart';
-import 'package:yam/features/food_search/presentation/create_product_screen.dart';
+import 'package:yam/features/food_search/presentation/user_food_form_screen.dart';
 import 'package:yam/features/food_search/data/user_food_repository.dart';
 import 'package:yam/features/food_search/data/open_food_facts_client.dart';
 import 'package:yam/features/food_search/data/remote_food_repository.dart';
@@ -173,7 +173,18 @@ GoRouter createAppRouter({
             path: 'create',
             builder: (context, state) => userFoodRepository == null
                 ? const CreateProductStubScreen()
-                : CreateProductScreen(repository: userFoodRepository),
+                : UserFoodFormScreen(repository: userFoodRepository),
+          ),
+          GoRoute(
+            path: 'edit',
+            redirect: (context, state) =>
+                userFoodRepository == null || state.extra is! SavedUserFood
+                ? '/add-food'
+                : null,
+            builder: (context, state) => UserFoodFormScreen(
+              repository: userFoodRepository!,
+              initialFood: state.extra! as SavedUserFood,
+            ),
           ),
         ],
       ),

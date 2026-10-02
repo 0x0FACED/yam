@@ -23,6 +23,9 @@
   0019/0020 и соответствующие разделы `agents/PROJECT_BLUEPRINT.md`.
 - `docs/adr/0022-local-brand-suggestions.md`: подсказки из локальных брендов
   UserFoods/RemoteFoods без изменения схемы; произвольный ввод сохраняется.
+- `docs/adr/0023-edit-user-foods.md`: редактировать можно только активные
+  UserFoods из «Моих блюд», без изменения существующих снимков Дневника;
+  ккал вычисляются по ADR 0017, схема БД остаётся v4.
 
 ## Реализовано
 
@@ -65,40 +68,35 @@
   форму стандартного календаря через DatePickerTheme для Light и Dark;
   выбранное сегодня использует контрастный `onPrimary`, невыбранное сегодня —
   `primary` через штатные Material state defaults. Правила выбора дат не менялись.
-- `user_food_repository.dart` читает бренды неудалённых UserFoods и RemoteFoods,
-  обрезает пробелы, объединяет варианты без учёта регистра и выдаёт до пяти
-  отсортированных префиксных совпадений. `create_product_screen.dart` использует
-  RawAutocomplete поверх существующего YamTextField: мышь/касание/клавиатура,
-  свободный ввод; при следующем открытии формы сохранённый бренд доступен.
-- RU/EN UI строки — в ARB с generated l10n. Для внешних ссылок добавлен
-  `url_launcher`; Android main manifest разрешает INTERNET, macOS sandbox —
-  исходящие соединения.
+- `lib/features/food_search/data/user_food_repository.dart`: атомарное
+  обновление UserFood и порций с сохранением ID/метаданных, soft delete
+  удалённых порций и исключением собственного штрихкода при проверке.
+  `loadFoods()` выполняет прямое согласованное чтение вместо ожидания stream.
+- `lib/features/food_search/presentation/user_food_form_screen.dart`:
+  общая форма создания/редактирования; сохранённые поля и порции загружаются
+  без округления, основной ID порции и `defaultAmount` сохраняются. Подсказки
+  локальных брендов доступны мышью, касанием и клавиатурой.
+- `food_search_screen.dart`, `widgets/food_search_result_row.dart` и
+  `lib/app/router.dart`: меню «Ещё» только у UserFood в «Моих блюдах», пункты
+  правки/удаления и маршрут `/add-food/edit`; тап по строке и long-press delete
+  сохранены. RU/EN строки в ARB и generated l10n.
+- Для внешних ссылок добавлен `url_launcher`; Android main manifest разрешает
+  INTERNET, macOS sandbox — исходящие соединения.
 
 ## Проверка
 
-- `dart run build_runner build --delete-conflicting-outputs`,
-  `dart run drift_dev schema dump ...` и `schema generate ...`,
-  `flutter gen-l10n`, `dart format` — выполнены.
-- Миграционный тест из заполненной реальной схемы v3 сравнивает все строки
-  старых таблиц до и после перехода; пути v1/v2→v4 также проходят.
-- Прицельные тесты миграций, DiaryRepository, UserFoodRepository,
-  StatisticsRepository, OFF-нормализации/кэша, сетевых состояний и Retry,
-  существующего и нового Food Search UI — пройдены. Полный suite и goldens
-  не запускались.
-- `flutter analyze` и `git diff --check` — успешно. Для Flutter-тестов в этой
-  среде требовалось задать `NO_PROXY=localhost,127.0.0.1`.
-- После изменений выполнены `dart format` и `flutter analyze` (без замечаний);
-  целевые тесты `diary_screen`, `diary_prototype_data`, `yam_components`,
-  `user_food_repository`, `create_product_screen` прошли (27 тестов). Тесты
-  проверяют темы календаря, оба размера Дневника, сортировку/удаление брендов,
-  выбор подсказки касанием и клавиатурой, свободный ввод. Запуск Linux
-  с `NO_PROXY=localhost,127.0.0.1 flutter run -d linux --no-pub --trace-startup`
-  прошёл до первого кадра. Настройки темы и взаимодействия проверены
-  widget-тестами; ручная интерактивная приёмка Light/Dark ещё не проведена.
-- Исправлен конфликт цвета цифры выбранного сегодняшнего дня с фоном круга:
-  `dart format`, `flutter analyze`, `flutter test`
-  `test/features/diary/presentation/diary_screen_test.dart` (14 тестов,
-  включая проверку фактического цвета текста в Light/Dark) — успешно.
+- `flutter gen-l10n`, `dart format` изменённых Dart-файлов,
+  `flutter analyze`, `git diff --check` — выполнены.
+- Четыре целевых файла `flutter test` (UserFoodRepository, форма, Food Search,
+  DiaryRepository) — пройдены с `NO_PROXY=localhost,127.0.0.1` и ограничением
+  запуска тестов одной минутой. Проверены атомарность/метаданные порций,
+  предзаполнение, редактирование через меню в EN/RU, fallback маршрута,
+  сохранение прежних снимков и новые значения в последующих записях Дневника.
+- Запуск Linux не состоялся: существующая конфигурация сборки JNI ссылается
+  на отсутствующий `/usr/lib/jvm/java-26-openjdk/lib/server/libjvm.so`.
+  Повторный запуск с установленным JDK 17 не переконфигурировал Ninja.
+  После просьбы пользователя запуск на устройстве прекращён; ручная
+  визуальная проверка не выполнялась.
 
 ## Следующее Действие
 

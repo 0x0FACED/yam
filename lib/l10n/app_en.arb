@@ -161,6 +161,7 @@
   "foodSearchSelectMealTitle": "Where should this food go?",
   "foodSearchMealRequired": "Choose a meal first",
   "foodSearchCreateFood": "Create food",
+  "createProductEditTitle": "Edit food",
   "createProductName": "Food name",
   "createProductNameHint": "For example, rolled oats",
   "createProductBrand": "Brand",
@@ -182,6 +183,7 @@
   "createProductRemoveServing": "Remove unit",
   "createProductBarcode": "Barcode (optional)",
   "createProductSave": "Save food",
+  "createProductUpdate": "Save changes",
   "createProductSaving": "Saving…",
   "createProductNameRequired": "Enter a food name",
   "createProductInvalidNumber": "Enter a number of zero or more",
@@ -193,6 +195,12 @@
   "@createProductSaved": {
     "placeholders": {"food": {"type": "String"}}
   },
+  "createProductUpdated": "Updated {food}",
+  "@createProductUpdated": {
+    "placeholders": {"food": {"type": "String"}}
+  },
+  "createProductMore": "More",
+  "createProductEdit": "Edit",
   "createProductDeleteTitle": "Delete food?",
   "createProductDeleteMessage": "{food} will disappear from My dishes, search and favorites.",
   "@createProductDeleteMessage": {"placeholders": {"food": {"type": "String"}}},

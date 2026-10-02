@@ -299,6 +299,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get foodSearchCreateFood => 'Создать продукт';
 
   @override
+  String get createProductEditTitle => 'Изменить продукт';
+
+  @override
   String get createProductName => 'Название продукта';
 
   @override
@@ -361,6 +364,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get createProductSave => 'Сохранить продукт';
 
   @override
+  String get createProductUpdate => 'Сохранить изменения';
+
+  @override
   String get createProductSaving => 'Сохранение…';
 
   @override
@@ -386,6 +392,17 @@ class AppLocalizationsRu extends AppLocalizations {
   String createProductSaved(String food) {
     return 'Продукт «$food» сохранён';
   }
+
+  @override
+  String createProductUpdated(String food) {
+    return 'Продукт «$food» обновлён';
+  }
+
+  @override
+  String get createProductMore => 'Ещё';
+
+  @override
+  String get createProductEdit => 'Изменить';
 
   @override
   String get createProductDeleteTitle => 'Удалить продукт?';
