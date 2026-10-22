@@ -149,4 +149,63 @@ void main() {
     expect(find.text(l10n.createProductEditTitle), findsOneWidget);
     expect(find.text(l10n.createProductUpdate), findsOneWidget);
   });
+
+  testWidgets('editing a name preserves a stored custom category', (
+    tester,
+  ) async {
+    final database = YamDatabase(NativeDatabase.memory());
+    addTearDown(database.close);
+    final repository = UserFoodRepository(database);
+    final id = await repository.create(
+      const CustomFoodDraft(
+        name: 'Local meal',
+        category: 'Custom pantry 🥣',
+        basis: CustomFoodBasis.grams,
+        basisAmount: 100,
+        displayBasis: CustomFoodDisplayBasis.perHundredGrams,
+        proteinG: 10,
+        fatG: 5,
+        carbsG: 20,
+        servings: [],
+      ),
+    );
+    final initialFood = (await repository.loadFoods()).single;
+    final navigator = GlobalKey<NavigatorState>();
+    await tester.pumpWidget(
+      MaterialApp(
+        navigatorKey: navigator,
+        theme: AppTheme.light,
+        locale: const Locale('en'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: const SizedBox.shrink(),
+      ),
+    );
+    navigator.currentState!.push(
+      MaterialPageRoute<void>(
+        builder: (context) => UserFoodFormScreen(
+          repository: repository,
+          initialFood: initialFood,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const ValueKey('create-food-name')),
+      'Renamed local meal',
+    );
+    final l10n = AppLocalizations.of(
+      tester.element(find.byKey(const ValueKey('create-food-name'))),
+    );
+    final save = find.text(l10n.createProductUpdate);
+    await tester.ensureVisible(save);
+    await tester.tap(save);
+    await tester.pumpAndSettle();
+    final saved = (await repository.loadFoods()).single.food;
+    expect(saved.id, id);
+    expect(saved.name, 'Renamed local meal');
+    expect(saved.category, 'Custom pantry 🥣');
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump(const Duration(milliseconds: 1));
+  });
 }

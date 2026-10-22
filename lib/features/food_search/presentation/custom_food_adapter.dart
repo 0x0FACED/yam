@@ -47,7 +47,7 @@ FoodSearchPrototypeFood adaptUserFood(
   return FoodSearchPrototypeFood(
     id: food.id,
     name: food.name,
-    category: FoodSearchPrototypeCategory.values.byName(food.category),
+    category: food.category,
     brand: food.brand,
     referenceAmount: food.basisAmount,
     referenceUnit: baseUnit,

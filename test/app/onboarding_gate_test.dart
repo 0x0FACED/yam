@@ -19,6 +19,7 @@ void main() {
       addTearDown(access.dispose);
       addTearDown(profile.dispose);
       final router = createAppRouter(
+        appVersion: '1.2.3+4',
         onboardingAccessListenable: access,
         profileListenable: profile,
         onProfileChanged: (value) {
@@ -92,6 +93,7 @@ void main() {
       await tester.pumpWidget(const SizedBox.shrink());
       await tester.pump(const Duration(milliseconds: 1));
       final reopenedRouter = createAppRouter(
+        appVersion: '1.2.3+4',
         onboardingAccessListenable: access,
         profileListenable: profile,
       );
@@ -123,6 +125,7 @@ void main() {
     addTearDown(access.dispose);
     var retried = false;
     final router = createAppRouter(
+      appVersion: '1.2.3+4',
       onboardingAccessListenable: access,
       onRetryProfileLoad: () {
         retried = true;

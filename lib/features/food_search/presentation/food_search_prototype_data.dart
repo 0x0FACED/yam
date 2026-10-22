@@ -95,7 +95,9 @@ class FoodSearchPrototypeFood {
 
   final String id;
   final String name;
-  final FoodSearchPrototypeCategory category;
+
+  /// A preset code or the original custom category stored with the food.
+  final String category;
   final String? brand;
 
   /// Product-specific mass for one reference unit when nutrition is per piece.
@@ -184,7 +186,7 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
     FoodSearchPrototypeFood(
       id: 'rolled-oats',
       name: russian ? 'Овсяные хлопья' : 'Rolled oats',
-      category: FoodSearchPrototypeCategory.grains,
+      category: FoodSearchPrototypeCategory.grains.name,
       referenceAmount: 100,
       referenceUnit: FoodSearchPrototypeUnit.grams,
       nutrition: const FoodSearchPrototypeNutrition(
@@ -216,7 +218,7 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
     FoodSearchPrototypeFood(
       id: 'milk-25',
       name: russian ? 'Молоко 2,5%' : 'Milk 2.5%',
-      category: FoodSearchPrototypeCategory.dairy,
+      category: FoodSearchPrototypeCategory.dairy.name,
       brand: russian ? 'Домик в деревне' : 'Village Dairy',
       referenceAmount: 100,
       referenceUnit: FoodSearchPrototypeUnit.milliliters,
@@ -255,7 +257,7 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
     FoodSearchPrototypeFood(
       id: 'whey-protein',
       name: russian ? 'Сывороточный протеин' : 'Whey protein',
-      category: FoodSearchPrototypeCategory.sportsNutrition,
+      category: FoodSearchPrototypeCategory.sportsNutrition.name,
       brand: 'Neo High Protein',
       referenceAmount: 30,
       referenceUnit: FoodSearchPrototypeUnit.grams,
@@ -295,7 +297,7 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
     FoodSearchPrototypeFood(
       id: 'banana',
       name: russian ? 'Банан свежий' : 'Fresh banana',
-      category: FoodSearchPrototypeCategory.fruit,
+      category: FoodSearchPrototypeCategory.fruit.name,
       referenceAmount: 100,
       referenceUnit: FoodSearchPrototypeUnit.grams,
       nutrition: const FoodSearchPrototypeNutrition(
@@ -333,7 +335,7 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
     FoodSearchPrototypeFood(
       id: 'chicken-breast',
       name: russian ? 'Куриная грудка' : 'Chicken breast',
-      category: FoodSearchPrototypeCategory.poultry,
+      category: FoodSearchPrototypeCategory.poultry.name,
       referenceAmount: 100,
       referenceUnit: FoodSearchPrototypeUnit.grams,
       nutrition: const FoodSearchPrototypeNutrition(
@@ -365,7 +367,7 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
     FoodSearchPrototypeFood(
       id: 'rice-cooked',
       name: russian ? 'Рис отварной' : 'Cooked rice',
-      category: FoodSearchPrototypeCategory.grains,
+      category: FoodSearchPrototypeCategory.grains.name,
       referenceAmount: 100,
       referenceUnit: FoodSearchPrototypeUnit.grams,
       nutrition: const FoodSearchPrototypeNutrition(
@@ -396,7 +398,7 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
     FoodSearchPrototypeFood(
       id: 'cottage-cheese',
       name: russian ? 'Творог 5%' : 'Cottage cheese 5%',
-      category: FoodSearchPrototypeCategory.dairy,
+      category: FoodSearchPrototypeCategory.dairy.name,
       brand: russian ? 'Простоквашино' : 'Farmhouse',
       referenceAmount: 100,
       referenceUnit: FoodSearchPrototypeUnit.grams,
@@ -428,7 +430,7 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
     FoodSearchPrototypeFood(
       id: 'eggs',
       name: russian ? 'Яйцо куриное С1' : 'Grade A chicken egg',
-      category: FoodSearchPrototypeCategory.eggs,
+      category: FoodSearchPrototypeCategory.eggs.name,
       brand: russian ? 'Село Зелёное' : 'Green Village',
       gramsPerReferenceUnit: 55,
       referenceAmount: 1,
@@ -469,7 +471,7 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
     FoodSearchPrototypeFood(
       id: 'wholegrain-bread',
       name: russian ? 'Хлеб цельнозерновой' : 'Wholegrain bread',
-      category: FoodSearchPrototypeCategory.bread,
+      category: FoodSearchPrototypeCategory.bread.name,
       brand: russian ? 'Смак' : 'Smak',
       referenceAmount: 100,
       referenceUnit: FoodSearchPrototypeUnit.grams,
@@ -508,7 +510,7 @@ List<FoodSearchPrototypeFood> buildFoodSearchPrototypeFoods(Locale locale) {
     FoodSearchPrototypeFood(
       id: 'americano',
       name: russian ? 'Кофе американо без сахара' : 'Americano without sugar',
-      category: FoodSearchPrototypeCategory.drinks,
+      category: FoodSearchPrototypeCategory.drinks.name,
       referenceAmount: 200,
       referenceUnit: FoodSearchPrototypeUnit.milliliters,
       nutrition: const FoodSearchPrototypeNutrition(

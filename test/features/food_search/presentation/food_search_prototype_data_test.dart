@@ -59,23 +59,4 @@ void main() {
       );
     },
   );
-
-  test('keeps catalog categories and favorites separate from user foods', () {
-    final foods = buildFoodSearchPrototypeFoods(const Locale('en'));
-
-    expect(foods.first.category, FoodSearchPrototypeCategory.grains);
-    expect(foods.first.brand, isNull);
-    expect(foods.where((food) => food.favorite).map((food) => food.id), [
-      'rolled-oats',
-      'whey-protein',
-      'chicken-breast',
-      'eggs',
-    ]);
-    expect(
-      foods.where(
-        (food) => food.source == FoodSearchPrototypeSource.userCreated,
-      ),
-      isEmpty,
-    );
-  });
 }

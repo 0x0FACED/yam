@@ -637,7 +637,7 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
       code: code,
       name: food.name,
       brand: food.brand,
-      category: food.category.name,
+      category: food.category,
       energyKcal: food.nutrition.calories,
       proteinG: food.nutrition.protein,
       fatG: food.nutrition.fat,

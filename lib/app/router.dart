@@ -6,6 +6,8 @@ import 'package:go_router/go_router.dart';
 import 'package:yam/app/onboarding_access.dart';
 import 'package:yam/app/navigation/adaptive_navigation_shell.dart';
 import 'package:yam/app/session/session_profile.dart';
+import 'package:yam/features/backup/data/backup_file_service.dart';
+import 'package:yam/features/backup/data/backup_repository.dart';
 import 'package:yam/features/diary/data/diary_repository.dart';
 import 'package:yam/features/diary/presentation/diary_screen.dart';
 import 'package:yam/features/food_search/presentation/create_product_stub_screen.dart';
@@ -22,6 +24,7 @@ import 'package:yam/features/statistics/presentation/statistics_screen.dart';
 import 'package:yam/features/startup/presentation/startup_data_screen.dart';
 
 GoRouter createAppRouter({
+  required String appVersion,
   DateTime? diaryToday,
   ValueListenable<ThemeMode>? themeModeListenable,
   ValueChanged<ThemeMode>? onThemeModeChanged,
@@ -35,6 +38,9 @@ GoRouter createAppRouter({
   OpenFoodFactsSearchClient? openFoodFactsClient,
   DiaryRepository? diaryRepository,
   StatisticsRepository? statisticsRepository,
+  BackupRepository? backupRepository,
+  BackupFileService? backupFiles,
+  VoidCallback? onBackupImported,
 }) {
   return GoRouter(
     initialLocation: '/diary',
@@ -111,12 +117,16 @@ GoRouter createAppRouter({
                   return ListenableBuilder(
                     listenable: Listenable.merge(listenables),
                     builder: (context, child) => SettingsScreen(
+                      appVersion: appVersion,
                       themeMode: themeModeListenable?.value ?? ThemeMode.system,
                       onThemeModeChanged: changeTheme,
                       profile: profileListenable?.value,
                       currentWeightKg:
                           weightListenable?.value ??
                           profileListenable?.value?.currentWeightKg,
+                      backupRepository: backupRepository,
+                      backupFiles: backupFiles,
+                      onBackupImported: onBackupImported,
                     ),
                   );
                 },
@@ -135,6 +145,9 @@ GoRouter createAppRouter({
             initialProfile: profileListenable?.value,
             initialWeightKg: weightListenable?.value,
             requiredFirstRun: firstRun,
+            backupRepository: backupRepository,
+            backupFiles: backupFiles,
+            onBackupImported: onBackupImported,
             onClose: () {
               if (context.canPop()) {
                 context.pop();

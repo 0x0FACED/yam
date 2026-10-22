@@ -1006,6 +1006,150 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsExportData => 'Export data';
 
   @override
+  String get settingsImportData => 'Import data';
+
+  @override
+  String get backupSaveDialogTitle => 'Save YAM backup';
+
+  @override
+  String get backupOpenDialogTitle => 'Open YAM backup';
+
+  @override
+  String get backupExportSuccess => 'Backup saved.';
+
+  @override
+  String get backupExportFailed =>
+      'Could not save the backup. Please try again.';
+
+  @override
+  String get backupExportInvalidData =>
+      'Could not prepare the saved data for export. Your data has not been changed.';
+
+  @override
+  String get backupImportFailed =>
+      'Could not import the backup. No data was changed.';
+
+  @override
+  String get backupInvalidFile =>
+      'This is not a valid YAM backup. No data was imported.';
+
+  @override
+  String get backupUnsupportedVersion =>
+      'This backup version is not supported. Try a newer version of YAM.';
+
+  @override
+  String get backupTooLarge => 'This backup exceeds the supported size limit.';
+
+  @override
+  String get backupPersonalDataNote =>
+      'The .yam file contains your diary, weights, goals and food data, including deleted records. It is not encrypted. Store it privately. The app theme is not included.';
+
+  @override
+  String get backupReplaceTitle => 'Replace local data?';
+
+  @override
+  String get backupReplaceWarning =>
+      'All local foods, servings, diary entries, goals, weight records and cached foods will be removed and replaced with this backup. This cannot be undone. An empty backup clears these records. If the backup has no goals, you will need to go through onboarding again.';
+
+  @override
+  String get backupReplaceConfirm => 'Replace all data';
+
+  @override
+  String get backupSaveAction => 'Choose where to save';
+
+  @override
+  String get backupCancel => 'Cancel';
+
+  @override
+  String get backupClose => 'Close';
+
+  @override
+  String get backupDone => 'Done';
+
+  @override
+  String get backupPreviewTitle => 'Import backup';
+
+  @override
+  String backupExportedAt(String date) {
+    return 'Created: $date';
+  }
+
+  @override
+  String get backupCountsNote =>
+      'Counts include deleted records. Nothing changes until you confirm an import below.';
+
+  @override
+  String get backupSupplementDescription =>
+      'Keep all current records, including deletions, unchanged. Add only missing records. Existing IDs, barcode conflicts and cached-food conflicts are skipped. Servings are added only with newly added foods.';
+
+  @override
+  String get backupSupplementAction => 'Supplement local data';
+
+  @override
+  String get backupReplaceDescription =>
+      'Remove all current records listed above and load this backup instead. Requires another confirmation.';
+
+  @override
+  String get backupReplaceAction => 'Replace local data…';
+
+  @override
+  String get backupImportComplete => 'Backup imported';
+
+  @override
+  String backupImportResult(String imported, String skipped) {
+    return 'Imported: $imported. Skipped: $skipped.';
+  }
+
+  @override
+  String get backupImportedRecords => 'Imported records';
+
+  @override
+  String get backupSkippedRecords => 'Skipped records';
+
+  @override
+  String get backupSkippedNote =>
+      'Existing records, barcode conflicts, cached-food conflicts and servings of skipped foods were not imported. Your current records were kept unchanged.';
+
+  @override
+  String get backupWaitingForConfirmation => 'Waiting for your confirmation';
+
+  @override
+  String get backupExporting => 'Preparing backup…';
+
+  @override
+  String get backupSaving => 'Saving backup…';
+
+  @override
+  String get backupOpening => 'Opening backup…';
+
+  @override
+  String get backupInspecting => 'Checking backup…';
+
+  @override
+  String get backupImporting => 'Importing backup…';
+
+  @override
+  String get backupCountUserFoods => 'Your foods';
+
+  @override
+  String get backupCountUserServings => 'Food servings';
+
+  @override
+  String get backupCountDiaryEntries => 'Diary entries';
+
+  @override
+  String get backupCountGoals => 'Goal versions';
+
+  @override
+  String get backupCountWeights => 'Weight records';
+
+  @override
+  String get backupCountRemoteFoods => 'Cached foods';
+
+  @override
+  String get backupRestoreAction => 'Restore from backup';
+
+  @override
   String get settingsDeleteAllData => 'Delete all data';
 
   @override

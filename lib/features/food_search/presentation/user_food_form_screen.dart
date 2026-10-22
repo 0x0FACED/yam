@@ -61,7 +61,8 @@ class _UserFoodFormScreenState extends State<UserFoodFormScreen> {
   String? _basisServingLabel;
   double _basisServingDefaultAmount = 1;
 
-  FoodSearchPrototypeCategory _category = FoodSearchPrototypeCategory.other;
+  String _category = FoodSearchPrototypeCategory.other.name;
+  String? _extraCategory;
   CustomFoodDisplayBasis _displayBasis = CustomFoodDisplayBasis.perHundredGrams;
   CustomFoodBasis _servingBasis = CustomFoodBasis.grams;
   Map<String, String> _errors = const {};
@@ -104,7 +105,8 @@ class _UserFoodFormScreenState extends State<UserFoodFormScreen> {
     _fat.clear();
     _carbs.clear();
     _servingSize.clear();
-    _category = FoodSearchPrototypeCategory.other;
+    _category = FoodSearchPrototypeCategory.other.name;
+    _extraCategory = null;
     _displayBasis = CustomFoodDisplayBasis.perHundredGrams;
     _servingBasis = CustomFoodBasis.grams;
     _basisServingId = null;
@@ -124,7 +126,13 @@ class _UserFoodFormScreenState extends State<UserFoodFormScreen> {
     _protein.text = food.proteinG.toString();
     _fat.text = food.fatG.toString();
     _carbs.text = food.carbsG.toString();
-    _category = FoodSearchPrototypeCategory.values.byName(food.category);
+    _category = food.category;
+    _extraCategory =
+        FoodSearchPrototypeCategory.values.any(
+          (preset) => preset.name == food.category,
+        )
+        ? null
+        : food.category;
     _displayBasis = CustomFoodDisplayBasis.values.byName(food.displayBasis);
     _servingBasis = CustomFoodBasis.values.byName(food.basisUnit);
     _servingSize.text = food.basisAmount.toString();
@@ -241,7 +249,7 @@ class _UserFoodFormScreenState extends State<UserFoodFormScreen> {
       name: _name.text.trim(),
       brand: _brand.text.trim().isEmpty ? null : _brand.text.trim(),
       barcode: _barcode.text.trim().isEmpty ? null : _barcode.text.trim(),
-      category: _category.name,
+      category: _category,
       basis: basis,
       basisAmount: basisAmount,
       displayBasis: _displayBasis,
@@ -526,16 +534,24 @@ class _UserFoodFormScreenState extends State<UserFoodFormScreen> {
                           },
                         ),
                         const SizedBox(height: AppSpacing.md),
-                        YamSelectField<FoodSearchPrototypeCategory>(
+                        YamSelectField<String>(
                           fieldKey: const ValueKey('create-food-category'),
                           label: l10n.createProductCategory,
                           value: _category,
                           items: [
+                            if (_extraCategory case final category?)
+                              YamDropdownOption(
+                                value: category,
+                                label: category,
+                              ),
                             for (final category
                                 in FoodSearchPrototypeCategory.values)
                               YamDropdownOption(
-                                value: category,
-                                label: foodSearchCategoryLabel(l10n, category),
+                                value: category.name,
+                                label: foodSearchCategoryLabel(
+                                  l10n,
+                                  category.name,
+                                ),
                               ),
                           ],
                           onChanged: (category) =>

@@ -125,6 +125,17 @@ install(CODE "
 install(DIRECTORY "${PROJECT_BUILD_DIR}/${FLUTTER_ASSET_DIR_NAME}"
   DESTINATION "${INSTALL_BUNDLE_DATA_DIR}" COMPONENT Runtime)
 
+# Flutter 3.38's Linux assets use pubspec metadata even with build overrides.
+# The generated CMake version fields already include --build-name/--build-number.
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/version.json.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/version.json"
+  @ONLY
+)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/version.json"
+  DESTINATION "${INSTALL_BUNDLE_DATA_DIR}/${FLUTTER_ASSET_DIR_NAME}"
+  COMPONENT Runtime)
+
 # Install the AOT library on non-Debug builds only.
 if(NOT CMAKE_BUILD_TYPE MATCHES "Debug")
   install(FILES "${AOT_LIBRARY}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"

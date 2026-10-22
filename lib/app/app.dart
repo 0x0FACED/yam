@@ -9,6 +9,8 @@ import 'package:yam/app/theme/app_scroll_behavior.dart';
 import 'package:yam/app/theme/app_theme.dart';
 import 'package:yam/core/data/yam_database.dart';
 import 'package:yam/core/ui/motion/yam_entrance_reveal.dart';
+import 'package:yam/features/backup/data/backup_file_service.dart';
+import 'package:yam/features/backup/data/backup_repository.dart';
 import 'package:yam/features/diary/data/diary_repository.dart';
 import 'package:yam/features/diary/domain/diary_entry.dart';
 import 'package:yam/features/startup/presentation/startup_artwork.dart';
@@ -21,17 +23,25 @@ import 'package:yam/features/statistics/domain/statistics_models.dart';
 import 'package:yam/l10n/generated/app_localizations.dart';
 
 class YamApp extends StatefulWidget {
-  const YamApp({this.startupArtwork, this.database, super.key});
+  const YamApp({
+    required this.appVersion,
+    this.startupArtwork,
+    this.database,
+    this.backupFiles,
+    super.key,
+  });
 
+  final String appVersion;
   final StartupArtwork? startupArtwork;
   final YamDatabase? database;
+  final BackupFileService? backupFiles;
 
   @override
   State<YamApp> createState() => _YamAppState();
 }
 
 class _YamAppState extends State<YamApp> {
-  late final GoRouter _router;
+  late GoRouter _router;
   late final ValueNotifier<ThemeMode> _themeMode;
   late final ValueNotifier<SessionProfile?> _profile;
   late final ValueNotifier<double?> _currentWeight;
@@ -42,6 +52,7 @@ class _YamAppState extends State<YamApp> {
   late final OpenFoodFactsHttpClient _openFoodFacts;
   late final DiaryRepository _diary;
   late final StatisticsRepository _statistics;
+  late final BackupRepository _backup;
   StreamSubscription<List<GoalVersion>>? _goalsSubscription;
   StreamSubscription<List<WeightRecord>>? _weightsSubscription;
   List<GoalVersion> _goals = const [];
@@ -65,20 +76,44 @@ class _YamAppState extends State<YamApp> {
     _openFoodFacts = OpenFoodFactsHttpClient();
     _diary = DiaryRepository(_foodDatabase);
     _statistics = StatisticsRepository(_foodDatabase);
+    _backup = BackupRepository(_foodDatabase);
     _listenToProfile();
-    _router = createAppRouter(
-      themeModeListenable: _themeMode,
-      onThemeModeChanged: (mode) => _themeMode.value = mode,
-      profileListenable: _profile,
-      onboardingAccessListenable: _onboardingAccess,
-      onRetryProfileLoad: _listenToProfile,
-      weightListenable: _currentWeight,
-      onProfileChanged: _saveProfile,
-      userFoodRepository: _userFoods,
-      remoteFoodRepository: _remoteFoods,
-      openFoodFactsClient: _openFoodFacts,
-      diaryRepository: _diary,
-      statisticsRepository: _statistics,
+    _router = _createRouter();
+  }
+
+  GoRouter _createRouter() => createAppRouter(
+    appVersion: widget.appVersion,
+    themeModeListenable: _themeMode,
+    onThemeModeChanged: (mode) => _themeMode.value = mode,
+    profileListenable: _profile,
+    onboardingAccessListenable: _onboardingAccess,
+    onRetryProfileLoad: _listenToProfile,
+    weightListenable: _currentWeight,
+    onProfileChanged: _saveProfile,
+    userFoodRepository: _userFoods,
+    remoteFoodRepository: _remoteFoods,
+    openFoodFactsClient: _openFoodFacts,
+    diaryRepository: _diary,
+    statisticsRepository: _statistics,
+    backupRepository: _backup,
+    backupFiles: widget.backupFiles,
+    onBackupImported: _reloadAfterImport,
+  );
+
+  void _reloadAfterImport() {
+    if (!mounted) return;
+    final previousRouter = _router;
+    _goals = const [];
+    _weights = const [];
+    _profile.value = null;
+    _currentWeight.value = null;
+    _listenToProfile();
+    setState(() {
+      _router = _createRouter();
+      _entranceEpoch++;
+    });
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => previousRouter.dispose(),
     );
   }
 
@@ -102,6 +137,7 @@ class _YamAppState extends State<YamApp> {
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: _themeMode,
       builder: (context, themeMode, child) => MaterialApp.router(
+        key: ObjectKey(_router),
         onGenerateTitle: (context) => AppLocalizations.of(context).appName,
         debugShowCheckedModeBanner: false,
         localizationsDelegates: AppLocalizations.localizationsDelegates,

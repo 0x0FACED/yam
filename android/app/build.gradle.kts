@@ -5,6 +5,14 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+val releaseSigningEnvironment =
+    listOf(
+        "ANDROID_KEYSTORE_PATH",
+        "ANDROID_KEYSTORE_PASSWORD",
+        "ANDROID_KEY_ALIAS",
+        "ANDROID_KEY_PASSWORD",
+    ).associateWith { System.getenv(it) }
+
 android {
     namespace = "dev.yam.yam"
     compileSdk = flutter.compileSdkVersion
@@ -30,13 +38,37 @@ android {
         versionName = flutter.versionName
     }
 
-    buildTypes {
-        release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+    signingConfigs {
+        create("release") {
+            storeFile =
+                releaseSigningEnvironment.getValue("ANDROID_KEYSTORE_PATH")
+                    ?.takeIf { it.isNotBlank() }
+                    ?.let { file(it) }
+            storePassword = releaseSigningEnvironment.getValue("ANDROID_KEYSTORE_PASSWORD")
+            keyAlias = releaseSigningEnvironment.getValue("ANDROID_KEY_ALIAS")
+            keyPassword = releaseSigningEnvironment.getValue("ANDROID_KEY_PASSWORD")
         }
     }
+
+    buildTypes {
+        release {
+            signingConfig = signingConfigs.getByName("release")
+        }
+    }
+}
+
+// Validate only release signing so ordinary debug builds need no private key.
+val validateReleaseSigning = tasks.register("validateReleaseSigningEnvironment") {
+    doLast {
+        val missing = releaseSigningEnvironment.filterValues { it.isNullOrBlank() }.keys
+        check(missing.isEmpty()) {
+            "Release signing requires these environment variables: ${missing.joinToString()}"
+        }
+    }
+}
+
+tasks.matching { it.name == "preReleaseBuild" }.configureEach {
+    dependsOn(validateReleaseSigning)
 }
 
 flutter {

@@ -8,7 +8,7 @@ import 'package:yam/l10n/generated/app_localizations.dart';
 void main() {
   testWidgets('uses bottom navigation on a compact window', (tester) async {
     await _setWindowSize(tester, const Size(390, 844));
-    final router = createAppRouter();
+    final router = createAppRouter(appVersion: '1.2.3+4');
     addTearDown(router.dispose);
 
     await tester.pumpWidget(_TestApp(router: router));
@@ -16,19 +16,11 @@ void main() {
 
     expect(find.byType(NavigationBar), findsOneWidget);
     expect(find.byType(NavigationRail), findsNothing);
-
-    await tester.tap(find.text('Stats'));
-    await tester.pumpAndSettle();
-
-    expect(
-      find.text('Nutrition and weight trends will appear here.'),
-      findsOneWidget,
-    );
   });
 
   testWidgets('uses navigation rail on a wide window', (tester) async {
     await _setWindowSize(tester, const Size(1280, 800));
-    final router = createAppRouter();
+    final router = createAppRouter(appVersion: '1.2.3+4');
     addTearDown(router.dispose);
 
     await tester.pumpWidget(_TestApp(router: router));

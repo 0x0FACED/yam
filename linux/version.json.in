@@ -1,0 +1,6 @@
+{
+  "app_name": "@BINARY_NAME@",
+  "version": "@FLUTTER_VERSION_MAJOR@.@FLUTTER_VERSION_MINOR@.@FLUTTER_VERSION_PATCH@",
+  "build_number": "@FLUTTER_VERSION_BUILD@",
+  "package_name": "@BINARY_NAME@"
+}

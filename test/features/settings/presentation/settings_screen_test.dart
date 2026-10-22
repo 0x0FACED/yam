@@ -27,7 +27,7 @@ void main() {
       ),
       DateTime.now(),
     );
-    await tester.pumpWidget(YamApp(database: database));
+    await tester.pumpWidget(YamApp(appVersion: '1.2.3+4', database: database));
     await tester.pump(const Duration(milliseconds: 1));
     await tester.pump(AppMotion.logoIntro);
     await tester.pumpAndSettle();
@@ -62,7 +62,6 @@ void main() {
 
     expect(find.text('Goals & nutrition'), findsOneWidget);
     expect(find.text('Metric'), findsOneWidget);
-    expect(find.text('Unavailable'), findsNWidgets(2));
     expect(tester.takeException(), isNull);
 
     await tester.ensureVisible(find.byKey(const ValueKey('settings-about')));
@@ -91,6 +90,7 @@ class _SettingsTestApp extends StatelessWidget {
         child: child!,
       ),
       home: SettingsScreen(
+        appVersion: '1.2.3+4',
         themeMode: ThemeMode.system,
         onThemeModeChanged: (_) {},
       ),

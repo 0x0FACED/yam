@@ -8,23 +8,32 @@ import 'package:yam/app/theme/app_spacing.dart';
 import 'package:yam/app/theme/app_typography.dart';
 import 'package:yam/core/ui/lists/yam_settings_list.dart';
 import 'package:yam/core/ui/motion/yam_entrance_reveal.dart';
+import 'package:yam/features/backup/data/backup_file_service.dart';
+import 'package:yam/features/backup/data/backup_repository.dart';
+import 'package:yam/features/backup/presentation/backup_settings_section.dart';
 import 'package:yam/l10n/generated/app_localizations.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({
+    required this.appVersion,
     required this.themeMode,
     required this.onThemeModeChanged,
     this.profile,
     this.currentWeightKg,
+    this.backupRepository,
+    this.backupFiles,
+    this.onBackupImported,
     super.key,
   });
 
-  static const _appVersion = '0.1.0';
-
+  final String appVersion;
   final ThemeMode themeMode;
   final ValueChanged<ThemeMode> onThemeModeChanged;
   final SessionProfile? profile;
   final double? currentWeightKg;
+  final BackupRepository? backupRepository;
+  final BackupFileService? backupFiles;
+  final VoidCallback? onBackupImported;
 
   @override
   Widget build(BuildContext context) {
@@ -136,22 +145,41 @@ class SettingsScreen extends StatelessWidget {
                             const SizedBox(height: AppSpacing.lg),
                             YamEntranceReveal(
                               index: 2,
-                              child: YamSettingsSection(
-                                title: l10n.settingsDataSection,
-                                children: [
-                                  YamSettingsRow(
-                                    title: l10n.settingsExportData,
-                                    value: l10n.settingsUnavailable,
-                                    mutedValue: true,
-                                  ),
-                                  YamSettingsRow(
-                                    title: l10n.settingsDeleteAllData,
-                                    value: l10n.settingsUnavailable,
-                                    tone: YamSettingsRowTone.destructive,
-                                    mutedValue: true,
-                                  ),
-                                ],
-                              ),
+                              child: backupRepository == null
+                                  ? YamSettingsSection(
+                                      title: l10n.settingsDataSection,
+                                      children: [
+                                        YamSettingsRow(
+                                          key: const ValueKey(
+                                            'settings-export',
+                                          ),
+                                          title: l10n.settingsExportData,
+                                          value: l10n.settingsUnavailable,
+                                          mutedValue: true,
+                                        ),
+                                        YamSettingsRow(
+                                          key: const ValueKey(
+                                            'settings-import',
+                                          ),
+                                          title: l10n.settingsImportData,
+                                          value: l10n.settingsUnavailable,
+                                          mutedValue: true,
+                                        ),
+                                        YamSettingsRow(
+                                          title: l10n.settingsDeleteAllData,
+                                          value: l10n.settingsUnavailable,
+                                          tone: YamSettingsRowTone.destructive,
+                                          mutedValue: true,
+                                        ),
+                                      ],
+                                    )
+                                  : BackupSettingsSection(
+                                      repository: backupRepository!,
+                                      files:
+                                          backupFiles ??
+                                          const BackupFileService(),
+                                      onImported: onBackupImported,
+                                    ),
                             ),
                             const SizedBox(height: AppSpacing.lg),
                             YamEntranceReveal(
@@ -167,7 +195,7 @@ class SettingsScreen extends StatelessWidget {
                                   ),
                                   YamSettingsRow(
                                     title: l10n.settingsVersion,
-                                    value: _appVersion,
+                                    value: appVersion,
                                   ),
                                 ],
                               ),
@@ -204,7 +232,7 @@ class SettingsScreen extends StatelessWidget {
     showAboutDialog(
       context: context,
       applicationName: l10n.appName,
-      applicationVersion: _appVersion,
+      applicationVersion: appVersion,
       applicationIcon: Icon(
         Icons.restaurant_menu_rounded,
         color: Theme.of(context).colorScheme.primary,

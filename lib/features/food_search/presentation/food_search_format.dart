@@ -67,21 +67,19 @@ String formatFoodSearchMetadata(
   return brand == null || brand.isEmpty ? category : '$category · $brand';
 }
 
-String foodSearchCategoryLabel(
-  AppLocalizations l10n,
-  FoodSearchPrototypeCategory category,
-) => switch (category) {
-  FoodSearchPrototypeCategory.other => l10n.foodCategoryOther,
-  FoodSearchPrototypeCategory.grains => l10n.foodCategoryGrains,
-  FoodSearchPrototypeCategory.dairy => l10n.foodCategoryDairy,
-  FoodSearchPrototypeCategory.sportsNutrition =>
-    l10n.foodCategorySportsNutrition,
-  FoodSearchPrototypeCategory.fruit => l10n.foodCategoryFruit,
-  FoodSearchPrototypeCategory.poultry => l10n.foodCategoryPoultry,
-  FoodSearchPrototypeCategory.eggs => l10n.foodCategoryEggs,
-  FoodSearchPrototypeCategory.bread => l10n.foodCategoryBread,
-  FoodSearchPrototypeCategory.drinks => l10n.foodCategoryDrinks,
-};
+String foodSearchCategoryLabel(AppLocalizations l10n, String category) =>
+    switch (category) {
+      'other' => l10n.foodCategoryOther,
+      'grains' => l10n.foodCategoryGrains,
+      'dairy' => l10n.foodCategoryDairy,
+      'sportsNutrition' => l10n.foodCategorySportsNutrition,
+      'fruit' => l10n.foodCategoryFruit,
+      'poultry' => l10n.foodCategoryPoultry,
+      'eggs' => l10n.foodCategoryEggs,
+      'bread' => l10n.foodCategoryBread,
+      'drinks' => l10n.foodCategoryDrinks,
+      _ => category,
+    };
 
 String? foodSearchServingEquivalent(
   BuildContext context,

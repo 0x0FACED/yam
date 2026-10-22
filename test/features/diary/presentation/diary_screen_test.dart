@@ -95,7 +95,7 @@ void main() {
     tester,
   ) async {
     await _setWindowSize(tester, const Size(390, 844));
-    final router = createAppRouter();
+    final router = createAppRouter(appVersion: '1.2.3+4');
     addTearDown(router.dispose);
     await tester.pumpWidget(
       _DiaryRouterTestApp(router: router, locale: const Locale('ru')),
@@ -116,7 +116,10 @@ void main() {
     tester,
   ) async {
     await _setWindowSize(tester, const Size(390, 844));
-    final router = createAppRouter(diaryToday: DateTime(2026, 9, 23));
+    final router = createAppRouter(
+      appVersion: '1.2.3+4',
+      diaryToday: DateTime(2026, 9, 23),
+    );
     addTearDown(router.dispose);
     await tester.pumpWidget(
       _DiaryRouterTestApp(router: router, locale: const Locale('ru')),

@@ -12,6 +12,9 @@ import 'package:yam/core/ui/forms/yam_goal_slider_field.dart';
 import 'package:yam/core/ui/forms/yam_number_field.dart';
 import 'package:yam/core/ui/navigation/yam_step_progress.dart';
 import 'package:yam/core/ui/selection/yam_choice_card.dart';
+import 'package:yam/features/backup/data/backup_file_service.dart';
+import 'package:yam/features/backup/data/backup_repository.dart';
+import 'package:yam/features/backup/presentation/backup_settings_section.dart';
 import 'package:yam/features/onboarding/presentation/onboarding_input.dart';
 import 'package:yam/l10n/generated/app_localizations.dart';
 
@@ -21,6 +24,9 @@ class OnboardingScreen extends StatefulWidget {
     this.initialWeightKg,
     this.requiredFirstRun = false,
     this.onClose,
+    this.backupRepository,
+    this.backupFiles,
+    this.onBackupImported,
     required this.onCompleted,
     super.key,
   });
@@ -29,6 +35,9 @@ class OnboardingScreen extends StatefulWidget {
   final double? initialWeightKg;
   final bool requiredFirstRun;
   final VoidCallback? onClose;
+  final BackupRepository? backupRepository;
+  final BackupFileService? backupFiles;
+  final VoidCallback? onBackupImported;
   final FutureOr<void> Function(SessionProfile) onCompleted;
 
   @override
@@ -52,6 +61,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   bool _localizedWeights = false;
   bool _goalError = false;
   bool _saving = false;
+  bool _restoring = false;
   String? _saveError;
 
   @override
@@ -132,7 +142,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Future<void> _goToStep(int step) async {
-    if (_transitioning) return;
+    if (_transitioning || _restoring) return;
     FocusManager.instance.primaryFocus?.unfocus();
     _transitioning = true;
     setState(() => _step = step);
@@ -149,7 +159,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Future<void> _continue() async {
-    if (_transitioning || _saving) return;
+    if (_transitioning || _saving || _restoring) return;
     if (_step == 0) {
       if (_goal == null) {
         setState(() => _goalError = true);
@@ -240,7 +250,28 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           index: 0,
                           title: l10n.onboardingGoalTitle,
                           description: l10n.onboardingGoalDescription,
-                          content: _buildGoalChoices(l10n),
+                          content: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              _buildGoalChoices(l10n),
+                              if (widget.requiredFirstRun &&
+                                  widget.backupRepository != null) ...[
+                                const SizedBox(height: AppSpacing.md),
+                                BackupImportButton(
+                                  repository: widget.backupRepository!,
+                                  files:
+                                      widget.backupFiles ??
+                                      const BackupFileService(),
+                                  onImported: widget.onBackupImported,
+                                  onBusyChanged: (busy) {
+                                    if (mounted) {
+                                      setState(() => _restoring = busy);
+                                    }
+                                  },
+                                ),
+                              ],
+                            ],
+                          ),
                         ),
                         _buildPage(
                           index: 1,
@@ -285,7 +316,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               ? null
                               : Icons.arrow_forward_rounded,
                           expanded: true,
-                          onPressed: _saving ? null : _continue,
+                          onPressed: _saving || _restoring ? null : _continue,
                           loading: _saving,
                         ),
                       ],

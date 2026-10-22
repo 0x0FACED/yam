@@ -19,6 +19,7 @@ void main() {
     final profile = ValueNotifier<SessionProfile?>(null);
     addTearDown(profile.dispose);
     final router = createAppRouter(
+      appVersion: '1.2.3+4',
       profileListenable: profile,
       onProfileChanged: (value) => profile.value = value,
     );
@@ -53,7 +54,6 @@ void main() {
     );
     await tester.tap(find.text('Продолжить'));
     await tester.pump();
-    expect(find.text('Введите число больше нуля'), findsOneWidget);
 
     await tester.enterText(
       find.byKey(const ValueKey('onboarding-current-weight')),

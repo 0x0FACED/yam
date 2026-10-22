@@ -25,7 +25,7 @@ import 'package:yam/l10n/generated/app_localizations_en.dart';
 void main() {
   testWidgets('requires a meal before completing quick add', (tester) async {
     await _setWindowSize(tester, const Size(390, 844));
-    final router = createAppRouter();
+    final router = createAppRouter(appVersion: '1.2.3+4');
     addTearDown(router.dispose);
     await tester.pumpWidget(_RouterTestApp(router: router));
     await tester.pumpAndSettle();
@@ -68,7 +68,7 @@ void main() {
     tester,
   ) async {
     await _setWindowSize(tester, const Size(390, 844));
-    final router = createAppRouter();
+    final router = createAppRouter(appVersion: '1.2.3+4');
     addTearDown(router.dispose);
     await tester.pumpWidget(_RouterTestApp(router: router));
     await tester.pumpAndSettle();
@@ -103,7 +103,10 @@ void main() {
     await _setWindowSize(tester, const Size(390, 844));
     final database = YamDatabase(NativeDatabase.memory());
     addTearDown(database.close);
-    final router = createAppRouter(diaryRepository: DiaryRepository(database));
+    final router = createAppRouter(
+      appVersion: '1.2.3+4',
+      diaryRepository: DiaryRepository(database),
+    );
     addTearDown(router.dispose);
     await tester.pumpWidget(_RouterTestApp(router: router));
     await tester.pumpAndSettle();
@@ -146,7 +149,7 @@ void main() {
     tester,
   ) async {
     await _setWindowSize(tester, const Size(390, 844));
-    final router = createAppRouter();
+    final router = createAppRouter(appVersion: '1.2.3+4');
     addTearDown(router.dispose);
     await tester.pumpWidget(_RouterTestApp(router: router));
     await tester.pumpAndSettle();
@@ -176,7 +179,7 @@ void main() {
     tester,
   ) async {
     await _setWindowSize(tester, const Size(390, 844));
-    final router = createAppRouter();
+    final router = createAppRouter(appVersion: '1.2.3+4');
     addTearDown(router.dispose);
     await tester.pumpWidget(_RouterTestApp(router: router));
     await tester.pumpAndSettle();
@@ -275,7 +278,7 @@ void main() {
 
   testWidgets('covers the navigation rail on a wide window', (tester) async {
     await _setWindowSize(tester, const Size(1280, 800));
-    final router = createAppRouter();
+    final router = createAppRouter(appVersion: '1.2.3+4');
     addTearDown(router.dispose);
     await tester.pumpWidget(_RouterTestApp(router: router));
     await tester.pumpAndSettle();
@@ -488,6 +491,7 @@ void main() {
         ),
       );
       final router = createAppRouter(
+        appVersion: '1.2.3+4',
         userFoodRepository: repository,
         diaryRepository: diary,
       );
@@ -628,7 +632,10 @@ void main() {
       ),
     );
     final saved = (await repository.loadFoods()).single;
-    final router = createAppRouter(userFoodRepository: repository);
+    final router = createAppRouter(
+      appVersion: '1.2.3+4',
+      userFoodRepository: repository,
+    );
     addTearDown(router.dispose);
     await tester.pumpWidget(
       _RouterTestApp(router: router, locale: const Locale('ru')),
@@ -662,7 +669,7 @@ void main() {
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump(const Duration(milliseconds: 1));
 
-    final noRepositoryRouter = createAppRouter();
+    final noRepositoryRouter = createAppRouter(appVersion: '1.2.3+4');
     addTearDown(noRepositoryRouter.dispose);
     await tester.pumpWidget(
       _RouterTestApp(router: noRepositoryRouter, locale: const Locale('ru')),

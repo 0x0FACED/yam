@@ -1015,6 +1015,151 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsExportData => 'Экспорт данных';
 
   @override
+  String get settingsImportData => 'Импорт данных';
+
+  @override
+  String get backupSaveDialogTitle => 'Сохранить копию YAM';
+
+  @override
+  String get backupOpenDialogTitle => 'Открыть копию YAM';
+
+  @override
+  String get backupExportSuccess => 'Резервная копия сохранена.';
+
+  @override
+  String get backupExportFailed =>
+      'Не удалось сохранить копию. Попробуйте ещё раз.';
+
+  @override
+  String get backupExportInvalidData =>
+      'Не удалось подготовить сохранённые данные для экспорта. Исходные данные не изменены.';
+
+  @override
+  String get backupImportFailed =>
+      'Не удалось импортировать копию. Данные не изменены.';
+
+  @override
+  String get backupInvalidFile =>
+      'Это не резервная копия YAM или файл повреждён. Данные не импортированы.';
+
+  @override
+  String get backupUnsupportedVersion =>
+      'Эта версия резервной копии не поддерживается. Попробуйте обновить YAM.';
+
+  @override
+  String get backupTooLarge =>
+      'Размер резервной копии превышает допустимый предел.';
+
+  @override
+  String get backupPersonalDataNote =>
+      'Файл .yam содержит дневник, вес, цели и данные продуктов, включая удалённые записи. Файл не зашифрован — храните его в безопасном месте. Тема приложения в копию не входит.';
+
+  @override
+  String get backupReplaceTitle => 'Заменить локальные данные?';
+
+  @override
+  String get backupReplaceWarning =>
+      'Все локальные продукты, порции, записи дневника, цели, записи веса и кешированные продукты будут удалены и заменены данными из копии. Это действие нельзя отменить. Пустая копия очистит эти записи. Если в копии нет целей, потребуется снова пройти онбординг.';
+
+  @override
+  String get backupReplaceConfirm => 'Заменить все данные';
+
+  @override
+  String get backupSaveAction => 'Выбрать место сохранения';
+
+  @override
+  String get backupCancel => 'Отмена';
+
+  @override
+  String get backupClose => 'Закрыть';
+
+  @override
+  String get backupDone => 'Готово';
+
+  @override
+  String get backupPreviewTitle => 'Импорт резервной копии';
+
+  @override
+  String backupExportedAt(String date) {
+    return 'Создана: $date';
+  }
+
+  @override
+  String get backupCountsNote =>
+      'Количество включает удалённые записи. Данные не изменятся до подтверждения импорта ниже.';
+
+  @override
+  String get backupSupplementDescription =>
+      'Все текущие записи, включая отметки об удалении, останутся без изменений. Добавятся только отсутствующие записи. Совпадающие идентификаторы, конфликты штрихкодов и кешированных продуктов будут пропущены. Порции добавятся только вместе с новыми продуктами.';
+
+  @override
+  String get backupSupplementAction => 'Дополнить локальные данные';
+
+  @override
+  String get backupReplaceDescription =>
+      'Удалить все перечисленные выше локальные записи и загрузить данные из копии. Потребуется дополнительное подтверждение.';
+
+  @override
+  String get backupReplaceAction => 'Заменить локальные данные…';
+
+  @override
+  String get backupImportComplete => 'Копия импортирована';
+
+  @override
+  String backupImportResult(String imported, String skipped) {
+    return 'Импортировано: $imported. Пропущено: $skipped.';
+  }
+
+  @override
+  String get backupImportedRecords => 'Импортированные записи';
+
+  @override
+  String get backupSkippedRecords => 'Пропущенные записи';
+
+  @override
+  String get backupSkippedNote =>
+      'Не импортированы существующие записи, конфликты штрихкодов и кешированных продуктов, а также порции пропущенных продуктов. Текущие записи сохранены без изменений.';
+
+  @override
+  String get backupWaitingForConfirmation => 'Ожидаем подтверждения';
+
+  @override
+  String get backupExporting => 'Подготавливаем копию…';
+
+  @override
+  String get backupSaving => 'Сохраняем копию…';
+
+  @override
+  String get backupOpening => 'Открываем копию…';
+
+  @override
+  String get backupInspecting => 'Проверяем копию…';
+
+  @override
+  String get backupImporting => 'Импортируем копию…';
+
+  @override
+  String get backupCountUserFoods => 'Свои продукты';
+
+  @override
+  String get backupCountUserServings => 'Порции продуктов';
+
+  @override
+  String get backupCountDiaryEntries => 'Записи дневника';
+
+  @override
+  String get backupCountGoals => 'Версии целей';
+
+  @override
+  String get backupCountWeights => 'Записи веса';
+
+  @override
+  String get backupCountRemoteFoods => 'Кешированные продукты';
+
+  @override
+  String get backupRestoreAction => 'Восстановить из копии';
+
+  @override
   String get settingsDeleteAllData => 'Удалить все данные';
 
   @override

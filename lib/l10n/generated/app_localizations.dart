@@ -1831,6 +1831,264 @@ abstract class AppLocalizations {
   /// **'Export data'**
   String get settingsExportData;
 
+  /// No description provided for @settingsImportData.
+  ///
+  /// In en, this message translates to:
+  /// **'Import data'**
+  String get settingsImportData;
+
+  /// No description provided for @backupSaveDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Save YAM backup'**
+  String get backupSaveDialogTitle;
+
+  /// No description provided for @backupOpenDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Open YAM backup'**
+  String get backupOpenDialogTitle;
+
+  /// No description provided for @backupExportSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup saved.'**
+  String get backupExportSuccess;
+
+  /// No description provided for @backupExportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save the backup. Please try again.'**
+  String get backupExportFailed;
+
+  /// No description provided for @backupExportInvalidData.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not prepare the saved data for export. Your data has not been changed.'**
+  String get backupExportInvalidData;
+
+  /// No description provided for @backupImportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not import the backup. No data was changed.'**
+  String get backupImportFailed;
+
+  /// No description provided for @backupInvalidFile.
+  ///
+  /// In en, this message translates to:
+  /// **'This is not a valid YAM backup. No data was imported.'**
+  String get backupInvalidFile;
+
+  /// No description provided for @backupUnsupportedVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'This backup version is not supported. Try a newer version of YAM.'**
+  String get backupUnsupportedVersion;
+
+  /// No description provided for @backupTooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'This backup exceeds the supported size limit.'**
+  String get backupTooLarge;
+
+  /// No description provided for @backupPersonalDataNote.
+  ///
+  /// In en, this message translates to:
+  /// **'The .yam file contains your diary, weights, goals and food data, including deleted records. It is not encrypted. Store it privately. The app theme is not included.'**
+  String get backupPersonalDataNote;
+
+  /// No description provided for @backupReplaceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace local data?'**
+  String get backupReplaceTitle;
+
+  /// No description provided for @backupReplaceWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'All local foods, servings, diary entries, goals, weight records and cached foods will be removed and replaced with this backup. This cannot be undone. An empty backup clears these records. If the backup has no goals, you will need to go through onboarding again.'**
+  String get backupReplaceWarning;
+
+  /// No description provided for @backupReplaceConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace all data'**
+  String get backupReplaceConfirm;
+
+  /// No description provided for @backupSaveAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose where to save'**
+  String get backupSaveAction;
+
+  /// No description provided for @backupCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get backupCancel;
+
+  /// No description provided for @backupClose.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get backupClose;
+
+  /// No description provided for @backupDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get backupDone;
+
+  /// No description provided for @backupPreviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Import backup'**
+  String get backupPreviewTitle;
+
+  /// No description provided for @backupExportedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Created: {date}'**
+  String backupExportedAt(String date);
+
+  /// No description provided for @backupCountsNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Counts include deleted records. Nothing changes until you confirm an import below.'**
+  String get backupCountsNote;
+
+  /// No description provided for @backupSupplementDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep all current records, including deletions, unchanged. Add only missing records. Existing IDs, barcode conflicts and cached-food conflicts are skipped. Servings are added only with newly added foods.'**
+  String get backupSupplementDescription;
+
+  /// No description provided for @backupSupplementAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Supplement local data'**
+  String get backupSupplementAction;
+
+  /// No description provided for @backupReplaceDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove all current records listed above and load this backup instead. Requires another confirmation.'**
+  String get backupReplaceDescription;
+
+  /// No description provided for @backupReplaceAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace local data…'**
+  String get backupReplaceAction;
+
+  /// No description provided for @backupImportComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup imported'**
+  String get backupImportComplete;
+
+  /// No description provided for @backupImportResult.
+  ///
+  /// In en, this message translates to:
+  /// **'Imported: {imported}. Skipped: {skipped}.'**
+  String backupImportResult(String imported, String skipped);
+
+  /// No description provided for @backupImportedRecords.
+  ///
+  /// In en, this message translates to:
+  /// **'Imported records'**
+  String get backupImportedRecords;
+
+  /// No description provided for @backupSkippedRecords.
+  ///
+  /// In en, this message translates to:
+  /// **'Skipped records'**
+  String get backupSkippedRecords;
+
+  /// No description provided for @backupSkippedNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Existing records, barcode conflicts, cached-food conflicts and servings of skipped foods were not imported. Your current records were kept unchanged.'**
+  String get backupSkippedNote;
+
+  /// No description provided for @backupWaitingForConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for your confirmation'**
+  String get backupWaitingForConfirmation;
+
+  /// No description provided for @backupExporting.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing backup…'**
+  String get backupExporting;
+
+  /// No description provided for @backupSaving.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving backup…'**
+  String get backupSaving;
+
+  /// No description provided for @backupOpening.
+  ///
+  /// In en, this message translates to:
+  /// **'Opening backup…'**
+  String get backupOpening;
+
+  /// No description provided for @backupInspecting.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking backup…'**
+  String get backupInspecting;
+
+  /// No description provided for @backupImporting.
+  ///
+  /// In en, this message translates to:
+  /// **'Importing backup…'**
+  String get backupImporting;
+
+  /// No description provided for @backupCountUserFoods.
+  ///
+  /// In en, this message translates to:
+  /// **'Your foods'**
+  String get backupCountUserFoods;
+
+  /// No description provided for @backupCountUserServings.
+  ///
+  /// In en, this message translates to:
+  /// **'Food servings'**
+  String get backupCountUserServings;
+
+  /// No description provided for @backupCountDiaryEntries.
+  ///
+  /// In en, this message translates to:
+  /// **'Diary entries'**
+  String get backupCountDiaryEntries;
+
+  /// No description provided for @backupCountGoals.
+  ///
+  /// In en, this message translates to:
+  /// **'Goal versions'**
+  String get backupCountGoals;
+
+  /// No description provided for @backupCountWeights.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight records'**
+  String get backupCountWeights;
+
+  /// No description provided for @backupCountRemoteFoods.
+  ///
+  /// In en, this message translates to:
+  /// **'Cached foods'**
+  String get backupCountRemoteFoods;
+
+  /// No description provided for @backupRestoreAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore from backup'**
+  String get backupRestoreAction;
+
   /// No description provided for @settingsDeleteAllData.
   ///
   /// In en, this message translates to:

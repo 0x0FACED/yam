@@ -10,7 +10,7 @@ FoodSearchPrototypeFood adaptRemoteFood(
   id: product.id,
   name: product.name,
   brand: product.brand,
-  category: FoodSearchPrototypeCategory.values.byName(product.category),
+  category: product.category,
   referenceAmount: 100,
   referenceUnit: FoodSearchPrototypeUnit.grams,
   nutrition: FoodSearchPrototypeNutrition(
