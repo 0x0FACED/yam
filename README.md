@@ -121,6 +121,36 @@ include both the resolved version and build number.
 If publication fails after creating a draft, inspect/remove that incomplete
 draft before rerunning. Published releases must not be silently overwritten.
 
+### In-app Android updates
+
+Android Settings checks `0x0FACED/yam` for a stable GitHub Release on its first
+opening in each app session; **Check for updates** repeats the check. The source
+repository and releases must be public. No GitHub account or token is stored in
+the app, and startup/local tracking never waits for this check.
+
+Tap **Download** to stream the APK with progress. Its exact size and SHA-256 from
+the same release's `SHA256SUMS` must match before **Install update** is offered.
+The existing release workflow already publishes the required assets and names.
+An update needs a public version at least as high as the installed one and a
+strictly greater Android build number.
+
+Installation uses Android's system confirmation. If Android asks, allow YAM to
+install apps from this source, return to Settings, and tap **Install update**
+again. APK package, expected version and current signing certificate are checked
+before handoff; debug/release keys cannot update each other, and signing-key
+rotation is not supported by this updater.
+
+The APK stays in private, non-backed-up app storage, not Downloads. It is not
+deleted merely because the installer opened: cancellation must remain retryable.
+After successful package replacement, a receiver removes completed/obsolete
+APKs; startup repeats this cleanup if needed and removes interrupted `.part`
+downloads. A canceled newer APK remains available until installation or a later
+successful update makes it obsolete.
+
+Install the first version containing this updater manually. Future updates can
+then stay entirely on the phone. This APK installation flow is Android-only;
+desktop downloads below are unchanged.
+
 ### Desktop downloads
 
 For Linux, extract the archive into its own directory and run `bundle/yam`.

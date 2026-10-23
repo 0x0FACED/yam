@@ -25,6 +25,94 @@ class AppLocalizationsRu extends AppLocalizations {
       'Попробуйте повторить загрузку локальной базы данных.';
 
   @override
+  String get updateSection => 'Обновления приложения';
+
+  @override
+  String get updateCheckAction => 'Проверить обновления';
+
+  @override
+  String get updateSource => 'GitHub · 0x0FACED/yam';
+
+  @override
+  String get updateCheckHint => 'Проверьте наличие новой Android-версии.';
+
+  @override
+  String get updateChecking => 'Проверяем обновления…';
+
+  @override
+  String get updateUpToDate => 'У вас последняя версия.';
+
+  @override
+  String updateAvailable(String version) {
+    return 'Доступна версия $version';
+  }
+
+  @override
+  String updateDownloading(String percent) {
+    return 'Скачивание: $percent';
+  }
+
+  @override
+  String updateReady(String version) {
+    return 'Версия $version готова к установке';
+  }
+
+  @override
+  String get updateOpeningInstaller => 'Открываем системный установщик…';
+
+  @override
+  String updateDownloadAction(String size) {
+    return 'Скачать · $size МБ';
+  }
+
+  @override
+  String get updateInstallAction => 'Установить обновление';
+
+  @override
+  String get updateInstallHint =>
+      'Android попросит подтвердить установку. После успешного обновления APK удалится автоматически.';
+
+  @override
+  String get updateUnavailable =>
+      'Публичный релиз недоступен. Возможно, репозиторий ещё приватный или релизы пока не опубликованы.';
+
+  @override
+  String get updateNetworkError =>
+      'Не удалось проверить обновления. Проверьте подключение к интернету и повторите попытку.';
+
+  @override
+  String get updateRateLimited =>
+      'Достигнут лимит запросов GitHub. Попробуйте позже.';
+
+  @override
+  String get updateInvalidRelease =>
+      'В релизе нет корректного Android-пакета и контрольной суммы.';
+
+  @override
+  String get updateDownloadError =>
+      'Не удалось скачать или сохранить обновление. Проверьте подключение и свободное место, затем попробуйте ещё раз.';
+
+  @override
+  String get updateChecksumError =>
+      'Скачанный файл повреждён. Скачайте обновление заново.';
+
+  @override
+  String get updatePermissionHint =>
+      'Разрешите YAM установку приложений в настройках Android, вернитесь сюда и снова нажмите «Установить обновление».';
+
+  @override
+  String get updateSignatureError =>
+      'APK подписан другим ключом и не может обновить эту установку. Перед ручной переустановкой экспортируйте резервную копию.';
+
+  @override
+  String get updateInvalidApk =>
+      'APK не соответствует приложению или ожидаемой новой версии. Скачайте обновление заново.';
+
+  @override
+  String get updateInstallError =>
+      'Не удалось открыть системный установщик. Попробуйте ещё раз.';
+
+  @override
   String onboardingStepOf(int step, int total) {
     return 'Шаг $step из $total';
   }

@@ -128,6 +128,144 @@ abstract class AppLocalizations {
   /// **'Try loading the local database again.'**
   String get startupDataErrorMessage;
 
+  /// No description provided for @updateSection.
+  ///
+  /// In en, this message translates to:
+  /// **'App updates'**
+  String get updateSection;
+
+  /// No description provided for @updateCheckAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Check for updates'**
+  String get updateCheckAction;
+
+  /// No description provided for @updateSource.
+  ///
+  /// In en, this message translates to:
+  /// **'GitHub · 0x0FACED/yam'**
+  String get updateSource;
+
+  /// No description provided for @updateCheckHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Check for a new Android version.'**
+  String get updateCheckHint;
+
+  /// No description provided for @updateChecking.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking for updates…'**
+  String get updateChecking;
+
+  /// No description provided for @updateUpToDate.
+  ///
+  /// In en, this message translates to:
+  /// **'You have the latest version.'**
+  String get updateUpToDate;
+
+  /// No description provided for @updateAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Version {version} is available'**
+  String updateAvailable(String version);
+
+  /// No description provided for @updateDownloading.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading: {percent}'**
+  String updateDownloading(String percent);
+
+  /// No description provided for @updateReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Version {version} is ready to install'**
+  String updateReady(String version);
+
+  /// No description provided for @updateOpeningInstaller.
+  ///
+  /// In en, this message translates to:
+  /// **'Opening the system installer…'**
+  String get updateOpeningInstaller;
+
+  /// No description provided for @updateDownloadAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Download · {size} MB'**
+  String updateDownloadAction(String size);
+
+  /// No description provided for @updateInstallAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Install update'**
+  String get updateInstallAction;
+
+  /// No description provided for @updateInstallHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Android will ask you to confirm installation. The APK is removed automatically after a successful update.'**
+  String get updateInstallHint;
+
+  /// No description provided for @updateUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No public release is available. The repository may still be private or have no published releases.'**
+  String get updateUnavailable;
+
+  /// No description provided for @updateNetworkError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not check for updates. Check your internet connection and try again.'**
+  String get updateNetworkError;
+
+  /// No description provided for @updateRateLimited.
+  ///
+  /// In en, this message translates to:
+  /// **'GitHub\'s request limit has been reached. Try again later.'**
+  String get updateRateLimited;
+
+  /// No description provided for @updateInvalidRelease.
+  ///
+  /// In en, this message translates to:
+  /// **'The release does not contain a valid Android package and checksum.'**
+  String get updateInvalidRelease;
+
+  /// No description provided for @updateDownloadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not download or save the update. Check your connection and free space, then try again.'**
+  String get updateDownloadError;
+
+  /// No description provided for @updateChecksumError.
+  ///
+  /// In en, this message translates to:
+  /// **'The downloaded file is damaged. Download the update again.'**
+  String get updateChecksumError;
+
+  /// No description provided for @updatePermissionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow YAM to install apps in Android settings, return here, and tap Install update again.'**
+  String get updatePermissionHint;
+
+  /// No description provided for @updateSignatureError.
+  ///
+  /// In en, this message translates to:
+  /// **'This APK uses a different signing key. It cannot update this installation. Export a backup before reinstalling manually.'**
+  String get updateSignatureError;
+
+  /// No description provided for @updateInvalidApk.
+  ///
+  /// In en, this message translates to:
+  /// **'The APK does not match this app or the expected newer version. Download the update again.'**
+  String get updateInvalidApk;
+
+  /// No description provided for @updateInstallError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open the system installer. Try again.'**
+  String get updateInstallError;
+
   /// No description provided for @onboardingStepOf.
   ///
   /// In en, this message translates to:

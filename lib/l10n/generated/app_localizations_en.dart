@@ -24,6 +24,94 @@ class AppLocalizationsEn extends AppLocalizations {
   String get startupDataErrorMessage => 'Try loading the local database again.';
 
   @override
+  String get updateSection => 'App updates';
+
+  @override
+  String get updateCheckAction => 'Check for updates';
+
+  @override
+  String get updateSource => 'GitHub · 0x0FACED/yam';
+
+  @override
+  String get updateCheckHint => 'Check for a new Android version.';
+
+  @override
+  String get updateChecking => 'Checking for updates…';
+
+  @override
+  String get updateUpToDate => 'You have the latest version.';
+
+  @override
+  String updateAvailable(String version) {
+    return 'Version $version is available';
+  }
+
+  @override
+  String updateDownloading(String percent) {
+    return 'Downloading: $percent';
+  }
+
+  @override
+  String updateReady(String version) {
+    return 'Version $version is ready to install';
+  }
+
+  @override
+  String get updateOpeningInstaller => 'Opening the system installer…';
+
+  @override
+  String updateDownloadAction(String size) {
+    return 'Download · $size MB';
+  }
+
+  @override
+  String get updateInstallAction => 'Install update';
+
+  @override
+  String get updateInstallHint =>
+      'Android will ask you to confirm installation. The APK is removed automatically after a successful update.';
+
+  @override
+  String get updateUnavailable =>
+      'No public release is available. The repository may still be private or have no published releases.';
+
+  @override
+  String get updateNetworkError =>
+      'Could not check for updates. Check your internet connection and try again.';
+
+  @override
+  String get updateRateLimited =>
+      'GitHub\'s request limit has been reached. Try again later.';
+
+  @override
+  String get updateInvalidRelease =>
+      'The release does not contain a valid Android package and checksum.';
+
+  @override
+  String get updateDownloadError =>
+      'Could not download or save the update. Check your connection and free space, then try again.';
+
+  @override
+  String get updateChecksumError =>
+      'The downloaded file is damaged. Download the update again.';
+
+  @override
+  String get updatePermissionHint =>
+      'Allow YAM to install apps in Android settings, return here, and tap Install update again.';
+
+  @override
+  String get updateSignatureError =>
+      'This APK uses a different signing key. It cannot update this installation. Export a backup before reinstalling manually.';
+
+  @override
+  String get updateInvalidApk =>
+      'The APK does not match this app or the expected newer version. Download the update again.';
+
+  @override
+  String get updateInstallError =>
+      'Could not open the system installer. Try again.';
+
+  @override
   String onboardingStepOf(int step, int total) {
     return 'Step $step of $total';
   }

@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yam/app/onboarding_access.dart';
 import 'package:yam/app/router.dart';
@@ -9,6 +11,9 @@ import 'package:yam/app/theme/app_scroll_behavior.dart';
 import 'package:yam/app/theme/app_theme.dart';
 import 'package:yam/core/data/yam_database.dart';
 import 'package:yam/core/ui/motion/yam_entrance_reveal.dart';
+import 'package:yam/features/app_update/data/android_update_installer.dart';
+import 'package:yam/features/app_update/data/github_update_client.dart';
+import 'package:yam/features/app_update/presentation/app_update_controller.dart';
 import 'package:yam/features/backup/data/backup_file_service.dart';
 import 'package:yam/features/backup/data/backup_repository.dart';
 import 'package:yam/features/diary/data/diary_repository.dart';
@@ -28,6 +33,7 @@ class YamApp extends StatefulWidget {
     this.startupArtwork,
     this.database,
     this.backupFiles,
+    this.appUpdates,
     super.key,
   });
 
@@ -35,6 +41,7 @@ class YamApp extends StatefulWidget {
   final StartupArtwork? startupArtwork;
   final YamDatabase? database;
   final BackupFileService? backupFiles;
+  final AppUpdateController? appUpdates;
 
   @override
   State<YamApp> createState() => _YamAppState();
@@ -53,6 +60,7 @@ class _YamAppState extends State<YamApp> {
   late final DiaryRepository _diary;
   late final StatisticsRepository _statistics;
   late final BackupRepository _backup;
+  late final AppUpdateController? _appUpdates;
   StreamSubscription<List<GoalVersion>>? _goalsSubscription;
   StreamSubscription<List<WeightRecord>>? _weightsSubscription;
   List<GoalVersion> _goals = const [];
@@ -77,6 +85,15 @@ class _YamAppState extends State<YamApp> {
     _diary = DiaryRepository(_foodDatabase);
     _statistics = StatisticsRepository(_foodDatabase);
     _backup = BackupRepository(_foodDatabase);
+    _appUpdates =
+        widget.appUpdates ??
+        (!kIsWeb && Platform.isAndroid
+            ? AppUpdateController(
+                installedVersion: widget.appVersion,
+                client: GitHubUpdateClient(),
+                installer: const AndroidUpdateInstaller(),
+              )
+            : null);
     _listenToProfile();
     _router = _createRouter();
   }
@@ -98,6 +115,7 @@ class _YamAppState extends State<YamApp> {
     backupRepository: _backup,
     backupFiles: widget.backupFiles,
     onBackupImported: _reloadAfterImport,
+    appUpdates: _appUpdates,
   );
 
   void _reloadAfterImport() {
@@ -121,6 +139,7 @@ class _YamAppState extends State<YamApp> {
   void dispose() {
     _router.dispose();
     _openFoodFacts.close();
+    if (widget.appUpdates == null) _appUpdates?.dispose();
     _goalsSubscription?.cancel();
     _weightsSubscription?.cancel();
     if (widget.database == null) unawaited(_foodDatabase.close());

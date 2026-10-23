@@ -74,3 +74,7 @@ tasks.matching { it.name == "preReleaseBuild" }.configureEach {
 flutter {
     source = "../.."
 }
+
+dependencies {
+    implementation("androidx.core:core:1.16.0")
+}

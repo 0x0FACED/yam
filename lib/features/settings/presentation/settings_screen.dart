@@ -8,6 +8,8 @@ import 'package:yam/app/theme/app_spacing.dart';
 import 'package:yam/app/theme/app_typography.dart';
 import 'package:yam/core/ui/lists/yam_settings_list.dart';
 import 'package:yam/core/ui/motion/yam_entrance_reveal.dart';
+import 'package:yam/features/app_update/presentation/app_update_controller.dart';
+import 'package:yam/features/app_update/presentation/app_update_settings_section.dart';
 import 'package:yam/features/backup/data/backup_file_service.dart';
 import 'package:yam/features/backup/data/backup_repository.dart';
 import 'package:yam/features/backup/presentation/backup_settings_section.dart';
@@ -23,6 +25,7 @@ class SettingsScreen extends StatelessWidget {
     this.backupRepository,
     this.backupFiles,
     this.onBackupImported,
+    this.appUpdates,
     super.key,
   });
 
@@ -34,6 +37,7 @@ class SettingsScreen extends StatelessWidget {
   final BackupRepository? backupRepository;
   final BackupFileService? backupFiles;
   final VoidCallback? onBackupImported;
+  final AppUpdateController? appUpdates;
 
   @override
   Widget build(BuildContext context) {
@@ -200,6 +204,15 @@ class SettingsScreen extends StatelessWidget {
                                 ],
                               ),
                             ),
+                            if (appUpdates != null) ...[
+                              const SizedBox(height: AppSpacing.lg),
+                              YamEntranceReveal(
+                                index: 4,
+                                child: AppUpdateSettingsSection(
+                                  controller: appUpdates!,
+                                ),
+                              ),
+                            ],
                           ],
                         ),
                       ),

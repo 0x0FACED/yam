@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:yam/app/onboarding_access.dart';
 import 'package:yam/app/navigation/adaptive_navigation_shell.dart';
 import 'package:yam/app/session/session_profile.dart';
+import 'package:yam/features/app_update/presentation/app_update_controller.dart';
 import 'package:yam/features/backup/data/backup_file_service.dart';
 import 'package:yam/features/backup/data/backup_repository.dart';
 import 'package:yam/features/diary/data/diary_repository.dart';
@@ -41,6 +42,7 @@ GoRouter createAppRouter({
   BackupRepository? backupRepository,
   BackupFileService? backupFiles,
   VoidCallback? onBackupImported,
+  AppUpdateController? appUpdates,
 }) {
   return GoRouter(
     initialLocation: '/diary',
@@ -127,6 +129,7 @@ GoRouter createAppRouter({
                       backupRepository: backupRepository,
                       backupFiles: backupFiles,
                       onBackupImported: onBackupImported,
+                      appUpdates: appUpdates,
                     ),
                   );
                 },
