@@ -4,6 +4,7 @@ A local-first nutrition tracker for Android, iOS, macOS and Linux. Food logging,
 nutrition history, goals and weight are stored locally in SQLite. An account or
 network connection is not required; Open Food Facts search is optional.
 
+
 ## Development
 
 Flutter is pinned in [`.fvmrc`](.fvmrc). Use that SDK locally (directly or through
@@ -46,12 +47,12 @@ for the workflow.
 
 Before pushing a release tag, configure these repository **Actions secrets**:
 
-| Secret | Value |
-| --- | --- |
-| `ANDROID_KEYSTORE_BASE64` | Base64 content of the permanent release keystore |
-| `ANDROID_KEYSTORE_PASSWORD` | Keystore password |
-| `ANDROID_KEY_ALIAS` | Signing-key alias |
-| `ANDROID_KEY_PASSWORD` | Signing-key password |
+| Secret                      | Value                                            |
+| --------------------------- | ------------------------------------------------ |
+| `ANDROID_KEYSTORE_BASE64`   | Base64 content of the permanent release keystore |
+| `ANDROID_KEYSTORE_PASSWORD` | Keystore password                                |
+| `ANDROID_KEY_ALIAS`         | Signing-key alias                                |
+| `ANDROID_KEY_PASSWORD`      | Signing-key password                             |
 
 Use an existing release key if the application has already been distributed.
 Keep a separate offline copy of the keystore and passwords: losing the key can
