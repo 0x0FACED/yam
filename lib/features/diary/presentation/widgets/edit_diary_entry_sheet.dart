@@ -171,6 +171,7 @@ class _EditDiaryEntrySheetState extends State<_EditDiaryEntrySheet> {
 
     return SafeArea(
       top: false,
+      maintainBottomViewPadding: true,
       child: Padding(
         padding: EdgeInsets.only(
           bottom: MediaQuery.viewInsetsOf(context).bottom,

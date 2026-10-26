@@ -132,6 +132,7 @@ class _FoodQuickAddSheetState extends State<_FoodQuickAddSheet> {
 
     return SafeArea(
       top: false,
+      maintainBottomViewPadding: true,
       child: Padding(
         padding: EdgeInsets.only(
           bottom: MediaQuery.viewInsetsOf(context).bottom,

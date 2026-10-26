@@ -314,6 +314,62 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('keyboard insets do not consume the quick-add bottom spacing', (
+    tester,
+  ) async {
+    await _setWindowSize(tester, const Size(390, 844));
+    tester.view.viewPadding = const FakeViewPadding(bottom: 24);
+    tester.view.padding = const FakeViewPadding(bottom: 24);
+    addTearDown(tester.view.resetViewPadding);
+    addTearDown(tester.view.resetPadding);
+    addTearDown(tester.view.resetViewInsets);
+    await tester.pumpWidget(
+      const _ScreenTestApp(
+        arguments: FoodSearchPrototypeArguments(
+          initialMealId: 'breakfast',
+          recentFoodIds: ['rolled-oats'],
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('food-result-rolled-oats')));
+    await tester.pumpAndSettle();
+
+    final submit = find.byKey(const ValueKey('quick-add-submit'));
+    final quantity = find.byKey(const ValueKey('quick-add-quantity'));
+    final restingBottom = tester.getBottomLeft(submit).dy;
+    await tester.tap(quantity);
+    await tester.pump();
+    for (final inset in [8.0, 16.0, 24.0, 80.0, 160.0, 240.0, 300.0]) {
+      tester.view.viewInsets = FakeViewPadding(bottom: inset);
+      tester.view.padding = FakeViewPadding(bottom: (24 - inset).clamp(0, 24));
+      await tester.pump(const Duration(milliseconds: 16));
+      expect(
+        tester.getBottomLeft(submit).dy,
+        closeTo(restingBottom - inset, 0.01),
+        reason: 'The sheet must follow the IME without losing safe-area space.',
+      );
+    }
+    await tester.pumpAndSettle();
+    final settledQuantityTop = tester.getTopLeft(quantity).dy;
+    expect(tester.getBottomLeft(quantity).dy, lessThan(544));
+    expect(tester.getBottomLeft(submit).dy, lessThan(544));
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(tester.getTopLeft(quantity).dy, settledQuantityTop);
+
+    for (final inset in [240.0, 160.0, 80.0, 24.0, 16.0, 8.0, 0.0]) {
+      tester.view.viewInsets = FakeViewPadding(bottom: inset);
+      tester.view.padding = FakeViewPadding(bottom: (24 - inset).clamp(0, 24));
+      await tester.pump(const Duration(milliseconds: 16));
+      expect(
+        tester.getBottomLeft(submit).dy,
+        closeTo(restingBottom - inset, 0.01),
+      );
+    }
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('quick-add quantity controls update the nutrition preview', (
     tester,
   ) async {

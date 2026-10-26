@@ -99,6 +99,7 @@ class _WeightEntrySheetState extends State<_WeightEntrySheet> {
     final kg = double.tryParse(_weight.text.trim().replaceAll(',', '.'));
     return SafeArea(
       top: false,
+      maintainBottomViewPadding: true,
       child: Padding(
         padding: EdgeInsets.only(
           bottom: MediaQuery.viewInsetsOf(context).bottom,
