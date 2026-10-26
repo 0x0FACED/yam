@@ -138,20 +138,31 @@ class TrackedDay {
 }
 
 class RegularityCell {
-  const RegularityCell({required this.day, required this.status});
+  const RegularityCell({
+    required this.day,
+    required this.status,
+    required this.nutrition,
+    required this.goal,
+  });
   final DateTime day;
   final GoalDayStatus status;
+  final NutritionDay? nutrition;
+  final GoalVersion? goal;
 }
 
 class ChartBucket {
   const ChartBucket({
     required this.day,
+    required this.endDay,
     required this.value,
     required this.days,
+    required this.calorieTarget,
   });
   final DateTime day;
-  final double value;
+  final DateTime endDay;
+  final double? value;
   final int days;
+  final double? calorieTarget;
 }
 
 class StatisticsSnapshot {
@@ -197,13 +208,6 @@ class StatisticsSnapshot {
 
   double? get withinGoalPercent =>
       goalEvaluatedDays == 0 ? null : withinGoalDays * 100 / goalEvaluatedDays;
-
-  double? get averageProteinPercent =>
-      averageProtein == null ||
-          averageProteinTarget == null ||
-          averageProteinTarget == 0
-      ? null
-      : averageProtein! * 100 / averageProteinTarget!;
 
   double? frequencyPercent(FrequentFood food) =>
       days.isEmpty ? null : food.days * 100 / days.length;
@@ -294,22 +298,51 @@ StatisticsSnapshot calculateStatistics({
       : tracked.fold<double>(0, (sum, day) => sum + value(day.nutrition)) /
             tracked.length;
 
+  var chartStart = start;
+  if (chartStart == null) {
+    final firstNutrition = sortedNutrition.firstOrNull?.day;
+    final firstWeight = plottedWeights.firstOrNull?.day;
+    final first = firstNutrition == null
+        ? firstWeight
+        : firstWeight == null || firstNutrition.isBefore(firstWeight)
+        ? firstNutrition
+        : firstWeight;
+    if (first != null) {
+      chartStart = DateTime(first.year, first.month, first.day);
+    }
+  }
+
   final heatmap = <RegularityCell>[];
   if (tracked.isNotEmpty) {
     final cutoff = DateTime(today.year, today.month, today.day - 29);
-    final first = start != null && start.isAfter(cutoff) ? start : cutoff;
-    final statuses = {
-      for (final day in tracked) diaryDayKey(day.nutrition.day): day.status,
+    final first = chartStart != null && chartStart.isAfter(cutoff)
+        ? chartStart
+        : cutoff;
+    final nutritionByDay = {
+      for (final day in sortedNutrition) diaryDayKey(day.day): day,
     };
+    var heatmapGoalIndex = 0;
+    GoalVersion? heatmapGoal;
     for (
       var day = first;
       !day.isAfter(DateTime(today.year, today.month, today.day));
       day = DateTime(day.year, day.month, day.day + 1)
     ) {
+      final key = diaryDayKey(day);
+      while (heatmapGoalIndex < sortedGoals.length &&
+          diaryDayKey(sortedGoals[heatmapGoalIndex].day).compareTo(key) <= 0) {
+        heatmapGoal = sortedGoals[heatmapGoalIndex++];
+      }
+      final nutrition = nutritionByDay[key];
       heatmap.add(
         RegularityCell(
           day: day,
-          status: statuses[diaryDayKey(day)] ?? GoalDayStatus.noEntry,
+          status: calorieGoalDayStatus(
+            kcal: nutrition?.kcal,
+            calorieTarget: heatmapGoal?.calorieTarget,
+          ),
+          nutrition: nutrition,
+          goal: heatmapGoal,
         ),
       );
     }
@@ -323,7 +356,15 @@ StatisticsSnapshot calculateStatistics({
     weights: plottedWeights,
     latestRecordedWeight: latestRecordedWeight,
     frequentlyEaten: frequentFoods,
-    calorieBuckets: bucketCalories(sortedNutrition, period),
+    calorieBuckets: chartStart == null
+        ? const []
+        : _bucketCalories(
+            days: sortedNutrition,
+            goals: sortedGoals,
+            period: period,
+            start: chartStart,
+            end: DateTime(today.year, today.month, today.day),
+          ),
     withinGoalDays: within,
     goalEvaluatedDays: evaluated,
     averageCalories: average((day) => day.kcal),
@@ -343,32 +384,66 @@ StatisticsSnapshot calculateStatistics({
   );
 }
 
-List<ChartBucket> bucketCalories(
-  List<NutritionDay> days,
-  StatisticsPeriod period,
-) {
-  if (period == StatisticsPeriod.days7 || period == StatisticsPeriod.days30) {
-    return [
-      for (final day in days)
-        ChartBucket(day: day.day, value: day.kcal, days: 1),
-    ];
-  }
-  DateTime bucketStart(DateTime date) => period == StatisticsPeriod.months3
-      ? DateTime(date.year, date.month, date.day - (date.weekday - 1))
-      : DateTime(date.year, date.month);
-  final groups = <String, (DateTime, double, int)>{};
-  for (final day in days) {
-    final start = bucketStart(day.day);
-    final key = diaryDayKey(start);
-    final current = groups[key];
-    groups[key] = (
-      start,
-      (current?.$2 ?? 0) + day.kcal,
-      (current?.$3 ?? 0) + 1,
+List<ChartBucket> _bucketCalories({
+  required List<NutritionDay> days,
+  required List<GoalVersion> goals,
+  required StatisticsPeriod period,
+  required DateTime start,
+  required DateTime end,
+}) {
+  final daily =
+      period == StatisticsPeriod.days7 || period == StatisticsPeriod.days30;
+  final buckets = <ChartBucket>[];
+  var nutritionIndex = 0;
+  var goalIndex = 0;
+  GoalVersion? activeGoal;
+  for (var day = start; !day.isAfter(end);) {
+    var endDay = daily
+        ? day
+        : period == StatisticsPeriod.months3
+        ? DateTime(day.year, day.month, day.day + 7 - day.weekday)
+        : DateTime(day.year, day.month + 1, 0);
+    if (endDay.isAfter(end)) endDay = end;
+    final endKey = diaryDayKey(endDay);
+    var calories = 0.0;
+    var calorieTargets = 0.0;
+    var loggedDays = 0;
+    var goalDays = 0;
+    while (nutritionIndex < days.length &&
+        diaryDayKey(days[nutritionIndex].day).compareTo(endKey) <= 0) {
+      final nutrition = days[nutritionIndex++];
+      final key = diaryDayKey(nutrition.day);
+      while (goalIndex < goals.length &&
+          diaryDayKey(goals[goalIndex].day).compareTo(key) <= 0) {
+        activeGoal = goals[goalIndex++];
+      }
+      calories += nutrition.kcal;
+      loggedDays++;
+      if (activeGoal != null) {
+        calorieTargets += activeGoal.calorieTarget;
+        goalDays++;
+      }
+    }
+    if (daily && loggedDays == 0) {
+      while (goalIndex < goals.length &&
+          diaryDayKey(goals[goalIndex].day).compareTo(endKey) <= 0) {
+        activeGoal = goals[goalIndex++];
+      }
+    }
+    buckets.add(
+      ChartBucket(
+        day: day,
+        endDay: endDay,
+        value: loggedDays == 0 ? null : calories / loggedDays,
+        days: loggedDays,
+        calorieTarget: daily
+            ? activeGoal?.calorieTarget.toDouble()
+            : loggedDays > 0 && goalDays == loggedDays
+            ? calorieTargets / loggedDays
+            : null,
+      ),
     );
+    day = DateTime(endDay.year, endDay.month, endDay.day + 1);
   }
-  return [
-    for (final group in groups.values)
-      ChartBucket(day: group.$1, value: group.$2 / group.$3, days: group.$3),
-  ];
+  return buckets;
 }

@@ -1604,6 +1604,36 @@ abstract class AppLocalizations {
   /// **'Current goal: {value}'**
   String statsCurrentGoal(String value);
 
+  /// No description provided for @statsGoalLegend.
+  ///
+  /// In en, this message translates to:
+  /// **'Goal'**
+  String get statsGoalLegend;
+
+  /// No description provided for @statsAverageGoal.
+  ///
+  /// In en, this message translates to:
+  /// **'Average goal: {value}'**
+  String statsAverageGoal(String value);
+
+  /// No description provided for @statsGoalDifference.
+  ///
+  /// In en, this message translates to:
+  /// **'Difference from goal: {value}'**
+  String statsGoalDifference(String value);
+
+  /// No description provided for @statsNutritionDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'P {protein} g · F {fat} g · C {carbs} g'**
+  String statsNutritionDetails(String protein, String fat, String carbs);
+
+  /// No description provided for @statsGoalDaysSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'In goal: {within} of {total} days ({percent}%)'**
+  String statsGoalDaysSummary(String within, String total, String percent);
+
   /// No description provided for @statsWeight.
   ///
   /// In en, this message translates to:

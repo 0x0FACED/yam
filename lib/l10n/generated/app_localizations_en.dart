@@ -885,6 +885,29 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get statsGoalLegend => 'Goal';
+
+  @override
+  String statsAverageGoal(String value) {
+    return 'Average goal: $value';
+  }
+
+  @override
+  String statsGoalDifference(String value) {
+    return 'Difference from goal: $value';
+  }
+
+  @override
+  String statsNutritionDetails(String protein, String fat, String carbs) {
+    return 'P $protein g · F $fat g · C $carbs g';
+  }
+
+  @override
+  String statsGoalDaysSummary(String within, String total, String percent) {
+    return 'In goal: $within of $total days ($percent%)';
+  }
+
+  @override
   String get statsWeight => 'Weight';
 
   @override

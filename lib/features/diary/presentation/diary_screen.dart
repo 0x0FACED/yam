@@ -243,19 +243,16 @@ class _DiaryScreenState extends State<DiaryScreen> {
                   ? AppSpacing.xl
                   : AppSpacing.md;
 
-              return ScrollConfiguration(
-                behavior: const MaterialScrollBehavior(),
-                child: CustomScrollView(
-                  key: const ValueKey('diary-scroll-view'),
-                  controller: _scrollController,
-                  slivers: [
-                    _buildHeaderSliver(horizontalPadding),
-                    if (constraints.maxWidth >= AppBreakpoints.wideDiary)
-                      ..._buildWideSlivers(day, horizontalPadding)
-                    else
-                      ..._buildCompactSlivers(day, horizontalPadding),
-                  ],
-                ),
+              return CustomScrollView(
+                key: const ValueKey('diary-scroll-view'),
+                controller: _scrollController,
+                slivers: [
+                  _buildHeaderSliver(horizontalPadding),
+                  if (constraints.maxWidth >= AppBreakpoints.wideDiary)
+                    ..._buildWideSlivers(day, horizontalPadding)
+                  else
+                    ..._buildCompactSlivers(day, horizontalPadding),
+                ],
               );
             },
           ),

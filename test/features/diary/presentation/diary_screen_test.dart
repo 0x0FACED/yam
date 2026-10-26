@@ -7,7 +7,6 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:yam/app/router.dart';
 import 'package:yam/app/session/session_profile.dart';
-import 'package:yam/app/theme/app_scroll_behavior.dart';
 import 'package:yam/app/theme/app_theme.dart';
 import 'package:yam/core/data/yam_database.dart';
 import 'package:yam/features/diary/data/diary_repository.dart';
@@ -217,17 +216,6 @@ void main() {
     },
   );
 
-  testWidgets('diary restores the native Android stretch overscroll', (
-    tester,
-  ) async {
-    await _setWindowSize(tester, const Size(390, 844));
-    await tester.pumpWidget(
-      _DiaryTestApp(locale: const Locale('en'), today: DateTime(2026, 9, 23)),
-    );
-
-    expect(find.byType(StretchingOverscrollIndicator), findsOneWidget);
-  });
-
   testWidgets('floating add does not cover the last meal at the bottom', (
     tester,
   ) async {
@@ -419,7 +407,6 @@ class _DiaryRouterTestApp extends StatelessWidget {
       routerConfig: router,
       locale: locale,
       theme: AppTheme.light,
-      scrollBehavior: const AppScrollBehavior(),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
     );
@@ -448,7 +435,6 @@ class _DiaryTestApp extends StatelessWidget {
     return MaterialApp(
       locale: locale,
       theme: theme ?? AppTheme.light,
-      scrollBehavior: const AppScrollBehavior(),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       builder: (context, child) {

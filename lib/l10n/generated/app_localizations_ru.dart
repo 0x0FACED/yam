@@ -894,6 +894,29 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get statsGoalLegend => 'Цель';
+
+  @override
+  String statsAverageGoal(String value) {
+    return 'Средняя цель: $value';
+  }
+
+  @override
+  String statsGoalDifference(String value) {
+    return 'Отклонение от цели: $value';
+  }
+
+  @override
+  String statsNutritionDetails(String protein, String fat, String carbs) {
+    return 'Б $protein г · Ж $fat г · У $carbs г';
+  }
+
+  @override
+  String statsGoalDaysSummary(String within, String total, String percent) {
+    return 'В цели: $within из $total дней ($percent%)';
+  }
+
+  @override
   String get statsWeight => 'Вес';
 
   @override

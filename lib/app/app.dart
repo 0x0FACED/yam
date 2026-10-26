@@ -7,7 +7,6 @@ import 'package:go_router/go_router.dart';
 import 'package:yam/app/onboarding_access.dart';
 import 'package:yam/app/router.dart';
 import 'package:yam/app/session/session_profile.dart';
-import 'package:yam/app/theme/app_scroll_behavior.dart';
 import 'package:yam/app/theme/app_theme.dart';
 import 'package:yam/core/data/yam_database.dart';
 import 'package:yam/core/ui/motion/yam_entrance_reveal.dart';
@@ -164,7 +163,6 @@ class _YamAppState extends State<YamApp> {
         theme: AppTheme.light,
         darkTheme: AppTheme.dark,
         themeMode: themeMode,
-        scrollBehavior: const AppScrollBehavior(),
         routerConfig: _router,
         builder: (context, child) {
           if (!_startupComplete) {

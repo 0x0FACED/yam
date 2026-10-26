@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -15,6 +14,7 @@ import 'package:yam/features/diary/domain/diary_entry.dart';
 import 'package:yam/features/statistics/data/statistics_repository.dart';
 import 'package:yam/features/statistics/domain/statistics_models.dart';
 import 'package:yam/features/statistics/presentation/widgets/statistics_charts.dart';
+import 'package:yam/features/statistics/presentation/widgets/statistics_regularity_calendar.dart';
 import 'package:yam/features/statistics/presentation/widgets/weight_entry_sheet.dart';
 import 'package:yam/l10n/generated/app_localizations.dart';
 
@@ -254,6 +254,74 @@ class _StatisticsScreenState extends State<StatisticsScreen>
         .format(day);
   }
 
+  String _fullDate(DateTime day) => DateFormat.yMMMMEEEEd(
+    Localizations.localeOf(context).toLanguageTag(),
+  ).format(day);
+
+  String _calories(num value) =>
+      '${_format(value)} ${AppLocalizations.of(context).unitKilocalories}';
+
+  String _goalDifference(num value, num target, AppLocalizations l10n) {
+    final difference = value - target;
+    return l10n.statsGoalDifference(
+      '${difference > 0 ? '+' : ''}${_calories(difference)}',
+    );
+  }
+
+  Widget _calorieDetails(ChartBucket bucket) {
+    final l10n = AppLocalizations.of(context);
+    final daily =
+        _period == StatisticsPeriod.days7 || _period == StatisticsPeriod.days30;
+    final value = bucket.value;
+    final target = bucket.calorieTarget;
+    return StatisticsInspectionDetails(
+      title: daily
+          ? _fullDate(bucket.day)
+          : '${_date(bucket.day)} — ${_date(bucket.endDay)}',
+      lines: [
+        if (value == null)
+          l10n.statsNoEntry
+        else ...[
+          _calories(value),
+          if (!daily) l10n.statsBucketAverage,
+        ],
+        if (!daily) l10n.statsLoggedDays(_format(bucket.days)),
+        if (target == null)
+          l10n.statsNoGoal
+        else ...[
+          daily
+              ? l10n.statsGoal(_calories(target))
+              : l10n.statsAverageGoal(_calories(target)),
+          if (value != null) _goalDifference(value, target, l10n),
+        ],
+      ],
+    );
+  }
+
+  Widget _regularityDetails(RegularityCell cell) {
+    final l10n = AppLocalizations.of(context);
+    final nutrition = cell.nutrition;
+    final goal = cell.goal;
+    return StatisticsInspectionDetails(
+      title: _fullDate(cell.day),
+      lines: [
+        if (nutrition == null)
+          l10n.statsNoEntry
+        else ...[
+          _calories(nutrition.kcal),
+          l10n.statsNutritionDetails(
+            _format(nutrition.protein, decimals: 1),
+            _format(nutrition.fat, decimals: 1),
+            _format(nutrition.carbs, decimals: 1),
+          ),
+        ],
+        goal == null
+            ? l10n.statsNoGoal
+            : l10n.statsGoal(_calories(goal.calorieTarget)),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -270,6 +338,7 @@ class _StatisticsScreenState extends State<StatisticsScreen>
                 : AppSpacing.md;
             return CustomScrollView(
               key: const ValueKey('statistics-scroll-view'),
+              physics: const AlwaysScrollableScrollPhysics(),
               slivers: [
                 SliverPadding(
                   padding: EdgeInsets.fromLTRB(
@@ -317,8 +386,6 @@ class _StatisticsScreenState extends State<StatisticsScreen>
                                 ),
                               )
                             else ...[
-                              _summary(snapshot, l10n),
-                              const SizedBox(height: AppSpacing.md),
                               LayoutBuilder(
                                 builder: (context, content) {
                                   final wide = content.maxWidth >= 760;
@@ -424,6 +491,12 @@ class _StatisticsScreenState extends State<StatisticsScreen>
       l10n.statsPeriodAll,
     ];
     final theme = Theme.of(context);
+    final selectedBackground = theme.brightness == Brightness.light
+        ? theme.colorScheme.primary
+        : theme.colorScheme.primaryContainer;
+    final selectedForeground = theme.brightness == Brightness.light
+        ? theme.colorScheme.onPrimary
+        : theme.colorScheme.primary;
     return LayoutBuilder(
       builder: (context, constraints) {
         final scroll =
@@ -438,7 +511,7 @@ class _StatisticsScreenState extends State<StatisticsScreen>
                 selected: _period == StatisticsPeriod.values[i],
                 child: Material(
                   color: _period == StatisticsPeriod.values[i]
-                      ? theme.colorScheme.primaryContainer
+                      ? selectedBackground
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(AppRadius.small),
                   child: InkWell(
@@ -457,7 +530,7 @@ class _StatisticsScreenState extends State<StatisticsScreen>
                                 ? FontWeight.w700
                                 : FontWeight.w500,
                             color: _period == StatisticsPeriod.values[i]
-                                ? theme.colorScheme.primary
+                                ? selectedForeground
                                 : theme.colorScheme.onSurfaceVariant,
                           ),
                         ),
@@ -482,83 +555,6 @@ class _StatisticsScreenState extends State<StatisticsScreen>
           ),
         );
       },
-    );
-  }
-
-  Widget _summary(StatisticsSnapshot data, AppLocalizations l10n) {
-    final latest = data.latestRecordedWeight;
-    final goal = data.latestGoal;
-    final semantic = AppSemanticColors.of(context);
-    final proteinPercent = data.averageProteinPercent;
-    final items = [
-      (
-        l10n.statsWeight,
-        _format(latest?.kg, decimals: 1),
-        latest == null ? '' : l10n.unitKilograms,
-        latest == null ? null : l10n.statsWeightLastDate(_date(latest.day)),
-        Theme.of(context).colorScheme.onSurfaceVariant,
-      ),
-      (
-        l10n.statsAverageCalories,
-        _format(data.averageCalories),
-        data.averageCalories == null ? '' : l10n.unitKilocalories,
-        goal == null
-            ? l10n.statsNoGoal
-            : l10n.statsCurrentGoal(
-                '${_format(goal.calorieTarget)} ${l10n.unitKilocalories}',
-              ),
-        Theme.of(context).colorScheme.onSurfaceVariant,
-      ),
-      (
-        l10n.statsAverageProtein,
-        _format(data.averageProtein),
-        data.averageProtein == null ? '' : l10n.statsGramsPerDay,
-        proteinPercent == null
-            ? null
-            : l10n.statsPercentOfGoal(_format(proteinPercent)),
-        semantic.protein,
-      ),
-      (
-        l10n.statsDaysInGoal,
-        _format(data.withinGoalPercent),
-        data.withinGoalPercent == null ? '' : '%',
-        data.goalEvaluatedDays == 0
-            ? null
-            : l10n.statsInGoalCount(
-                _format(data.withinGoalDays),
-                _format(data.goalEvaluatedDays),
-              ),
-        semantic.goalWithin,
-      ),
-    ];
-    return _StatsPanel(
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final oneColumn =
-              constraints.maxWidth < 310 ||
-              MediaQuery.textScalerOf(context).scale(14) > 20;
-          final width = oneColumn
-              ? constraints.maxWidth
-              : (constraints.maxWidth - AppSpacing.sm) / 2;
-          return Wrap(
-            spacing: AppSpacing.sm,
-            runSpacing: AppSpacing.md,
-            children: [
-              for (final item in items)
-                SizedBox(
-                  width: width,
-                  child: _SummaryMetric(
-                    label: item.$1,
-                    value: item.$2,
-                    unit: item.$3,
-                    hint: item.$4,
-                    hintColor: item.$5,
-                  ),
-                ),
-            ],
-          );
-        },
-      ),
     );
   }
 
@@ -598,6 +594,12 @@ class _StatisticsScreenState extends State<StatisticsScreen>
                 color: theme.colorScheme.onSurface,
               ),
             ),
+            Text(
+              l10n.statsWeightLastDate(_date(latest.day)),
+              style: AppTypography.caption.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
             if (data.weightChange case final change?)
               Text(
                 l10n.statsWeightChange(
@@ -618,22 +620,26 @@ class _StatisticsScreenState extends State<StatisticsScreen>
             )
           else ...[
             StatisticsWeightChart(
+              key: ValueKey('stats-weight-${_period.name}'),
               weights: data.weights,
               goal: data.latestGoal?.targetWeightKg,
               lineColor: theme.colorScheme.primary,
               goalColor: theme.colorScheme.primary.withValues(alpha: 0.55),
               gridColor: theme.colorScheme.outlineVariant,
               semanticLabel: l10n.statsWeightChart,
-              onSelected: (entry) => _editWeight(entry),
+              dateLabelBuilder: _date,
+              detailsBuilder: (entry) => StatisticsInspectionDetails(
+                title: _fullDate(entry.day),
+                lines: [
+                  '${_format(entry.kg, decimals: 2)} ${l10n.unitKilograms}',
+                ],
+                action: YamTextButton(
+                  label: l10n.statsEditWeight,
+                  onPressed: () => _editWeight(entry),
+                ),
+              ),
             ),
             const SizedBox(height: AppSpacing.xs),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(_date(data.weights.first.day)),
-                Text(_date(data.weights.last.day)),
-              ],
-            ),
             if (data.latestGoal != null)
               Text(
                 l10n.statsCurrentGoal(
@@ -643,13 +649,6 @@ class _StatisticsScreenState extends State<StatisticsScreen>
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
-            Align(
-              alignment: Alignment.centerRight,
-              child: YamTextButton(
-                label: l10n.statsEditWeight,
-                onPressed: () => _editWeight(data.weights.last),
-              ),
-            ),
           ],
         ],
       ),
@@ -662,9 +661,26 @@ class _StatisticsScreenState extends State<StatisticsScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            l10n.statsCaloriesChart,
-            style: AppTypography.sectionTitle.copyWith(color: colors.onSurface),
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: AppSpacing.md,
+            runSpacing: AppSpacing.xxs,
+            children: [
+              Text(
+                l10n.statsCaloriesChart,
+                style: AppTypography.sectionTitle.copyWith(
+                  color: colors.onSurface,
+                ),
+              ),
+              if (data.calorieBuckets.any(
+                (bucket) => bucket.calorieTarget != null,
+              ))
+                StatisticsGoalLegend(
+                  color: colors.primary,
+                  label: l10n.statsGoalLegend,
+                ),
+            ],
           ),
           const SizedBox(height: AppSpacing.xs),
           if (data.averageCalories == null)
@@ -699,25 +715,16 @@ class _StatisticsScreenState extends State<StatisticsScreen>
               ),
             const SizedBox(height: AppSpacing.md),
             StatisticsCalorieChart(
+              key: ValueKey('stats-calories-${_period.name}'),
               buckets: data.calorieBuckets,
-              statuses:
-                  _period == StatisticsPeriod.days7 ||
-                      _period == StatisticsPeriod.days30
-                  ? [for (final day in data.days) day.status]
-                  : const [],
-              goal: data.latestGoal?.calorieTarget.toDouble(),
-              barColor: colors.primaryContainer,
+              barColor: colors.brightness == Brightness.light
+                  ? colors.primary
+                  : colors.primaryContainer,
               overColor: AppSemanticColors.of(context).goalAbove,
               goalColor: colors.primary,
               semanticLabel: l10n.statsCaloriesChart,
-            ),
-            const SizedBox(height: AppSpacing.xs),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(_date(data.days.first.nutrition.day)),
-                Text(_date(data.days.last.nutrition.day)),
-              ],
+              dateLabelBuilder: _date,
+              detailsBuilder: _calorieDetails,
             ),
             if (_period == StatisticsPeriod.months3 ||
                 _period == StatisticsPeriod.year1 ||
@@ -795,9 +802,10 @@ class _StatisticsScreenState extends State<StatisticsScreen>
             Text(
               data.goalEvaluatedDays == 0
                   ? l10n.statsNoGoalDays
-                  : l10n.statsInGoalCount(
+                  : l10n.statsGoalDaysSummary(
                       _format(data.withinGoalDays),
                       _format(data.goalEvaluatedDays),
+                      _format(data.withinGoalPercent),
                     ),
               style: AppTypography.label.copyWith(
                 color: colors.onSurfaceVariant,
@@ -815,76 +823,12 @@ class _StatisticsScreenState extends State<StatisticsScreen>
                 ),
               ),
               const SizedBox(height: AppSpacing.xs),
-              Row(
-                children: [
-                  for (var weekday = 1; weekday <= 7; weekday++)
-                    Expanded(
-                      child: Text(
-                        DateFormat.E(
-                          Localizations.localeOf(context).toLanguageTag(),
-                        ).dateSymbols.SHORTWEEKDAYS[weekday % 7],
-                        textAlign: TextAlign.center,
-                        style: AppTypography.caption.copyWith(
-                          color: colors.onSurfaceVariant,
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.xxs),
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  final width = (constraints.maxWidth - AppSpacing.xxs * 6) / 7;
-                  final cells = [
-                    for (var i = 0; i < data.heatmap.first.day.weekday - 1; i++)
-                      const SizedBox.shrink(),
-                    for (final cell in data.heatmap)
-                      Semantics(
-                        label:
-                            '${DateFormat.yMMMMEEEEd(Localizations.localeOf(context).toLanguageTag()).format(cell.day)}, '
-                            '${_statusLabel(cell.status, l10n)}',
-                        child: ExcludeSemantics(
-                          child: Container(
-                            height: math.max(
-                              26,
-                              MediaQuery.textScalerOf(context).scale(16) +
-                                  AppSpacing.sm,
-                            ),
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              color: switch (cell.status) {
-                                GoalDayStatus.within => semantic.goalWithin,
-                                GoalDayStatus.below => semantic.goalBelow,
-                                GoalDayStatus.above => semantic.goalAbove,
-                                _ => colors.surface,
-                              },
-                              borderRadius: BorderRadius.circular(
-                                AppRadius.small,
-                              ),
-                            ),
-                            child: Text(
-                              '${cell.day.day}',
-                              style: AppTypography.caption.copyWith(
-                                color:
-                                    cell.status == GoalDayStatus.within ||
-                                        cell.status == GoalDayStatus.above
-                                    ? colors.onPrimary
-                                    : colors.onSurfaceVariant,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                  ];
-                  return Wrap(
-                    spacing: AppSpacing.xxs,
-                    runSpacing: AppSpacing.xxs,
-                    children: [
-                      for (final cell in cells)
-                        SizedBox(width: width, child: cell),
-                    ],
-                  );
-                },
+              StatisticsRegularityCalendar(
+                key: ValueKey('stats-calendar-${_period.name}'),
+                cells: data.heatmap,
+                detailsBuilder: _regularityDetails,
+                semanticLabelBuilder: (cell) =>
+                    '${_fullDate(cell.day)}, ${_statusLabel(cell.status, l10n)}',
               ),
               const SizedBox(height: AppSpacing.sm),
               Wrap(
@@ -1025,57 +969,6 @@ class _StatsPanel extends StatelessWidget {
       borderRadius: BorderRadius.circular(AppRadius.card),
     ),
     child: Padding(padding: const EdgeInsets.all(AppSpacing.md), child: child),
-  );
-}
-
-class _SummaryMetric extends StatelessWidget {
-  const _SummaryMetric({
-    required this.label,
-    required this.value,
-    required this.unit,
-    required this.hint,
-    required this.hintColor,
-  });
-  final String label;
-  final String value;
-  final String unit;
-  final String? hint;
-  final Color hintColor;
-
-  @override
-  Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(
-        label,
-        style: AppTypography.caption.copyWith(
-          color: Theme.of(context).colorScheme.onSurfaceVariant,
-        ),
-      ),
-      const SizedBox(height: AppSpacing.xxs),
-      Wrap(
-        crossAxisAlignment: WrapCrossAlignment.center,
-        spacing: AppSpacing.xxs,
-        children: [
-          Text(
-            value,
-            style: AppTypography.screenTitle.copyWith(
-              color: Theme.of(context).colorScheme.onSurface,
-              fontFeatures: AppTypography.tabularFigures,
-            ),
-          ),
-          if (unit.isNotEmpty)
-            Text(
-              unit,
-              style: AppTypography.caption.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-            ),
-        ],
-      ),
-      if (hint != null)
-        Text(hint!, style: AppTypography.caption.copyWith(color: hintColor)),
-    ],
   );
 }
 

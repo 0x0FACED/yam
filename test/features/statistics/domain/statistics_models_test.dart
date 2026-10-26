@@ -183,4 +183,336 @@ void main() {
       expect(afterGoal.averageProteinTarget, 150);
     },
   );
+
+  test(
+    'daily inspection separates missing days from logged zero and goals',
+    () {
+      final zero = _nutrition(DateTime(2025, 12, 30), 0);
+      final logged = _nutrition(DateTime(2026, 1, 2), 2400);
+      final firstGoal = _goal('1', DateTime(2025, 12, 30), 1000);
+      final latestSameDayGoal = _goal('3', DateTime(2026, 1, 1), 2000);
+      final snapshot = calculateStatistics(
+        period: StatisticsPeriod.days7,
+        today: DateTime(2026, 1, 4, 20),
+        nutrition: [
+          logged,
+          _nutrition(DateTime(2026, 1, 5), 9000),
+          zero,
+          _nutrition(DateTime(2025, 12, 28), 9000),
+        ],
+        goals: [
+          latestSameDayGoal,
+          _goal('4', DateTime(2026, 1, 5), 9000),
+          firstGoal,
+          _goal('2', DateTime(2026, 1, 1), 4000),
+        ],
+        weightEntries: const [],
+        frequentFoods: const [],
+      );
+
+      final dates = [for (var i = 0; i < 7; i++) DateTime(2025, 12, 29 + i)];
+      expect(snapshot.calorieBuckets.map((bucket) => bucket.day), dates);
+      expect(snapshot.calorieBuckets.map((bucket) => bucket.endDay), dates);
+      expect(snapshot.calorieBuckets.map((bucket) => bucket.value), [
+        null,
+        0,
+        null,
+        null,
+        2400,
+        null,
+        null,
+      ]);
+      expect(snapshot.calorieBuckets.map((bucket) => bucket.days), [
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        0,
+      ]);
+      expect(snapshot.calorieBuckets.map((bucket) => bucket.calorieTarget), [
+        null,
+        1000,
+        1000,
+        2000,
+        2000,
+        2000,
+        2000,
+      ]);
+      expect(snapshot.heatmap.map((cell) => cell.day), dates);
+      expect(snapshot.heatmap.map((cell) => cell.status), [
+        GoalDayStatus.noEntry,
+        GoalDayStatus.below,
+        GoalDayStatus.noEntry,
+        GoalDayStatus.noEntry,
+        GoalDayStatus.above,
+        GoalDayStatus.noEntry,
+        GoalDayStatus.noEntry,
+      ]);
+      expect(snapshot.heatmap.first.nutrition, isNull);
+      expect(snapshot.heatmap.first.goal, isNull);
+      expect(snapshot.heatmap[1].nutrition, same(zero));
+      expect(snapshot.heatmap[1].goal, same(firstGoal));
+      expect(snapshot.heatmap[2].nutrition, isNull);
+      expect(snapshot.heatmap[2].goal, same(firstGoal));
+      expect(snapshot.heatmap[4].nutrition, same(logged));
+      expect(snapshot.heatmap.last.nutrition, isNull);
+      expect(snapshot.heatmap.last.goal, same(latestSameDayGoal));
+      expect(snapshot.latestGoal, same(latestSameDayGoal));
+      expect(snapshot.days.length, 2);
+      expect(snapshot.averageCalories, 1200);
+      expect(snapshot.goalEvaluatedDays, 2);
+      expect(snapshot.withinGoalDays, 0);
+    },
+  );
+
+  test('30-day empty chart retains every date and effective daily targets', () {
+    final snapshot = calculateStatistics(
+      period: StatisticsPeriod.days30,
+      today: DateTime(2024, 3, 1),
+      nutrition: const [],
+      goals: [
+        _goal('2', DateTime(2024, 2, 29), 2500),
+        _goal('1', DateTime(2024, 1, 1), 1000),
+      ],
+      weightEntries: const [],
+      frequentFoods: const [],
+    );
+
+    expect(snapshot.calorieBuckets.length, 30);
+    expect(snapshot.calorieBuckets.first.day, DateTime(2024, 2, 1));
+    expect(snapshot.calorieBuckets.last.day, DateTime(2024, 3, 1));
+    for (var i = 0; i < snapshot.calorieBuckets.length; i++) {
+      final bucket = snapshot.calorieBuckets[i];
+      expect(bucket.day, DateTime(2024, 2, i + 1));
+      expect(bucket.endDay, bucket.day);
+      expect(bucket.value, isNull);
+      expect(bucket.days, 0);
+      expect(bucket.calorieTarget, i < 28 ? 1000 : 2500);
+    }
+    expect(snapshot.days, isEmpty);
+    expect(snapshot.averageCalories, isNull);
+    expect(snapshot.averageProteinTarget, isNull);
+  });
+
+  test('90-day weekly ranges clip boundaries and omit partial goal means', () {
+    final snapshot = calculateStatistics(
+      period: StatisticsPeriod.months3,
+      today: DateTime(2026, 4, 3),
+      nutrition: [
+        _nutrition(DateTime(2026, 4, 4), 9000),
+        _nutrition(DateTime(2026, 1, 14), 4000),
+        _nutrition(DateTime(2026, 1, 5), 400),
+        _nutrition(DateTime(2026, 1, 3), 9000),
+        _nutrition(DateTime(2026, 1, 10), 1800),
+        _nutrition(DateTime(2026, 1, 4), 900),
+        _nutrition(DateTime(2026, 4, 3), 3600),
+        _nutrition(DateTime(2026, 1, 12), 0),
+        _nutrition(DateTime(2026, 1, 7), 1200),
+      ],
+      goals: [
+        _goal('3', DateTime(2026, 1, 13), 3000),
+        _goal('1', DateTime(2026, 1, 6), 1000),
+        _goal('2', DateTime(2026, 1, 10), 2000),
+      ],
+      weightEntries: const [],
+      frequentFoods: const [],
+    );
+
+    final buckets = snapshot.calorieBuckets;
+    expect(buckets.length, 14);
+    expect(
+      (buckets.first.day, buckets.first.endDay),
+      (DateTime(2026, 1, 4), DateTime(2026, 1, 4)),
+    );
+    expect(buckets.first.value, 900);
+    expect(buckets.first.days, 1);
+    expect(buckets.first.calorieTarget, isNull);
+    expect(
+      (buckets[1].day, buckets[1].endDay),
+      (DateTime(2026, 1, 5), DateTime(2026, 1, 11)),
+    );
+    expect(buckets[1].value, closeTo(3400 / 3, 0.000001));
+    expect(buckets[1].days, 3);
+    expect(buckets[1].calorieTarget, isNull);
+    expect(
+      (buckets[2].day, buckets[2].endDay),
+      (DateTime(2026, 1, 12), DateTime(2026, 1, 18)),
+    );
+    expect(buckets[2].value, 2000);
+    expect(buckets[2].days, 2);
+    expect(buckets[2].calorieTarget, 2500);
+    expect(
+      (buckets[3].day, buckets[3].endDay),
+      (DateTime(2026, 1, 19), DateTime(2026, 1, 25)),
+    );
+    expect(buckets[3].value, isNull);
+    expect(buckets[3].days, 0);
+    expect(buckets[3].calorieTarget, isNull);
+    expect(
+      (buckets.last.day, buckets.last.endDay),
+      (DateTime(2026, 3, 30), DateTime(2026, 4, 3)),
+    );
+    expect(buckets.last.value, 3600);
+    expect(buckets.last.days, 1);
+    expect(buckets.last.calorieTarget, 3000);
+    for (var i = 1; i < buckets.length; i++) {
+      final previousEnd = buckets[i - 1].endDay;
+      expect(
+        buckets[i].day,
+        DateTime(previousEnd.year, previousEnd.month, previousEnd.day + 1),
+      );
+    }
+  });
+
+  test('yearly monthly means use logged days and inclusive clipped ranges', () {
+    final snapshot = calculateStatistics(
+      period: StatisticsPeriod.year1,
+      today: DateTime(2026, 2, 14),
+      nutrition: [
+        _nutrition(DateTime(2025, 2, 14), 9000),
+        _nutrition(DateTime(2025, 2, 15), 1000),
+        _nutrition(DateTime(2025, 3, 1), 2000),
+        _nutrition(DateTime(2025, 3, 30), 4000),
+        _nutrition(DateTime(2026, 2, 14), 5000),
+        _nutrition(DateTime(2026, 2, 15), 9000),
+      ],
+      goals: [
+        _goal('1', DateTime(2025, 2, 1), 1000),
+        _goal('2', DateTime(2025, 3, 15), 3000),
+        _goal('3', DateTime(2026, 2, 15), 9000),
+      ],
+      weightEntries: const [],
+      frequentFoods: const [],
+    );
+
+    final buckets = snapshot.calorieBuckets;
+    expect(buckets.length, 13);
+    expect(
+      (buckets.first.day, buckets.first.endDay),
+      (DateTime(2025, 2, 15), DateTime(2025, 2, 28)),
+    );
+    expect(buckets.first.value, 1000);
+    expect(buckets.first.days, 1);
+    expect(buckets.first.calorieTarget, 1000);
+    expect(
+      (buckets[1].day, buckets[1].endDay),
+      (DateTime(2025, 3, 1), DateTime(2025, 3, 31)),
+    );
+    expect(buckets[1].value, 3000);
+    expect(buckets[1].days, 2);
+    expect(buckets[1].calorieTarget, 2000);
+    expect(
+      (buckets[2].day, buckets[2].endDay),
+      (DateTime(2025, 4, 1), DateTime(2025, 4, 30)),
+    );
+    expect(buckets[2].value, isNull);
+    expect(buckets[2].days, 0);
+    expect(buckets[2].calorieTarget, isNull);
+    expect(
+      (buckets.last.day, buckets.last.endDay),
+      (DateTime(2026, 2, 1), DateTime(2026, 2, 14)),
+    );
+    expect(buckets.last.value, 5000);
+    expect(buckets.last.days, 1);
+    expect(buckets.last.calorieTarget, 3000);
+  });
+
+  test('all-period months start at the first real food or weight day', () {
+    final firstDay = DateTime(2025, 11, 23, 15);
+    final laterDay = DateTime(2026, 1, 3);
+    for (final (foodDay, weightDay) in [
+      (firstDay, laterDay),
+      (laterDay, firstDay),
+    ]) {
+      final snapshot = calculateStatistics(
+        period: StatisticsPeriod.all,
+        today: DateTime(2026, 1, 9),
+        nutrition: [
+          _nutrition(foodDay, 1000),
+          _nutrition(DateTime(2026, 1, 10), 9000),
+        ],
+        goals: [_goal('1', DateTime(2020, 1, 1), 1000)],
+        weightEntries: [
+          WeightRecord(id: '1', day: weightDay, kg: 70),
+          WeightRecord(id: '2', day: DateTime(2026, 1, 10), kg: 71),
+        ],
+        frequentFoods: const [],
+      );
+
+      expect(
+        snapshot.calorieBuckets.map((bucket) => (bucket.day, bucket.endDay)),
+        [
+          (DateTime(2025, 11, 23), DateTime(2025, 11, 30)),
+          (DateTime(2025, 12, 1), DateTime(2025, 12, 31)),
+          (DateTime(2026, 1, 1), DateTime(2026, 1, 9)),
+        ],
+      );
+      expect(snapshot.calorieBuckets[1].value, isNull);
+      expect(snapshot.calorieBuckets[1].days, 0);
+      expect(snapshot.calorieBuckets[1].calorieTarget, isNull);
+      final loggedBucket = snapshot.calorieBuckets.singleWhere(
+        (bucket) => bucket.days > 0,
+      );
+      expect(loggedBucket.value, 1000);
+      expect(loggedBucket.days, 1);
+      expect(loggedBucket.calorieTarget, 1000);
+    }
+  });
+
+  test('all-period calendar clips to the earliest real record day', () {
+    final goal = _goal('1', DateTime(2026, 1, 1), 1000);
+    final snapshot = calculateStatistics(
+      period: StatisticsPeriod.all,
+      today: DateTime(2026, 1, 9),
+      nutrition: [_nutrition(DateTime(2026, 1, 8), 1000)],
+      goals: [goal],
+      weightEntries: [WeightRecord(id: '1', day: DateTime(2026, 1, 7), kg: 70)],
+      frequentFoods: const [],
+    );
+
+    expect(snapshot.heatmap.map((cell) => cell.day), [
+      DateTime(2026, 1, 7),
+      DateTime(2026, 1, 8),
+      DateTime(2026, 1, 9),
+    ]);
+    expect(snapshot.heatmap.first.nutrition, isNull);
+    expect(snapshot.heatmap.first.goal, same(goal));
+    expect(snapshot.heatmap[1].nutrition?.kcal, 1000);
+    expect(snapshot.heatmap.last.nutrition, isNull);
+    expect(snapshot.heatmap.last.goal, same(goal));
+  });
+
+  test('all-period goals and future records do not invent history', () {
+    final snapshot = calculateStatistics(
+      period: StatisticsPeriod.all,
+      today: DateTime(2026, 1, 9),
+      nutrition: [_nutrition(DateTime(2026, 1, 10), 1000)],
+      goals: [_goal('1', DateTime(2020, 1, 1), 1000)],
+      weightEntries: [
+        WeightRecord(id: '1', day: DateTime(2026, 1, 10), kg: 70),
+      ],
+      frequentFoods: const [],
+    );
+
+    expect(snapshot.calorieBuckets, isEmpty);
+    expect(snapshot.days, isEmpty);
+    expect(snapshot.weights, isEmpty);
+    expect(snapshot.averageCalories, isNull);
+  });
 }
+
+NutritionDay _nutrition(DateTime day, double kcal) =>
+    NutritionDay(day: day, kcal: kcal, protein: 20, fat: 10, carbs: 30);
+
+GoalVersion _goal(String id, DateTime day, int kcal) => GoalVersion(
+  id: id,
+  day: day,
+  goal: WeightGoal.maintain,
+  calorieTarget: kcal,
+  proteinTarget: 100,
+  fatTarget: 50,
+  carbsTarget: 120,
+  targetWeightKg: 70,
+);

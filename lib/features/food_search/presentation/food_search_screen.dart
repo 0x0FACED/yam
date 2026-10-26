@@ -198,15 +198,12 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
                     },
                     layoutBuilder: (currentChild, previousChildren) =>
                         currentChild ?? const SizedBox.shrink(),
-                    child: ScrollConfiguration(
-                      behavior: const MaterialScrollBehavior(),
-                      child: CustomScrollView(
-                        key: ValueKey(_contentKey),
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        keyboardDismissBehavior:
-                            ScrollViewKeyboardDismissBehavior.onDrag,
-                        slivers: _buildContentSlivers(l10n),
-                      ),
+                    child: CustomScrollView(
+                      key: ValueKey(_contentKey),
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      keyboardDismissBehavior:
+                          ScrollViewKeyboardDismissBehavior.onDrag,
+                      slivers: _buildContentSlivers(l10n),
                     ),
                   ),
                 ),

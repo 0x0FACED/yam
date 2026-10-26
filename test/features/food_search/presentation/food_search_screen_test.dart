@@ -5,7 +5,6 @@ import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yam/app/router.dart';
-import 'package:yam/app/theme/app_scroll_behavior.dart';
 import 'package:yam/app/theme/app_theme.dart';
 import 'package:yam/core/ui/feedback/yam_snack_bar.dart';
 import 'package:yam/core/ui/food/yam_quantity_control.dart';
@@ -727,7 +726,6 @@ class _RouterTestApp extends StatelessWidget {
       routerConfig: router,
       locale: locale,
       theme: AppTheme.light,
-      scrollBehavior: const AppScrollBehavior(),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
     );
@@ -747,7 +745,6 @@ class _ScreenTestApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: AppTheme.light,
-      scrollBehavior: const AppScrollBehavior(),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       builder: (context, child) {
