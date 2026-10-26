@@ -175,6 +175,7 @@ void main() {
         const CustomFoodDraft(
           name: 'Homemade bar',
           brand: 'Old brand',
+          description: 'Original recipe\nRest overnight.',
           category: 'other',
           basis: CustomFoodBasis.grams,
           basisAmount: 80,
@@ -206,6 +207,7 @@ void main() {
           canonicalQuantity: 80,
         ),
       );
+      final storedSnapshot = await db.select(db.diaryEntries).getSingle();
 
       expect(
         await catalog.update(
@@ -213,6 +215,7 @@ void main() {
           CustomFoodDraft(
             name: 'Updated bar',
             brand: 'New brand',
+            description: 'Changed recipe\nBake for 20 minutes.',
             category: 'other',
             basis: CustomFoodBasis.grams,
             basisAmount: 90,
@@ -232,6 +235,7 @@ void main() {
         ),
         isTrue,
       );
+      expect(await db.select(db.diaryEntries).getSingle(), storedSnapshot);
       final updatedSaved = (await catalog.loadFoods()).single;
       final newEntryId = await diary.create(
         DiaryEntryDraft(

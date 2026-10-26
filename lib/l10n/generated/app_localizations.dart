@@ -788,6 +788,36 @@ abstract class AppLocalizations {
   /// **'Category'**
   String get createProductCategory;
 
+  /// No description provided for @createProductCategoryHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter or choose a category'**
+  String get createProductCategoryHint;
+
+  /// No description provided for @createProductCategoryRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a category'**
+  String get createProductCategoryRequired;
+
+  /// No description provided for @createProductDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Description (optional)'**
+  String get createProductDescription;
+
+  /// No description provided for @createProductDescriptionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Ingredients, preparation steps, or other notes'**
+  String get createProductDescriptionHint;
+
+  /// No description provided for @foodDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get foodDescription;
+
   /// No description provided for @createProductNutritionBasis.
   ///
   /// In en, this message translates to:

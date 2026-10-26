@@ -65,7 +65,7 @@ Uint8List _encodeBackup(_BackupData data) {
 
   addJson('manifest.json', {
     'format': 'yam-backup',
-    'formatVersion': 1,
+    'formatVersion': 2,
     'exportedAt': data.exportedAt.toUtc().toIso8601String(),
     'sourceDeviceId': data.sourceDeviceId,
     'counts': {
@@ -91,10 +91,10 @@ _BackupData _decodeBackup(Uint8List bytes) {
     _require(manifest['format'] == 'yam-backup');
     final version = manifest['formatVersion'];
     _require(version is int && version > 0);
-    if (version != 1) {
+    if (version != 1 && version != 2) {
       throw const BackupException(BackupFailure.unsupportedVersion);
     }
-    _keys(manifest, {
+    _requireKeys(manifest, {
       'format',
       'formatVersion',
       'exportedAt',
@@ -105,7 +105,7 @@ _BackupData _decodeBackup(Uint8List bytes) {
     final sourceDeviceId = manifest['sourceDeviceId'];
     _require(sourceDeviceId is String && _uuid.hasMatch(sourceDeviceId));
     final counts = _object(manifest['counts']);
-    _keys(counts, _tableFiles.keys.toSet());
+    _requireKeys(counts, _tableFiles.keys.toSet());
     final tables = <String, List<Map<String, dynamic>>>{};
     var totalRows = 0;
     for (final entry in _tableFiles.entries) {
@@ -192,6 +192,7 @@ const _schemas = {
   'userFoods': {
     ..._catalog,
     'barcode': _Value.optionalText,
+    'description': _Value.optionalText,
     'displayBasis': _Value.text,
   },
   'userServings': {
@@ -328,7 +329,7 @@ void _validateTables(Map<String, List<Map<String, dynamic>>> tables) {
 }
 
 void _validateFields(Map<String, dynamic> row, Map<String, _Value> schema) {
-  _keys(row, schema.keys.toSet());
+  // Missing nullable fields default to null; all other validators reject null.
   for (final entry in schema.entries) {
     final value = row[entry.key];
     switch (entry.value) {
@@ -437,9 +438,8 @@ Map<String, dynamic> _object(dynamic value) {
   return value as Map<String, dynamic>;
 }
 
-void _keys(Map<String, dynamic> value, Set<String> expected) => _require(
-  value.length == expected.length && value.keys.every(expected.contains),
-);
+void _requireKeys(Map<String, dynamic> value, Set<String> expected) =>
+    _require(expected.every(value.containsKey));
 
 void _require(bool condition) {
   if (!condition) throw const BackupException(BackupFailure.invalidFile);
@@ -467,7 +467,7 @@ class _ZipMember {
   final int method;
 }
 
-// Parse only the bounded v1 envelope. Do not call ZipDecoder.readBytes: its
+// Parse only the bounded archive envelope. Do not call ZipDecoder.readBytes: its
 // default inflater trusts member sizes and can allocate an unbounded ZIP bomb.
 // No names are ever used as filesystem paths; only these seven members exist.
 Map<String, Uint8List> _readZipMembers(Uint8List bytes) {

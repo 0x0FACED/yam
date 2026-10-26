@@ -405,6 +405,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get createProductCategory => 'Category';
 
   @override
+  String get createProductCategoryHint => 'Enter or choose a category';
+
+  @override
+  String get createProductCategoryRequired => 'Enter a category';
+
+  @override
+  String get createProductDescription => 'Description (optional)';
+
+  @override
+  String get createProductDescriptionHint =>
+      'Ingredients, preparation steps, or other notes';
+
+  @override
+  String get foodDescription => 'Description';
+
+  @override
   String get createProductNutritionBasis => 'Nutrition values for';
 
   @override

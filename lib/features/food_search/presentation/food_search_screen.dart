@@ -249,12 +249,7 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
           showRemoteAttribution: _recentHasRemoteFood,
         );
       case _FoodSearchTab.myDishes:
-        return _buildSingleTabSlivers(
-          l10n.foodSearchMyDishes,
-          _myDishes,
-          l10n,
-          allowDelete: true,
-        );
+        return _buildSingleTabSlivers(l10n.foodSearchMyDishes, _myDishes, l10n);
       case _FoodSearchTab.favorites:
         return _buildSingleTabSlivers(
           l10n.foodSearchFavorites,
@@ -269,7 +264,6 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
     String title,
     List<FoodSearchPrototypeFood> foods,
     AppLocalizations l10n, {
-    bool allowDelete = false,
     bool showRemoteAttribution = false,
   }) {
     if (foods.isEmpty) {
@@ -285,7 +279,7 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
       ];
     }
     return [
-      ..._buildSection(title, foods, allowDelete: allowDelete),
+      ..._buildSection(title, foods),
       if (showRemoteAttribution)
         SliverToBoxAdapter(child: _buildRemoteAttribution(l10n)),
       const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xl)),
@@ -463,9 +457,8 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
 
   List<Widget> _buildSection(
     String title,
-    List<FoodSearchPrototypeFood> foods, {
-    bool allowDelete = false,
-  }) {
+    List<FoodSearchPrototypeFood> foods,
+  ) {
     if (foods.isEmpty) {
       return const [];
     }
@@ -473,18 +466,13 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
       SliverToBoxAdapter(child: _SectionHeader(title: title)),
       SliverList.builder(
         itemCount: foods.length,
-        itemBuilder: (context, index) =>
-            _buildFoodRow(foods[index], allowDelete: allowDelete),
+        itemBuilder: (context, index) => _buildFoodRow(foods[index]),
       ),
     ];
   }
 
-  Widget _buildFoodRow(
-    FoodSearchPrototypeFood food, {
-    bool allowDelete = false,
-  }) {
+  Widget _buildFoodRow(FoodSearchPrototypeFood food) {
     final editable =
-        allowDelete &&
         food.source == FoodSearchPrototypeSource.userCreated &&
         widget.userFoodRepository != null;
     return FoodSearchResultRow(
@@ -844,12 +832,9 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
     if (updated == null) return;
     setState(() {
       _savedFoods = saved;
-      _searchController.clear();
       _searchFocusNode.unfocus();
-      _selectedTab = _FoodSearchTab.myDishes;
       _refreshFoods();
     });
-    _scheduleRemote();
     showYamSuccessSnackBar(
       context: context,
       message: AppLocalizations.of(

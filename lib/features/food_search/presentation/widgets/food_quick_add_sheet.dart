@@ -136,195 +136,234 @@ class _FoodQuickAddSheetState extends State<_FoodQuickAddSheet> {
         padding: EdgeInsets.only(
           bottom: MediaQuery.viewInsetsOf(context).bottom,
         ),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.md,
-            0,
-            AppSpacing.md,
-            AppSpacing.lg,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Column(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Flexible(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.md,
+                  0,
+                  AppSpacing.md,
+                  AppSpacing.md,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        YamDropdown<String>(
-                          value: _mealId,
-                          options: [
-                            for (final meal in meals)
-                              YamDropdownOption(
-                                key: ValueKey('quick-add-meal-${meal.id}'),
-                                value: meal.id,
-                                label: meal.name,
-                                icon: meal.icon,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              YamDropdown<String>(
+                                value: _mealId,
+                                options: [
+                                  for (final meal in meals)
+                                    YamDropdownOption(
+                                      key: ValueKey(
+                                        'quick-add-meal-${meal.id}',
+                                      ),
+                                      value: meal.id,
+                                      label: meal.name,
+                                      icon: meal.icon,
+                                    ),
+                                ],
+                                onSelected: (mealId) =>
+                                    setState(() => _mealId = mealId),
+                                triggerBuilder:
+                                    (context, toggle, focusNode, isOpen) =>
+                                        YamMealChip(
+                                          key: const ValueKey('quick-add-meal'),
+                                          icon:
+                                              selectedMeal?.icon ??
+                                              Icons.restaurant_menu_rounded,
+                                          label: selectedMeal == null
+                                              ? l10n.foodSearchChooseMeal
+                                              : l10n.quickAddSelectedMeal(
+                                                  selectedMeal.name,
+                                                ),
+                                          active: selectedMeal != null,
+                                          maxWidth: 280,
+                                          focusNode: focusNode,
+                                          focused: focusNode.hasFocus || isOpen,
+                                          onPressed: toggle,
+                                        ),
                               ),
-                          ],
-                          onSelected: (mealId) =>
-                              setState(() => _mealId = mealId),
-                          triggerBuilder:
-                              (context, toggle, focusNode, isOpen) =>
-                                  YamMealChip(
-                                    key: const ValueKey('quick-add-meal'),
-                                    icon:
-                                        selectedMeal?.icon ??
-                                        Icons.restaurant_menu_rounded,
-                                    label: selectedMeal == null
-                                        ? l10n.foodSearchChooseMeal
-                                        : l10n.quickAddSelectedMeal(
-                                            selectedMeal.name,
-                                          ),
-                                    active: selectedMeal != null,
-                                    maxWidth: 280,
-                                    focusNode: focusNode,
-                                    focused: focusNode.hasFocus || isOpen,
-                                    onPressed: toggle,
+                              if (_attemptedSubmit && selectedMeal == null) ...[
+                                const SizedBox(height: AppSpacing.xxs),
+                                Semantics(
+                                  liveRegion: true,
+                                  child: Text(
+                                    l10n.foodSearchMealRequired,
+                                    style: AppTypography.caption.copyWith(
+                                      color: theme.colorScheme.error,
+                                    ),
                                   ),
-                        ),
-                        if (_attemptedSubmit && selectedMeal == null) ...[
-                          const SizedBox(height: AppSpacing.xxs),
-                          Semantics(
-                            liveRegion: true,
-                            child: Text(
-                              l10n.foodSearchMealRequired,
-                              style: AppTypography.caption.copyWith(
-                                color: theme.colorScheme.error,
+                                ),
+                              ],
+                              const SizedBox(height: AppSpacing.sm),
+                              Text(
+                                widget.food.name,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: AppTypography.screenTitle.copyWith(
+                                  color: theme.colorScheme.onSurface,
+                                ),
                               ),
-                            ),
-                          ),
-                        ],
-                        const SizedBox(height: AppSpacing.sm),
-                        Text(
-                          widget.food.name,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: AppTypography.screenTitle.copyWith(
-                            color: theme.colorScheme.onSurface,
+                              const SizedBox(height: AppSpacing.xxs),
+                              Text(
+                                '$metadataLabel · $referenceCalories',
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: AppTypography.caption.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(height: AppSpacing.xxs),
-                        Text(
-                          '$metadataLabel · $referenceCalories',
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: AppTypography.caption.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
+                        const SizedBox(width: AppSpacing.xs),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            YamIconButton(
+                              key: const ValueKey('quick-add-favorite'),
+                              icon: _favorite
+                                  ? Icons.star_rounded
+                                  : Icons.star_border_rounded,
+                              tooltip: _favorite
+                                  ? l10n.quickAddFavoriteRemove
+                                  : l10n.quickAddFavoriteAdd,
+                              selected: _favorite,
+                              onPressed: _toggleFavorite,
+                              iconSize: 18,
+                              visualSize: 32,
+                              visualBorderRadius: AppRadius.small,
+                            ),
+                            YamIconButton(
+                              key: const ValueKey('quick-add-close'),
+                              icon: Icons.close_rounded,
+                              tooltip: l10n.quickAddClose,
+                              onPressed: () => Navigator.of(context).pop(),
+                              iconSize: 17,
+                              visualSize: 32,
+                              visualBorderRadius: AppRadius.small,
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ),
-                  const SizedBox(width: AppSpacing.xs),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      YamIconButton(
-                        key: const ValueKey('quick-add-favorite'),
-                        icon: _favorite
-                            ? Icons.star_rounded
-                            : Icons.star_border_rounded,
-                        tooltip: _favorite
-                            ? l10n.quickAddFavoriteRemove
-                            : l10n.quickAddFavoriteAdd,
-                        selected: _favorite,
-                        onPressed: _toggleFavorite,
-                        iconSize: 18,
-                        visualSize: 32,
-                        visualBorderRadius: AppRadius.small,
-                      ),
-                      YamIconButton(
-                        key: const ValueKey('quick-add-close'),
-                        icon: Icons.close_rounded,
-                        tooltip: l10n.quickAddClose,
-                        onPressed: () => Navigator.of(context).pop(),
-                        iconSize: 17,
-                        visualSize: 32,
-                        visualBorderRadius: AppRadius.small,
+                    if (_favoriteError != null) ...[
+                      const SizedBox(height: AppSpacing.xxs),
+                      Text(
+                        _favoriteError!,
+                        style: AppTypography.caption.copyWith(
+                          color: theme.colorScheme.error,
+                        ),
                       ),
                     ],
-                  ),
-                ],
-              ),
-              if (_favoriteError != null) ...[
-                const SizedBox(height: AppSpacing.xxs),
-                Text(
-                  _favoriteError!,
-                  style: AppTypography.caption.copyWith(
-                    color: theme.colorScheme.error,
-                  ),
-                ),
-              ],
-              const SizedBox(height: AppSpacing.md),
-              YamQuantityControl(
-                amountFieldKey: const ValueKey('quick-add-quantity'),
-                unitKey: ValueKey('quick-add-unit-${_serving.id}'),
-                controller: _amountController,
-                unitLabels: [
-                  for (final serving in widget.food.servings)
-                    foodSearchServingUnitLabel(l10n, serving),
-                ],
-                selectedUnitIndex: widget.food.servings.indexOf(_serving),
-                amountSemanticLabel: l10n.quickAddQuantity,
-                unitTooltip: l10n.quickAddUnit,
-                decreaseTooltip: l10n.quickAddDecrease,
-                increaseTooltip: l10n.quickAddIncrease,
-                errorText: _attemptedSubmit && !validAmount
-                    ? l10n.quickAddAmountInvalid
-                    : null,
-                onAmountChanged: _onAmountChanged,
-                onUnitSelected: _selectServing,
-                onDecrease: () => _changeAmount(-1),
-                onIncrease: () => _changeAmount(1),
-              ),
-              if (unitEquivalent != null) ...[
-                const SizedBox(height: AppSpacing.xxs),
-                Text(
-                  unitEquivalent,
-                  style: AppTypography.caption.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-              const SizedBox(height: AppSpacing.sm),
-              YamQuickAmountPresets(
-                title: l10n.quickAddQuickSelect,
-                usualAmountLabel: widget.food.hasUsualAmount
-                    ? l10n.quickAddUsualAmount(
-                        formatFoodSearchServingQuantity(
-                          context,
-                          widget.food.lastServing,
-                          widget.food.lastAmount,
+                    const SizedBox(height: AppSpacing.md),
+                    YamQuantityControl(
+                      amountFieldKey: const ValueKey('quick-add-quantity'),
+                      unitKey: ValueKey('quick-add-unit-${_serving.id}'),
+                      controller: _amountController,
+                      unitLabels: [
+                        for (final serving in widget.food.servings)
+                          foodSearchServingUnitLabel(l10n, serving),
+                      ],
+                      selectedUnitIndex: widget.food.servings.indexOf(_serving),
+                      amountSemanticLabel: l10n.quickAddQuantity,
+                      unitTooltip: l10n.quickAddUnit,
+                      decreaseTooltip: l10n.quickAddDecrease,
+                      increaseTooltip: l10n.quickAddIncrease,
+                      errorText: _attemptedSubmit && !validAmount
+                          ? l10n.quickAddAmountInvalid
+                          : null,
+                      onAmountChanged: _onAmountChanged,
+                      onUnitSelected: _selectServing,
+                      onDecrease: () => _changeAmount(-1),
+                      onIncrease: () => _changeAmount(1),
+                    ),
+                    if (unitEquivalent != null) ...[
+                      const SizedBox(height: AppSpacing.xxs),
+                      Text(
+                        unitEquivalent,
+                        style: AppTypography.caption.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
                         ),
-                      )
-                    : null,
-                labels: [
-                  for (final preset in _serving.presets)
-                    formatFoodSearchServingQuantity(context, _serving, preset),
-                ],
-                selectedIndex: selectedPresetIndex,
-                onSelected: (index) => _setAmount(_serving.presets[index]),
+                      ),
+                    ],
+                    const SizedBox(height: AppSpacing.sm),
+                    YamQuickAmountPresets(
+                      title: l10n.quickAddQuickSelect,
+                      usualAmountLabel: widget.food.hasUsualAmount
+                          ? l10n.quickAddUsualAmount(
+                              formatFoodSearchServingQuantity(
+                                context,
+                                widget.food.lastServing,
+                                widget.food.lastAmount,
+                              ),
+                            )
+                          : null,
+                      labels: [
+                        for (final preset in _serving.presets)
+                          formatFoodSearchServingQuantity(
+                            context,
+                            _serving,
+                            preset,
+                          ),
+                      ],
+                      selectedIndex: selectedPresetIndex,
+                      onSelected: (index) =>
+                          _setAmount(_serving.presets[index]),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    YamNutritionSummary(
+                      calorieValue: calorieValue,
+                      calorieUnit: l10n.unitKilocalories,
+                      proteinLabel: l10n.macroProteinShort,
+                      proteinValue:
+                          '${formatFoodSearchNumber(context, nutrition.protein)} ${l10n.unitGrams}',
+                      fatLabel: l10n.macroFatShort,
+                      fatValue:
+                          '${formatFoodSearchNumber(context, nutrition.fat)} ${l10n.unitGrams}',
+                      carbsLabel: l10n.macroCarbsShort,
+                      carbsValue:
+                          '${formatFoodSearchNumber(context, nutrition.carbs)} ${l10n.unitGrams}',
+                    ),
+                    if (widget.food.description case final description?
+                        when description.trim().isNotEmpty) ...[
+                      const SizedBox(height: AppSpacing.md),
+                      Text(
+                        l10n.foodDescription,
+                        style: AppTypography.label.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.xs),
+                      SelectableText(
+                        description,
+                        key: const ValueKey('quick-add-description'),
+                        style: AppTypography.body.copyWith(
+                          color: theme.colorScheme.onSurface,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
               ),
-              const SizedBox(height: AppSpacing.md),
-              YamNutritionSummary(
-                calorieValue: calorieValue,
-                calorieUnit: l10n.unitKilocalories,
-                proteinLabel: l10n.macroProteinShort,
-                proteinValue:
-                    '${formatFoodSearchNumber(context, nutrition.protein)} ${l10n.unitGrams}',
-                fatLabel: l10n.macroFatShort,
-                fatValue:
-                    '${formatFoodSearchNumber(context, nutrition.fat)} ${l10n.unitGrams}',
-                carbsLabel: l10n.macroCarbsShort,
-                carbsValue:
-                    '${formatFoodSearchNumber(context, nutrition.carbs)} ${l10n.unitGrams}',
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.md,
+                AppSpacing.xs,
+                AppSpacing.md,
+                AppSpacing.lg,
               ),
-              const SizedBox(height: AppSpacing.md),
-              YamPrimaryButton(
+              child: YamPrimaryButton(
                 key: const ValueKey('quick-add-submit'),
                 label: selectedMeal == null
                     ? l10n.quickAddAdd
@@ -332,8 +371,8 @@ class _FoodQuickAddSheetState extends State<_FoodQuickAddSheet> {
                 onPressed: _submit,
                 expanded: true,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

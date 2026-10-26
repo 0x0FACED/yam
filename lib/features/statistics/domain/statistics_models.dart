@@ -80,6 +80,57 @@ class FrequentFood {
 
 enum GoalDayStatus { below, within, above, noGoal, noEntry }
 
+GoalDayStatus calorieGoalDayStatus({
+  required double? kcal,
+  required int? calorieTarget,
+}) {
+  if (kcal == null) return GoalDayStatus.noEntry;
+  if (calorieTarget == null) return GoalDayStatus.noGoal;
+  final ratio = kcal / calorieTarget;
+  return ratio < 0.9
+      ? GoalDayStatus.below
+      : ratio > 1.1
+      ? GoalDayStatus.above
+      : GoalDayStatus.within;
+}
+
+Map<DateTime, GoalDayStatus> calculateGoalDayStatuses({
+  required DateTime start,
+  required DateTime end,
+  required List<NutritionDay> nutrition,
+  required List<GoalVersion> goals,
+}) {
+  final sortedGoals = [...goals]..sort(_compareGoals);
+  final caloriesByDay = {
+    for (final day in nutrition) diaryDayKey(day.day): day.kcal,
+  };
+  final statuses = <DateTime, GoalDayStatus>{};
+  var goalIndex = 0;
+  GoalVersion? activeGoal;
+  final lastDay = DateTime(end.year, end.month, end.day);
+  for (
+    var day = DateTime(start.year, start.month, start.day);
+    !day.isAfter(lastDay);
+    day = DateTime(day.year, day.month, day.day + 1)
+  ) {
+    final key = diaryDayKey(day);
+    while (goalIndex < sortedGoals.length &&
+        diaryDayKey(sortedGoals[goalIndex].day).compareTo(key) <= 0) {
+      activeGoal = sortedGoals[goalIndex++];
+    }
+    statuses[day] = calorieGoalDayStatus(
+      kcal: caloriesByDay[key],
+      calorieTarget: activeGoal?.calorieTarget,
+    );
+  }
+  return statuses;
+}
+
+int _compareGoals(GoalVersion a, GoalVersion b) {
+  final byDay = diaryDayKey(a.day).compareTo(diaryDayKey(b.day));
+  return byDay != 0 ? byDay : a.id.compareTo(b.id);
+}
+
 class TrackedDay {
   const TrackedDay({required this.nutrition, required this.status});
   final NutritionDay nutrition;
@@ -179,11 +230,7 @@ StatisticsSnapshot calculateStatistics({
         (start == null || key.compareTo(diaryDayKey(start)) >= 0);
   }
 
-  final sortedGoals = [...goals]
-    ..sort((a, b) {
-      final byDay = diaryDayKey(a.day).compareTo(diaryDayKey(b.day));
-      return byDay != 0 ? byDay : a.id.compareTo(b.id);
-    });
+  final sortedGoals = [...goals]..sort(_compareGoals);
   final sortedNutrition = [...nutrition.where((day) => inRange(day.day))]
     ..sort((a, b) => a.day.compareTo(b.day));
   final sortedWeights = [...weightEntries.where((entry) => inRange(entry.day))]
@@ -224,16 +271,11 @@ StatisticsSnapshot calculateStatistics({
             0) {
       activeGoal = sortedGoals[goalIndex++];
     }
-    GoalDayStatus status;
-    if (activeGoal == null) {
-      status = GoalDayStatus.noGoal;
-    } else {
-      final ratio = day.kcal / activeGoal.calorieTarget;
-      status = ratio < 0.9
-          ? GoalDayStatus.below
-          : ratio > 1.1
-          ? GoalDayStatus.above
-          : GoalDayStatus.within;
+    final status = calorieGoalDayStatus(
+      kcal: day.kcal,
+      calorieTarget: activeGoal?.calorieTarget,
+    );
+    if (activeGoal != null) {
       evaluated++;
       if (status == GoalDayStatus.within) within++;
       targetProtein += activeGoal.proteinTarget;

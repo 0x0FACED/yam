@@ -12,6 +12,7 @@ class UserFoods extends Table {
   TextColumn get name => text()();
   TextColumn get category => text()();
   TextColumn get brand => text().nullable()();
+  TextColumn get description => text().nullable()();
   TextColumn get barcode => text().nullable().unique()();
   TextColumn get basisUnit => text()();
   RealColumn get basisAmount => real()();
@@ -184,7 +185,7 @@ class YamDatabase extends _$YamDatabase {
     : super(LazyDatabase(() async => driftDatabase(name: 'yam')));
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -222,6 +223,9 @@ class YamDatabase extends _$YamDatabase {
           'CREATE INDEX remote_foods_favorites ON remote_foods '
           '(is_favorite, deleted_at)',
         );
+      }
+      if (from < 5) {
+        await migrator.addColumn(userFoods, userFoods.description);
       }
     },
     beforeOpen: (details) async {

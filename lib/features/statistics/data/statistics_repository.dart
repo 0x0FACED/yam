@@ -37,8 +37,17 @@ class StatisticsRepository {
   Stream<List<NutritionDay>> watchNutrition({
     required DateTime today,
     required StatisticsPeriod period,
+  }) => _watchNutritionRange(start: period.start(today), end: today);
+
+  Stream<List<NutritionDay>> watchNutritionRange({
+    required DateTime start,
+    required DateTime end,
+  }) => _watchNutritionRange(start: start, end: end);
+
+  Stream<List<NutritionDay>> _watchNutritionRange({
+    required DateTime? start,
+    required DateTime end,
   }) {
-    final start = period.start(today);
     return database
         .customSelect(
           'SELECT diary_day, SUM(energy_kcal) AS kcal, '
@@ -48,7 +57,7 @@ class StatisticsRepository {
           '${start == null ? '' : 'AND diary_day >= ? '}'
           'GROUP BY diary_day ORDER BY diary_day',
           variables: [
-            Variable.withString(diaryDayKey(today)),
+            Variable.withString(diaryDayKey(end)),
             if (start != null) Variable.withString(diaryDayKey(start)),
           ],
           readsFrom: {database.diaryEntries},

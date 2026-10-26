@@ -16,6 +16,8 @@ class YamTextField extends StatelessWidget {
     this.onSubmitted,
     this.focusNode,
     this.fieldKey,
+    this.minLines,
+    this.maxLines = 1,
     super.key,
   });
 
@@ -29,6 +31,8 @@ class YamTextField extends StatelessWidget {
   final ValueChanged<String>? onSubmitted;
   final FocusNode? focusNode;
   final Key? fieldKey;
+  final int? minLines;
+  final int? maxLines;
 
   @override
   Widget build(BuildContext context) {
@@ -47,6 +51,8 @@ class YamTextField extends StatelessWidget {
           focusNode: focusNode,
           keyboardType: keyboardType,
           inputFormatters: inputFormatters,
+          minLines: minLines,
+          maxLines: maxLines,
           onChanged: onChanged,
           onSubmitted: onSubmitted,
           style: AppTypography.productTitle.copyWith(color: colors.onSurface),

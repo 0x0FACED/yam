@@ -19,14 +19,23 @@ import 'package:yam/features/diary/presentation/widgets/diary_day_selector.dart'
 import 'package:yam/features/diary/presentation/widgets/meal_section.dart';
 import 'package:yam/features/food_search/presentation/food_search_prototype_data.dart';
 import 'package:yam/features/food_search/presentation/food_search_format.dart';
+import 'package:yam/features/statistics/data/statistics_repository.dart';
+import 'package:yam/features/statistics/domain/statistics_models.dart';
 import 'package:yam/l10n/generated/app_localizations.dart';
 
 class DiaryScreen extends StatefulWidget {
-  const DiaryScreen({this.today, this.profile, this.repository, super.key});
+  const DiaryScreen({
+    this.today,
+    this.profile,
+    this.repository,
+    this.statisticsRepository,
+    super.key,
+  });
 
   final DateTime? today;
   final SessionProfile? profile;
   final DiaryRepository? repository;
+  final StatisticsRepository? statisticsRepository;
 
   @override
   State<DiaryScreen> createState() => _DiaryScreenState();
@@ -38,6 +47,16 @@ class _DiaryScreenState extends State<DiaryScreen> {
   Map<String, List<DiaryPrototypeEntry>> _displayEntriesByMeal = const {};
   Locale? _displayLocale;
   StreamSubscription<List<DiaryEntry>>? _daySubscription;
+  StreamSubscription<List<GoalVersion>>? _goalsSubscription;
+  StreamSubscription<List<NutritionDay>>? _weekSubscription;
+  List<GoalVersion> _goals = const [];
+  List<NutritionDay> _weekNutrition = const [];
+  Map<DateTime, GoalDayStatus> _weekStatuses = const {};
+  late DateTime _visibleWeekStart;
+  bool _goalsReady = false;
+  bool _weekNutritionReady = false;
+  int _goalsEpoch = 0;
+  int _weekEpoch = 0;
   final Set<String> _favoriteOverrides = {};
 
   late final DateTime _today;
@@ -53,12 +72,16 @@ class _DiaryScreenState extends State<DiaryScreen> {
     _today = DateTime(now.year, now.month, now.day);
     _selectedDay = _today;
     _watchSelectedDay();
+    _watchCalendarGoals();
   }
 
   @override
   void didUpdateWidget(DiaryScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.repository != widget.repository) _watchSelectedDay();
+    if (oldWidget.statisticsRepository != widget.statisticsRepository) {
+      _watchCalendarGoals();
+    }
   }
 
   @override
@@ -86,10 +109,72 @@ class _DiaryScreenState extends State<DiaryScreen> {
     });
   }
 
+  DateTime _weekStartFor(DateTime day) =>
+      DateTime(day.year, day.month, day.day - day.weekday + DateTime.monday);
+
+  void _watchCalendarGoals() {
+    _goalsSubscription?.cancel();
+    final epoch = ++_goalsEpoch;
+    _goals = const [];
+    final repository = widget.statisticsRepository;
+    _goalsReady = repository == null;
+    _goalsSubscription = repository?.watchGoals().listen((goals) {
+      if (!mounted || epoch != _goalsEpoch) return;
+      _goals = goals;
+      _goalsReady = true;
+      _recalculateWeek();
+    });
+    _watchVisibleWeek();
+  }
+
+  void _watchVisibleWeek() {
+    _weekSubscription?.cancel();
+    final epoch = ++_weekEpoch;
+    _visibleWeekStart = _weekStartFor(_selectedDay);
+    _weekNutrition = const [];
+    _weekStatuses = const {};
+    final repository = widget.statisticsRepository;
+    _weekNutritionReady = repository == null;
+    if (repository == null) return;
+    _weekSubscription = repository
+        .watchNutritionRange(
+          start: _visibleWeekStart,
+          end: DateTime(
+            _visibleWeekStart.year,
+            _visibleWeekStart.month,
+            _visibleWeekStart.day + DateTime.daysPerWeek - 1,
+          ),
+        )
+        .listen((nutrition) {
+          if (!mounted || epoch != _weekEpoch) return;
+          _weekNutrition = nutrition;
+          _weekNutritionReady = true;
+          _recalculateWeek();
+        });
+  }
+
+  void _recalculateWeek() {
+    if (!_goalsReady || !_weekNutritionReady) return;
+    setState(() {
+      _weekStatuses = calculateGoalDayStatuses(
+        start: _visibleWeekStart,
+        end: DateTime(
+          _visibleWeekStart.year,
+          _visibleWeekStart.month,
+          _visibleWeekStart.day + DateTime.daysPerWeek - 1,
+        ),
+        nutrition: _weekNutrition,
+        goals: _goals,
+      );
+    });
+  }
+
   @override
   void dispose() {
     _highlightTimer?.cancel();
     _daySubscription?.cancel();
+    _goalsSubscription?.cancel();
+    _weekSubscription?.cancel();
     _scrollController.dispose();
     super.dispose();
   }
@@ -354,6 +439,7 @@ class _DiaryScreenState extends State<DiaryScreen> {
         child: DiaryDaySelector(
           selectedDay: _selectedDay,
           today: _today,
+          dayStatuses: _weekStatuses,
           onDaySelected: _selectDay,
           onCalendarPressed: _openCalendar,
         ),
@@ -364,6 +450,9 @@ class _DiaryScreenState extends State<DiaryScreen> {
   void _selectDay(DateTime day) {
     setState(() => _selectedDay = DateTime(day.year, day.month, day.day));
     _watchSelectedDay();
+    if (_visibleWeekStart != _weekStartFor(_selectedDay)) {
+      _watchVisibleWeek();
+    }
   }
 
   void _returnToToday() {

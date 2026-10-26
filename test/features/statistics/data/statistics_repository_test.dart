@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:drift/native.dart';
@@ -10,6 +11,99 @@ import 'package:yam/features/statistics/data/statistics_repository.dart';
 import 'package:yam/features/statistics/domain/statistics_models.dart';
 
 void main() {
+  test(
+    'calendar range reacts to exact snapshot totals and Undo across years',
+    () async {
+      final database = YamDatabase(NativeDatabase.memory());
+      addTearDown(database.close);
+      final diary = DiaryRepository(database);
+      final statistics = StatisticsRepository(database);
+      final start = DateTime(2020, 12, 28);
+      final end = DateTime(2021, 1, 3);
+      Future<String> add(DateTime day, double amount) => diary.create(
+        DiaryEntryDraft(
+          day: day,
+          mealId: 'breakfast',
+          food: const DiaryFoodSnapshot(
+            foodId: 'calendar-food',
+            name: 'Calendar food',
+            baseUnit: DiaryBaseUnit.grams,
+            basisAmount: 1,
+            nutritionPerBasis: DiaryNutrition(
+              kcal: 1,
+              protein: 0,
+              fat: 0,
+              carbs: 0,
+            ),
+            servings: [
+              DiaryServingSnapshot(id: 'g', unit: 'grams', baseAmount: 1),
+            ],
+          ),
+          servingId: 'g',
+          amount: amount,
+          canonicalQuantity: amount,
+        ),
+      );
+      await add(DateTime(2020, 12, 27), 5000);
+      await add(DateTime(2021, 1, 4), 5000);
+      final changes = StreamIterator(
+        statistics.watchNutritionRange(start: start, end: end),
+      );
+      addTearDown(changes.cancel);
+      expect(await changes.moveNext(), isTrue);
+      expect(changes.current, isEmpty);
+
+      final firstId = await add(start, 450.125);
+      expect(await changes.moveNext(), isTrue);
+      expect(changes.current.single.day, start);
+      expect(changes.current.single.kcal, 450.125);
+      final secondId = await add(start, 449.875);
+      expect(await changes.moveNext(), isTrue);
+      expect(changes.current.single.kcal, 900);
+      final originals = await diary.watchDay(start).first;
+      final first = originals.singleWhere((entry) => entry.id == firstId);
+      final second = originals.singleWhere((entry) => entry.id == secondId);
+
+      await add(end, 1100);
+      expect(await changes.moveNext(), isTrue);
+      expect(changes.current.map((day) => day.day), [start, end]);
+      expect(changes.current.map((day) => day.kcal), [900, 1100]);
+      await diary.update(
+        first,
+        mealId: 'dinner',
+        servingId: 'g',
+        amount: 450.124999,
+        canonicalQuantity: 450.124999,
+      );
+      expect(await changes.moveNext(), isTrue);
+      expect(changes.current.first.kcal, closeTo(899.999999, 0.000000001));
+      expect(
+        calorieGoalDayStatus(
+          kcal: changes.current.first.kcal,
+          calorieTarget: 1000,
+        ),
+        GoalDayStatus.below,
+      );
+
+      await diary.delete(second.id);
+      expect(await changes.moveNext(), isTrue);
+      expect(changes.current.first.kcal, closeTo(450.124999, 0.000000001));
+      await diary.restore(second);
+      expect(await changes.moveNext(), isTrue);
+      expect(changes.current.first.kcal, closeTo(899.999999, 0.000000001));
+      await diary.restore(first);
+      expect(await changes.moveNext(), isTrue);
+      expect(changes.current.first.kcal, 900);
+      await diary.delete(first.id);
+      expect(await changes.moveNext(), isTrue);
+      expect(changes.current.first.kcal, 449.875);
+      await diary.delete(second.id);
+      expect(await changes.moveNext(), isTrue);
+      expect(changes.current.single.day, end);
+      expect(changes.current.single.kcal, 1100);
+    },
+  );
+
   test(
     'goals and weight persist, changing a goal preserves its old version',
     () async {

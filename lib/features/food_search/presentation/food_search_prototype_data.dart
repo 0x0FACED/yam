@@ -86,6 +86,7 @@ class FoodSearchPrototypeFood {
     required this.lastServingId,
     required this.lastAmount,
     this.brand,
+    this.description,
     this.gramsPerReferenceUnit,
     this.referenceDescription,
     this.hasUsualAmount = true,
@@ -99,6 +100,7 @@ class FoodSearchPrototypeFood {
   /// A preset code or the original custom category stored with the food.
   final String category;
   final String? brand;
+  final String? description;
 
   /// Product-specific mass for one reference unit when nutrition is per piece.
   final double? gramsPerReferenceUnit;

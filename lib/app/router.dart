@@ -85,12 +85,14 @@ GoRouter createAppRouter({
                         today: diaryToday,
                         profile: profile,
                         repository: diaryRepository,
+                        statisticsRepository: statisticsRepository,
                       ),
                     );
                   }
                   return DiaryScreen(
                     today: diaryToday,
                     repository: diaryRepository,
+                    statisticsRepository: statisticsRepository,
                   );
                 },
               ),

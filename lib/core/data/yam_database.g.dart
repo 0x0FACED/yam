@@ -47,6 +47,17 @@ class $UserFoodsTable extends UserFoods
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _descriptionMeta = const VerificationMeta(
+    'description',
+  );
+  @override
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+    'description',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _barcodeMeta = const VerificationMeta(
     'barcode',
   );
@@ -197,6 +208,7 @@ class $UserFoodsTable extends UserFoods
     name,
     category,
     brand,
+    description,
     barcode,
     basisUnit,
     basisAmount,
@@ -248,6 +260,15 @@ class $UserFoodsTable extends UserFoods
       context.handle(
         _brandMeta,
         brand.isAcceptableOrUnknown(data['brand']!, _brandMeta),
+      );
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+        _descriptionMeta,
+        description.isAcceptableOrUnknown(
+          data['description']!,
+          _descriptionMeta,
+        ),
       );
     }
     if (data.containsKey('barcode')) {
@@ -379,6 +400,10 @@ class $UserFoodsTable extends UserFoods
         DriftSqlType.string,
         data['${effectivePrefix}brand'],
       ),
+      description: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}description'],
+      ),
       barcode: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}barcode'],
@@ -445,6 +470,7 @@ class StoredUserFood extends DataClass implements Insertable<StoredUserFood> {
   final String name;
   final String category;
   final String? brand;
+  final String? description;
   final String? barcode;
   final String basisUnit;
   final double basisAmount;
@@ -463,6 +489,7 @@ class StoredUserFood extends DataClass implements Insertable<StoredUserFood> {
     required this.name,
     required this.category,
     this.brand,
+    this.description,
     this.barcode,
     required this.basisUnit,
     required this.basisAmount,
@@ -485,6 +512,9 @@ class StoredUserFood extends DataClass implements Insertable<StoredUserFood> {
     map['category'] = Variable<String>(category);
     if (!nullToAbsent || brand != null) {
       map['brand'] = Variable<String>(brand);
+    }
+    if (!nullToAbsent || description != null) {
+      map['description'] = Variable<String>(description);
     }
     if (!nullToAbsent || barcode != null) {
       map['barcode'] = Variable<String>(barcode);
@@ -514,6 +544,9 @@ class StoredUserFood extends DataClass implements Insertable<StoredUserFood> {
       brand: brand == null && nullToAbsent
           ? const Value.absent()
           : Value(brand),
+      description: description == null && nullToAbsent
+          ? const Value.absent()
+          : Value(description),
       barcode: barcode == null && nullToAbsent
           ? const Value.absent()
           : Value(barcode),
@@ -544,6 +577,7 @@ class StoredUserFood extends DataClass implements Insertable<StoredUserFood> {
       name: serializer.fromJson<String>(json['name']),
       category: serializer.fromJson<String>(json['category']),
       brand: serializer.fromJson<String?>(json['brand']),
+      description: serializer.fromJson<String?>(json['description']),
       barcode: serializer.fromJson<String?>(json['barcode']),
       basisUnit: serializer.fromJson<String>(json['basisUnit']),
       basisAmount: serializer.fromJson<double>(json['basisAmount']),
@@ -567,6 +601,7 @@ class StoredUserFood extends DataClass implements Insertable<StoredUserFood> {
       'name': serializer.toJson<String>(name),
       'category': serializer.toJson<String>(category),
       'brand': serializer.toJson<String?>(brand),
+      'description': serializer.toJson<String?>(description),
       'barcode': serializer.toJson<String?>(barcode),
       'basisUnit': serializer.toJson<String>(basisUnit),
       'basisAmount': serializer.toJson<double>(basisAmount),
@@ -588,6 +623,7 @@ class StoredUserFood extends DataClass implements Insertable<StoredUserFood> {
     String? name,
     String? category,
     Value<String?> brand = const Value.absent(),
+    Value<String?> description = const Value.absent(),
     Value<String?> barcode = const Value.absent(),
     String? basisUnit,
     double? basisAmount,
@@ -606,6 +642,7 @@ class StoredUserFood extends DataClass implements Insertable<StoredUserFood> {
     name: name ?? this.name,
     category: category ?? this.category,
     brand: brand.present ? brand.value : this.brand,
+    description: description.present ? description.value : this.description,
     barcode: barcode.present ? barcode.value : this.barcode,
     basisUnit: basisUnit ?? this.basisUnit,
     basisAmount: basisAmount ?? this.basisAmount,
@@ -626,6 +663,9 @@ class StoredUserFood extends DataClass implements Insertable<StoredUserFood> {
       name: data.name.present ? data.name.value : this.name,
       category: data.category.present ? data.category.value : this.category,
       brand: data.brand.present ? data.brand.value : this.brand,
+      description: data.description.present
+          ? data.description.value
+          : this.description,
       barcode: data.barcode.present ? data.barcode.value : this.barcode,
       basisUnit: data.basisUnit.present ? data.basisUnit.value : this.basisUnit,
       basisAmount: data.basisAmount.present
@@ -657,6 +697,7 @@ class StoredUserFood extends DataClass implements Insertable<StoredUserFood> {
           ..write('name: $name, ')
           ..write('category: $category, ')
           ..write('brand: $brand, ')
+          ..write('description: $description, ')
           ..write('barcode: $barcode, ')
           ..write('basisUnit: $basisUnit, ')
           ..write('basisAmount: $basisAmount, ')
@@ -680,6 +721,7 @@ class StoredUserFood extends DataClass implements Insertable<StoredUserFood> {
     name,
     category,
     brand,
+    description,
     barcode,
     basisUnit,
     basisAmount,
@@ -702,6 +744,7 @@ class StoredUserFood extends DataClass implements Insertable<StoredUserFood> {
           other.name == this.name &&
           other.category == this.category &&
           other.brand == this.brand &&
+          other.description == this.description &&
           other.barcode == this.barcode &&
           other.basisUnit == this.basisUnit &&
           other.basisAmount == this.basisAmount &&
@@ -722,6 +765,7 @@ class UserFoodsCompanion extends UpdateCompanion<StoredUserFood> {
   final Value<String> name;
   final Value<String> category;
   final Value<String?> brand;
+  final Value<String?> description;
   final Value<String?> barcode;
   final Value<String> basisUnit;
   final Value<double> basisAmount;
@@ -741,6 +785,7 @@ class UserFoodsCompanion extends UpdateCompanion<StoredUserFood> {
     this.name = const Value.absent(),
     this.category = const Value.absent(),
     this.brand = const Value.absent(),
+    this.description = const Value.absent(),
     this.barcode = const Value.absent(),
     this.basisUnit = const Value.absent(),
     this.basisAmount = const Value.absent(),
@@ -761,6 +806,7 @@ class UserFoodsCompanion extends UpdateCompanion<StoredUserFood> {
     required String name,
     required String category,
     this.brand = const Value.absent(),
+    this.description = const Value.absent(),
     this.barcode = const Value.absent(),
     required String basisUnit,
     required double basisAmount,
@@ -793,6 +839,7 @@ class UserFoodsCompanion extends UpdateCompanion<StoredUserFood> {
     Expression<String>? name,
     Expression<String>? category,
     Expression<String>? brand,
+    Expression<String>? description,
     Expression<String>? barcode,
     Expression<String>? basisUnit,
     Expression<double>? basisAmount,
@@ -813,6 +860,7 @@ class UserFoodsCompanion extends UpdateCompanion<StoredUserFood> {
       if (name != null) 'name': name,
       if (category != null) 'category': category,
       if (brand != null) 'brand': brand,
+      if (description != null) 'description': description,
       if (barcode != null) 'barcode': barcode,
       if (basisUnit != null) 'basis_unit': basisUnit,
       if (basisAmount != null) 'basis_amount': basisAmount,
@@ -835,6 +883,7 @@ class UserFoodsCompanion extends UpdateCompanion<StoredUserFood> {
     Value<String>? name,
     Value<String>? category,
     Value<String?>? brand,
+    Value<String?>? description,
     Value<String?>? barcode,
     Value<String>? basisUnit,
     Value<double>? basisAmount,
@@ -855,6 +904,7 @@ class UserFoodsCompanion extends UpdateCompanion<StoredUserFood> {
       name: name ?? this.name,
       category: category ?? this.category,
       brand: brand ?? this.brand,
+      description: description ?? this.description,
       barcode: barcode ?? this.barcode,
       basisUnit: basisUnit ?? this.basisUnit,
       basisAmount: basisAmount ?? this.basisAmount,
@@ -886,6 +936,9 @@ class UserFoodsCompanion extends UpdateCompanion<StoredUserFood> {
     }
     if (brand.present) {
       map['brand'] = Variable<String>(brand.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
     }
     if (barcode.present) {
       map['barcode'] = Variable<String>(barcode.value);
@@ -939,6 +992,7 @@ class UserFoodsCompanion extends UpdateCompanion<StoredUserFood> {
           ..write('name: $name, ')
           ..write('category: $category, ')
           ..write('brand: $brand, ')
+          ..write('description: $description, ')
           ..write('barcode: $barcode, ')
           ..write('basisUnit: $basisUnit, ')
           ..write('basisAmount: $basisAmount, ')
@@ -5410,6 +5464,7 @@ typedef $$UserFoodsTableCreateCompanionBuilder =
       required String name,
       required String category,
       Value<String?> brand,
+      Value<String?> description,
       Value<String?> barcode,
       required String basisUnit,
       required double basisAmount,
@@ -5431,6 +5486,7 @@ typedef $$UserFoodsTableUpdateCompanionBuilder =
       Value<String> name,
       Value<String> category,
       Value<String?> brand,
+      Value<String?> description,
       Value<String?> barcode,
       Value<String> basisUnit,
       Value<double> basisAmount,
@@ -5496,6 +5552,11 @@ class $$UserFoodsTableFilterComposer
 
   ColumnFilters<String> get brand => $composableBuilder(
     column: $table.brand,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get description => $composableBuilder(
+    column: $table.description,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -5619,6 +5680,11 @@ class $$UserFoodsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get barcode => $composableBuilder(
     column: $table.barcode,
     builder: (column) => ColumnOrderings(column),
@@ -5705,6 +5771,11 @@ class $$UserFoodsTableAnnotationComposer
 
   GeneratedColumn<String> get brand =>
       $composableBuilder(column: $table.brand, builder: (column) => column);
+
+  GeneratedColumn<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<String> get barcode =>
       $composableBuilder(column: $table.barcode, builder: (column) => column);
@@ -5811,6 +5882,7 @@ class $$UserFoodsTableTableManager
                 Value<String> name = const Value.absent(),
                 Value<String> category = const Value.absent(),
                 Value<String?> brand = const Value.absent(),
+                Value<String?> description = const Value.absent(),
                 Value<String?> barcode = const Value.absent(),
                 Value<String> basisUnit = const Value.absent(),
                 Value<double> basisAmount = const Value.absent(),
@@ -5830,6 +5902,7 @@ class $$UserFoodsTableTableManager
                 name: name,
                 category: category,
                 brand: brand,
+                description: description,
                 barcode: barcode,
                 basisUnit: basisUnit,
                 basisAmount: basisAmount,
@@ -5851,6 +5924,7 @@ class $$UserFoodsTableTableManager
                 required String name,
                 required String category,
                 Value<String?> brand = const Value.absent(),
+                Value<String?> description = const Value.absent(),
                 Value<String?> barcode = const Value.absent(),
                 required String basisUnit,
                 required double basisAmount,
@@ -5870,6 +5944,7 @@ class $$UserFoodsTableTableManager
                 name: name,
                 category: category,
                 brand: brand,
+                description: description,
                 barcode: barcode,
                 basisUnit: basisUnit,
                 basisAmount: basisAmount,

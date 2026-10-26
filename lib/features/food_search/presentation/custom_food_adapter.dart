@@ -49,6 +49,7 @@ FoodSearchPrototypeFood adaptUserFood(
     name: food.name,
     category: food.category,
     brand: food.brand,
+    description: food.description,
     referenceAmount: food.basisAmount,
     referenceUnit: baseUnit,
     referenceDescription: primaryServing == null

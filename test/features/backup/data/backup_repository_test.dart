@@ -30,6 +30,7 @@ void main() {
       await _seed(source);
       final original = await _state(source);
       final bytes = await BackupRepository(source).exportBackup();
+      expect(_jsonFiles(bytes)['manifest.json']['formatVersion'], 2);
       final destination = database();
       await _identity(destination, _id(901));
       await destination.into(destination.userFoods).insert(_food(100));
@@ -70,6 +71,14 @@ void main() {
         246.1234567890123,
       );
       expect(
+        catalog.firstWhere((row) => row.id == _id(1)).description,
+        '  1. Mix oats.\n\n2. Rest overnight.\r\n3. Serve. 🥣  ',
+      );
+      expect(
+        catalog.firstWhere((row) => row.id == _id(2)).description,
+        'Deleted recipe\nKeep this note too.',
+      );
+      expect(
         (await destination.select(destination.remoteFoods).get())
             .first
             .lastAmount,
@@ -107,6 +116,166 @@ void main() {
   });
 
   test(
+    'legacy v1 descriptions default to null without losing other fields',
+    () async {
+      final source = database();
+      await _seed(source);
+      final expected = await _state(source);
+      for (final row in expected['userFoods']!) {
+        row['description'] = null;
+      }
+      final files = _jsonFiles(await BackupRepository(source).exportBackup());
+      files['manifest.json']['formatVersion'] = 1;
+      for (final row in _rows(files, 'user_foods.json')) {
+        row.remove('description');
+      }
+      final bytes = _pack(files);
+
+      for (final mode in BackupImportMode.values) {
+        final destination = database();
+        final repository = BackupRepository(destination);
+        final preview = await repository.inspectBackup(bytes);
+        final result = await repository.importBackup(preview, mode);
+        expect(result.imported.total, 12);
+        expect(result.skipped.total, 0);
+        expect(await _state(destination), expected, reason: mode.name);
+        final exported = _jsonFiles(await repository.exportBackup());
+        expect(exported['manifest.json']['formatVersion'], 2);
+        expect(
+          _rows(exported, 'user_foods.json').every(
+            (row) =>
+                row.containsKey('description') && row['description'] == null,
+          ),
+          isTrue,
+        );
+      }
+    },
+  );
+
+  for (final version in [1, 2]) {
+    test(
+      'v$version imports additional fields and reexports all known data',
+      () async {
+        final source = database();
+        await _seed(source);
+        final expected = await _state(source);
+        final files = _jsonFiles(await BackupRepository(source).exportBackup());
+        files['manifest.json']['formatVersion'] = version;
+        files['manifest.json']['futureMetadata'] = {'optional': true};
+        files['manifest.json']['counts']['futureCounter'] = 0;
+        if (version == 1) {
+          for (final row in _rows(files, 'user_foods.json')) {
+            row.remove('description');
+          }
+          for (final row in expected['userFoods']!) {
+            row['description'] = null;
+          }
+        }
+        for (final file in files.entries) {
+          if (file.key == 'manifest.json') continue;
+          for (final row in file.value as List) {
+            (row as Map<String, dynamic>)['futureOptional'] = {
+              'text': 'Not understood by this version',
+              'enabled': true,
+            };
+          }
+        }
+        for (final row in _rows(files, 'diary_entries.json')) {
+          final servings =
+              jsonDecode(row['servingsSnapshot'] as String) as List;
+          for (final serving in servings) {
+            (serving as Map<String, dynamic>)['futureOptional'] =
+                'portion note';
+          }
+          row['servingsSnapshot'] = jsonEncode(servings);
+          expected['diaryEntries']!.singleWhere(
+            (entry) => entry['id'] == row['id'],
+          )['servingsSnapshot'] = row['servingsSnapshot'];
+        }
+
+        for (final mode in BackupImportMode.values) {
+          final destination = database();
+          final repository = BackupRepository(destination);
+          await repository.importBackup(
+            await repository.inspectBackup(_pack(files)),
+            mode,
+          );
+          expect(await _state(destination), expected, reason: mode.name);
+
+          final roundtrip = database();
+          final reader = BackupRepository(roundtrip);
+          await reader.importBackup(
+            await reader.inspectBackup(await repository.exportBackup()),
+            BackupImportMode.replace,
+          );
+          expect(await _state(roundtrip), expected, reason: mode.name);
+        }
+      },
+    );
+  }
+
+  test(
+    'absent nullable fields default to null without losing required data',
+    () async {
+      final source = database();
+      await _seed(source);
+      final expected = await _state(source);
+      final files = _jsonFiles(await BackupRepository(source).exportBackup());
+      for (final file in files.entries) {
+        if (file.key == 'manifest.json') continue;
+        for (final row in (file.value as List).cast<Map<String, dynamic>>()) {
+          for (final key in [
+            'brand',
+            'barcode',
+            'description',
+            'label',
+            'deletedAt',
+          ]) {
+            if (row.containsKey(key) && row[key] == null) row.remove(key);
+          }
+        }
+      }
+      for (final row in _rows(files, 'user_foods.json')) {
+        row.remove('brand');
+        row.remove('barcode');
+        row.remove('description');
+      }
+      for (final row in expected['userFoods']!) {
+        row['brand'] = null;
+        row['barcode'] = null;
+        row['description'] = null;
+      }
+      for (final row in _rows(files, 'user_servings.json')) {
+        row.remove('label');
+      }
+      for (final row in expected['userServings']!) {
+        row['label'] = null;
+      }
+      for (final row in _rows(files, 'diary_entries.json')) {
+        final servings = jsonDecode(row['servingsSnapshot'] as String) as List;
+        for (final serving in servings) {
+          (serving as Map<String, dynamic>).remove('label');
+        }
+        row['servingsSnapshot'] = jsonEncode(servings);
+        expected['diaryEntries']!.singleWhere(
+          (entry) => entry['id'] == row['id'],
+        )['servingsSnapshot'] = row['servingsSnapshot'];
+      }
+      final destination = database();
+      final repository = BackupRepository(destination);
+      await repository.importBackup(
+        await repository.inspectBackup(_pack(files)),
+        BackupImportMode.replace,
+      );
+      expect(await _state(destination), expected);
+      final diary = await DiaryRepository(
+        destination,
+      ).watchDay(DateTime(2025, 1, 1)).first;
+      expect(diary.single.food.serving(_id(3)).label, isNull);
+    },
+  );
+
+  test(
     'supplement preserves edits and tombstones, skips natural-key parents and their children',
     () async {
       final source = database();
@@ -115,7 +284,14 @@ void main() {
       await _identity(destination, _id(901));
       await destination
           .into(destination.userFoods)
-          .insert(_food(1, name: 'Local edit', barcode: '111'));
+          .insert(
+            _food(
+              1,
+              name: 'Local edit',
+              barcode: '111',
+              description: 'Local recipe\nDo not overwrite.',
+            ),
+          );
       await destination
           .into(destination.userFoods)
           .insert(_food(20, barcode: '002', deleted: true));
@@ -382,6 +558,12 @@ void main() {
             _rows(files, 'user_foods.json').first['energyKcal'] = -1,
         'wrong numeric type': (files) =>
             _rows(files, 'weight_entries.json').first['weightKg'] = '68',
+        'non-string description': (files) =>
+            _rows(files, 'user_foods.json').first['description'] = 123,
+        'non-string brand': (files) =>
+            _rows(files, 'user_foods.json').first['brand'] = false,
+        'invalid optional timestamp': (files) =>
+            _rows(files, 'weight_entries.json').first['deletedAt'] = 123,
         'zero quantity': (files) =>
             _rows(files, 'diary_entries.json').first['amount'] = 0,
         'empty category': (files) =>
@@ -427,10 +609,26 @@ void main() {
             _rows(files, 'diary_entries.json').first['energyKcal'] = 999,
         'invalid display basis': (files) =>
             _rows(files, 'user_foods.json').first['basisAmount'] = 80,
-        'unexpected field': (files) =>
-            _rows(files, 'weight_entries.json').first['extra'] = true,
         'missing field': (files) =>
             _rows(files, 'weight_entries.json').first.remove('weightKg'),
+        'missing food name': (files) =>
+            _rows(files, 'user_foods.json').first.remove('name'),
+        'missing nutrition': (files) =>
+            _rows(files, 'user_foods.json').first.remove('energyKcal'),
+        'missing favorite state': (files) =>
+            _rows(files, 'user_foods.json').first.remove('isFavorite'),
+        'missing serving unit': (files) =>
+            _rows(files, 'user_servings.json').first.remove('unit'),
+        'missing creation metadata': (files) =>
+            _rows(files, 'weight_entries.json').first.remove('createdAt'),
+        'missing diary snapshot': (files) =>
+            _rows(files, 'diary_entries.json').first.remove('servingsSnapshot'),
+        'missing goal target': (files) =>
+            _rows(files, 'goal_versions.json').first.remove('calorieTarget'),
+        'missing manifest version': (files) =>
+            (files['manifest.json'] as Map).remove('formatVersion'),
+        'missing table count': (files) =>
+            (files['manifest.json']['counts'] as Map).remove('weights'),
         'mismatched counts': (files) =>
             (files['manifest.json']['counts'] as Map)['weights'] = 200,
         'missing member': (files) => files.remove('weight_entries.json'),
@@ -471,7 +669,7 @@ void main() {
         ),
       );
       final future = _jsonFiles(bytes);
-      future['manifest.json']['formatVersion'] = 2;
+      future['manifest.json']['formatVersion'] = 3;
       await expectLater(
         repository.inspectBackup(_pack(future)),
         throwsA(
@@ -575,6 +773,7 @@ StoredUserFood _food(
   int id, {
   String name = 'Edited catalog oats',
   String? barcode,
+  String? description,
   bool deleted = false,
 }) => StoredUserFood(
   id: _id(id),
@@ -582,6 +781,7 @@ StoredUserFood _food(
   category: 'grains',
   brand: 'Brand',
   barcode: barcode,
+  description: description,
   basisUnit: 'grams',
   basisAmount: 100,
   displayBasis: 'perHundredGrams',
@@ -701,8 +901,17 @@ Future<void> _seed(YamDatabase database) async {
   );
   await database.batch((batch) {
     batch.insertAll(database.userFoods, [
-      _food(1, barcode: '001'),
-      _food(2, barcode: '002', deleted: true),
+      _food(
+        1,
+        barcode: '001',
+        description: '  1. Mix oats.\n\n2. Rest overnight.\r\n3. Serve. 🥣  ',
+      ),
+      _food(
+        2,
+        barcode: '002',
+        deleted: true,
+        description: 'Deleted recipe\nKeep this note too.',
+      ),
     ]);
     batch.insertAll(database.userServings, [
       _serving(3, 1),

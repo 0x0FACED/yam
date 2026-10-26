@@ -441,7 +441,7 @@ void main() {
     expect(find.text('84'), findsOneWidget);
   });
   testWidgets(
-    'My dishes edit preserves old diary entries and updates new ones',
+    'own-food menus edit from search and delete without changing diary history',
     (tester) async {
       await _setWindowSize(tester, const Size(390, 844));
       final database = YamDatabase(NativeDatabase.memory());
@@ -513,10 +513,15 @@ void main() {
       final menu = find.byKey(ValueKey('food-actions-$id'));
       final row = find.byKey(ValueKey('food-result-$id'));
       expect(row, findsOneWidget);
-      expect(menu, findsNothing);
+      expect(menu, findsOneWidget);
       await tester.tap(find.byKey(const ValueKey('food-search-tab-myDishes')));
       await tester.pumpAndSettle();
       expect(menu, findsOneWidget);
+      await tester.enterText(
+        find.byKey(const ValueKey('food-search-field')),
+        'oat',
+      );
+      await tester.pump();
       await tester.tap(menu);
       await tester.pumpAndSettle();
       expect(find.text('Edit'), findsOneWidget);
@@ -550,6 +555,13 @@ void main() {
       expect(find.text('Updated oats'), findsOneWidget);
       expect(find.text('Updated Updated oats'), findsOneWidget);
       expect(menu, findsOneWidget);
+      expect(
+        tester
+            .widget<TextField>(find.byKey(const ValueKey('food-search-field')))
+            .controller!
+            .text,
+        'oat',
+      );
 
       await tester.longPress(row);
       await tester.pumpAndSettle();
@@ -565,17 +577,23 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byKey(const ValueKey('food-search-field')), findsOneWidget);
 
+      await tester.tap(find.byTooltip('Clear search'));
+      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const ValueKey('food-search-tab-favorites')));
       await tester.pumpAndSettle();
       expect(find.byKey(ValueKey('food-result-$id')), findsOneWidget);
-      expect(menu, findsNothing);
+      expect(menu, findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('food-actions-rolled-oats')),
+        findsNothing,
+      );
       await tester.enterText(
         find.byKey(const ValueKey('food-search-field')),
         'Updated',
       );
       await tester.pump();
       expect(find.byKey(ValueKey('food-result-$id')), findsOneWidget);
-      expect(menu, findsNothing);
+      expect(menu, findsOneWidget);
 
       final saved = await (database.select(
         database.userFoods,
@@ -607,6 +625,21 @@ void main() {
       expect(added.foodName, 'Updated oats');
       expect(added.brand, 'New brand');
       expect(added.energyKcal, 179.375);
+
+      await tester.tap(menu);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Delete'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Delete').last);
+      await tester.pumpAndSettle();
+      expect(row, findsNothing);
+      expect(await repository.loadFoods(), isEmpty);
+      expect(
+        await (database.select(
+          database.diaryEntries,
+        )..where((entry) => entry.foodId.equals(id))).get(),
+        hasLength(2),
+      );
       await tester.pumpWidget(const SizedBox.shrink());
       await tester.pump(const Duration(milliseconds: 1));
     },

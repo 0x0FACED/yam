@@ -405,6 +405,22 @@ class AppLocalizationsRu extends AppLocalizations {
   String get createProductCategory => 'Категория';
 
   @override
+  String get createProductCategoryHint => 'Введите или выберите категорию';
+
+  @override
+  String get createProductCategoryRequired => 'Укажите категорию';
+
+  @override
+  String get createProductDescription => 'Описание (необязательно)';
+
+  @override
+  String get createProductDescriptionHint =>
+      'Ингредиенты, приготовление или другие заметки';
+
+  @override
+  String get foodDescription => 'Описание';
+
+  @override
   String get createProductNutritionBasis => 'Значения указаны на';
 
   @override

@@ -62,4 +62,26 @@ void main() {
       expect(draft.validate, throwsArgumentError);
     }
   });
+
+  test('category requires nonblank text but preserves arbitrary data', () {
+    CustomFoodDraft draft(String category) => CustomFoodDraft(
+      name: 'Oats',
+      category: category,
+      basis: CustomFoodBasis.grams,
+      basisAmount: 100,
+      displayBasis: CustomFoodDisplayBasis.perHundredGrams,
+      proteinG: 1,
+      fatG: 1,
+      carbsG: 1,
+      servings: const [],
+    );
+
+    for (final category in ['', ' ', '\t\n']) {
+      expect(draft(category).validate, throwsArgumentError);
+    }
+    const category = '  Домашние блюда 🥣  ';
+    final custom = draft(category);
+    custom.validate();
+    expect(custom.category, category);
+  });
 }

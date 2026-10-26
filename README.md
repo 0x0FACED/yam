@@ -43,6 +43,15 @@ The GitHub Release remains a draft until its downloads are uploaded. The built-i
 Actions must be enabled for the repository. No personal access token is required
 for the workflow.
 
+Android SDK packages are installed by invoking
+`$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager` directly. The hosted image
+provides the SDK, but its command-line tools directory is not assumed to be in
+`PATH`.
+
+Before macOS packaging, every bundled Mach-O must contain both `x86_64` and
+`arm64`. The check uses `lipo "$binary" -verify_arch x86_64 arm64`: the input file
+precedes `-verify_arch`, whose remaining arguments are architecture names.
+
 ### Android signing secrets
 
 Before pushing a release tag, configure these repository **Actions secrets**:
@@ -121,6 +130,10 @@ include both the resolved version and build number.
 If publication fails after creating a draft, inspect/remove that incomplete
 draft before rerunning. Published releases must not be silently overwritten.
 
+A workflow fix must be committed before starting a release from that commit.
+Rerunning an older failed run reuses its original workflow revision; it does not
+pick up newer workflow changes from the default branch.
+
 ### In-app Android updates
 
 Android Settings checks `0x0FACED/yam` for a stable GitHub Release on its first
@@ -162,6 +175,27 @@ The macOS archive contains both Intel and Apple Silicon executables, but has no
 Apple Developer ID signature or notarization. Gatekeeper may require an explicit
 allowance in Privacy & Security. Only allow a download whose source and checksum
 you trust; this pipeline does not publish to the App Store.
+
+## Backup compatibility
+
+Settings exports `.yam` archives, not raw SQLite files. This build writes backup
+format v2 and imports v1/v2. Updating the app migrates its existing local database;
+reinstalling or moving devices requires restoring an exported `.yam` backup.
+Keep a backup before uninstalling or downgrading the app.
+
+Starting with this importer, additional JSON fields are ignored, while missing
+nullable fields default to null. Required fields, known value types, units,
+relationships and archive limits are still validated before any database change.
+Unknown incompatible format versions and changes to the ZIP structure are rejected.
+
+Compatible future exporters must keep format v2 for additive optional fields and
+preserve the existing required fields and their meaning. A database schema bump
+does not itself require a backup-format bump. An older compatible importer only
+stores fields it understands; unknown fields can be lost on re-export. This does
+not retroactively change already-released strict v1 importers.
+
+The compatibility policy is recorded in
+[ADR 0030](docs/adr/0030-compatible-backup-fields.md).
 
 ## Project decisions
 

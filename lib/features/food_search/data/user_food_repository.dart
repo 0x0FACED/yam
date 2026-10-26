@@ -84,27 +84,48 @@ class UserFoodRepository {
       ..where(database.remoteFoods.deletedAt.isNull());
     final userRows = await userQuery.get();
     final remoteRows = await remoteQuery.get();
-    final brandsByKey = <String, String>{};
+    return _sortedSuggestions(
+      userRows
+          .map((row) => row.read(database.userFoods.brand))
+          .followedBy(
+            remoteRows.map((row) => row.read(database.remoteFoods.brand)),
+          ),
+    );
+  }
 
-    for (final brand in [
-      ...userRows.map((row) => row.read(database.userFoods.brand)),
-      ...remoteRows.map((row) => row.read(database.remoteFoods.brand)),
-    ]) {
-      final trimmed = brand?.trim();
+  Future<List<String>> loadCategories() async {
+    final userQuery = database.selectOnly(database.userFoods)
+      ..addColumns([database.userFoods.category])
+      ..where(database.userFoods.deletedAt.isNull());
+    final remoteQuery = database.selectOnly(database.remoteFoods)
+      ..addColumns([database.remoteFoods.category])
+      ..where(database.remoteFoods.deletedAt.isNull());
+    final userRows = await userQuery.get();
+    final remoteRows = await remoteQuery.get();
+    return _sortedSuggestions(
+      userRows
+          .map((row) => row.read(database.userFoods.category))
+          .followedBy(
+            remoteRows.map((row) => row.read(database.remoteFoods.category)),
+          ),
+    );
+  }
+
+  static List<String> _sortedSuggestions(Iterable<String?> values) {
+    final valuesByKey = <String, String>{};
+    for (final value in values) {
+      final trimmed = value?.trim();
       if (trimmed == null || trimmed.isEmpty) continue;
       final key = trimmed.toLowerCase();
-      final existing = brandsByKey[key];
+      final existing = valuesByKey[key];
       if (existing == null || trimmed.compareTo(existing) < 0) {
-        brandsByKey[key] = trimmed;
+        valuesByKey[key] = trimmed;
       }
     }
-
-    final brands = brandsByKey.values.toList()
-      ..sort((a, b) {
-        final order = a.toLowerCase().compareTo(b.toLowerCase());
-        return order != 0 ? order : a.compareTo(b);
-      });
-    return brands;
+    return valuesByKey.values.toList()..sort((a, b) {
+      final order = a.toLowerCase().compareTo(b.toLowerCase());
+      return order != 0 ? order : a.compareTo(b);
+    });
   }
 
   static List<String> matchingBrands(
@@ -142,6 +163,7 @@ class UserFoodRepository {
               id: id,
               name: draft.name.trim(),
               category: draft.category,
+              description: Value(draft.description),
               brand: Value(
                 draft.brand?.trim().isEmpty == true
                     ? null
@@ -234,6 +256,7 @@ class UserFoodRepository {
         UserFoodsCompanion(
           name: Value(draft.name.trim()),
           category: Value(draft.category),
+          description: Value(draft.description),
           brand: Value(
             draft.brand?.trim().isEmpty == true ? null : draft.brand?.trim(),
           ),

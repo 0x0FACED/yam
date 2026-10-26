@@ -6,10 +6,9 @@ import 'package:yam/app/theme/app_semantic_colors.dart';
 import 'package:yam/app/theme/app_spacing.dart';
 import 'package:yam/app/theme/app_typography.dart';
 import 'package:yam/core/ui/buttons/yam_buttons.dart';
+import 'package:yam/core/ui/forms/yam_autocomplete_field.dart';
 import 'package:yam/core/ui/forms/yam_number_field.dart';
-import 'package:yam/core/ui/forms/yam_select_field.dart';
 import 'package:yam/core/ui/forms/yam_text_field.dart';
-import 'package:yam/core/ui/selection/yam_dropdown.dart';
 import 'package:yam/core/ui/selection/yam_selection_controls.dart';
 import 'package:yam/core/data/yam_database.dart';
 import 'package:yam/features/food_search/data/user_food_repository.dart';
@@ -47,10 +46,15 @@ class _ServingEditor {
   }
 }
 
+typedef _CategorySuggestion = ({String value, String label});
+
 class _UserFoodFormScreenState extends State<UserFoodFormScreen> {
   final _name = TextEditingController();
   final _brand = TextEditingController();
   final _brandFocus = FocusNode();
+  final _categoryText = TextEditingController();
+  final _categoryFocus = FocusNode();
+  final _description = TextEditingController();
   final _barcode = TextEditingController();
   final _protein = TextEditingController();
   final _fat = TextEditingController();
@@ -61,8 +65,7 @@ class _UserFoodFormScreenState extends State<UserFoodFormScreen> {
   String? _basisServingLabel;
   double _basisServingDefaultAmount = 1;
 
-  String _category = FoodSearchPrototypeCategory.other.name;
-  String? _extraCategory;
+  String? _selectedCategory = FoodSearchPrototypeCategory.other.name;
   CustomFoodDisplayBasis _displayBasis = CustomFoodDisplayBasis.perHundredGrams;
   CustomFoodBasis _servingBasis = CustomFoodBasis.grams;
   Map<String, String> _errors = const {};
@@ -70,27 +73,74 @@ class _UserFoodFormScreenState extends State<UserFoodFormScreen> {
   bool _saving = false;
   String? _saveError;
   late Future<List<String>> _brands;
+  late Future<List<String>> _categories;
+  late Future<List<_CategorySuggestion>> _categorySuggestions;
+  AppLocalizations? _categoryLocalizations;
 
   @override
   void initState() {
     super.initState();
     _populateInitialFood();
-    _loadBrands();
+    _loadSuggestions();
   }
 
   @override
   void didUpdateWidget(UserFoodFormScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.repository != widget.repository) _loadBrands();
+    if (oldWidget.repository != widget.repository) _loadSuggestions();
     if (oldWidget.initialFood?.food.id != widget.initialFood?.food.id) {
       _populateInitialFood();
     }
   }
 
-  void _loadBrands() {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final l10n = AppLocalizations.of(context);
+    if (_categoryLocalizations == l10n) return;
+    _categoryLocalizations = l10n;
+    _refreshCategorySuggestions();
+    if (_selectedCategory case final category?) {
+      _categoryText.text = foodSearchCategoryLabel(l10n, category);
+    }
+  }
+
+  void _loadSuggestions() {
     _brands = widget.repository.loadBrands().catchError(
       (Object _) => <String>[],
     );
+    _categories = widget.repository.loadCategories().catchError(
+      (Object _) => <String>[],
+    );
+    if (_categoryLocalizations != null) _refreshCategorySuggestions();
+  }
+
+  void _refreshCategorySuggestions() {
+    final l10n = _categoryLocalizations!;
+    _categorySuggestions = _categories.then((categories) {
+      final presets = [
+        for (final category in FoodSearchPrototypeCategory.values)
+          (
+            value: category.name,
+            label: foodSearchCategoryLabel(l10n, category.name),
+          ),
+      ];
+      final seen = {for (final preset in presets) preset.label.toLowerCase()};
+      return [
+        ...presets,
+        for (final category in categories)
+          if (!FoodSearchPrototypeCategory.values.any(
+                (preset) => preset.name == category,
+              ) &&
+              seen.add(category.toLowerCase()))
+            (value: category, label: category),
+      ];
+    });
+  }
+
+  void _categoryChanged(String text) {
+    _selectedCategory = null;
+    _changed(text);
   }
 
   void _populateInitialFood() {
@@ -101,12 +151,17 @@ class _UserFoodFormScreenState extends State<UserFoodFormScreen> {
     _name.clear();
     _brand.clear();
     _barcode.clear();
+    _description.clear();
     _protein.clear();
     _fat.clear();
     _carbs.clear();
     _servingSize.clear();
-    _category = FoodSearchPrototypeCategory.other.name;
-    _extraCategory = null;
+    _selectedCategory =
+        widget.initialFood?.food.category ??
+        FoodSearchPrototypeCategory.other.name;
+    _categoryText.text = _categoryLocalizations == null
+        ? _selectedCategory!
+        : foodSearchCategoryLabel(_categoryLocalizations!, _selectedCategory!);
     _displayBasis = CustomFoodDisplayBasis.perHundredGrams;
     _servingBasis = CustomFoodBasis.grams;
     _basisServingId = null;
@@ -123,16 +178,10 @@ class _UserFoodFormScreenState extends State<UserFoodFormScreen> {
     _name.text = food.name;
     _brand.text = food.brand ?? '';
     _barcode.text = food.barcode ?? '';
+    _description.text = food.description ?? '';
     _protein.text = food.proteinG.toString();
     _fat.text = food.fatG.toString();
     _carbs.text = food.carbsG.toString();
-    _category = food.category;
-    _extraCategory =
-        FoodSearchPrototypeCategory.values.any(
-          (preset) => preset.name == food.category,
-        )
-        ? null
-        : food.category;
     _displayBasis = CustomFoodDisplayBasis.values.byName(food.displayBasis);
     _servingBasis = CustomFoodBasis.values.byName(food.basisUnit);
     _servingSize.text = food.basisAmount.toString();
@@ -167,12 +216,15 @@ class _UserFoodFormScreenState extends State<UserFoodFormScreen> {
   @override
   void dispose() {
     _brandFocus.dispose();
+    _categoryFocus.dispose();
     for (final serving in _servings) {
       serving.dispose();
     }
     for (final controller in [
       _name,
       _brand,
+      _categoryText,
+      _description,
       _barcode,
       _protein,
       _fat,
@@ -204,6 +256,9 @@ class _UserFoodFormScreenState extends State<UserFoodFormScreen> {
     final errors = <String, String>{};
     if (_name.text.trim().isEmpty) {
       errors['name'] = l10n.createProductNameRequired;
+    }
+    if (_categoryText.text.trim().isEmpty) {
+      errors['category'] = l10n.createProductCategoryRequired;
     }
     for (final field in {
       'protein': _protein,
@@ -249,7 +304,8 @@ class _UserFoodFormScreenState extends State<UserFoodFormScreen> {
       name: _name.text.trim(),
       brand: _brand.text.trim().isEmpty ? null : _brand.text.trim(),
       barcode: _barcode.text.trim().isEmpty ? null : _barcode.text.trim(),
-      category: _category,
+      category: _selectedCategory ?? _categoryText.text.trim(),
+      description: _description.text.trim().isEmpty ? null : _description.text,
       basis: basis,
       basisAmount: basisAmount,
       displayBasis: _displayBasis,
@@ -445,8 +501,11 @@ class _UserFoodFormScreenState extends State<UserFoodFormScreen> {
                           onChanged: _changed,
                         ),
                         const SizedBox(height: AppSpacing.md),
-                        RawAutocomplete<String>(
-                          textEditingController: _brand,
+                        YamAutocompleteField<String>(
+                          fieldKey: const ValueKey('create-food-brand'),
+                          label: l10n.createProductBrand,
+                          hintText: l10n.createProductBrandHint,
+                          controller: _brand,
                           focusNode: _brandFocus,
                           displayStringForOption: (brand) => brand,
                           optionsBuilder: (value) async =>
@@ -454,108 +513,42 @@ class _UserFoodFormScreenState extends State<UserFoodFormScreen> {
                                 await _brands,
                                 value.text,
                               ),
-                          fieldViewBuilder:
-                              (context, controller, focusNode, onSubmitted) =>
-                                  YamTextField(
-                                    fieldKey: const ValueKey(
-                                      'create-food-brand',
-                                    ),
-                                    label: l10n.createProductBrand,
-                                    hintText: l10n.createProductBrandHint,
-                                    controller: controller,
-                                    focusNode: focusNode,
-                                    onSubmitted: (_) => onSubmitted(),
-                                  ),
-                          optionsViewBuilder: (context, onSelected, options) {
-                            final candidates = options.toList();
-                            return Align(
-                              alignment: Alignment.topLeft,
-                              child: Material(
-                                color: theme.colorScheme.surface,
-                                shape: RoundedRectangleBorder(
-                                  side: BorderSide(
-                                    color: theme.colorScheme.outlineVariant,
-                                  ),
-                                  borderRadius: BorderRadius.circular(
-                                    AppRadius.control,
-                                  ),
-                                ),
-                                clipBehavior: Clip.antiAlias,
-                                child: ConstrainedBox(
-                                  constraints: const BoxConstraints(
-                                    maxHeight: AppSpacing.xxl * 5,
-                                  ),
-                                  child: ListView.builder(
-                                    padding: EdgeInsets.zero,
-                                    shrinkWrap: true,
-                                    itemCount: candidates.length,
-                                    itemBuilder: (context, index) {
-                                      final candidate = candidates[index];
-                                      final highlighted =
-                                          AutocompleteHighlightedOption.of(
-                                            context,
-                                          ) ==
-                                          index;
-                                      return Material(
-                                        color: highlighted
-                                            ? theme.colorScheme.primaryContainer
-                                            : Colors.transparent,
-                                        child: InkWell(
-                                          onTap: () => onSelected(candidate),
-                                          child: ConstrainedBox(
-                                            constraints: const BoxConstraints(
-                                              minHeight: 48,
-                                            ),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                    horizontal: AppSpacing.md,
-                                                    vertical: AppSpacing.sm,
-                                                  ),
-                                              child: Text(
-                                                candidate,
-                                                style: AppTypography
-                                                    .productTitle
-                                                    .copyWith(
-                                                      color: theme
-                                                          .colorScheme
-                                                          .onSurface,
-                                                    ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ),
-                            );
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        YamAutocompleteField<_CategorySuggestion>(
+                          fieldKey: const ValueKey('create-food-category'),
+                          label: l10n.createProductCategory,
+                          hintText: l10n.createProductCategoryHint,
+                          controller: _categoryText,
+                          focusNode: _categoryFocus,
+                          errorText: _errors['category'],
+                          displayStringForOption: (category) => category.label,
+                          optionsBuilder: (value) async {
+                            final prefix = value.text.trim().toLowerCase();
+                            if (prefix.isEmpty) return const [];
+                            return (await _categorySuggestions)
+                                .where(
+                                  (category) => category.label
+                                      .toLowerCase()
+                                      .startsWith(prefix),
+                                )
+                                .take(5);
+                          },
+                          onChanged: _categoryChanged,
+                          onSelected: (category) {
+                            _selectedCategory = category.value;
+                            _changed(category.label);
                           },
                         ),
                         const SizedBox(height: AppSpacing.md),
-                        YamSelectField<String>(
-                          fieldKey: const ValueKey('create-food-category'),
-                          label: l10n.createProductCategory,
-                          value: _category,
-                          items: [
-                            if (_extraCategory case final category?)
-                              YamDropdownOption(
-                                value: category,
-                                label: category,
-                              ),
-                            for (final category
-                                in FoodSearchPrototypeCategory.values)
-                              YamDropdownOption(
-                                value: category.name,
-                                label: foodSearchCategoryLabel(
-                                  l10n,
-                                  category.name,
-                                ),
-                              ),
-                          ],
-                          onChanged: (category) =>
-                              setState(() => _category = category),
+                        YamTextField(
+                          fieldKey: const ValueKey('create-food-description'),
+                          label: l10n.createProductDescription,
+                          hintText: l10n.createProductDescriptionHint,
+                          controller: _description,
+                          keyboardType: TextInputType.multiline,
+                          minLines: 3,
+                          maxLines: 8,
                         ),
                         const SizedBox(height: AppSpacing.sm),
                         Divider(color: theme.colorScheme.outlineVariant),

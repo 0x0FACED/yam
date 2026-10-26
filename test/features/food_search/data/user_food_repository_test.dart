@@ -30,6 +30,7 @@ const example = CustomFoodDraft(
     ),
   ],
   barcode: '00012345',
+  description: '  Mix oats with milk.\nRest overnight.\nServe cold.  ',
 );
 
 void main() {
@@ -54,6 +55,7 @@ void main() {
       expect(foods.single.food.name, 'Homemade oats');
       expect(foods.single.food.barcode, '00012345');
       expect(foods.single.food.isFavorite, isTrue);
+      expect(foods.single.food.description, example.description);
       expect(foods.single.food.energyKcal, closeTo(273.68, 0.000001));
       expect(foods.single.food.basisAmount, 80);
       expect(foods.single.servings, hasLength(2));
@@ -63,7 +65,7 @@ void main() {
       expect(
         (await reopened.customSelect('PRAGMA user_version').getSingle())
             .read<int>('user_version'),
-        4,
+        5,
       );
     },
   );
@@ -133,6 +135,50 @@ void main() {
     expect(foods.map((saved) => saved.food.id), [recreatedId]);
     expect(foods.single.food.barcode, example.barcode);
   });
+
+  test(
+    'description updates and clears without changing food precision',
+    () async {
+      final database = YamDatabase(NativeDatabase.memory());
+      addTearDown(database.close);
+      final repository = UserFoodRepository(database);
+      final id = await repository.create(example);
+      final original = (await repository.loadFoods()).single.food;
+
+      for (final description in [
+        '  1. Toast oats.\n\n2. Add milk.\r\n3. Simmer. 🥣  ',
+        null,
+      ]) {
+        expect(
+          await repository.update(
+            id,
+            CustomFoodDraft(
+              name: example.name,
+              category: example.category,
+              barcode: example.barcode,
+              description: description,
+              basis: example.basis,
+              basisAmount: example.basisAmount,
+              displayBasis: example.displayBasis,
+              proteinG: example.proteinG,
+              fatG: example.fatG,
+              carbsG: example.carbsG,
+              servings: example.servings,
+            ),
+          ),
+          isTrue,
+        );
+        final food = (await repository.loadFoods()).single.food;
+        expect(food.description, description);
+        expect(food.energyKcal, original.energyKcal);
+        expect(food.proteinG, original.proteinG);
+        expect(food.fatG, original.fatG);
+        expect(food.carbsG, original.carbsG);
+        expect(food.createdAt, original.createdAt);
+        expect(food.deviceId, original.deviceId);
+      }
+    },
+  );
 
   test(
     'updates a food and servings atomically without replacing identity',
@@ -481,6 +527,88 @@ void main() {
         UserFoodRepository.matchingBrands(await repository.loadBrands(), 'new'),
         ['New Brand'],
       );
+    },
+  );
+  test(
+    'category suggestions use active catalogs without rewriting stored values',
+    () async {
+      final database = YamDatabase(NativeDatabase.memory());
+      addTearDown(database.close);
+      final repository = UserFoodRepository(database);
+      final now = DateTime.now().toUtc();
+
+      Future<String> addUserCategory(String category) => repository.create(
+        CustomFoodDraft(
+          name: 'Food $category',
+          category: category,
+          basis: CustomFoodBasis.grams,
+          basisAmount: 100,
+          displayBasis: CustomFoodDisplayBasis.perHundredGrams,
+          proteinG: 1,
+          fatG: 1,
+          carbsG: 1,
+          servings: const [],
+        ),
+      );
+
+      Future<void> addRemoteCategory(
+        String id,
+        String category, {
+        bool deleted = false,
+      }) => database
+          .into(database.remoteFoods)
+          .insert(
+            RemoteFoodsCompanion.insert(
+              id: id,
+              source: 'off',
+              sourceCode: id,
+              name: 'Cached $id',
+              category: category,
+              basisUnit: 'grams',
+              basisAmount: 100,
+              energyKcal: 17,
+              proteinG: 1,
+              fatG: 1,
+              carbsG: 1,
+              createdAt: now,
+              updatedAt: now,
+              deviceId: 'test-device',
+              deletedAt: Value(deleted ? now : null),
+            ),
+          );
+
+      await addUserCategory('  Breakfast bowls  ');
+      await addUserCategory('  Домашние блюда 🥣  ');
+      await addUserCategory('breakfast bowls');
+      final legacyBlank = await addUserCategory('Legacy blank');
+      await (database.update(database.userFoods)
+            ..where((food) => food.id.equals(legacyBlank)))
+          .write(const UserFoodsCompanion(category: Value(' \t ')));
+      final removed = await addUserCategory('Deleted user category');
+      await repository.delete(removed);
+      await addRemoteCategory('1', 'BREAKFAST BOWLS');
+      await addRemoteCategory('2', '  Provider/custom  ');
+      await addRemoteCategory('3', ' ');
+      await addRemoteCategory('4', '');
+      await addRemoteCategory('5', 'Deleted remote category', deleted: true);
+      final userBefore = await database.select(database.userFoods).get();
+      final remoteBefore = await database.select(database.remoteFoods).get();
+
+      expect(await repository.loadCategories(), [
+        'BREAKFAST BOWLS',
+        'Provider/custom',
+        'Домашние блюда 🥣',
+      ]);
+      expect(await database.select(database.userFoods).get(), userBefore);
+      expect(await database.select(database.remoteFoods).get(), remoteBefore);
+
+      await addUserCategory('New category');
+      expect(await repository.loadCategories(), [
+        'BREAKFAST BOWLS',
+        'New category',
+        'Provider/custom',
+        'Домашние блюда 🥣',
+      ]);
     },
   );
 }

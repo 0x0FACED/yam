@@ -45,12 +45,14 @@ class CustomFoodDraft {
     required this.servings,
     this.brand,
     this.barcode,
+    this.description,
   });
 
   final String name;
   final String category;
   final String? brand;
   final String? barcode;
+  final String? description;
   final CustomFoodBasis basis;
   final double basisAmount;
   final CustomFoodDisplayBasis displayBasis;
@@ -64,7 +66,7 @@ class CustomFoodDraft {
 
   void validate() {
     if (name.trim().isEmpty ||
-        category.isEmpty ||
+        category.trim().isEmpty ||
         !basisAmount.isFinite ||
         basisAmount <= 0) {
       throw ArgumentError('Name, category and nutrition basis are required');

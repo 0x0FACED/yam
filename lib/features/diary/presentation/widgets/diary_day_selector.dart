@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:yam/app/theme/app_motion.dart';
 import 'package:yam/app/theme/app_radius.dart';
+import 'package:yam/app/theme/app_semantic_colors.dart';
 import 'package:yam/app/theme/app_spacing.dart';
 import 'package:yam/app/theme/app_typography.dart';
 import 'package:yam/core/ui/buttons/yam_buttons.dart';
+import 'package:yam/features/statistics/domain/statistics_models.dart';
 import 'package:yam/l10n/generated/app_localizations.dart';
 
 class DiaryDaySelector extends StatelessWidget {
@@ -13,11 +15,13 @@ class DiaryDaySelector extends StatelessWidget {
     required this.today,
     required this.onDaySelected,
     required this.onCalendarPressed,
+    this.dayStatuses = const {},
     super.key,
   });
 
   final DateTime selectedDay;
   final DateTime today;
+  final Map<DateTime, GoalDayStatus> dayStatuses;
   final ValueChanged<DateTime> onDaySelected;
   final VoidCallback onCalendarPressed;
 
@@ -27,8 +31,15 @@ class DiaryDaySelector extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final locale = Localizations.localeOf(context).toLanguageTag();
     final selectedIsToday = _isSameDay(selectedDay, today);
-    final startOfWeek = selectedDay.subtract(
-      Duration(days: selectedDay.weekday - DateTime.monday),
+    final startOfWeek = DateTime(
+      selectedDay.year,
+      selectedDay.month,
+      selectedDay.day - selectedDay.weekday + DateTime.monday,
+    );
+    final endOfWeek = DateTime(
+      startOfWeek.year,
+      startOfWeek.month,
+      startOfWeek.day + DateTime.daysPerWeek - 1,
     );
     final dateLabel = [
       DateFormat.MMMMd(locale).format(selectedDay),
@@ -42,8 +53,13 @@ class DiaryDaySelector extends StatelessWidget {
             YamIconButton(
               icon: Icons.chevron_left_rounded,
               tooltip: l10n.diaryPreviousDay,
-              onPressed: () =>
-                  onDaySelected(selectedDay.subtract(const Duration(days: 1))),
+              onPressed: () => onDaySelected(
+                DateTime(
+                  selectedDay.year,
+                  selectedDay.month,
+                  selectedDay.day - 1,
+                ),
+              ),
               surface: false,
             ),
             Expanded(
@@ -92,8 +108,13 @@ class DiaryDaySelector extends StatelessWidget {
             YamIconButton(
               icon: Icons.chevron_right_rounded,
               tooltip: l10n.diaryNextDay,
-              onPressed: () =>
-                  onDaySelected(selectedDay.add(const Duration(days: 1))),
+              onPressed: () => onDaySelected(
+                DateTime(
+                  selectedDay.year,
+                  selectedDay.month,
+                  selectedDay.day + 1,
+                ),
+              ),
               surface: false,
             ),
           ],
@@ -101,10 +122,15 @@ class DiaryDaySelector extends StatelessWidget {
         const SizedBox(height: AppSpacing.xs),
         Row(
           children: [
-            for (var index = 0; index < DateTime.daysPerWeek; index++)
+            for (
+              var day = startOfWeek;
+              !day.isAfter(endOfWeek);
+              day = DateTime(day.year, day.month, day.day + 1)
+            )
               Expanded(
                 child: _DayTile(
-                  day: startOfWeek.add(Duration(days: index)),
+                  day: day,
+                  status: dayStatuses[day] ?? GoalDayStatus.noEntry,
                   selectedDay: selectedDay,
                   today: today,
                   locale: locale,
@@ -122,12 +148,14 @@ class _DayTile extends StatelessWidget {
   const _DayTile({
     required this.day,
     required this.selectedDay,
+    required this.status,
     required this.today,
     required this.locale,
     required this.onSelected,
   });
 
   final DateTime day;
+  final GoalDayStatus status;
   final DateTime selectedDay;
   final DateTime today;
   final String locale;
@@ -139,9 +167,26 @@ class _DayTile extends StatelessWidget {
     final selected = _isSameDay(day, selectedDay);
     final isToday = _isSameDay(day, today);
     final l10n = AppLocalizations.of(context);
-    final foreground = selected
-        ? theme.colorScheme.onPrimary
-        : theme.colorScheme.onSurface;
+    final colors = theme.colorScheme;
+    final semantic = AppSemanticColors.of(context);
+    final statusColor = switch (status) {
+      GoalDayStatus.within => semantic.goalWithin,
+      GoalDayStatus.below => semantic.goalBelow,
+      GoalDayStatus.above => semantic.goalAbove,
+      GoalDayStatus.noGoal => colors.surfaceContainerHighest,
+      GoalDayStatus.noEntry => Colors.transparent,
+    };
+    final colored =
+        status == GoalDayStatus.within ||
+        status == GoalDayStatus.below ||
+        status == GoalDayStatus.above;
+    final primarySelection = selected && !colored;
+    final foreground =
+        primarySelection ||
+            status == GoalDayStatus.within ||
+            status == GoalDayStatus.above
+        ? colors.onPrimary
+        : colors.onSurface;
     final animationDuration = MediaQuery.disableAnimationsOf(context)
         ? Duration.zero
         : AppMotion.smallChange;
@@ -151,16 +196,31 @@ class _DayTile extends StatelessWidget {
       child: Semantics(
         button: true,
         selected: selected,
+        onTap: () => onSelected(day),
         label: [
           DateFormat.yMMMMEEEEd(locale).format(day),
           if (isToday) l10n.diaryToday,
+          switch (status) {
+            GoalDayStatus.within => l10n.statsGoalWithin,
+            GoalDayStatus.below => l10n.statsGoalBelow,
+            GoalDayStatus.above => l10n.statsGoalAbove,
+            GoalDayStatus.noGoal => l10n.statsNoGoal,
+            GoalDayStatus.noEntry => l10n.statsNoEntry,
+          },
         ].join(', '),
         child: ExcludeSemantics(
           child: AnimatedContainer(
             duration: animationDuration,
             curve: AppMotion.standardCurve,
             decoration: BoxDecoration(
-              color: selected ? theme.colorScheme.primary : Colors.transparent,
+              color: primarySelection ? colors.primary : statusColor,
+              borderRadius: BorderRadius.circular(AppRadius.control),
+            ),
+            foregroundDecoration: BoxDecoration(
+              border: Border.all(
+                color: selected ? colors.primary : Colors.transparent,
+                width: 2,
+              ),
               borderRadius: BorderRadius.circular(AppRadius.control),
             ),
             child: InkWell(
@@ -178,9 +238,9 @@ class _DayTile extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.clip,
                         style: AppTypography.caption.copyWith(
-                          color: selected
-                              ? foreground.withValues(alpha: 0.8)
-                              : theme.colorScheme.onSurfaceVariant,
+                          color: colored || primarySelection
+                              ? foreground
+                              : colors.onSurfaceVariant,
                           fontWeight: selected
                               ? FontWeight.w600
                               : FontWeight.w400,
@@ -200,18 +260,34 @@ class _DayTile extends StatelessWidget {
                       const SizedBox(height: 2),
                       SizedBox(
                         height: 5,
-                        child: isToday
-                            ? Container(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            if (isToday)
+                              Container(
                                 key: const ValueKey('diary-today-marker'),
                                 width: 5,
+                                height: 5,
                                 decoration: BoxDecoration(
-                                  color: selected
-                                      ? theme.colorScheme.onPrimary
-                                      : theme.colorScheme.primary,
+                                  color: colored || primarySelection
+                                      ? foreground
+                                      : colors.primary,
                                   shape: BoxShape.circle,
                                 ),
-                              )
-                            : null,
+                              ),
+                            if (status == GoalDayStatus.noGoal) ...[
+                              if (isToday)
+                                const SizedBox(width: AppSpacing.xxs),
+                              Container(
+                                width: AppSpacing.sm,
+                                height: 2,
+                                color: primarySelection
+                                    ? foreground
+                                    : colors.onSurfaceVariant,
+                              ),
+                            ],
+                          ],
+                        ),
                       ),
                     ],
                   ),
