@@ -53,7 +53,14 @@ jobs:
         id: metadata
         env:
           TAG: ${{ github.ref_name }}
-        run: dart run tool/release_metadata.dart --tag "$TAG" --build-number "$GITHUB_RUN_NUMBER"
+        run: dart run tool/release_metadata.dart --tag "$TAG" --build-number "$GITHUB_RUN_NUMBER" --notes-file "$RUNNER_TEMP/release-notes.md"
+      - name: Upload validated release notes
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: release-notes
+          path: ${{ runner.temp }}/release-notes.md
+          if-no-files-found: error
+          retention-days: 14
 
   ci:
     name: Required CI
@@ -227,6 +234,11 @@ jobs:
       TAG: ${{ needs.prepare.outputs.tag }}
       ARTIFACT_VERSION: ${{ needs.prepare.outputs.artifact_version }}
     steps:
+      - name: Download validated release notes
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: release-notes
+          path: ${{ runner.temp }}/release-notes
       - name: Download Android package
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
@@ -260,7 +272,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
         run: |
-          cat > "$RUNNER_TEMP/yam-release-notes.txt" <<'NOTES'
+          notes="$RUNNER_TEMP/release-notes/release-notes.md"
+          test -s "$notes"
+          printf '\n\n---\n\n' >> "$notes"
+          cat >> "$notes" <<'NOTES'
           Packages:
           - Android: APK signed with the project's persistent release key.
           - Linux x64: complete Flutter bundle; extract and run bundle/yam. Requires a compatible Linux system with GTK 3; built on Ubuntu 24.04, not a portable AppImage.
@@ -268,7 +283,7 @@ jobs:
 
           SHA256SUMS covers the three downloadable packages.
           NOTES
-          gh release create "$TAG" --verify-tag --title "YAM $ARTIFACT_VERSION" --draft --notes-file "$RUNNER_TEMP/yam-release-notes.txt"
+          gh release create "$TAG" --verify-tag --title "YAM $ARTIFACT_VERSION" --draft --notes-file "$notes"
           gh release upload "$TAG" \
             "yam-${ARTIFACT_VERSION}-android.apk" \
             "yam-${ARTIFACT_VERSION}-linux-x64.tar.gz" \

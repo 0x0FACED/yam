@@ -38,6 +38,9 @@
   JSON-поля совместимого backup игнорируются, отсутствующие nullable — null;
   обязательные поля и известные значения проверяются. Необязательные расширения
   сохраняют поколение формата v2; несовместимые форматы автоматически не принимаются.
+- [ADR 0031](../docs/adr/0031-versioned-changelog-and-release-notes.md):
+  Keep a Changelog — источник заметок, точное сопоставление tag/pubspec/section,
+  проверенный Markdown artifact и публикация через `gh --notes-file`.
 
 ## Реализовано И Основные Файлы
 
@@ -132,6 +135,13 @@
   metadata — Settings/About, CI build number — release run counter. Linux
   `version.json.in`/CMake сохраняют CLI overrides. Release Android требует
   постоянный ключ через Secrets/env, debug fallback отсутствует.
+- `CHANGELOG.md`: Unreleased, подготовленные заметки 0.2.0 и фактическая история
+  0.1.0 от 2026-10-23; пользователь уже поднял pubspec до `0.2.0+2`.
+  `tool/changelog.dart` разбирает оговорённые version headings, даты, границы
+  секций/fences/комментарии/reference links. `release_metadata.dart` проверяет
+  файл на CI и при `--tag` требует непустые заметки точной версии; `--notes-file`
+  пишет их в Markdown. Prepare передаёт файл через `release-notes` artifact,
+  Publish дополняет прежними инструкциями пакетов/подписей и не исполняет текст.
 - `lib/features/app_update/` и Android installer/provider/receiver: latest
   stable GitHub Release без токенов, потоковая `.part` загрузка, длина/SHA-256,
   проверка пакета/версии/подписи, системное подтверждение. Отмена не удаляет APK;
@@ -140,12 +150,21 @@
 
 ## Проверка
 
-- Текущий проход: `flutter gen-l10n`, build_runner, schema dump/generate v5
-  и `dart format` изменённых файлов выполнены. `flutter analyze --no-pub`:
-  **No issues found**. Полный `flutter test --no-pub --reporter expanded`:
+- Для schema v5: `flutter gen-l10n`, build_runner, schema dump/generate v5
+  и `dart format` выполнены. Последний полный прогон
+  `flutter test --no-pub --reporter expanded` перед changelog:
   **181 тест прошёл**, включая совместимые дополнительные поля v1/v2, повторный
   экспорт известных данных, nullable defaults и отказ отсутствующих обязательных
   полей без изменения БД. Новых миграций после schema v5 не потребовалось.
+- Changelog: `dart format` изменённых Dart-файлов, `flutter analyze --no-pub`
+  (No issues found), `flutter test --no-pub --reporter expanded test/tool`
+  (16 тестов) и actionlint 1.7.12 обоих workflow прошли. Полный suite повторно
+  для изменения релизного инструмента не запускался.
+- Реальный CLI и команды prepare/сборки notes из YAML подтвердили выбор 0.2.0,
+  сохранение Markdown/ссылок и package footer; отсутствующая/пустая/дублированная
+  версия, неверный тег и notes-file без тега дают отказ без создания файла и
+  изменения GitHub outputs. Shell-метасимволы в тексте остались буквальным текстом.
+  Команды создания/загрузки/публикации GitHub Release не исполнялись.
 - `flutter build linux --debug --no-pub --target lib/main.dart` прошёл:
   debug bundle собран со штатной точкой входа после удаления runtime smoke.
 - Регрессии: миграции v1–v4→v5 с сохранением всех прежних полей/метаданных,
@@ -176,19 +195,19 @@
 
 ## Следующее Действие
 
-- На Android проверить обновление существующей установки со schema v4:
-  сохранность продуктов/истории после миграции, свою категорию/описание,
-  экспорт новой `.yam` v2 и восстановление прежней v1 без описания.
+- Перед тегом `v0.2.0` владельцу проверить дату и заметки 0.2.0, включить
+  `CHANGELOG.md`, новый Dart-модуль и правки workflow в commit/push; только затем
+  пушить совпадающий тег. Весь текст будущих изменений сначала вести в Unreleased.
 
 ## Ограничения И Непроверенное
 
-- В текущем проходе Android/iOS/macOS не запускались. Нативные установка/
-  отмена/очистка updater после package replacement ещё не приняты на устройстве.
-- Последний зафиксированный GitHub release run собрал Android/Linux, но упал
-  на порядке аргументов `lipo`. В `release.yml` исправлено на
-  `lipo "$binary" -verify_arch x86_64 arm64`; macOS packaging после исправления
-  ещё требует runner-прогона. Re-run старого commit не подхватывает правку.
-  Настоящие подписи/теги/публикация остаются действиями владельца.
+- В текущем проходе Android/iOS/macOS не запускались. Приёмка обновления живой
+  Android-установки до schema v5/backup v2 и нативной установки/отмены/очистки
+  updater после package replacement остаётся на устройстве.
+- GitHub Release `v0.1.0` / `YAM 0.1.0+4` опубликован 2026-10-23 (подтверждено
+  read-only запросом GitHub CLI). Версия 0.2.0 не публиковалась; реальный
+  GitHub-run обновлённого changelog workflow ещё предстоит. Подписи, commit,
+  push, теги и публикации остаются действиями владельца.
 - Тема и избранное встроенной еды сессионные. Настройки языка/единиц пока
   только отображаются, цели меняются через повторный онбординг; отдельного
   удаления всех данных нет. Riverpod не подключён.

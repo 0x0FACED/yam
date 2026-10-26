@@ -104,23 +104,25 @@ About read actual installed package metadata, not a copy of this version in Dart
 
 Release tags must be exactly `vMAJOR.MINOR.PATCH` and match the public pubspec
 version. Prerelease suffixes are not currently part of the native release format.
-For example, for `version: 0.2.0+2`, commit/push that version change, then create
-and push the matching tag yourself:
+For example, for `version: 0.2.0+2`, prepare the matching dated changelog section,
+commit/push the version and changelog changes, then create and push the tag:
 
 ```sh
 git tag v0.2.0
 git push origin v0.2.0
 ```
 
-A mismatched tag fails before platform builds. CI does not rewrite pubspec,
-commit version bumps or create tags. To inspect or validate metadata locally:
+A mismatched tag or missing release notes fails before platform builds. CI does
+not rewrite pubspec/changelog, commit version bumps or create tags. To validate
+the version and changelog locally:
 
 ```sh
 dart run tool/release_metadata.dart
-dart run tool/release_metadata.dart --tag v0.2.0 --build-number 42
+dart run tool/release_metadata.dart --tag v0.2.0 --build-number 42 --notes-file /tmp/yam-release-notes.md
 ```
 
-The second command only succeeds when pubspec declares `0.2.0`. Release CI
+The second command requires pubspec version `0.2.0` and its non-empty changelog
+section, and writes that version's Markdown notes to the supplied file. Release CI
 replaces the local BUILD with its `github.run_number`; that single number and
 build name are passed to Android, Linux and macOS. A rerun retains the same build
 number. Keep the release workflow counter monotonic if the workflow is ever
@@ -133,6 +135,33 @@ draft before rerunning. Published releases must not be silently overwritten.
 A workflow fix must be committed before starting a release from that commit.
 Rerunning an older failed run reuses its original workflow revision; it does not
 pick up newer workflow changes from the default branch.
+
+### Changelog and release notes
+
+[`CHANGELOG.md`](CHANGELOG.md) is the single source of user-facing release notes,
+following [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Entries are
+curated in Russian, grouped under `Added`, `Changed`, `Deprecated`, `Removed`,
+`Fixed` or `Security` as needed; do not add empty groups or paste raw git logs.
+
+1. During development, add notable changes under `## [Unreleased]`.
+2. Before a release, move those entries into `## [MAJOR.MINOR.PATCH] - YYYY-MM-DD`
+   immediately below Unreleased, using the actual release date. Leave Unreleased
+   in place for future work and update the comparison links at the bottom.
+3. Match the section version to pubspec and the tag, without `v` or `+BUILD` in
+   the changelog heading. Previously released sections remain release history.
+4. Run the validation/extraction command above and review its output file.
+5. Commit and push these changes **before** pushing the release tag.
+
+Push/PR CI validates the changelog structure. Tagged releases additionally require
+the exact version section; empty notes, duplicate versions, invalid dates and
+ambiguous headings stop release preparation. There is no fallback to Unreleased
+or whichever version happens to be first.
+
+Prepare uploads the validated Markdown as a release-notes artifact. Publish
+downloads that same file, appends package/signing/checksum instructions, and
+passes it to `gh release create --notes-file`. Notes are never interpolated into
+shell commands or multiline GitHub outputs. A changelog entry does not create a
+release; existing published releases are not edited by this process.
 
 ### In-app Android updates
 
@@ -200,5 +229,6 @@ The compatibility policy is recorded in
 ## Project decisions
 
 Product and architecture decisions are in [`docs/adr/`](docs/adr/). CI, signing
-and version rules are recorded in [ADR 0025](docs/adr/0025-github-ci-releases-and-runtime-version.md).
+and version rules are recorded in [ADR 0025](docs/adr/0025-github-ci-releases-and-runtime-version.md);
+the changelog contract is in [ADR 0031](docs/adr/0031-versioned-changelog-and-release-notes.md).
 The current implementation handoff is [`agents/PROJECT_STATE.md`](agents/PROJECT_STATE.md).

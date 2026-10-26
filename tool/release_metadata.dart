@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:yaml/yaml.dart';
 
+import 'changelog.dart';
+
 /// Shared native release metadata. Public versions stay suitable for all targets.
 class ReleaseMetadata {
   const ReleaseMetadata._(this.version, this.buildNumber);
@@ -83,21 +85,35 @@ Future<void> main(List<String> arguments) async {
     final options = <String, String>{};
     for (var index = 0; index < arguments.length; index += 2) {
       final option = arguments[index];
-      if ((option != '--tag' && option != '--build-number') ||
+      if ((option != '--tag' &&
+              option != '--build-number' &&
+              option != '--notes-file') ||
           index + 1 == arguments.length ||
           options.containsKey(option)) {
         throw const FormatException(
           'Usage: dart run tool/release_metadata.dart '
-          '[--tag vMAJOR.MINOR.PATCH] [--build-number NUMBER]',
+          '[--tag vMAJOR.MINOR.PATCH] [--build-number NUMBER] [--notes-file PATH]',
         );
       }
       options[option] = arguments[index + 1];
+    }
+    if (options.containsKey('--notes-file') && !options.containsKey('--tag')) {
+      throw const FormatException('--notes-file requires --tag.');
     }
     final metadata = ReleaseMetadata.fromPubspec(
       await File('pubspec.yaml').readAsString(),
       tag: options['--tag'],
       buildNumberOverride: options['--build-number'],
     );
+    final changelog = ReleaseChangelog.parse(
+      await File('CHANGELOG.md').readAsString(),
+    );
+    if (options.containsKey('--tag')) {
+      final notes = changelog.notesForVersion(metadata.version);
+      if (options['--notes-file'] case final path?) {
+        await File(path).writeAsString(notes, flush: true);
+      }
+    }
     final outputPath = Platform.environment['GITHUB_OUTPUT'];
     if (outputPath != null && outputPath.isNotEmpty) {
       await File(outputPath).writeAsString(
