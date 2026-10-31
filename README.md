@@ -205,10 +205,26 @@ Apple Developer ID signature or notarization. Gatekeeper may require an explicit
 allowance in Privacy & Security. Only allow a download whose source and checksum
 you trust; this pipeline does not publish to the App Store.
 
+## Food library exchange
+
+Settings → Food library exports only **My dishes** to a plain UTF-8 JSON file.
+Import supports replacing My dishes, merging without duplicates, and merging
+while keeping every duplicate. Imported foods become editable user-created foods.
+Diary history, weights, goals, built-in foods and saved Open Food Facts are untouched.
+
+Deduplication compares normalized name and brand plus exact unit, basis amount
+and all four nutrition values. It skips matching incoming records without updating
+existing foods; it does not clean up duplicates that already exist.
+
+The format is designed for hand editing and AI-generated libraries. Settings
+includes a copyable example; the complete contract and an AI prompt are in
+[the food library format guide](docs/food-library-format.md).
+This JSON file is **not** a full application backup.
+
 ## Backup compatibility
 
 Settings exports `.yam` archives, not raw SQLite files. This build writes backup
-format v2 and imports v1/v2. Updating the app migrates its existing local database;
+format v3 and imports v1/v2/v3. Updating the app migrates its existing local database;
 reinstalling or moving devices requires restoring an exported `.yam` backup.
 Keep a backup before uninstalling or downgrading the app.
 
@@ -217,14 +233,17 @@ nullable fields default to null. Required fields, known value types, units,
 relationships and archive limits are still validated before any database change.
 Unknown incompatible format versions and changes to the ZIP structure are rejected.
 
-Compatible future exporters must keep format v2 for additive optional fields and
-preserve the existing required fields and their meaning. A database schema bump
+Compatible future exporters should keep format v3 for additive optional fields and
+preserve the existing required fields and their meaning. Version 3 permits repeated
+food barcodes; older v1/v2 importers reject it rather than losing duplicate foods.
+A database schema bump
 does not itself require a backup-format bump. An older compatible importer only
 stores fields it understands; unknown fields can be lost on re-export. This does
 not retroactively change already-released strict v1 importers.
 
 The compatibility policy is recorded in
-[ADR 0030](docs/adr/0030-compatible-backup-fields.md).
+[ADR 0030](docs/adr/0030-compatible-backup-fields.md), with the barcode and v3
+cutover in [ADR 0034](docs/adr/0034-food-library-json-import-export.md).
 
 ## Project decisions
 
