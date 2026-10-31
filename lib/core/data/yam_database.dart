@@ -7,13 +7,14 @@ part 'yam_database.g.dart';
 @DataClassName('StoredUserFood')
 @TableIndex(name: 'user_foods_history', columns: {#deletedAt, #createdAt})
 @TableIndex(name: 'user_foods_name', columns: {#name})
+@TableIndex(name: 'user_foods_barcode', columns: {#barcode, #deletedAt})
 class UserFoods extends Table {
   TextColumn get id => text()();
   TextColumn get name => text()();
   TextColumn get category => text()();
   TextColumn get brand => text().nullable()();
   TextColumn get description => text().nullable()();
-  TextColumn get barcode => text().nullable().unique()();
+  TextColumn get barcode => text().nullable()();
   TextColumn get basisUnit => text()();
   RealColumn get basisAmount => real()();
   TextColumn get displayBasis => text()();
@@ -185,7 +186,7 @@ class YamDatabase extends _$YamDatabase {
     : super(LazyDatabase(() async => driftDatabase(name: 'yam')));
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -226,6 +227,15 @@ class YamDatabase extends _$YamDatabase {
       }
       if (from < 5) {
         await migrator.addColumn(userFoods, userFoods.description);
+      }
+      if (from < 6) {
+        // Rebuild without the barcode UNIQUE constraint. Drift copies every
+        // column, preserves declared indexes, and temporarily disables foreign
+        // keys so existing user servings keep their original parent IDs.
+        await migrator.alterTable(TableMigration(userFoods));
+        await customStatement(
+          'CREATE INDEX user_foods_barcode ON user_foods (barcode, deleted_at)',
+        );
       }
     },
     beforeOpen: (details) async {

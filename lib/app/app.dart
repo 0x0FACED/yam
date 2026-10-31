@@ -16,6 +16,8 @@ import 'package:yam/features/app_update/presentation/app_update_controller.dart'
 import 'package:yam/features/backup/data/backup_file_service.dart';
 import 'package:yam/features/backup/data/backup_repository.dart';
 import 'package:yam/features/diary/data/diary_repository.dart';
+import 'package:yam/features/food_library/data/food_library_file_service.dart';
+import 'package:yam/features/food_library/data/food_library_repository.dart';
 import 'package:yam/features/diary/domain/diary_entry.dart';
 import 'package:yam/features/startup/presentation/startup_artwork.dart';
 import 'package:yam/features/startup/presentation/startup_screen.dart';
@@ -32,6 +34,7 @@ class YamApp extends StatefulWidget {
     this.startupArtwork,
     this.database,
     this.backupFiles,
+    this.foodLibraryFiles,
     this.appUpdates,
     super.key,
   });
@@ -40,6 +43,7 @@ class YamApp extends StatefulWidget {
   final StartupArtwork? startupArtwork;
   final YamDatabase? database;
   final BackupFileService? backupFiles;
+  final FoodLibraryFileService? foodLibraryFiles;
   final AppUpdateController? appUpdates;
 
   @override
@@ -59,6 +63,7 @@ class _YamAppState extends State<YamApp> {
   late final DiaryRepository _diary;
   late final StatisticsRepository _statistics;
   late final BackupRepository _backup;
+  late final FoodLibraryRepository _foodLibrary;
   late final AppUpdateController? _appUpdates;
   StreamSubscription<List<GoalVersion>>? _goalsSubscription;
   StreamSubscription<List<WeightRecord>>? _weightsSubscription;
@@ -84,6 +89,7 @@ class _YamAppState extends State<YamApp> {
     _diary = DiaryRepository(_foodDatabase);
     _statistics = StatisticsRepository(_foodDatabase);
     _backup = BackupRepository(_foodDatabase);
+    _foodLibrary = FoodLibraryRepository(_foodDatabase);
     _appUpdates =
         widget.appUpdates ??
         (!kIsWeb && Platform.isAndroid
@@ -114,6 +120,8 @@ class _YamAppState extends State<YamApp> {
     backupRepository: _backup,
     backupFiles: widget.backupFiles,
     onBackupImported: _reloadAfterImport,
+    foodLibraryRepository: _foodLibrary,
+    foodLibraryFiles: widget.foodLibraryFiles,
     appUpdates: _appUpdates,
   );
 

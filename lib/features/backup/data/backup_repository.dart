@@ -135,6 +135,8 @@ class BackupRepository {
       // Include tombstones: supplement is deliberately not last-write-wins.
       final existingFoods = await _database.select(_database.userFoods).get();
       final foodIds = {for (final row in existingFoods) row.id};
+      // Only pre-existing barcodes conflict. Repeated barcodes within a v3
+      // backup belong to distinct products and must be preserved together.
       final barcodes = {
         for (final row in existingFoods)
           if (row.barcode != null) row.barcode!,

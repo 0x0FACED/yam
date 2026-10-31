@@ -363,6 +363,7 @@ class _UserFoodFormScreenState extends State<UserFoodFormScreen> {
       final draft = _draft();
       final foodId = widget.initialFood?.food.id;
       if (draft.barcode != null &&
+          draft.barcode != widget.initialFood?.food.barcode &&
           await widget.repository.barcodeExists(
             draft.barcode!,
             excludingFoodId: foodId,

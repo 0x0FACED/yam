@@ -13,6 +13,9 @@ import 'package:yam/features/app_update/presentation/app_update_settings_section
 import 'package:yam/features/backup/data/backup_file_service.dart';
 import 'package:yam/features/backup/data/backup_repository.dart';
 import 'package:yam/features/backup/presentation/backup_settings_section.dart';
+import 'package:yam/features/food_library/data/food_library_file_service.dart';
+import 'package:yam/features/food_library/data/food_library_repository.dart';
+import 'package:yam/features/food_library/presentation/food_library_settings_section.dart';
 import 'package:yam/l10n/generated/app_localizations.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -25,6 +28,8 @@ class SettingsScreen extends StatelessWidget {
     this.backupRepository,
     this.backupFiles,
     this.onBackupImported,
+    this.foodLibraryRepository,
+    this.foodLibraryFiles,
     this.appUpdates,
     super.key,
   });
@@ -37,6 +42,8 @@ class SettingsScreen extends StatelessWidget {
   final BackupRepository? backupRepository;
   final BackupFileService? backupFiles;
   final VoidCallback? onBackupImported;
+  final FoodLibraryRepository? foodLibraryRepository;
+  final FoodLibraryFileService? foodLibraryFiles;
   final AppUpdateController? appUpdates;
 
   @override
@@ -146,9 +153,21 @@ class SettingsScreen extends StatelessWidget {
                                 ],
                               ),
                             ),
+                            if (foodLibraryRepository != null) ...[
+                              const SizedBox(height: AppSpacing.lg),
+                              YamEntranceReveal(
+                                index: 2,
+                                child: FoodLibrarySettingsSection(
+                                  repository: foodLibraryRepository!,
+                                  files:
+                                      foodLibraryFiles ??
+                                      const FoodLibraryFileService(),
+                                ),
+                              ),
+                            ],
                             const SizedBox(height: AppSpacing.lg),
                             YamEntranceReveal(
-                              index: 2,
+                              index: 3,
                               child: backupRepository == null
                                   ? YamSettingsSection(
                                       title: l10n.settingsDataSection,
@@ -187,7 +206,7 @@ class SettingsScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: AppSpacing.lg),
                             YamEntranceReveal(
-                              index: 3,
+                              index: 4,
                               child: YamSettingsSection(
                                 title: l10n.settingsAboutSection,
                                 children: [
@@ -207,7 +226,7 @@ class SettingsScreen extends StatelessWidget {
                             if (appUpdates != null) ...[
                               const SizedBox(height: AppSpacing.lg),
                               YamEntranceReveal(
-                                index: 4,
+                                index: 5,
                                 child: AppUpdateSettingsSection(
                                   controller: appUpdates!,
                                 ),

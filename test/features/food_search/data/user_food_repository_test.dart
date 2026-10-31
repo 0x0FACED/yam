@@ -65,7 +65,7 @@ void main() {
       expect(
         (await reopened.customSelect('PRAGMA user_version').getSingle())
             .read<int>('user_version'),
-        5,
+        6,
       );
     },
   );
@@ -89,6 +89,85 @@ void main() {
     await expectLater(repository.create(invalid), throwsArgumentError);
     expect(await repository.watchFoods().first, isEmpty);
   });
+
+  test(
+    'manual creation rejects an active barcode without partial rows',
+    () async {
+      final database = YamDatabase(NativeDatabase.memory());
+      addTearDown(database.close);
+      final repository = UserFoodRepository(database);
+      await repository.create(example);
+      final foodsBefore = await database.select(database.userFoods).get();
+      final servingsBefore = await database.select(database.userServings).get();
+
+      await expectLater(repository.create(example), throwsArgumentError);
+
+      expect(await database.select(database.userFoods).get(), foodsBefore);
+      expect(
+        await database.select(database.userServings).get(),
+        servingsBefore,
+      );
+    },
+  );
+
+  test(
+    'duplicate imported barcodes stay queryable and editable with SQL exclusions',
+    () async {
+      final database = YamDatabase(NativeDatabase.memory());
+      addTearDown(database.close);
+      final repository = UserFoodRepository(database);
+      final id = await repository.create(example);
+      final original = (await repository.loadFoods()).single.food;
+      await database
+          .into(database.userFoods)
+          .insert(
+            original.copyWith(
+              id: 'deleted-duplicate',
+              deletedAt: Value(DateTime.utc(2025, 1, 1)),
+            ),
+          );
+      expect(
+        await repository.barcodeExists(example.barcode!, excludingFoodId: id),
+        isFalse,
+      );
+      for (final duplicateId in [
+        'imported-duplicate-1',
+        'imported-duplicate-2',
+      ]) {
+        await database
+            .into(database.userFoods)
+            .insert(original.copyWith(id: duplicateId));
+      }
+
+      expect(await repository.barcodeExists(example.barcode!), isTrue);
+      for (final excluded in [
+        id,
+        'imported-duplicate-1',
+        'imported-duplicate-2',
+      ]) {
+        expect(
+          await repository.barcodeExists(
+            example.barcode!,
+            excludingFoodId: excluded,
+          ),
+          isTrue,
+        );
+      }
+      expect(
+        await repository.barcodeExists('999999', excludingFoodId: id),
+        isFalse,
+      );
+      expect(await repository.update(id, example), isTrue);
+      expect((await repository.loadFoods()).length, 3);
+      expect(
+        (await repository.loadFoods()).every(
+          (saved) => saved.food.barcode == example.barcode,
+        ),
+        isTrue,
+      );
+      await expectLater(repository.create(example), throwsArgumentError);
+    },
+  );
 
   test('soft delete hides food and servings and frees its barcode', () async {
     final dir = await Directory.systemTemp.createTemp('yam-delete-test-');

@@ -142,19 +142,30 @@ class UserFoodRepository {
   }
 
   Future<bool> barcodeExists(String barcode, {String? excludingFoodId}) async {
-    final existing =
-        await (database.select(database.userFoods)..where(
-              (food) => food.barcode.equals(barcode) & food.deletedAt.isNull(),
-            ))
-            .getSingleOrNull();
-    return existing != null && existing.id != excludingFoodId;
+    final query = database.selectOnly(database.userFoods)
+      ..addColumns([database.userFoods.id])
+      ..where(
+        database.userFoods.barcode.equals(barcode) &
+            database.userFoods.deletedAt.isNull(),
+      );
+    if (excludingFoodId != null) {
+      query.where(database.userFoods.id.equals(excludingFoodId).not());
+    }
+    query.limit(1);
+    return await query.getSingleOrNull() != null;
   }
 
   Future<String> create(CustomFoodDraft draft) async {
     draft.validate();
+    final barcode = draft.barcode?.trim();
     final id = _uuid.v7();
     final now = DateTime.now().toUtc();
     await database.transaction(() async {
+      if (barcode != null &&
+          barcode.isNotEmpty &&
+          await barcodeExists(barcode)) {
+        throw ArgumentError('Barcode belongs to another active food');
+      }
       final deviceId = await database.installationDeviceId(_uuid);
       await database
           .into(database.userFoods)
@@ -169,11 +180,7 @@ class UserFoodRepository {
                     ? null
                     : draft.brand?.trim(),
               ),
-              barcode: Value(
-                draft.barcode?.trim().isEmpty == true
-                    ? null
-                    : draft.barcode?.trim(),
-              ),
+              barcode: Value(barcode?.isEmpty == true ? null : barcode),
               basisUnit: draft.basis.name,
               basisAmount: draft.basisAmount,
               displayBasis: draft.displayBasis.name,
@@ -221,6 +228,13 @@ class UserFoodRepository {
               .getSingleOrNull();
       if (food == null) return false;
       draft.validate();
+      final barcode = draft.barcode?.trim();
+      final normalizedBarcode = barcode?.isEmpty == true ? null : barcode;
+      if (normalizedBarcode != null &&
+          normalizedBarcode != food.barcode &&
+          await barcodeExists(normalizedBarcode, excludingFoodId: id)) {
+        throw ArgumentError('Barcode belongs to another active food');
+      }
       final activeServings =
           await (database.select(database.userServings)..where(
                 (serving) =>
@@ -260,11 +274,7 @@ class UserFoodRepository {
           brand: Value(
             draft.brand?.trim().isEmpty == true ? null : draft.brand?.trim(),
           ),
-          barcode: Value(
-            draft.barcode?.trim().isEmpty == true
-                ? null
-                : draft.barcode?.trim(),
-          ),
+          barcode: Value(normalizedBarcode),
           basisUnit: Value(draft.basis.name),
           basisAmount: Value(draft.basisAmount),
           displayBasis: Value(draft.displayBasis.name),

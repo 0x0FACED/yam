@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:yam/app/theme/app_spacing.dart';
 import 'package:yam/app/theme/app_typography.dart';
 import 'package:yam/core/ui/buttons/yam_buttons.dart';
+import 'package:yam/core/ui/feedback/yam_action_sheet.dart';
 import 'package:yam/core/ui/feedback/yam_snack_bar.dart';
 import 'package:yam/core/ui/lists/yam_settings_list.dart';
 import 'package:yam/features/backup/data/backup_file_service.dart';
@@ -257,30 +258,12 @@ class _BackupActionsState extends State<_BackupActions> {
   Future<T?> _showSheet<T>({
     required String title,
     required List<Widget> Function(BuildContext, ValueChanged<T?>) content,
-  }) {
-    dismissYamSnackBar(context);
-    var closed = false;
-    return showModalBottomSheet<T>(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      showDragHandle: true,
-      constraints: const BoxConstraints(maxWidth: 560),
-      builder: (sheetContext) {
-        void close(T? result) {
-          if (closed || ModalRoute.of(sheetContext)?.isCurrent != true) return;
-          closed = true;
-          Navigator.of(sheetContext).pop(result);
-        }
-
-        return _BackupSheet(
-          title: title,
-          onClose: () => close(null),
-          children: content(sheetContext, close),
-        );
-      },
-    );
-  }
+  }) => showYamActionSheet<T>(
+    context: context,
+    title: title,
+    closeLabel: AppLocalizations.of(context).backupClose,
+    content: content,
+  );
 
   Future<bool?> _confirm({required bool replace}) {
     final l10n = AppLocalizations.of(context);
@@ -444,57 +427,6 @@ class _BackupProgress extends StatelessWidget {
       ),
     ),
   );
-}
-
-class _BackupSheet extends StatelessWidget {
-  const _BackupSheet({
-    required this.title,
-    required this.onClose,
-    required this.children,
-  });
-
-  final String title;
-  final VoidCallback onClose;
-  final List<Widget> children;
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(
-          AppSpacing.md,
-          0,
-          AppSpacing.md,
-          AppSpacing.lg,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Semantics(
-                    header: true,
-                    child: Text(title, style: AppTypography.sectionTitle),
-                  ),
-                ),
-                YamIconButton(
-                  icon: Icons.close_rounded,
-                  tooltip: AppLocalizations.of(context).backupClose,
-                  surface: false,
-                  onPressed: onClose,
-                ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.md),
-            ...children,
-          ],
-        ),
-      ),
-    );
-  }
 }
 
 class _BackupCountsSummary extends StatelessWidget {

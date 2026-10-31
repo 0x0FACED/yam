@@ -51,7 +51,7 @@ Uint8List _encodeBackup(_BackupData data) {
       for (final row in data.remoteFoods) row.toJson(serializer: _serializer),
     ],
   };
-  _validateTables(tables);
+  _validateTables(tables, allowDuplicateBarcodes: true);
   final archive = Archive();
   var totalBytes = 0;
   void addJson(String name, Object value) {
@@ -65,7 +65,7 @@ Uint8List _encodeBackup(_BackupData data) {
 
   addJson('manifest.json', {
     'format': 'yam-backup',
-    'formatVersion': 2,
+    'formatVersion': 3,
     'exportedAt': data.exportedAt.toUtc().toIso8601String(),
     'sourceDeviceId': data.sourceDeviceId,
     'counts': {
@@ -91,7 +91,7 @@ _BackupData _decodeBackup(Uint8List bytes) {
     _require(manifest['format'] == 'yam-backup');
     final version = manifest['formatVersion'];
     _require(version is int && version > 0);
-    if (version != 1 && version != 2) {
+    if (version != 1 && version != 2 && version != 3) {
       throw const BackupException(BackupFailure.unsupportedVersion);
     }
     _requireKeys(manifest, {
@@ -119,7 +119,7 @@ _BackupData _decodeBackup(Uint8List bytes) {
       _require(counts[entry.key] is int && counts[entry.key] == rows.length);
       tables[entry.key] = rows;
     }
-    _validateTables(tables);
+    _validateTables(tables, allowDuplicateBarcodes: version == 3);
     return _BackupData(
       exportedAt: exportedAt,
       sourceDeviceId: sourceDeviceId as String,
@@ -251,7 +251,10 @@ final _uuid = RegExp(
 );
 final _barcode = RegExp(r'^\d+$');
 
-void _validateTables(Map<String, List<Map<String, dynamic>>> tables) {
+void _validateTables(
+  Map<String, List<Map<String, dynamic>>> tables, {
+  required bool allowDuplicateBarcodes,
+}) {
   if (tables.values.fold<int>(0, (sum, rows) => sum + rows.length) >
       _maxBackupRows) {
     throw const BackupException(BackupFailure.tooLarge);
@@ -276,12 +279,13 @@ void _validateTables(Map<String, List<Map<String, dynamic>>> tables) {
     _positive(row['defaultAmount']);
     servings.putIfAbsent(row['foodId'] as String, () => []).add(row);
   }
-  final barcodes = <String>{};
+  final barcodes = allowDuplicateBarcodes ? null : <String>{};
   for (final row in tables['userFoods']!) {
     _validateCatalog(row);
     final barcode = row['barcode'];
     if (barcode != null) {
-      _require(_barcode.hasMatch(barcode as String) && barcodes.add(barcode));
+      _require(_barcode.hasMatch(barcode as String));
+      if (barcodes != null) _require(barcodes.add(barcode));
     }
     _enum(row['displayBasis'], CustomFoodDisplayBasis.values);
     switch (row['displayBasis']) {

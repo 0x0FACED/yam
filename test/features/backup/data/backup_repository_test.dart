@@ -30,7 +30,7 @@ void main() {
       await _seed(source);
       final original = await _state(source);
       final bytes = await BackupRepository(source).exportBackup();
-      expect(_jsonFiles(bytes)['manifest.json']['formatVersion'], 2);
+      expect(_jsonFiles(bytes)['manifest.json']['formatVersion'], 3);
       final destination = database();
       await _identity(destination, _id(901));
       await destination.into(destination.userFoods).insert(_food(100));
@@ -115,6 +115,99 @@ void main() {
     expect(await _state(source), before);
   });
 
+  for (final mode in BackupImportMode.values) {
+    test(
+      'v3 ${mode.name} preserves repeated barcodes and exact numbers',
+      () async {
+        final source = database();
+        await _seed(source);
+        await _seedDuplicateBarcodes(source);
+        final before = await _state(source);
+        final bytes = await BackupRepository(source).exportBackup();
+        expect(_jsonFiles(bytes)['manifest.json']['formatVersion'], 3);
+        final destination = database();
+        final repository = BackupRepository(destination);
+        final preview = await repository.inspectBackup(bytes);
+        expect(_counts(preview.counts), [3, 3, 2, 2, 2, 2]);
+        final result = await repository.importBackup(preview, mode);
+        expect(_counts(result.imported), [3, 3, 2, 2, 2, 2]);
+        expect(result.skipped.total, 0);
+        expect(await _state(destination), before);
+        expect(await _state(source), before);
+        final roundtrip = database();
+        final reader = BackupRepository(roundtrip);
+        await reader.importBackup(
+          await reader.inspectBackup(await repository.exportBackup()),
+          BackupImportMode.replace,
+        );
+        expect(await _state(roundtrip), before);
+        final repeat = await repository.importBackup(
+          preview,
+          BackupImportMode.supplement,
+        );
+        expect(repeat.imported.total, 0);
+        expect(repeat.skipped.total, 14);
+      },
+    );
+  }
+
+  for (final deleted in [false, true]) {
+    test(
+      'supplement skips every repeated incoming barcode conflicting with an existing ${deleted ? 'tombstone' : 'product'}',
+      () async {
+        final source = database();
+        await _seed(source);
+        await _seedDuplicateBarcodes(source);
+        final destination = database();
+        final existing = _food(100, barcode: '001', deleted: deleted);
+        await destination.into(destination.userFoods).insert(existing);
+        final before = await destination.select(destination.userFoods).get();
+        final repository = BackupRepository(destination);
+        final preview = await repository.inspectBackup(
+          await BackupRepository(source).exportBackup(),
+        );
+        final result = await repository.importBackup(
+          preview,
+          BackupImportMode.supplement,
+        );
+        expect(_counts(result.imported), [0, 0, 2, 2, 2, 2]);
+        expect(_counts(result.skipped), [3, 3, 0, 0, 0, 0]);
+        expect(await destination.select(destination.userFoods).get(), before);
+        expect(
+          await destination.select(destination.userServings).get(),
+          isEmpty,
+        );
+      },
+    );
+  }
+
+  for (final version in [1, 2]) {
+    test(
+      'v$version still rejects duplicate barcodes before mutation',
+      () async {
+        final source = database();
+        await _seed(source);
+        final files = _jsonFiles(await BackupRepository(source).exportBackup());
+        files['manifest.json']['formatVersion'] = version;
+        _rows(files, 'user_foods.json').last['barcode'] = '001';
+        final destination = database();
+        await _seed(destination);
+        final before = await _state(destination);
+        await expectLater(
+          BackupRepository(destination).inspectBackup(_pack(files)),
+          throwsA(
+            isA<BackupException>().having(
+              (error) => error.failure,
+              'failure',
+              BackupFailure.invalidFile,
+            ),
+          ),
+        );
+        expect(await _state(destination), before);
+      },
+    );
+  }
+
   test(
     'legacy v1 descriptions default to null without losing other fields',
     () async {
@@ -140,7 +233,7 @@ void main() {
         expect(result.skipped.total, 0);
         expect(await _state(destination), expected, reason: mode.name);
         final exported = _jsonFiles(await repository.exportBackup());
-        expect(exported['manifest.json']['formatVersion'], 2);
+        expect(exported['manifest.json']['formatVersion'], 3);
         expect(
           _rows(exported, 'user_foods.json').every(
             (row) =>
@@ -152,7 +245,7 @@ void main() {
     },
   );
 
-  for (final version in [1, 2]) {
+  for (final version in [1, 2, 3]) {
     test(
       'v$version imports additional fields and reexports all known data',
       () async {
@@ -550,8 +643,8 @@ void main() {
             _rows(files, 'user_servings.json').first['foodId'] = _id(999),
         'duplicate entity ID': (files) =>
             _rows(files, 'weight_entries.json').last['id'] = _id(9),
-        'duplicate barcode': (files) =>
-            _rows(files, 'user_foods.json').last['barcode'] = '001',
+        'invalid barcode': (files) =>
+            _rows(files, 'user_foods.json').last['barcode'] = '12x34',
         'duplicate provider key': (files) =>
             _rows(files, 'remote_foods.json').last['sourceCode'] = '000111',
         'negative nutrition': (files) =>
@@ -669,7 +762,7 @@ void main() {
         ),
       );
       final future = _jsonFiles(bytes);
-      future['manifest.json']['formatVersion'] = 3;
+      future['manifest.json']['formatVersion'] = 4;
       await expectLater(
         repository.inspectBackup(_pack(future)),
         throwsA(
@@ -935,6 +1028,24 @@ Future<void> _seed(YamDatabase database) async {
       _remote(12, code: '000222', deleted: true),
     ]);
   });
+}
+
+Future<void> _seedDuplicateBarcodes(YamDatabase database) async {
+  await (database.update(database.userFoods)
+        ..where((food) => food.id.equals(_id(2))))
+      .write(const UserFoodsCompanion(barcode: Value('001')));
+  await database
+      .into(database.userFoods)
+      .insert(
+        _food(
+          13,
+          barcode: '001',
+          description: '  Duplicate barcode, distinct product.  ',
+        ).copyWith(displayBasis: 'perServing', basisAmount: 63.1234567890123),
+      );
+  await database
+      .into(database.userServings)
+      .insert(_serving(14, 13, baseAmount: 63.1234567890123));
 }
 
 Future<Map<String, List<Map<String, dynamic>>>> _state(

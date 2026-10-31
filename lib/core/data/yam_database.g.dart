@@ -68,7 +68,6 @@ class $UserFoodsTable extends UserFoods
     true,
     type: DriftSqlType.string,
     requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
   );
   static const VerificationMeta _basisUnitMeta = const VerificationMeta(
     'basisUnit',
@@ -5406,6 +5405,10 @@ abstract class _$YamDatabase extends GeneratedDatabase {
     'user_foods_name',
     'CREATE INDEX user_foods_name ON user_foods (name)',
   );
+  late final Index userFoodsBarcode = Index(
+    'user_foods_barcode',
+    'CREATE INDEX user_foods_barcode ON user_foods (barcode, deleted_at)',
+  );
   late final Index userServingsFood = Index(
     'user_servings_food',
     'CREATE INDEX user_servings_food ON user_servings (food_id, deleted_at)',
@@ -5448,6 +5451,7 @@ abstract class _$YamDatabase extends GeneratedDatabase {
     remoteFoods,
     userFoodsHistory,
     userFoodsName,
+    userFoodsBarcode,
     userServingsFood,
     diaryEntriesDay,
     diaryEntriesRecent,

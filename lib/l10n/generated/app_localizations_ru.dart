@@ -1145,6 +1145,138 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsImportData => 'Импорт данных';
 
   @override
+  String get foodLibrarySection => 'База продуктов';
+
+  @override
+  String get foodLibraryExport => 'Экспорт продуктов';
+
+  @override
+  String get foodLibraryExportHint =>
+      'Только «Мои блюда», в редактируемый JSON';
+
+  @override
+  String get foodLibraryImport => 'Импорт продуктов';
+
+  @override
+  String get foodLibraryImportHint => 'Замена или объединение базы из JSON';
+
+  @override
+  String get foodLibrarySaveDialog => 'Сохранить базу продуктов YAM';
+
+  @override
+  String get foodLibraryOpenDialog => 'Открыть JSON с продуктами';
+
+  @override
+  String get foodLibraryExportSuccess => 'База продуктов сохранена.';
+
+  @override
+  String get foodLibraryExportFailed => 'Не удалось сохранить базу продуктов.';
+
+  @override
+  String get foodLibraryImportFailed =>
+      'Не удалось импортировать продукты. Данные не изменены.';
+
+  @override
+  String get foodLibraryInvalidFile =>
+      'Некорректный файл продуктов. Нужен JSON формата yam-foods. Данные не изменены.';
+
+  @override
+  String foodLibraryInvalidField(String path) {
+    return 'Некорректное или отсутствующее поле: $path. Данные не изменены.';
+  }
+
+  @override
+  String get foodLibraryUnsupportedVersion =>
+      'Эта версия формата продуктов не поддерживается. Попробуйте обновить YAM.';
+
+  @override
+  String get foodLibraryTooLarge =>
+      'Превышен лимит: 64 МиБ, 50 000 продуктов или 250 000 порций.';
+
+  @override
+  String get foodLibraryPreviewTitle => 'Импорт продуктов';
+
+  @override
+  String foodLibraryPreviewCounts(String foods, String servings) {
+    return 'Продуктов: $foods. Порций: $servings.';
+  }
+
+  @override
+  String get foodLibraryScopeNote =>
+      'Добавленные продукты появятся в «Моих блюдах». Дневник, вес, цели, встроенный каталог и сохранённые Open Food Facts не изменятся.';
+
+  @override
+  String get foodLibraryDeduplicate => 'Объединить без дублей';
+
+  @override
+  String get foodLibraryDeduplicateDescription =>
+      'Пропустить совпадения по названию, бренду, единице, базовому количеству и КБЖУ, включая повторы внутри файла. Регистр и лишние пробелы в названии и бренде не учитываются. Существующие продукты не изменятся.';
+
+  @override
+  String get foodLibraryMergeAll => 'Объединить с дублями';
+
+  @override
+  String get foodLibraryMergeAllDescription =>
+      'Добавить каждую запись файла как новый продукт, даже если такой продукт или штрихкод уже есть.';
+
+  @override
+  String get foodLibraryReplace => 'Заменить базу продуктов…';
+
+  @override
+  String get foodLibraryReplaceDescription =>
+      'Убрать текущие «Мои блюда» и загрузить все продукты из файла, сохранив повторы. Потребуется дополнительное подтверждение.';
+
+  @override
+  String get foodLibraryReplaceTitle => 'Заменить «Мои блюда»?';
+
+  @override
+  String get foodLibraryReplaceWarning =>
+      'Все текущие продукты и их порции в «Моих блюдах» будут убраны и заменены содержимым файла. Отмены нет. Пустой список очистит «Мои блюда». История дневника, вес, цели и другие каталоги останутся без изменений.';
+
+  @override
+  String get foodLibraryReplaceConfirm => 'Заменить «Мои блюда»';
+
+  @override
+  String get foodLibraryImportComplete => 'Продукты импортированы';
+
+  @override
+  String foodLibraryImportResult(
+    String imported,
+    String skipped,
+    String replaced,
+  ) {
+    return 'Добавлено: $imported. Пропущено дублей: $skipped. Убрано прежних продуктов: $replaced.';
+  }
+
+  @override
+  String get foodLibraryResultNote =>
+      'Добавленные продукты доступны для изменения и добавления в дневник в «Моих блюдах».';
+
+  @override
+  String get foodLibraryWorking =>
+      'Обмен продуктами: подготовка файла или ожидание подтверждения…';
+
+  @override
+  String get foodLibraryFormatTitle => 'Формат файла и пример';
+
+  @override
+  String get foodLibraryFormatDescription =>
+      'Обычный файл .json в UTF-8: его можно редактировать вручную или создавать через ИИ. КБЖУ задаётся на basisAmount граммов (g) или миллилитров (ml). Числа — без кавычек, десятичный разделитель — точка. Калории импортируются как указано, без пересчёта из БЖУ.';
+
+  @override
+  String get foodLibraryOptionalFields =>
+      'Необязательные поля: brand — бренд, barcode — строка цифр, description — описание; servings — порции с unit (serving/piece/glass/scoop), baseAmount в г/мл, defaultAmount (по умолчанию 1) и label. displayBasis: per100 (базис 100) или perServing; без него базис 100 показывается на 100 г/мл, иной — на порцию. Для базиса на порцию недостающий эквивалент создаётся автоматически.';
+
+  @override
+  String get foodLibraryCopyExample => 'Скопировать пример JSON';
+
+  @override
+  String get foodLibraryExampleName => 'Творог 5%';
+
+  @override
+  String get foodLibraryExampleCategory => 'Молочные продукты';
+
+  @override
   String get backupSaveDialogTitle => 'Сохранить копию YAM';
 
   @override

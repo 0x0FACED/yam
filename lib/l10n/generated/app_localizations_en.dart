@@ -1136,6 +1136,137 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsImportData => 'Import data';
 
   @override
+  String get foodLibrarySection => 'Food library';
+
+  @override
+  String get foodLibraryExport => 'Export foods';
+
+  @override
+  String get foodLibraryExportHint => 'Only My dishes, as editable JSON';
+
+  @override
+  String get foodLibraryImport => 'Import foods';
+
+  @override
+  String get foodLibraryImportHint => 'Replace or merge a library from JSON';
+
+  @override
+  String get foodLibrarySaveDialog => 'Save YAM food library';
+
+  @override
+  String get foodLibraryOpenDialog => 'Open food library JSON';
+
+  @override
+  String get foodLibraryExportSuccess => 'Food library saved.';
+
+  @override
+  String get foodLibraryExportFailed => 'Could not save the food library.';
+
+  @override
+  String get foodLibraryImportFailed =>
+      'Could not import foods. No data was changed.';
+
+  @override
+  String get foodLibraryInvalidFile =>
+      'Invalid food file. Expected yam-foods JSON. No data was changed.';
+
+  @override
+  String foodLibraryInvalidField(String path) {
+    return 'Invalid or missing field: $path. No data was changed.';
+  }
+
+  @override
+  String get foodLibraryUnsupportedVersion =>
+      'This food format version is not supported. Try a newer version of YAM.';
+
+  @override
+  String get foodLibraryTooLarge =>
+      'Limit exceeded: 64 MiB, 50,000 foods or 250,000 servings.';
+
+  @override
+  String get foodLibraryPreviewTitle => 'Import foods';
+
+  @override
+  String foodLibraryPreviewCounts(String foods, String servings) {
+    return 'Foods: $foods. Servings: $servings.';
+  }
+
+  @override
+  String get foodLibraryScopeNote =>
+      'Added foods will appear in My dishes. Your diary, weights, goals, built-in catalog and saved Open Food Facts foods will not change.';
+
+  @override
+  String get foodLibraryDeduplicate => 'Merge without duplicates';
+
+  @override
+  String get foodLibraryDeduplicateDescription =>
+      'Skip matching names, brands, units, basis amounts and nutrition, including repeats within the file. Name and brand matching ignores case and extra whitespace. Existing foods stay unchanged.';
+
+  @override
+  String get foodLibraryMergeAll => 'Merge keeping duplicates';
+
+  @override
+  String get foodLibraryMergeAllDescription =>
+      'Add every record as a new food, even if the same food or barcode already exists.';
+
+  @override
+  String get foodLibraryReplace => 'Replace food library…';
+
+  @override
+  String get foodLibraryReplaceDescription =>
+      'Remove current My dishes and load every food from the file, keeping repeats. Requires another confirmation.';
+
+  @override
+  String get foodLibraryReplaceTitle => 'Replace My dishes?';
+
+  @override
+  String get foodLibraryReplaceWarning =>
+      'All current foods and their servings in My dishes will be removed and replaced with this file. This cannot be undone. An empty list clears My dishes. Diary history, weights, goals and other catalogs stay unchanged.';
+
+  @override
+  String get foodLibraryReplaceConfirm => 'Replace My dishes';
+
+  @override
+  String get foodLibraryImportComplete => 'Foods imported';
+
+  @override
+  String foodLibraryImportResult(
+    String imported,
+    String skipped,
+    String replaced,
+  ) {
+    return 'Added: $imported. Duplicates skipped: $skipped. Previous foods removed: $replaced.';
+  }
+
+  @override
+  String get foodLibraryResultNote =>
+      'Added foods are editable and available for diary logging in My dishes.';
+
+  @override
+  String get foodLibraryWorking =>
+      'Food transfer: preparing a file or waiting for confirmation…';
+
+  @override
+  String get foodLibraryFormatTitle => 'File format and example';
+
+  @override
+  String get foodLibraryFormatDescription =>
+      'A plain UTF-8 .json file, editable by hand or generated with AI. Nutrition is per basisAmount grams (g) or milliliters (ml). Use numbers without quotes and a decimal point. Calories are imported as written, not recalculated from macros.';
+
+  @override
+  String get foodLibraryOptionalFields =>
+      'Optional fields: brand, barcode (a string of digits), description; servings with unit (serving/piece/glass/scoop), baseAmount in g/ml, defaultAmount (1 if omitted) and label. displayBasis: per100 (basis 100) or perServing; if omitted, basis 100 displays per 100 g/ml, otherwise per serving. A missing per-serving equivalent is created automatically.';
+
+  @override
+  String get foodLibraryCopyExample => 'Copy JSON example';
+
+  @override
+  String get foodLibraryExampleName => 'Cottage cheese 5%';
+
+  @override
+  String get foodLibraryExampleCategory => 'Dairy';
+
+  @override
   String get backupSaveDialogTitle => 'Save YAM backup';
 
   @override

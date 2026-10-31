@@ -11,6 +11,8 @@ import 'package:yam/features/backup/data/backup_file_service.dart';
 import 'package:yam/features/backup/data/backup_repository.dart';
 import 'package:yam/features/diary/data/diary_repository.dart';
 import 'package:yam/features/diary/presentation/diary_screen.dart';
+import 'package:yam/features/food_library/data/food_library_file_service.dart';
+import 'package:yam/features/food_library/data/food_library_repository.dart';
 import 'package:yam/features/food_search/presentation/create_product_stub_screen.dart';
 import 'package:yam/features/food_search/presentation/user_food_form_screen.dart';
 import 'package:yam/features/food_search/data/user_food_repository.dart';
@@ -42,6 +44,8 @@ GoRouter createAppRouter({
   BackupRepository? backupRepository,
   BackupFileService? backupFiles,
   VoidCallback? onBackupImported,
+  FoodLibraryRepository? foodLibraryRepository,
+  FoodLibraryFileService? foodLibraryFiles,
   AppUpdateController? appUpdates,
 }) {
   return GoRouter(
@@ -131,6 +135,8 @@ GoRouter createAppRouter({
                       backupRepository: backupRepository,
                       backupFiles: backupFiles,
                       onBackupImported: onBackupImported,
+                      foodLibraryRepository: foodLibraryRepository,
+                      foodLibraryFiles: foodLibraryFiles,
                       appUpdates: appUpdates,
                     ),
                   );

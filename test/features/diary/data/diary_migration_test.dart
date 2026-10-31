@@ -6,7 +6,7 @@ import 'package:yam/features/food_search/data/user_food_repository.dart';
 import '../../food_search/data/generated/schema.dart';
 
 void main() {
-  test('v1 foods and servings survive migration to schema v5', () async {
+  test('v1 foods and servings survive migration to schema v6', () async {
     final verifier = SchemaVerifier(GeneratedHelper());
     final schema = await verifier.schemaAt(1);
     addTearDown(schema.close);
@@ -44,7 +44,7 @@ void main() {
     );
 
     final db = YamDatabase(schema.newConnection());
-    await verifier.migrateAndValidate(db, 5);
+    await verifier.migrateAndValidate(db, 6);
     addTearDown(db.close);
     final foods = await UserFoodRepository(db).loadFoods();
     expect(foods, hasLength(1));
@@ -59,7 +59,7 @@ void main() {
     );
   });
 
-  test('v2 diary entries survive migration to schema v5', () async {
+  test('v2 diary entries survive migration to schema v6', () async {
     final verifier = SchemaVerifier(GeneratedHelper());
     final schema = await verifier.schemaAt(2);
     addTearDown(schema.close);
@@ -96,7 +96,7 @@ void main() {
       ],
     );
     final db = YamDatabase(schema.newConnection());
-    await verifier.migrateAndValidate(db, 5);
+    await verifier.migrateAndValidate(db, 6);
     addTearDown(db.close);
     final entries = await db.select(db.diaryEntries).get();
     expect(entries.single.foodName, 'Oats');
@@ -105,8 +105,8 @@ void main() {
     expect(await db.select(db.goalVersions).get(), isEmpty);
   });
 
-  for (final version in [3, 4]) {
-    test('filled v$version database survives additive migration to v5', () async {
+  for (final version in [3, 4, 5]) {
+    test('filled v$version database survives migration to v6', () async {
       final verifier = SchemaVerifier(GeneratedHelper());
       final schema = await verifier.schemaAt(version);
       addTearDown(schema.close);
@@ -216,7 +216,7 @@ void main() {
           'existing-device-v3',
         ],
       );
-      if (version == 4) {
+      if (version >= 4) {
         raw.execute(
           'INSERT INTO user_foods (id, name, category, brand, barcode, basis_unit, '
           'basis_amount, display_basis, energy_kcal, protein_g, fat_g, carbs_g, '
@@ -272,6 +272,11 @@ void main() {
           );
         }
       }
+      if (version == 5) {
+        raw.execute('UPDATE user_foods SET description = ?', [
+          '  Existing recipe\nKeep precision and whitespace.  ',
+        ]);
+      }
 
       final oldTables = [
         'installation_values',
@@ -280,7 +285,7 @@ void main() {
         'diary_entries',
         'goal_versions',
         'weight_entries',
-        if (version == 4) 'remote_foods',
+        if (version >= 4) 'remote_foods',
       ];
       final before = {
         for (final table in oldTables)
@@ -290,7 +295,7 @@ void main() {
           ],
       };
       final db = YamDatabase(schema.newConnection());
-      await verifier.migrateAndValidate(db, 5);
+      await verifier.migrateAndValidate(db, 6);
       addTearDown(db.close);
       for (final table in oldTables) {
         expect(
@@ -299,17 +304,23 @@ void main() {
                 in await db.customSelect('SELECT * FROM $table').get())
               {
                 for (final entry in row.data.entries)
-                  if (table != 'user_foods' || entry.key != 'description')
+                  if (table != 'user_foods' ||
+                      version >= 5 ||
+                      entry.key != 'description')
                     entry.key: entry.value,
               },
           ],
           before[table],
-          reason: '$table changed in v$version→v5 migration',
+          reason: '$table changed in v$version→v6 migration',
         );
       }
       expect(
         (await db.select(db.userFoods).get()).every(
-          (food) => food.description == null,
+          (food) =>
+              food.description ==
+              (version < 5
+                  ? null
+                  : '  Existing recipe\nKeep precision and whitespace.  '),
         ),
         isTrue,
       );
@@ -317,5 +328,146 @@ void main() {
         expect(await db.select(db.remoteFoods).get(), isEmpty);
       }
     });
+  }
+
+  for (final version in [1, 2, 3, 4, 5]) {
+    test(
+      'v$version rebuild preserves exact foods, servings, indexes and foreign keys',
+      () async {
+        final verifier = SchemaVerifier(GeneratedHelper());
+        final schema = await verifier.schemaAt(version);
+        addTearDown(schema.close);
+        final raw = schema.rawDatabase;
+        raw.execute('PRAGMA foreign_keys = ON');
+        for (final deleted in [false, true]) {
+          final values = <Object?>[
+            deleted ? 'deleted-food' : 'active-food',
+            '  Homemade oats 🥣  ',
+            'Custom/category',
+            'Original brand',
+            deleted ? '0098765' : '0012345',
+            if (version >= 5) '  Recipe\nKeep this exact.  ',
+            'grams',
+            80.1234567890123,
+            'perServing',
+            246.1234567890123,
+            9.1234567890123,
+            3.333333333333333,
+            42.9876543210987,
+            1,
+            100,
+            101,
+            deleted ? 102 : null,
+            'existing-device',
+          ];
+          raw.execute(
+            'INSERT INTO user_foods (id, name, category, brand, barcode, '
+            '${version >= 5 ? 'description, ' : ''}'
+            'basis_unit, basis_amount, display_basis, energy_kcal, protein_g, '
+            'fat_g, carbs_g, is_favorite, created_at, updated_at, deleted_at, '
+            'device_id) VALUES (${List.filled(values.length, '?').join(', ')})',
+            values,
+          );
+          raw.execute(
+            'INSERT INTO user_servings (id, food_id, unit, label, base_amount, '
+            'default_amount, created_at, updated_at, deleted_at, device_id) '
+            'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [
+              deleted ? 'deleted-serving' : 'active-serving',
+              deleted ? 'deleted-food' : 'active-food',
+              'serving',
+              'Original bowl',
+              80.1234567890123,
+              1.375,
+              100,
+              101,
+              deleted ? 102 : null,
+              'existing-device',
+            ],
+          );
+        }
+        final before = {
+          for (final table in ['user_foods', 'user_servings'])
+            table: [
+              for (final row in raw.select('SELECT * FROM $table ORDER BY id'))
+                Map<String, Object?>.from(row),
+            ],
+        };
+
+        final db = YamDatabase(schema.newConnection());
+        addTearDown(db.close);
+        await verifier.migrateAndValidate(db, 6);
+        for (final table in before.keys) {
+          expect([
+            for (final row
+                in await db
+                    .customSelect('SELECT * FROM $table ORDER BY id')
+                    .get())
+              {
+                for (final entry in row.data.entries)
+                  if (table != 'user_foods' ||
+                      version >= 5 ||
+                      entry.key != 'description')
+                    entry.key: entry.value,
+              },
+          ], before[table]);
+        }
+        final indexes = await db
+            .customSelect('PRAGMA index_list(user_foods)')
+            .get();
+        expect(
+          indexes.map((row) => row.read<String>('name')),
+          containsAll([
+            'user_foods_history',
+            'user_foods_name',
+            'user_foods_barcode',
+          ]),
+        );
+        expect(
+          indexes
+              .singleWhere(
+                (row) => row.read<String>('name') == 'user_foods_barcode',
+              )
+              .read<int>('unique'),
+          0,
+        );
+        expect(
+          (await db.customSelect('PRAGMA index_info(user_foods_barcode)').get())
+              .map((row) => row.read<String>('name')),
+          ['barcode', 'deleted_at'],
+        );
+        final foreignKey =
+            (await db
+                    .customSelect('PRAGMA foreign_key_list(user_servings)')
+                    .get())
+                .single;
+        expect(foreignKey.read<String>('table'), 'user_foods');
+        expect(foreignKey.read<String>('from'), 'food_id');
+        expect(foreignKey.read<String>('to'), 'id');
+        expect(
+          await db.customSelect('PRAGMA foreign_key_check').get(),
+          isEmpty,
+        );
+        final serving = (await db.select(db.userServings).get()).first;
+        await expectLater(
+          db
+              .into(db.userServings)
+              .insert(serving.copyWith(id: 'orphan', foodId: 'missing-food')),
+          throwsA(anything),
+        );
+
+        final food = (await db.select(db.userFoods).get()).firstWhere(
+          (food) => food.id == 'active-food',
+        );
+        await db
+            .into(db.userFoods)
+            .insert(food.copyWith(id: 'duplicate-barcode'));
+        expect(await UserFoodRepository(db).barcodeExists('0012345'), isTrue);
+        expect(
+          await db.customSelect('PRAGMA foreign_key_check').get(),
+          isEmpty,
+        );
+      },
+    );
   }
 }

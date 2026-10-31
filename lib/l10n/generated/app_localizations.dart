@@ -2035,6 +2035,226 @@ abstract class AppLocalizations {
   /// **'Import data'**
   String get settingsImportData;
 
+  /// No description provided for @foodLibrarySection.
+  ///
+  /// In en, this message translates to:
+  /// **'Food library'**
+  String get foodLibrarySection;
+
+  /// No description provided for @foodLibraryExport.
+  ///
+  /// In en, this message translates to:
+  /// **'Export foods'**
+  String get foodLibraryExport;
+
+  /// No description provided for @foodLibraryExportHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Only My dishes, as editable JSON'**
+  String get foodLibraryExportHint;
+
+  /// No description provided for @foodLibraryImport.
+  ///
+  /// In en, this message translates to:
+  /// **'Import foods'**
+  String get foodLibraryImport;
+
+  /// No description provided for @foodLibraryImportHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace or merge a library from JSON'**
+  String get foodLibraryImportHint;
+
+  /// No description provided for @foodLibrarySaveDialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Save YAM food library'**
+  String get foodLibrarySaveDialog;
+
+  /// No description provided for @foodLibraryOpenDialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Open food library JSON'**
+  String get foodLibraryOpenDialog;
+
+  /// No description provided for @foodLibraryExportSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Food library saved.'**
+  String get foodLibraryExportSuccess;
+
+  /// No description provided for @foodLibraryExportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save the food library.'**
+  String get foodLibraryExportFailed;
+
+  /// No description provided for @foodLibraryImportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not import foods. No data was changed.'**
+  String get foodLibraryImportFailed;
+
+  /// No description provided for @foodLibraryInvalidFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid food file. Expected yam-foods JSON. No data was changed.'**
+  String get foodLibraryInvalidFile;
+
+  /// No description provided for @foodLibraryInvalidField.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid or missing field: {path}. No data was changed.'**
+  String foodLibraryInvalidField(String path);
+
+  /// No description provided for @foodLibraryUnsupportedVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'This food format version is not supported. Try a newer version of YAM.'**
+  String get foodLibraryUnsupportedVersion;
+
+  /// No description provided for @foodLibraryTooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'Limit exceeded: 64 MiB, 50,000 foods or 250,000 servings.'**
+  String get foodLibraryTooLarge;
+
+  /// No description provided for @foodLibraryPreviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Import foods'**
+  String get foodLibraryPreviewTitle;
+
+  /// No description provided for @foodLibraryPreviewCounts.
+  ///
+  /// In en, this message translates to:
+  /// **'Foods: {foods}. Servings: {servings}.'**
+  String foodLibraryPreviewCounts(String foods, String servings);
+
+  /// No description provided for @foodLibraryScopeNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Added foods will appear in My dishes. Your diary, weights, goals, built-in catalog and saved Open Food Facts foods will not change.'**
+  String get foodLibraryScopeNote;
+
+  /// No description provided for @foodLibraryDeduplicate.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge without duplicates'**
+  String get foodLibraryDeduplicate;
+
+  /// No description provided for @foodLibraryDeduplicateDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip matching names, brands, units, basis amounts and nutrition, including repeats within the file. Name and brand matching ignores case and extra whitespace. Existing foods stay unchanged.'**
+  String get foodLibraryDeduplicateDescription;
+
+  /// No description provided for @foodLibraryMergeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge keeping duplicates'**
+  String get foodLibraryMergeAll;
+
+  /// No description provided for @foodLibraryMergeAllDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Add every record as a new food, even if the same food or barcode already exists.'**
+  String get foodLibraryMergeAllDescription;
+
+  /// No description provided for @foodLibraryReplace.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace food library…'**
+  String get foodLibraryReplace;
+
+  /// No description provided for @foodLibraryReplaceDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove current My dishes and load every food from the file, keeping repeats. Requires another confirmation.'**
+  String get foodLibraryReplaceDescription;
+
+  /// No description provided for @foodLibraryReplaceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace My dishes?'**
+  String get foodLibraryReplaceTitle;
+
+  /// No description provided for @foodLibraryReplaceWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'All current foods and their servings in My dishes will be removed and replaced with this file. This cannot be undone. An empty list clears My dishes. Diary history, weights, goals and other catalogs stay unchanged.'**
+  String get foodLibraryReplaceWarning;
+
+  /// No description provided for @foodLibraryReplaceConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace My dishes'**
+  String get foodLibraryReplaceConfirm;
+
+  /// No description provided for @foodLibraryImportComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Foods imported'**
+  String get foodLibraryImportComplete;
+
+  /// No description provided for @foodLibraryImportResult.
+  ///
+  /// In en, this message translates to:
+  /// **'Added: {imported}. Duplicates skipped: {skipped}. Previous foods removed: {replaced}.'**
+  String foodLibraryImportResult(
+    String imported,
+    String skipped,
+    String replaced,
+  );
+
+  /// No description provided for @foodLibraryResultNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Added foods are editable and available for diary logging in My dishes.'**
+  String get foodLibraryResultNote;
+
+  /// No description provided for @foodLibraryWorking.
+  ///
+  /// In en, this message translates to:
+  /// **'Food transfer: preparing a file or waiting for confirmation…'**
+  String get foodLibraryWorking;
+
+  /// No description provided for @foodLibraryFormatTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'File format and example'**
+  String get foodLibraryFormatTitle;
+
+  /// No description provided for @foodLibraryFormatDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'A plain UTF-8 .json file, editable by hand or generated with AI. Nutrition is per basisAmount grams (g) or milliliters (ml). Use numbers without quotes and a decimal point. Calories are imported as written, not recalculated from macros.'**
+  String get foodLibraryFormatDescription;
+
+  /// No description provided for @foodLibraryOptionalFields.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional fields: brand, barcode (a string of digits), description; servings with unit (serving/piece/glass/scoop), baseAmount in g/ml, defaultAmount (1 if omitted) and label. displayBasis: per100 (basis 100) or perServing; if omitted, basis 100 displays per 100 g/ml, otherwise per serving. A missing per-serving equivalent is created automatically.'**
+  String get foodLibraryOptionalFields;
+
+  /// No description provided for @foodLibraryCopyExample.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy JSON example'**
+  String get foodLibraryCopyExample;
+
+  /// No description provided for @foodLibraryExampleName.
+  ///
+  /// In en, this message translates to:
+  /// **'Cottage cheese 5%'**
+  String get foodLibraryExampleName;
+
+  /// No description provided for @foodLibraryExampleCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Dairy'**
+  String get foodLibraryExampleCategory;
+
   /// No description provided for @backupSaveDialogTitle.
   ///
   /// In en, this message translates to:
