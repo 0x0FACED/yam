@@ -13,7 +13,7 @@ void main() {
     );
     await tester.pumpWidget(app());
     expect(_opacity(tester), 0);
-    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 1));
     await tester.pump(const Duration(milliseconds: 80));
     expect(_opacity(tester), inExclusiveRange(0, 1));
     await tester.enterText(find.byType(TextField), 'Retained input');
@@ -25,7 +25,7 @@ void main() {
     await tester.pumpWidget(app());
     expect(_opacity(tester), 0);
     expect(find.text('Retained input'), findsOneWidget);
-    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 1));
     await tester.pump(const Duration(milliseconds: 80));
     expect(_opacity(tester), inExclusiveRange(0, 1));
     await tester.pumpAndSettle();
@@ -98,31 +98,26 @@ void main() {
     expect(_opacity(tester), 1);
   });
 
-  testWidgets('skips a route return but still reveals a new selection', (
-    tester,
-  ) async {
-    var selection = 0;
-    var active = false;
+  testWidgets('replays after a hidden route becomes active', (tester) async {
+    var active = true;
     Widget app() => _app(
-      animate: false,
       active: active,
-      child: YamEntranceReveal(
-        index: 0,
-        replayKey: selection,
-        child: const Text('Data'),
-      ),
+      child: const YamEntranceReveal(index: 0, child: Text('Data')),
     );
     await tester.pumpWidget(app());
-    active = true;
-    await tester.pumpWidget(app());
-    expect(_opacity(tester), 1);
-    await tester.pump(const Duration(milliseconds: 80));
+    await tester.pumpAndSettle();
     expect(_opacity(tester), 1);
 
-    selection++;
+    active = false;
     await tester.pumpWidget(app());
     expect(_opacity(tester), 0);
-    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
+    expect(_opacity(tester), 0);
+
+    active = true;
+    await tester.pumpWidget(app());
+    expect(_opacity(tester), 0);
+    await tester.pump(const Duration(milliseconds: 1));
     await tester.pump(const Duration(milliseconds: 80));
     expect(_opacity(tester), inExclusiveRange(0, 1));
     await tester.pumpAndSettle();
@@ -135,7 +130,6 @@ Widget _app({
   int epoch = 0,
   bool active = true,
   bool reduceMotion = false,
-  bool animate = true,
 }) => MaterialApp(
   home: MediaQuery(
     data: MediaQueryData(disableAnimations: reduceMotion),
@@ -143,7 +137,6 @@ Widget _app({
       enabled: active,
       child: YamEntranceScope(
         epoch: epoch,
-        animate: animate,
         child: Scaffold(body: child),
       ),
     ),

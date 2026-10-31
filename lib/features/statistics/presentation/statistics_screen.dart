@@ -9,6 +9,7 @@ import 'package:yam/app/theme/app_spacing.dart';
 import 'package:yam/app/theme/app_typography.dart';
 import 'package:yam/core/ui/buttons/yam_buttons.dart';
 import 'package:yam/core/ui/feedback/yam_snack_bar.dart';
+import 'package:yam/core/ui/motion/yam_entrance_reveal.dart';
 import 'package:yam/core/ui/nutrition/yam_progress_bar.dart';
 import 'package:yam/features/diary/domain/diary_entry.dart';
 import 'package:yam/features/statistics/data/statistics_repository.dart';
@@ -389,15 +390,25 @@ class _StatisticsScreenState extends State<StatisticsScreen>
                               LayoutBuilder(
                                 builder: (context, content) {
                                   final wide = content.maxWidth >= 760;
-                                  final weight = _weightCard(snapshot, l10n);
-                                  final calories = _caloriesCard(
-                                    snapshot,
-                                    l10n,
+                                  final weight = YamEntranceReveal(
+                                    index: 0,
+                                    replayKey: _rangeEpoch,
+                                    child: _weightCard(snapshot, l10n),
                                   );
-                                  final macros = _macrosCard(snapshot, l10n);
-                                  final regularity = _regularityCard(
-                                    snapshot,
-                                    l10n,
+                                  final calories = YamEntranceReveal(
+                                    index: 1,
+                                    replayKey: _rangeEpoch,
+                                    child: _caloriesCard(snapshot, l10n),
+                                  );
+                                  final macros = YamEntranceReveal(
+                                    index: 2,
+                                    replayKey: _rangeEpoch,
+                                    child: _macrosCard(snapshot, l10n),
+                                  );
+                                  final regularity = YamEntranceReveal(
+                                    index: 3,
+                                    replayKey: _rangeEpoch,
+                                    child: _regularityCard(snapshot, l10n),
                                   );
                                   return wide
                                       ? Column(
@@ -449,7 +460,11 @@ class _StatisticsScreenState extends State<StatisticsScreen>
                                 },
                               ),
                               const SizedBox(height: AppSpacing.md),
-                              _frequentCard(snapshot, l10n),
+                              YamEntranceReveal(
+                                index: 4,
+                                replayKey: _rangeEpoch,
+                                child: _frequentCard(snapshot, l10n),
+                              ),
                             ],
                           ],
                         ),

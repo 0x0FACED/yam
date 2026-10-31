@@ -44,6 +44,7 @@ class DiaryScreen extends StatefulWidget {
 class _DiaryScreenState extends State<DiaryScreen> {
   final _scrollController = ScrollController();
   List<DiaryEntry> _entries = const [];
+  bool _entriesReady = false;
   Map<String, List<DiaryPrototypeEntry>> _displayEntriesByMeal = const {};
   Locale? _displayLocale;
   StreamSubscription<List<DiaryEntry>>? _daySubscription;
@@ -98,11 +99,13 @@ class _DiaryScreenState extends State<DiaryScreen> {
     _daySubscription?.cancel();
     _entries = const [];
     _displayEntriesByMeal = const {};
+    _entriesReady = widget.repository == null;
     final day = _selectedDay;
     _daySubscription = widget.repository?.watchDay(day).listen((entries) {
       if (mounted && _isSameDay(day, _selectedDay)) {
         setState(() {
           _entries = entries;
+          _entriesReady = true;
           _prepareDisplayEntries();
         });
       }
@@ -342,6 +345,8 @@ class _DiaryScreenState extends State<DiaryScreen> {
             child: _ConstrainedDiaryContent(
               child: YamEntranceReveal(
                 index: 1,
+                replayKey: _selectedDay,
+                ready: _entriesReady,
                 child: DailyNutritionSummary(day: day),
               ),
             ),
@@ -367,6 +372,8 @@ class _DiaryScreenState extends State<DiaryScreen> {
                   ? YamEntranceReveal(
                       key: ValueKey('diary-reveal-${meal.id}'),
                       index: index + 2,
+                      replayKey: _selectedDay,
+                      ready: _entriesReady,
                       child: section,
                     )
                   : section,
@@ -406,6 +413,8 @@ class _DiaryScreenState extends State<DiaryScreen> {
                       width: 360,
                       child: YamEntranceReveal(
                         index: 1,
+                        replayKey: _selectedDay,
+                        ready: _entriesReady,
                         child: DailyNutritionSummary(day: day),
                       ),
                     ),
@@ -413,6 +422,8 @@ class _DiaryScreenState extends State<DiaryScreen> {
                     Expanded(
                       child: _MealList(
                         day: day,
+                        replayKey: _selectedDay,
+                        ready: _entriesReady,
                         onAddFood: (mealId) => _openFoodSearch(mealId: mealId),
                         onEntryPressed: _editEntry,
                         highlightedEntryId: _highlightedEntryId,
@@ -445,7 +456,12 @@ class _DiaryScreenState extends State<DiaryScreen> {
   }
 
   void _selectDay(DateTime day) {
-    setState(() => _selectedDay = DateTime(day.year, day.month, day.day));
+    final selectedDay = DateTime(day.year, day.month, day.day);
+    if (_isSameDay(selectedDay, _selectedDay)) return;
+    setState(() {
+      _selectedDay = selectedDay;
+      _entriesReady = widget.repository == null;
+    });
     _watchSelectedDay();
     if (_visibleWeekStart != _weekStartFor(_selectedDay)) {
       _watchVisibleWeek();
@@ -636,6 +652,8 @@ class _ConstrainedDiaryContent extends StatelessWidget {
 class _MealList extends StatelessWidget {
   const _MealList({
     required this.day,
+    required this.replayKey,
+    required this.ready,
     required this.onAddFood,
     required this.onEntryPressed,
     required this.highlightedEntryId,
@@ -643,6 +661,8 @@ class _MealList extends StatelessWidget {
   });
 
   final DiaryPrototypeDay day;
+  final Object replayKey;
+  final bool ready;
   final ValueChanged<String> onAddFood;
   final ValueChanged<DiaryPrototypeEntry> onEntryPressed;
   final String? highlightedEntryId;
@@ -657,6 +677,8 @@ class _MealList extends StatelessWidget {
             YamEntranceReveal(
               key: ValueKey('diary-reveal-${day.meals[index].id}'),
               index: index + 2,
+              replayKey: replayKey,
+              ready: ready,
               child: _buildMeal(day.meals[index]),
             )
           else

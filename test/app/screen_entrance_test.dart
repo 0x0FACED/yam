@@ -41,7 +41,7 @@ void main() {
     final diary = DiaryRepository(database);
     await diary.create(_entry(today, 'Today food', 300));
     await diary.create(_entry(yesterday, 'Yesterday food', 500));
-    await tester.pumpWidget(YamApp(database: database));
+    await tester.pumpWidget(YamApp(appVersion: '0.4.0+8', database: database));
     await tester.pumpAndSettle();
     expect(find.text('Today food'), findsOneWidget);
     expect(_diaryOpacity(tester), 1);
@@ -86,6 +86,10 @@ void main() {
         (widget) => widget is YamEntranceReveal && widget.index == 1,
       ),
     );
+    for (var frame = 0; frame < 100 && summary.evaluate().isEmpty; frame++) {
+      await tester.pump(const Duration(milliseconds: 1));
+    }
+    expect(summary, findsOneWidget);
     expect(_revealOpacity(tester, summary), 0);
     await tester.pump(const Duration(milliseconds: 80));
     await tester.pump(const Duration(milliseconds: 60));
@@ -117,8 +121,9 @@ void main() {
     expect(find.byKey(const ValueKey('food-search-field')), findsOneWidget);
     await tester.binding.handlePopRoute();
     await tester.pump();
-    expect(_diaryOpacity(tester), 1);
+    expect(_diaryOpacity(tester), 0);
     await tester.pumpAndSettle();
+    expect(_diaryOpacity(tester), 1);
     expect(find.text('Yesterday food'), findsOneWidget);
 
     // Returning from search must not disable later date transitions.
