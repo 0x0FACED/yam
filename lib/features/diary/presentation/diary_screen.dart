@@ -29,6 +29,7 @@ class DiaryScreen extends StatefulWidget {
     this.profile,
     this.repository,
     this.statisticsRepository,
+    this.onOpenAssistant,
     super.key,
   });
 
@@ -36,6 +37,7 @@ class DiaryScreen extends StatefulWidget {
   final SessionProfile? profile;
   final DiaryRepository? repository;
   final StatisticsRepository? statisticsRepository;
+  final ValueChanged<DateTime>? onOpenAssistant;
 
   @override
   State<DiaryScreen> createState() => _DiaryScreenState();
@@ -295,6 +297,16 @@ class _DiaryScreenState extends State<DiaryScreen> {
                   ),
                 ),
               ),
+              if (widget.onOpenAssistant case final open?)
+                YamIconButton(
+                  key: const ValueKey('diary-assistant'),
+                  icon: Icons.auto_awesome_outlined,
+                  tooltip: AppLocalizations.of(context).assistantTitle,
+                  onPressed: () => open(_selectedDay),
+                  surface: false,
+                  iconSize: 22,
+                  visualSize: 32,
+                ),
               if (!_isSameDay(_selectedDay, _today))
                 YamIconButton(
                   icon: Icons.today_rounded,

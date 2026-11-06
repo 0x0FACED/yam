@@ -6,7 +6,7 @@ import 'package:yam/features/food_search/data/user_food_repository.dart';
 import '../../food_search/data/generated/schema.dart';
 
 void main() {
-  test('v1 foods and servings survive migration to schema v6', () async {
+  test('v1 foods and servings survive migration to schema v7', () async {
     final verifier = SchemaVerifier(GeneratedHelper());
     final schema = await verifier.schemaAt(1);
     addTearDown(schema.close);
@@ -44,7 +44,7 @@ void main() {
     );
 
     final db = YamDatabase(schema.newConnection());
-    await verifier.migrateAndValidate(db, 6);
+    await verifier.migrateAndValidate(db, 7);
     addTearDown(db.close);
     final foods = await UserFoodRepository(db).loadFoods();
     expect(foods, hasLength(1));
@@ -59,7 +59,7 @@ void main() {
     );
   });
 
-  test('v2 diary entries survive migration to schema v6', () async {
+  test('v2 diary entries survive migration to schema v7', () async {
     final verifier = SchemaVerifier(GeneratedHelper());
     final schema = await verifier.schemaAt(2);
     addTearDown(schema.close);
@@ -96,17 +96,18 @@ void main() {
       ],
     );
     final db = YamDatabase(schema.newConnection());
-    await verifier.migrateAndValidate(db, 6);
+    await verifier.migrateAndValidate(db, 7);
     addTearDown(db.close);
     final entries = await db.select(db.diaryEntries).get();
     expect(entries.single.foodName, 'Oats');
     expect(entries.single.energyKcal, 125);
+    expect(entries.single.isEstimated, isFalse);
     expect(await db.select(db.weightEntries).get(), isEmpty);
     expect(await db.select(db.goalVersions).get(), isEmpty);
   });
 
-  for (final version in [3, 4, 5]) {
-    test('filled v$version database survives migration to v6', () async {
+  for (final version in [3, 4, 5, 6]) {
+    test('filled v$version database survives migration to v7', () async {
       final verifier = SchemaVerifier(GeneratedHelper());
       final schema = await verifier.schemaAt(version);
       addTearDown(schema.close);
@@ -272,7 +273,7 @@ void main() {
           );
         }
       }
-      if (version == 5) {
+      if (version >= 5) {
         raw.execute('UPDATE user_foods SET description = ?', [
           '  Existing recipe\nKeep precision and whitespace.  ',
         ]);
@@ -295,7 +296,7 @@ void main() {
           ],
       };
       final db = YamDatabase(schema.newConnection());
-      await verifier.migrateAndValidate(db, 6);
+      await verifier.migrateAndValidate(db, 7);
       addTearDown(db.close);
       for (final table in oldTables) {
         expect(
@@ -304,14 +305,15 @@ void main() {
                 in await db.customSelect('SELECT * FROM $table').get())
               {
                 for (final entry in row.data.entries)
-                  if (table != 'user_foods' ||
-                      version >= 5 ||
-                      entry.key != 'description')
+                  if ((table != 'user_foods' ||
+                          version >= 5 ||
+                          entry.key != 'description') &&
+                      (table != 'diary_entries' || entry.key != 'is_estimated'))
                     entry.key: entry.value,
               },
           ],
           before[table],
-          reason: '$table changed in v$version→v6 migration',
+          reason: '$table changed in v$version→v7 migration',
         );
       }
       expect(
@@ -323,6 +325,10 @@ void main() {
                   : '  Existing recipe\nKeep precision and whitespace.  '),
         ),
         isTrue,
+      );
+      expect(
+        (await db.select(db.diaryEntries).get()).single.isEstimated,
+        isFalse,
       );
       if (version == 3) {
         expect(await db.select(db.remoteFoods).get(), isEmpty);
@@ -396,7 +402,7 @@ void main() {
 
         final db = YamDatabase(schema.newConnection());
         addTearDown(db.close);
-        await verifier.migrateAndValidate(db, 6);
+        await verifier.migrateAndValidate(db, 7);
         for (final table in before.keys) {
           expect([
             for (final row

@@ -85,6 +85,7 @@ class DiaryEntries extends Table {
   RealColumn get proteinG => real()();
   RealColumn get fatG => real()();
   RealColumn get carbsG => real()();
+  BoolColumn get isEstimated => boolean().withDefault(const Constant(false))();
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();
   DateTimeColumn get deletedAt => dateTime().nullable()();
@@ -186,7 +187,7 @@ class YamDatabase extends _$YamDatabase {
     : super(LazyDatabase(() async => driftDatabase(name: 'yam')));
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -236,6 +237,10 @@ class YamDatabase extends _$YamDatabase {
         await customStatement(
           'CREATE INDEX user_foods_barcode ON user_foods (barcode, deleted_at)',
         );
+      }
+      // v1 creates the current diary table above, including this column.
+      if (from >= 2 && from < 7) {
+        await migrator.addColumn(diaryEntries, diaryEntries.isEstimated);
       }
     },
     beforeOpen: (details) async {

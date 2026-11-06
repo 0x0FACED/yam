@@ -24,6 +24,14 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Use the microphone to turn a short food description into editable text.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Recognize your spoken food description as editable text before you send it.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Take a food or package photo to attach to the assistant.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Select a food or package photo to attach to the assistant.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

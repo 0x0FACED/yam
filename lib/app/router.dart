@@ -7,6 +7,10 @@ import 'package:yam/app/onboarding_access.dart';
 import 'package:yam/app/navigation/adaptive_navigation_shell.dart';
 import 'package:yam/app/session/session_profile.dart';
 import 'package:yam/features/app_update/presentation/app_update_controller.dart';
+import 'package:yam/features/assistant/data/assistant_connection_manager.dart';
+import 'package:yam/features/assistant/presentation/assistant_connection_screen.dart';
+import 'package:yam/features/assistant/presentation/assistant_screen.dart';
+import 'package:yam/features/diary/domain/diary_entry.dart';
 import 'package:yam/features/backup/data/backup_file_service.dart';
 import 'package:yam/features/backup/data/backup_repository.dart';
 import 'package:yam/features/diary/data/diary_repository.dart';
@@ -47,6 +51,7 @@ GoRouter createAppRouter({
   FoodLibraryRepository? foodLibraryRepository,
   FoodLibraryFileService? foodLibraryFiles,
   AppUpdateController? appUpdates,
+  AssistantConnectionManager? assistantConnection,
 }) {
   return GoRouter(
     initialLocation: '/diary',
@@ -89,6 +94,11 @@ GoRouter createAppRouter({
                         today: diaryToday,
                         profile: profile,
                         repository: diaryRepository,
+                        onOpenAssistant: assistantConnection == null
+                            ? null
+                            : (day) => context.push(
+                                '/assistant?day=${diaryDayKey(day)}',
+                              ),
                         statisticsRepository: statisticsRepository,
                       ),
                     );
@@ -97,6 +107,11 @@ GoRouter createAppRouter({
                     today: diaryToday,
                     repository: diaryRepository,
                     statisticsRepository: statisticsRepository,
+                    onOpenAssistant: assistantConnection == null
+                        ? null
+                        : (day) => context.push(
+                            '/assistant?day=${diaryDayKey(day)}',
+                          ),
                   );
                 },
               ),
@@ -138,6 +153,9 @@ GoRouter createAppRouter({
                       foodLibraryRepository: foodLibraryRepository,
                       foodLibraryFiles: foodLibraryFiles,
                       appUpdates: appUpdates,
+                      onOpenAssistant: assistantConnection == null
+                          ? null
+                          : () => context.push('/assistant/connection'),
                     ),
                   );
                 },
@@ -146,6 +164,33 @@ GoRouter createAppRouter({
           ),
         ],
       ),
+      if (assistantConnection != null)
+        GoRoute(
+          path: '/assistant/connection',
+          builder: (context, state) =>
+              AssistantConnectionScreen(connection: assistantConnection),
+        ),
+      if (assistantConnection != null &&
+          userFoodRepository != null &&
+          diaryRepository != null)
+        GoRoute(
+          path: '/assistant',
+          builder: (context, state) {
+            final selected = DateTime.tryParse(
+              state.uri.queryParameters['day'] ?? '',
+            );
+            return AssistantScreen(
+              database: diaryRepository.database,
+              userFoods: userFoodRepository,
+              diary: diaryRepository,
+              connection: assistantConnection,
+              day: selected ?? diaryToday ?? DateTime.now(),
+              mealId: diaryMealIds.contains(state.uri.queryParameters['meal'])
+                  ? state.uri.queryParameters['meal']!
+                  : 'breakfast',
+            );
+          },
+        ),
       GoRoute(
         path: '/onboarding',
         builder: (context, state) {

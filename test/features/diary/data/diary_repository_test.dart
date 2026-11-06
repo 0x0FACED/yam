@@ -47,6 +47,7 @@ void main() {
           servingId: 'grams',
           amount: 80,
           canonicalQuantity: 80,
+          isEstimated: true,
         ),
       );
       expect(id[14], '7');
@@ -57,6 +58,7 @@ void main() {
       final stored = DiaryRepository(reopened);
       final original = (await stored.watchDay(day).first).single;
       expect(original.day, day);
+      expect(original.isEstimated, isTrue);
       expect(original.nutrition.kcal, closeTo(293, 0.000001));
       expect(original.food.servings, hasLength(2));
       final metadata = await (reopened.select(
@@ -78,6 +80,7 @@ void main() {
       expect(edited.servingId, 'serving');
       expect(edited.canonicalQuantity, 100);
       expect(edited.nutrition.kcal, 366.25);
+      expect(edited.isEstimated, isTrue);
       expect(await stored.watchRecentFoodIds().first, ['local-oats']);
 
       await stored.delete(id);
@@ -85,6 +88,7 @@ void main() {
       expect(await stored.watchRecentFoodIds().first, isEmpty);
       await stored.restore(edited);
       expect((await stored.watchDay(day).first).single.mealId, 'lunch');
+      expect((await stored.watchDay(day).first).single.isEstimated, isTrue);
       await stored.restore(original);
       expect(
         (await stored.watchDay(day).first).single.nutrition.kcal,
@@ -109,6 +113,7 @@ void main() {
       ),
     );
     expect((await repo.watchDay(localDay).first).single.day, localDay);
+    expect((await repo.watchDay(localDay).first).single.isEstimated, isFalse);
     expect(await repo.watchDay(DateTime(2027, 1, 1)).first, isEmpty);
   });
 

@@ -23,6 +23,60 @@ void main() {
     return db;
   }
 
+  for (final version in [1, 2, 3]) {
+    test(
+      'v$version missing provenance defaults false in both import modes',
+      () async {
+        final source = database();
+        await _seed(source);
+        final files = _jsonFiles(await BackupRepository(source).exportBackup());
+        files['manifest.json']['formatVersion'] = version;
+        for (final row in _rows(files, 'diary_entries.json')) {
+          row.remove('isEstimated');
+        }
+        for (final mode in BackupImportMode.values) {
+          final destination = database();
+          final repository = BackupRepository(destination);
+          await repository.importBackup(
+            await repository.inspectBackup(_pack(files)),
+            mode,
+          );
+          expect(
+            (await destination.select(destination.diaryEntries).get()).every(
+              (entry) => !entry.isEstimated,
+            ),
+            isTrue,
+          );
+        }
+      },
+    );
+  }
+
+  for (final malformed in <Object?>[null, 0, 1, 'true', [], {}]) {
+    test(
+      'rejects malformed estimated provenance $malformed before writes',
+      () async {
+        final source = database();
+        await _seed(source);
+        final files = _jsonFiles(await BackupRepository(source).exportBackup());
+        _rows(files, 'diary_entries.json').first['isEstimated'] = malformed;
+        final destination = database();
+        final before = await _state(destination);
+        await expectLater(
+          BackupRepository(destination).inspectBackup(_pack(files)),
+          throwsA(
+            isA<BackupException>().having(
+              (error) => error.failure,
+              'failure',
+              BackupFailure.invalidFile,
+            ),
+          ),
+        );
+        expect(await _state(destination), before);
+      },
+    );
+  }
+
   test(
     'replace roundtrips every persisted field, tombstone and exact snapshot',
     () async {
@@ -61,6 +115,7 @@ void main() {
       expect(entries.single.food.name, 'Historical oats');
       expect(entries.single.food.serving(_id(3)).baseAmount, 80);
       expect(entries.single.nutrition.kcal, 251.1234567890123 * 1.25);
+      expect(entries.single.isEstimated, isTrue);
       final catalog = await destination.select(destination.userFoods).get();
       expect(
         catalog.firstWhere((row) => row.id == _id(1)).name,
@@ -987,6 +1042,7 @@ Future<void> _seed(YamDatabase database) async {
     proteinG: 10.1234567890123 * 1.25,
     fatG: 4.9876543210987 * 1.25,
     carbsG: 37.1234567890123 * 1.25,
+    isEstimated: true,
     createdAt: _created,
     updatedAt: _updated,
     deletedAt: null,

@@ -13,6 +13,7 @@ import 'package:yam/core/ui/motion/yam_entrance_reveal.dart';
 import 'package:yam/features/app_update/data/android_update_installer.dart';
 import 'package:yam/features/app_update/data/github_update_client.dart';
 import 'package:yam/features/app_update/presentation/app_update_controller.dart';
+import 'package:yam/features/assistant/data/assistant_connection_manager.dart';
 import 'package:yam/features/backup/data/backup_file_service.dart';
 import 'package:yam/features/backup/data/backup_repository.dart';
 import 'package:yam/features/diary/data/diary_repository.dart';
@@ -65,6 +66,7 @@ class _YamAppState extends State<YamApp> {
   late final BackupRepository _backup;
   late final FoodLibraryRepository _foodLibrary;
   late final AppUpdateController? _appUpdates;
+  late final AssistantConnectionManager _assistantConnection;
   StreamSubscription<List<GoalVersion>>? _goalsSubscription;
   StreamSubscription<List<WeightRecord>>? _weightsSubscription;
   List<GoalVersion> _goals = const [];
@@ -90,6 +92,7 @@ class _YamAppState extends State<YamApp> {
     _statistics = StatisticsRepository(_foodDatabase);
     _backup = BackupRepository(_foodDatabase);
     _foodLibrary = FoodLibraryRepository(_foodDatabase);
+    _assistantConnection = AssistantConnectionManager();
     _appUpdates =
         widget.appUpdates ??
         (!kIsWeb && Platform.isAndroid
@@ -123,6 +126,7 @@ class _YamAppState extends State<YamApp> {
     foodLibraryRepository: _foodLibrary,
     foodLibraryFiles: widget.foodLibraryFiles,
     appUpdates: _appUpdates,
+    assistantConnection: _assistantConnection,
   );
 
   void _reloadAfterImport() {
@@ -146,6 +150,7 @@ class _YamAppState extends State<YamApp> {
   void dispose() {
     _router.dispose();
     _openFoodFacts.close();
+    _assistantConnection.dispose();
     if (widget.appUpdates == null) _appUpdates?.dispose();
     _goalsSubscription?.cancel();
     _weightsSubscription?.cancel();

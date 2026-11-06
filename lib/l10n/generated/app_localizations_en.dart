@@ -1423,6 +1423,264 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsVersion => 'Version';
 
   @override
+  String get assistantTitle => 'AI assistant';
+
+  @override
+  String get assistantSettings => 'AI connection';
+
+  @override
+  String get assistantSettingsSubtitle => 'ChatGPT or your own OpenAI API key';
+
+  @override
+  String get assistantIntro =>
+      'Describe your food, dictate, or attach a photo. I will find foods and prepare a draft. Nothing is saved until you confirm.';
+
+  @override
+  String get assistantPrivacy =>
+      'The provider receives your messages, attached photos, and only requested YAM data. Your full database is not sent in advance. The regular diary works without AI or a network.';
+
+  @override
+  String get assistantSessionNote =>
+      'The conversation and unsaved draft are discarded when you close this screen.';
+
+  @override
+  String get assistantPrompt => 'What did you eat?';
+
+  @override
+  String get assistantPromptHint =>
+      'For example: two eggs and 200 g of cottage cheese for breakfast';
+
+  @override
+  String get assistantSend => 'Send';
+
+  @override
+  String get assistantStop => 'Stop';
+
+  @override
+  String get assistantRetry => 'Retry request';
+
+  @override
+  String get assistantThinking => 'Preparing a response…';
+
+  @override
+  String get assistantPhoto => 'Choose a photo';
+
+  @override
+  String get assistantCamera => 'Take a photo';
+
+  @override
+  String get assistantRemovePhoto => 'Remove photo';
+
+  @override
+  String get assistantPhotoAttached => 'Photo attached';
+
+  @override
+  String get assistantVoice => 'Dictate';
+
+  @override
+  String get assistantVoiceStop => 'Finish dictation';
+
+  @override
+  String get assistantListening =>
+      'Speak, then stop dictation and review the text.';
+
+  @override
+  String get assistantApiKey => 'Own API key';
+
+  @override
+  String get assistantApiKeyLabel => 'OpenAI API key';
+
+  @override
+  String get assistantApiKeyNote =>
+      'API-key requests are billed separately by OpenAI. The key is stored securely on this device and excluded from backups. A saved key also transcribes voice when system recognition is unavailable.';
+
+  @override
+  String get assistantSaveKey => 'Connect API key';
+
+  @override
+  String get assistantChatGpt => 'ChatGPT plan';
+
+  @override
+  String get assistantChatGptContinue => 'Continue with ChatGPT';
+
+  @override
+  String get assistantOAuthReturn => 'Return to YAM to continue connecting.';
+
+  @override
+  String get assistantChatGptAccount => 'ChatGPT account';
+
+  @override
+  String get assistantAddChatGptAccount => 'Add another account';
+
+  @override
+  String get assistantPlanNote =>
+      'For eligible ChatGPT plans. Uses your shared plan limit; voice recognition is separate. Sign-in opens in your system browser.';
+
+  @override
+  String get assistantPlanWelcomeTitle => 'You are using your ChatGPT plan';
+
+  @override
+  String get assistantPlanWelcome =>
+      'Eligible YAM AI requests will use your ChatGPT plan allowance. You can manage app access and limits in ChatGPT settings.';
+
+  @override
+  String get assistantManageUsage => 'Manage ChatGPT usage';
+
+  @override
+  String get assistantDisconnect => 'Disconnect selected connection';
+
+  @override
+  String get assistantConnected => 'Connected';
+
+  @override
+  String get assistantNotConnected => 'Choose a connection to start';
+
+  @override
+  String get assistantModel => 'Model';
+
+  @override
+  String get assistantRefreshModels => 'Refresh models';
+
+  @override
+  String get assistantConnectionMode => 'Use';
+
+  @override
+  String get assistantDraftTitle => 'Review before saving';
+
+  @override
+  String get assistantDraftNote =>
+      'Check the food, quantity, date, and meal. This is a draft; nothing has been saved.';
+
+  @override
+  String get assistantDate => 'Date';
+
+  @override
+  String get assistantMeal => 'Meal';
+
+  @override
+  String get assistantAmount => 'Quantity';
+
+  @override
+  String get assistantUnit => 'Unit';
+
+  @override
+  String get assistantEstimatedLabel => 'AI estimate';
+
+  @override
+  String get assistantEstimateNote =>
+      'A photo estimate is not a measurement. Check ingredients, added oil, and portion size.';
+
+  @override
+  String get assistantSaveToCatalog => 'Save new food to My dishes';
+
+  @override
+  String get assistantAddToDiary => 'Add to diary';
+
+  @override
+  String get assistantSaveProducts => 'Save foods';
+
+  @override
+  String get assistantRemoveItem => 'Remove from draft';
+
+  @override
+  String get assistantEditProduct => 'Edit food details';
+
+  @override
+  String get assistantDiscard => 'Discard draft';
+
+  @override
+  String get assistantSaved => 'The confirmed batch has been saved';
+
+  @override
+  String get assistantCloseTitle => 'Close assistant?';
+
+  @override
+  String get assistantCloseNote =>
+      'The conversation, attached photo, and unsaved draft will be discarded. Saved entries remain in the diary.';
+
+  @override
+  String get assistantCloseConfirm => 'Close';
+
+  @override
+  String get assistantKeepEditing => 'Keep editing';
+
+  @override
+  String get assistantClearTitle => 'Start a new conversation?';
+
+  @override
+  String get assistantClear => 'New conversation';
+
+  @override
+  String get assistantSwitchNote =>
+      'Changing the connection starts a new conversation and discards the unsaved draft.';
+
+  @override
+  String get assistantConsent => 'Understood, open assistant';
+
+  @override
+  String get assistantInvalidDraft =>
+      'Check the draft fields: quantities must be greater than zero and food details must be complete.';
+
+  @override
+  String get assistantErrorNetwork =>
+      'Cannot reach the provider. Check your connection and retry. The manual diary is available.';
+
+  @override
+  String get assistantErrorAuth =>
+      'The connection is invalid or access was denied. Reconnect your key or sign in again.';
+
+  @override
+  String get assistantErrorLimit =>
+      'The request limit has been reached. Check your connection limits and try again later.';
+
+  @override
+  String get assistantErrorModels =>
+      'No available models could be loaded. Refresh the list or check your connection.';
+
+  @override
+  String get assistantErrorInterrupted =>
+      'The response did not complete. Nothing was saved; you can retry.';
+
+  @override
+  String get assistantErrorCancelled => 'Request stopped. Nothing was saved.';
+
+  @override
+  String get assistantErrorStorage =>
+      'Secure storage is unavailable. Check the system keyring; secrets have not been stored in ordinary files.';
+
+  @override
+  String get assistantErrorRevocation =>
+      'The local connection was removed, but remote revocation was not confirmed. Disconnect YAM in ChatGPT settings.';
+
+  @override
+  String get assistantErrorSpeechPermission =>
+      'Microphone or speech recognition access was denied. Check system permissions.';
+
+  @override
+  String get assistantErrorSpeechKey =>
+      'Voice recognition on this platform requires your own API key. Add it in AI settings or type your message.';
+
+  @override
+  String get assistantErrorSpeech =>
+      'Could not recognize speech. Check your microphone and system support, or type your message.';
+
+  @override
+  String get assistantErrorImage =>
+      'Choose a JPEG, PNG, or WebP photo up to 10 MB. If the file is already smaller, reduce its resolution.';
+
+  @override
+  String get assistantErrorMedia =>
+      'Could not open the photo or microphone. Check permissions and retry.';
+
+  @override
+  String get assistantErrorSave =>
+      'Could not save the batch. Nothing was added; check the draft and retry.';
+
+  @override
+  String get assistantErrorGeneric =>
+      'The request failed. Your input and draft remain on this screen; try again.';
+
+  @override
   String get settingsAboutDescription =>
       'A fast, local-first nutrition tracker.';
 }

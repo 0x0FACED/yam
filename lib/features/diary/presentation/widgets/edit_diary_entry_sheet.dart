@@ -231,6 +231,7 @@ class _EditDiaryEntrySheetState extends State<_EditDiaryEntrySheet> {
               Text(
                 [
                   if (entry.food.brand != null) entry.food.brand!,
+                  if (entry.isEstimated) l10n.assistantEstimatedLabel,
                   l10n.foodSearchCaloriesPerReference(
                     formatFoodSearchNumber(
                       context,

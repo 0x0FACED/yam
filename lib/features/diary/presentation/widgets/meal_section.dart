@@ -120,7 +120,11 @@ class _DiaryFoodRow extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final locale = Localizations.localeOf(context).toLanguageTag();
     final calories = NumberFormat.decimalPattern(locale).format(entry.calories);
-    final details = [?entry.brand, entry.quantity].join(' · ');
+    final details = [
+      ?entry.brand,
+      entry.quantity,
+      if (entry.storedEntry?.isEstimated == true) l10n.assistantEstimatedLabel,
+    ].join(' · ');
 
     return YamDiaryFoodRow(
       name: entry.name,

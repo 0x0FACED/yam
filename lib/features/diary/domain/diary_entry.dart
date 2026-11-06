@@ -93,6 +93,7 @@ class DiaryEntryDraft {
     required this.servingId,
     required this.amount,
     required this.canonicalQuantity,
+    this.isEstimated = false,
   });
 
   final DateTime day;
@@ -101,6 +102,7 @@ class DiaryEntryDraft {
   final String servingId;
   final double amount;
   final double canonicalQuantity;
+  final bool isEstimated;
 
   void validate() {
     food.validate();
@@ -128,6 +130,7 @@ class DiaryEntry {
     required this.amount,
     required this.canonicalQuantity,
     required this.nutrition,
+    this.isEstimated = false,
   });
 
   final String id;
@@ -138,6 +141,7 @@ class DiaryEntry {
   final double amount;
   final double canonicalQuantity;
   final DiaryNutrition nutrition;
+  final bool isEstimated;
 }
 
 String diaryDayKey(DateTime day) =>

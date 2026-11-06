@@ -851,6 +851,7 @@ Future<void> _seed(YamDatabase db) async {
         proteinG: _protein * 1.25,
         fatG: _fat * 1.25,
         carbsG: _carbs * 1.25,
+        isEstimated: false,
         createdAt: _created,
         updatedAt: _updated,
         deletedAt: null,

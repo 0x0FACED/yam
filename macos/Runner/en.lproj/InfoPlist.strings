@@ -1,0 +1,2 @@
+"NSMicrophoneUsageDescription" = "Use the microphone to turn a short food description into editable text.";
+"NSSpeechRecognitionUsageDescription" = "Recognize your spoken food description as editable text before you send it.";

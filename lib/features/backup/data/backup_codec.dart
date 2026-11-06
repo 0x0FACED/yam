@@ -221,6 +221,7 @@ const _schemas = {
     'servingId': _Value.text,
     'amount': _Value.number,
     'canonicalQuantity': _Value.number,
+    'isEstimated': _Value.boolean,
   },
   'goals': {
     ..._metadata,
@@ -262,6 +263,11 @@ void _validateTables(
   for (final entry in tables.entries) {
     final ids = <String>{};
     for (final row in entry.value) {
+      // Additive provenance is absent in backups written before schema v7.
+      // An explicit null (or any non-bool value) is still malformed.
+      if (entry.key == 'diaryEntries' && !row.containsKey('isEstimated')) {
+        row['isEstimated'] = false;
+      }
       _validateFields(row, _schemas[entry.key]!);
       _require(_uuid.hasMatch(row['id'] as String));
       _require(_uuid.hasMatch(row['deviceId'] as String));

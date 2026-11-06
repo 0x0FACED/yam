@@ -64,6 +64,7 @@ class DiaryRepository {
               proteinG: nutrition.protein,
               fatG: nutrition.fat,
               carbsG: nutrition.carbs,
+              isEstimated: Value(draft.isEstimated),
               createdAt: now,
               updatedAt: now,
               deviceId: deviceId,
@@ -87,6 +88,7 @@ class DiaryRepository {
       servingId: servingId,
       amount: amount,
       canonicalQuantity: canonicalQuantity,
+      isEstimated: entry.isEstimated,
     )..validate();
     final nutrition = draft.food.nutritionFor(canonicalQuantity);
     final count =
@@ -133,6 +135,7 @@ class DiaryRepository {
         proteinG: Value(entry.nutrition.protein),
         fatG: Value(entry.nutrition.fat),
         carbsG: Value(entry.nutrition.carbs),
+        isEstimated: Value(entry.isEstimated),
         updatedAt: Value(DateTime.now().toUtc()),
       ),
     );
@@ -159,6 +162,7 @@ class DiaryRepository {
     servingId: row.servingId,
     amount: row.amount,
     canonicalQuantity: row.canonicalQuantity,
+    isEstimated: row.isEstimated,
     nutrition: DiaryNutrition(
       kcal: row.energyKcal,
       protein: row.proteinG,

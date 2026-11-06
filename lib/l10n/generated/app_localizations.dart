@@ -2537,6 +2537,468 @@ abstract class AppLocalizations {
   /// **'Version'**
   String get settingsVersion;
 
+  /// No description provided for @assistantTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'AI assistant'**
+  String get assistantTitle;
+
+  /// No description provided for @assistantSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'AI connection'**
+  String get assistantSettings;
+
+  /// No description provided for @assistantSettingsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'ChatGPT or your own OpenAI API key'**
+  String get assistantSettingsSubtitle;
+
+  /// No description provided for @assistantIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Describe your food, dictate, or attach a photo. I will find foods and prepare a draft. Nothing is saved until you confirm.'**
+  String get assistantIntro;
+
+  /// No description provided for @assistantPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'The provider receives your messages, attached photos, and only requested YAM data. Your full database is not sent in advance. The regular diary works without AI or a network.'**
+  String get assistantPrivacy;
+
+  /// No description provided for @assistantSessionNote.
+  ///
+  /// In en, this message translates to:
+  /// **'The conversation and unsaved draft are discarded when you close this screen.'**
+  String get assistantSessionNote;
+
+  /// No description provided for @assistantPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'What did you eat?'**
+  String get assistantPrompt;
+
+  /// No description provided for @assistantPromptHint.
+  ///
+  /// In en, this message translates to:
+  /// **'For example: two eggs and 200 g of cottage cheese for breakfast'**
+  String get assistantPromptHint;
+
+  /// No description provided for @assistantSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get assistantSend;
+
+  /// No description provided for @assistantStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop'**
+  String get assistantStop;
+
+  /// No description provided for @assistantRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry request'**
+  String get assistantRetry;
+
+  /// No description provided for @assistantThinking.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing a response…'**
+  String get assistantThinking;
+
+  /// No description provided for @assistantPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a photo'**
+  String get assistantPhoto;
+
+  /// No description provided for @assistantCamera.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a photo'**
+  String get assistantCamera;
+
+  /// No description provided for @assistantRemovePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove photo'**
+  String get assistantRemovePhoto;
+
+  /// No description provided for @assistantPhotoAttached.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo attached'**
+  String get assistantPhotoAttached;
+
+  /// No description provided for @assistantVoice.
+  ///
+  /// In en, this message translates to:
+  /// **'Dictate'**
+  String get assistantVoice;
+
+  /// No description provided for @assistantVoiceStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish dictation'**
+  String get assistantVoiceStop;
+
+  /// No description provided for @assistantListening.
+  ///
+  /// In en, this message translates to:
+  /// **'Speak, then stop dictation and review the text.'**
+  String get assistantListening;
+
+  /// No description provided for @assistantApiKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Own API key'**
+  String get assistantApiKey;
+
+  /// No description provided for @assistantApiKeyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'OpenAI API key'**
+  String get assistantApiKeyLabel;
+
+  /// No description provided for @assistantApiKeyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'API-key requests are billed separately by OpenAI. The key is stored securely on this device and excluded from backups. A saved key also transcribes voice when system recognition is unavailable.'**
+  String get assistantApiKeyNote;
+
+  /// No description provided for @assistantSaveKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect API key'**
+  String get assistantSaveKey;
+
+  /// No description provided for @assistantChatGpt.
+  ///
+  /// In en, this message translates to:
+  /// **'ChatGPT plan'**
+  String get assistantChatGpt;
+
+  /// No description provided for @assistantChatGptContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with ChatGPT'**
+  String get assistantChatGptContinue;
+
+  /// No description provided for @assistantOAuthReturn.
+  ///
+  /// In en, this message translates to:
+  /// **'Return to YAM to continue connecting.'**
+  String get assistantOAuthReturn;
+
+  /// No description provided for @assistantChatGptAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'ChatGPT account'**
+  String get assistantChatGptAccount;
+
+  /// No description provided for @assistantAddChatGptAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Add another account'**
+  String get assistantAddChatGptAccount;
+
+  /// No description provided for @assistantPlanNote.
+  ///
+  /// In en, this message translates to:
+  /// **'For eligible ChatGPT plans. Uses your shared plan limit; voice recognition is separate. Sign-in opens in your system browser.'**
+  String get assistantPlanNote;
+
+  /// No description provided for @assistantPlanWelcomeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You are using your ChatGPT plan'**
+  String get assistantPlanWelcomeTitle;
+
+  /// No description provided for @assistantPlanWelcome.
+  ///
+  /// In en, this message translates to:
+  /// **'Eligible YAM AI requests will use your ChatGPT plan allowance. You can manage app access and limits in ChatGPT settings.'**
+  String get assistantPlanWelcome;
+
+  /// No description provided for @assistantManageUsage.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage ChatGPT usage'**
+  String get assistantManageUsage;
+
+  /// No description provided for @assistantDisconnect.
+  ///
+  /// In en, this message translates to:
+  /// **'Disconnect selected connection'**
+  String get assistantDisconnect;
+
+  /// No description provided for @assistantConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected'**
+  String get assistantConnected;
+
+  /// No description provided for @assistantNotConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a connection to start'**
+  String get assistantNotConnected;
+
+  /// No description provided for @assistantModel.
+  ///
+  /// In en, this message translates to:
+  /// **'Model'**
+  String get assistantModel;
+
+  /// No description provided for @assistantRefreshModels.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh models'**
+  String get assistantRefreshModels;
+
+  /// No description provided for @assistantConnectionMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Use'**
+  String get assistantConnectionMode;
+
+  /// No description provided for @assistantDraftTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Review before saving'**
+  String get assistantDraftTitle;
+
+  /// No description provided for @assistantDraftNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Check the food, quantity, date, and meal. This is a draft; nothing has been saved.'**
+  String get assistantDraftNote;
+
+  /// No description provided for @assistantDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get assistantDate;
+
+  /// No description provided for @assistantMeal.
+  ///
+  /// In en, this message translates to:
+  /// **'Meal'**
+  String get assistantMeal;
+
+  /// No description provided for @assistantAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity'**
+  String get assistantAmount;
+
+  /// No description provided for @assistantUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'Unit'**
+  String get assistantUnit;
+
+  /// No description provided for @assistantEstimatedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'AI estimate'**
+  String get assistantEstimatedLabel;
+
+  /// No description provided for @assistantEstimateNote.
+  ///
+  /// In en, this message translates to:
+  /// **'A photo estimate is not a measurement. Check ingredients, added oil, and portion size.'**
+  String get assistantEstimateNote;
+
+  /// No description provided for @assistantSaveToCatalog.
+  ///
+  /// In en, this message translates to:
+  /// **'Save new food to My dishes'**
+  String get assistantSaveToCatalog;
+
+  /// No description provided for @assistantAddToDiary.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to diary'**
+  String get assistantAddToDiary;
+
+  /// No description provided for @assistantSaveProducts.
+  ///
+  /// In en, this message translates to:
+  /// **'Save foods'**
+  String get assistantSaveProducts;
+
+  /// No description provided for @assistantRemoveItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from draft'**
+  String get assistantRemoveItem;
+
+  /// No description provided for @assistantEditProduct.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit food details'**
+  String get assistantEditProduct;
+
+  /// No description provided for @assistantDiscard.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard draft'**
+  String get assistantDiscard;
+
+  /// No description provided for @assistantSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'The confirmed batch has been saved'**
+  String get assistantSaved;
+
+  /// No description provided for @assistantCloseTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Close assistant?'**
+  String get assistantCloseTitle;
+
+  /// No description provided for @assistantCloseNote.
+  ///
+  /// In en, this message translates to:
+  /// **'The conversation, attached photo, and unsaved draft will be discarded. Saved entries remain in the diary.'**
+  String get assistantCloseNote;
+
+  /// No description provided for @assistantCloseConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get assistantCloseConfirm;
+
+  /// No description provided for @assistantKeepEditing.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep editing'**
+  String get assistantKeepEditing;
+
+  /// No description provided for @assistantClearTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Start a new conversation?'**
+  String get assistantClearTitle;
+
+  /// No description provided for @assistantClear.
+  ///
+  /// In en, this message translates to:
+  /// **'New conversation'**
+  String get assistantClear;
+
+  /// No description provided for @assistantSwitchNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Changing the connection starts a new conversation and discards the unsaved draft.'**
+  String get assistantSwitchNote;
+
+  /// No description provided for @assistantConsent.
+  ///
+  /// In en, this message translates to:
+  /// **'Understood, open assistant'**
+  String get assistantConsent;
+
+  /// No description provided for @assistantInvalidDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Check the draft fields: quantities must be greater than zero and food details must be complete.'**
+  String get assistantInvalidDraft;
+
+  /// No description provided for @assistantErrorNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot reach the provider. Check your connection and retry. The manual diary is available.'**
+  String get assistantErrorNetwork;
+
+  /// No description provided for @assistantErrorAuth.
+  ///
+  /// In en, this message translates to:
+  /// **'The connection is invalid or access was denied. Reconnect your key or sign in again.'**
+  String get assistantErrorAuth;
+
+  /// No description provided for @assistantErrorLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'The request limit has been reached. Check your connection limits and try again later.'**
+  String get assistantErrorLimit;
+
+  /// No description provided for @assistantErrorModels.
+  ///
+  /// In en, this message translates to:
+  /// **'No available models could be loaded. Refresh the list or check your connection.'**
+  String get assistantErrorModels;
+
+  /// No description provided for @assistantErrorInterrupted.
+  ///
+  /// In en, this message translates to:
+  /// **'The response did not complete. Nothing was saved; you can retry.'**
+  String get assistantErrorInterrupted;
+
+  /// No description provided for @assistantErrorCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Request stopped. Nothing was saved.'**
+  String get assistantErrorCancelled;
+
+  /// No description provided for @assistantErrorStorage.
+  ///
+  /// In en, this message translates to:
+  /// **'Secure storage is unavailable. Check the system keyring; secrets have not been stored in ordinary files.'**
+  String get assistantErrorStorage;
+
+  /// No description provided for @assistantErrorRevocation.
+  ///
+  /// In en, this message translates to:
+  /// **'The local connection was removed, but remote revocation was not confirmed. Disconnect YAM in ChatGPT settings.'**
+  String get assistantErrorRevocation;
+
+  /// No description provided for @assistantErrorSpeechPermission.
+  ///
+  /// In en, this message translates to:
+  /// **'Microphone or speech recognition access was denied. Check system permissions.'**
+  String get assistantErrorSpeechPermission;
+
+  /// No description provided for @assistantErrorSpeechKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice recognition on this platform requires your own API key. Add it in AI settings or type your message.'**
+  String get assistantErrorSpeechKey;
+
+  /// No description provided for @assistantErrorSpeech.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not recognize speech. Check your microphone and system support, or type your message.'**
+  String get assistantErrorSpeech;
+
+  /// No description provided for @assistantErrorImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a JPEG, PNG, or WebP photo up to 10 MB. If the file is already smaller, reduce its resolution.'**
+  String get assistantErrorImage;
+
+  /// No description provided for @assistantErrorMedia.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open the photo or microphone. Check permissions and retry.'**
+  String get assistantErrorMedia;
+
+  /// No description provided for @assistantErrorSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save the batch. Nothing was added; check the draft and retry.'**
+  String get assistantErrorSave;
+
+  /// No description provided for @assistantErrorGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'The request failed. Your input and draft remain on this screen; try again.'**
+  String get assistantErrorGeneric;
+
   /// No description provided for @settingsAboutDescription.
   ///
   /// In en, this message translates to:

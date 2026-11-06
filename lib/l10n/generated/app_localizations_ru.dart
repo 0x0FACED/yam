@@ -1434,5 +1434,265 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsVersion => 'Версия';
 
   @override
+  String get assistantTitle => 'ИИ-помощник';
+
+  @override
+  String get assistantSettings => 'Подключение ИИ';
+
+  @override
+  String get assistantSettingsSubtitle => 'ChatGPT или собственный ключ OpenAI';
+
+  @override
+  String get assistantIntro =>
+      'Опиши еду, продиктуй или приложи фото. Я найду продукты и подготовлю черновик — запись только после твоего подтверждения.';
+
+  @override
+  String get assistantPrivacy =>
+      'Провайдер получит твои сообщения, приложенные фото и только запрошенные данные YAM. Вся база заранее не отправляется. Обычный дневник работает без ИИ и сети.';
+
+  @override
+  String get assistantSessionNote =>
+      'Диалог и несохранённый черновик исчезнут после закрытия экрана.';
+
+  @override
+  String get assistantPrompt => 'Что ты ел?';
+
+  @override
+  String get assistantPromptHint =>
+      'Например: на завтрак два яйца и 200 г творога';
+
+  @override
+  String get assistantSend => 'Отправить';
+
+  @override
+  String get assistantStop => 'Остановить';
+
+  @override
+  String get assistantRetry => 'Повторить запрос';
+
+  @override
+  String get assistantThinking => 'Готовлю ответ…';
+
+  @override
+  String get assistantPhoto => 'Выбрать фото';
+
+  @override
+  String get assistantCamera => 'Снять фото';
+
+  @override
+  String get assistantRemovePhoto => 'Убрать фото';
+
+  @override
+  String get assistantPhotoAttached => 'Фото приложено';
+
+  @override
+  String get assistantVoice => 'Продиктовать';
+
+  @override
+  String get assistantVoiceStop => 'Завершить диктовку';
+
+  @override
+  String get assistantListening =>
+      'Говори. Затем останови диктовку и проверь текст.';
+
+  @override
+  String get assistantApiKey => 'Собственный API-ключ';
+
+  @override
+  String get assistantApiKeyLabel => 'Ключ OpenAI API';
+
+  @override
+  String get assistantApiKeyNote =>
+      'Запросы по ключу оплачиваются отдельно у OpenAI. Ключ хранится защищённо на этом устройстве и не включается в резервные копии. Сохранённый ключ также используется для расшифровки голоса, если системное распознавание недоступно.';
+
+  @override
+  String get assistantSaveKey => 'Подключить ключ';
+
+  @override
+  String get assistantChatGpt => 'Подписка ChatGPT';
+
+  @override
+  String get assistantChatGptContinue => 'Продолжить с ChatGPT';
+
+  @override
+  String get assistantOAuthReturn =>
+      'Вернись в YAM, чтобы продолжить подключение.';
+
+  @override
+  String get assistantChatGptAccount => 'Аккаунт ChatGPT';
+
+  @override
+  String get assistantAddChatGptAccount => 'Добавить другой аккаунт';
+
+  @override
+  String get assistantPlanNote =>
+      'Для подходящих подписок ChatGPT. Расходуется общий лимит плана; голос распознаётся отдельно. Вход откроется в системном браузере.';
+
+  @override
+  String get assistantPlanWelcomeTitle => 'Используется подписка ChatGPT';
+
+  @override
+  String get assistantPlanWelcome =>
+      'Подходящие ИИ-запросы YAM будут расходовать лимит твоей подписки ChatGPT. Доступ и лимиты приложения можно изменить в настройках ChatGPT.';
+
+  @override
+  String get assistantManageUsage => 'Управлять лимитами ChatGPT';
+
+  @override
+  String get assistantDisconnect => 'Отключить выбранное подключение';
+
+  @override
+  String get assistantConnected => 'Подключено';
+
+  @override
+  String get assistantNotConnected => 'Выбери подключение, чтобы начать';
+
+  @override
+  String get assistantModel => 'Модель';
+
+  @override
+  String get assistantRefreshModels => 'Обновить модели';
+
+  @override
+  String get assistantConnectionMode => 'Использовать';
+
+  @override
+  String get assistantDraftTitle => 'Проверь перед сохранением';
+
+  @override
+  String get assistantDraftNote =>
+      'Проверь продукт, количество, дату и приём пищи. Это черновик, данные ещё не записаны.';
+
+  @override
+  String get assistantDate => 'Дата';
+
+  @override
+  String get assistantMeal => 'Приём пищи';
+
+  @override
+  String get assistantAmount => 'Количество';
+
+  @override
+  String get assistantUnit => 'Единица';
+
+  @override
+  String get assistantEstimatedLabel => 'Оценка ИИ';
+
+  @override
+  String get assistantEstimateNote =>
+      'Оценка по фото не заменяет взвешивание. Проверь состав, масло и размер порции.';
+
+  @override
+  String get assistantSaveToCatalog => 'Сохранить новый продукт в «Мои блюда»';
+
+  @override
+  String get assistantAddToDiary => 'Добавить в Дневник';
+
+  @override
+  String get assistantSaveProducts => 'Сохранить продукты';
+
+  @override
+  String get assistantRemoveItem => 'Убрать из черновика';
+
+  @override
+  String get assistantEditProduct => 'Исправить данные продукта';
+
+  @override
+  String get assistantDiscard => 'Отклонить черновик';
+
+  @override
+  String get assistantSaved => 'Подтверждённый набор сохранён';
+
+  @override
+  String get assistantCloseTitle => 'Закрыть помощника?';
+
+  @override
+  String get assistantCloseNote =>
+      'Диалог, приложенное фото и несохранённый черновик будут удалены. Сохранённые записи останутся в Дневнике.';
+
+  @override
+  String get assistantCloseConfirm => 'Закрыть';
+
+  @override
+  String get assistantKeepEditing => 'Продолжить';
+
+  @override
+  String get assistantClearTitle => 'Начать новый диалог?';
+
+  @override
+  String get assistantClear => 'Новый диалог';
+
+  @override
+  String get assistantSwitchNote =>
+      'Смена подключения начнёт новый диалог. Несохранённый черновик будет удалён.';
+
+  @override
+  String get assistantConsent => 'Понятно, открыть помощника';
+
+  @override
+  String get assistantInvalidDraft =>
+      'Проверь поля черновика: количество должно быть больше нуля, а данные продукта — заполнены.';
+
+  @override
+  String get assistantErrorNetwork =>
+      'Нет связи с провайдером. Проверь сеть и повтори запрос. Ручной дневник доступен.';
+
+  @override
+  String get assistantErrorAuth =>
+      'Подключение недействительно или доступ не разрешён. Подключи ключ или войди заново.';
+
+  @override
+  String get assistantErrorLimit =>
+      'Достигнут лимит запросов. Проверь лимиты выбранного подключения и повтори позже.';
+
+  @override
+  String get assistantErrorModels =>
+      'Не удалось получить доступные модели. Обнови список или проверь подключение.';
+
+  @override
+  String get assistantErrorInterrupted =>
+      'Ответ не завершён. Ничего не записано; можно повторить запрос.';
+
+  @override
+  String get assistantErrorCancelled =>
+      'Запрос остановлен. Ничего не записано.';
+
+  @override
+  String get assistantErrorStorage =>
+      'Защищённое хранилище недоступно. Проверь системную связку ключей; секреты не сохранены в обычные файлы.';
+
+  @override
+  String get assistantErrorRevocation =>
+      'Подключение удалено с устройства, но отзыв доступа на сервере не подтверждён. Отключи YAM в настройках ChatGPT.';
+
+  @override
+  String get assistantErrorSpeechPermission =>
+      'Нет доступа к микрофону или распознаванию речи. Проверь системные разрешения.';
+
+  @override
+  String get assistantErrorSpeechKey =>
+      'Для распознавания голоса на этой платформе нужен собственный API-ключ. Подключи его в настройках ИИ или введи текст.';
+
+  @override
+  String get assistantErrorSpeech =>
+      'Не удалось распознать речь. Проверь микрофон и системную поддержку; текст можно ввести вручную.';
+
+  @override
+  String get assistantErrorImage =>
+      'Нужно фото JPEG, PNG или WebP до 10 МБ. Если файл уже меньше, уменьши разрешение.';
+
+  @override
+  String get assistantErrorMedia =>
+      'Не удалось открыть фото или микрофон. Проверь разрешения и повтори.';
+
+  @override
+  String get assistantErrorSave =>
+      'Не удалось сохранить набор. Ничего не добавлено; проверь черновик и повтори.';
+
+  @override
+  String get assistantErrorGeneric =>
+      'Не удалось выполнить запрос. Ввод и черновик сохранены на этом экране; попробуй ещё раз.';
+
+  @override
   String get settingsAboutDescription => 'Быстрый локальный дневник питания.';
 }

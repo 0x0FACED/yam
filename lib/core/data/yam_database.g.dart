@@ -2048,6 +2048,21 @@ class $DiaryEntriesTable extends DiaryEntries
     type: DriftSqlType.double,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _isEstimatedMeta = const VerificationMeta(
+    'isEstimated',
+  );
+  @override
+  late final GeneratedColumn<bool> isEstimated = GeneratedColumn<bool>(
+    'is_estimated',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_estimated" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -2114,6 +2129,7 @@ class $DiaryEntriesTable extends DiaryEntries
     proteinG,
     fatG,
     carbsG,
+    isEstimated,
     createdAt,
     updatedAt,
     deletedAt,
@@ -2307,6 +2323,15 @@ class $DiaryEntriesTable extends DiaryEntries
     } else if (isInserting) {
       context.missing(_carbsGMeta);
     }
+    if (data.containsKey('is_estimated')) {
+      context.handle(
+        _isEstimatedMeta,
+        isEstimated.isAcceptableOrUnknown(
+          data['is_estimated']!,
+          _isEstimatedMeta,
+        ),
+      );
+    }
     if (data.containsKey('created_at')) {
       context.handle(
         _createdAtMeta,
@@ -2426,6 +2451,10 @@ class $DiaryEntriesTable extends DiaryEntries
         DriftSqlType.double,
         data['${effectivePrefix}carbs_g'],
       )!,
+      isEstimated: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_estimated'],
+      )!,
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -2473,6 +2502,7 @@ class StoredDiaryEntry extends DataClass
   final double proteinG;
   final double fatG;
   final double carbsG;
+  final bool isEstimated;
   final DateTime createdAt;
   final DateTime updatedAt;
   final DateTime? deletedAt;
@@ -2498,6 +2528,7 @@ class StoredDiaryEntry extends DataClass
     required this.proteinG,
     required this.fatG,
     required this.carbsG,
+    required this.isEstimated,
     required this.createdAt,
     required this.updatedAt,
     this.deletedAt,
@@ -2528,6 +2559,7 @@ class StoredDiaryEntry extends DataClass
     map['protein_g'] = Variable<double>(proteinG);
     map['fat_g'] = Variable<double>(fatG);
     map['carbs_g'] = Variable<double>(carbsG);
+    map['is_estimated'] = Variable<bool>(isEstimated);
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
     if (!nullToAbsent || deletedAt != null) {
@@ -2561,6 +2593,7 @@ class StoredDiaryEntry extends DataClass
       proteinG: Value(proteinG),
       fatG: Value(fatG),
       carbsG: Value(carbsG),
+      isEstimated: Value(isEstimated),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
       deletedAt: deletedAt == null && nullToAbsent
@@ -2596,6 +2629,7 @@ class StoredDiaryEntry extends DataClass
       proteinG: serializer.fromJson<double>(json['proteinG']),
       fatG: serializer.fromJson<double>(json['fatG']),
       carbsG: serializer.fromJson<double>(json['carbsG']),
+      isEstimated: serializer.fromJson<bool>(json['isEstimated']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
@@ -2626,6 +2660,7 @@ class StoredDiaryEntry extends DataClass
       'proteinG': serializer.toJson<double>(proteinG),
       'fatG': serializer.toJson<double>(fatG),
       'carbsG': serializer.toJson<double>(carbsG),
+      'isEstimated': serializer.toJson<bool>(isEstimated),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'deletedAt': serializer.toJson<DateTime?>(deletedAt),
@@ -2654,6 +2689,7 @@ class StoredDiaryEntry extends DataClass
     double? proteinG,
     double? fatG,
     double? carbsG,
+    bool? isEstimated,
     DateTime? createdAt,
     DateTime? updatedAt,
     Value<DateTime?> deletedAt = const Value.absent(),
@@ -2679,6 +2715,7 @@ class StoredDiaryEntry extends DataClass
     proteinG: proteinG ?? this.proteinG,
     fatG: fatG ?? this.fatG,
     carbsG: carbsG ?? this.carbsG,
+    isEstimated: isEstimated ?? this.isEstimated,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
     deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
@@ -2722,6 +2759,9 @@ class StoredDiaryEntry extends DataClass
       proteinG: data.proteinG.present ? data.proteinG.value : this.proteinG,
       fatG: data.fatG.present ? data.fatG.value : this.fatG,
       carbsG: data.carbsG.present ? data.carbsG.value : this.carbsG,
+      isEstimated: data.isEstimated.present
+          ? data.isEstimated.value
+          : this.isEstimated,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
@@ -2752,6 +2792,7 @@ class StoredDiaryEntry extends DataClass
           ..write('proteinG: $proteinG, ')
           ..write('fatG: $fatG, ')
           ..write('carbsG: $carbsG, ')
+          ..write('isEstimated: $isEstimated, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('deletedAt: $deletedAt, ')
@@ -2782,6 +2823,7 @@ class StoredDiaryEntry extends DataClass
     proteinG,
     fatG,
     carbsG,
+    isEstimated,
     createdAt,
     updatedAt,
     deletedAt,
@@ -2811,6 +2853,7 @@ class StoredDiaryEntry extends DataClass
           other.proteinG == this.proteinG &&
           other.fatG == this.fatG &&
           other.carbsG == this.carbsG &&
+          other.isEstimated == this.isEstimated &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
           other.deletedAt == this.deletedAt &&
@@ -2838,6 +2881,7 @@ class DiaryEntriesCompanion extends UpdateCompanion<StoredDiaryEntry> {
   final Value<double> proteinG;
   final Value<double> fatG;
   final Value<double> carbsG;
+  final Value<bool> isEstimated;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   final Value<DateTime?> deletedAt;
@@ -2864,6 +2908,7 @@ class DiaryEntriesCompanion extends UpdateCompanion<StoredDiaryEntry> {
     this.proteinG = const Value.absent(),
     this.fatG = const Value.absent(),
     this.carbsG = const Value.absent(),
+    this.isEstimated = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.deletedAt = const Value.absent(),
@@ -2891,6 +2936,7 @@ class DiaryEntriesCompanion extends UpdateCompanion<StoredDiaryEntry> {
     required double proteinG,
     required double fatG,
     required double carbsG,
+    this.isEstimated = const Value.absent(),
     required DateTime createdAt,
     required DateTime updatedAt,
     this.deletedAt = const Value.absent(),
@@ -2939,6 +2985,7 @@ class DiaryEntriesCompanion extends UpdateCompanion<StoredDiaryEntry> {
     Expression<double>? proteinG,
     Expression<double>? fatG,
     Expression<double>? carbsG,
+    Expression<bool>? isEstimated,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<DateTime>? deletedAt,
@@ -2966,6 +3013,7 @@ class DiaryEntriesCompanion extends UpdateCompanion<StoredDiaryEntry> {
       if (proteinG != null) 'protein_g': proteinG,
       if (fatG != null) 'fat_g': fatG,
       if (carbsG != null) 'carbs_g': carbsG,
+      if (isEstimated != null) 'is_estimated': isEstimated,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (deletedAt != null) 'deleted_at': deletedAt,
@@ -2995,6 +3043,7 @@ class DiaryEntriesCompanion extends UpdateCompanion<StoredDiaryEntry> {
     Value<double>? proteinG,
     Value<double>? fatG,
     Value<double>? carbsG,
+    Value<bool>? isEstimated,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
     Value<DateTime?>? deletedAt,
@@ -3022,6 +3071,7 @@ class DiaryEntriesCompanion extends UpdateCompanion<StoredDiaryEntry> {
       proteinG: proteinG ?? this.proteinG,
       fatG: fatG ?? this.fatG,
       carbsG: carbsG ?? this.carbsG,
+      isEstimated: isEstimated ?? this.isEstimated,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       deletedAt: deletedAt ?? this.deletedAt,
@@ -3093,6 +3143,9 @@ class DiaryEntriesCompanion extends UpdateCompanion<StoredDiaryEntry> {
     if (carbsG.present) {
       map['carbs_g'] = Variable<double>(carbsG.value);
     }
+    if (isEstimated.present) {
+      map['is_estimated'] = Variable<bool>(isEstimated.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -3134,6 +3187,7 @@ class DiaryEntriesCompanion extends UpdateCompanion<StoredDiaryEntry> {
           ..write('proteinG: $proteinG, ')
           ..write('fatG: $fatG, ')
           ..write('carbsG: $carbsG, ')
+          ..write('isEstimated: $isEstimated, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('deletedAt: $deletedAt, ')
@@ -6617,6 +6671,7 @@ typedef $$DiaryEntriesTableCreateCompanionBuilder =
       required double proteinG,
       required double fatG,
       required double carbsG,
+      Value<bool> isEstimated,
       required DateTime createdAt,
       required DateTime updatedAt,
       Value<DateTime?> deletedAt,
@@ -6645,6 +6700,7 @@ typedef $$DiaryEntriesTableUpdateCompanionBuilder =
       Value<double> proteinG,
       Value<double> fatG,
       Value<double> carbsG,
+      Value<bool> isEstimated,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<DateTime?> deletedAt,
@@ -6758,6 +6814,11 @@ class $$DiaryEntriesTableFilterComposer
 
   ColumnFilters<double> get carbsG => $composableBuilder(
     column: $table.carbsG,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isEstimated => $composableBuilder(
+    column: $table.isEstimated,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -6891,6 +6952,11 @@ class $$DiaryEntriesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<bool> get isEstimated => $composableBuilder(
+    column: $table.isEstimated,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -6997,6 +7063,11 @@ class $$DiaryEntriesTableAnnotationComposer
   GeneratedColumn<double> get carbsG =>
       $composableBuilder(column: $table.carbsG, builder: (column) => column);
 
+  GeneratedColumn<bool> get isEstimated => $composableBuilder(
+    column: $table.isEstimated,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
@@ -7061,6 +7132,7 @@ class $$DiaryEntriesTableTableManager
                 Value<double> proteinG = const Value.absent(),
                 Value<double> fatG = const Value.absent(),
                 Value<double> carbsG = const Value.absent(),
+                Value<bool> isEstimated = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<DateTime?> deletedAt = const Value.absent(),
@@ -7087,6 +7159,7 @@ class $$DiaryEntriesTableTableManager
                 proteinG: proteinG,
                 fatG: fatG,
                 carbsG: carbsG,
+                isEstimated: isEstimated,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 deletedAt: deletedAt,
@@ -7115,6 +7188,7 @@ class $$DiaryEntriesTableTableManager
                 required double proteinG,
                 required double fatG,
                 required double carbsG,
+                Value<bool> isEstimated = const Value.absent(),
                 required DateTime createdAt,
                 required DateTime updatedAt,
                 Value<DateTime?> deletedAt = const Value.absent(),
@@ -7141,6 +7215,7 @@ class $$DiaryEntriesTableTableManager
                 proteinG: proteinG,
                 fatG: fatG,
                 carbsG: carbsG,
+                isEstimated: isEstimated,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 deletedAt: deletedAt,

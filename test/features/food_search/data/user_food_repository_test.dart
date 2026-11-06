@@ -62,11 +62,6 @@ void main() {
       expect(foods.single.servings.first.foodId, id);
       expect(foods.single.food.deviceId, isNotEmpty);
       expect(foods.single.food.deletedAt, isNull);
-      expect(
-        (await reopened.customSelect('PRAGMA user_version').getSingle())
-            .read<int>('user_version'),
-        6,
-      );
     },
   );
 

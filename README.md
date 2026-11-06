@@ -2,7 +2,52 @@
 
 A local-first nutrition tracker for Android, iOS, macOS and Linux. Food logging,
 nutrition history, goals and weight are stored locally in SQLite. An account or
-network connection is not required; Open Food Facts search is optional.
+network connection is not required; Open Food Facts search and the AI assistant are optional.
+
+## AI food-entry assistant
+
+Open the sparkle action in the diary for the selected day. **Settings → AI
+assistant** configures the connection. The assistant accepts text, dictation and
+photos, searches local foods/portions, asks clarifying questions and prepares an
+editable review. Check the date, meal, quantities and new-food nutrition, then
+confirm the whole batch once. Nothing is written by a model tool call.
+
+- **ChatGPT plan:** official Sign in with ChatGPT for eligible accounts/plans.
+  The system browser returns to a local `127.0.0.1` OAuth callback. Return to YAM
+  to finish; saved accounts can be selected or reauthorized. Requests share the
+  plan's usage limits. **Manage ChatGPT usage** opens ChatGPT's own settings.
+  Listing a model is not a guarantee that the account can complete inference.
+- **OpenAI API key:** separately billed API usage, with available models loaded
+  from the API. Keys/tokens use platform secure storage and never `.yam` backups,
+  food-library JSON or application logs. Switching to ChatGPT retains a separately
+  configured API key for speech transcription; disconnect the API-key connection
+  as well if you want to remove it.
+- **Privacy:** messages, attached images and requested tool results go to OpenAI.
+  The full catalog/history is not sent in advance. Conversation/photos/unsaved
+  drafts are session-only and discarded when the assistant closes. `store:false`
+  is used, but is not a promise of zero provider retention; provider policies apply.
+- **Voice:** native speech recognition when available, otherwise transcription
+  with the saved API key. ChatGPT plan OAuth does not authorize transcription.
+  Permission, language support, network/offline behavior depend on the device.
+  On Linux, install `pulseaudio-utils` (`parecord`) and run PulseAudio or
+  PipeWire-Pulse; an API key is required. Captures are bounded to 60 seconds
+  and kept in memory, not audio files. Recognized text is editable before sending.
+- **Photos:** JPEG/PNG/WebP, at most 10 MiB and 24 × 1024 × 1024 decoded pixels.
+  Metadata is removed and camera orientation preserved before upload. Mobile
+  supports camera/gallery; desktop uses a file dialog. A plate photo is an
+  estimate, not a weighing. The **AI estimate** marker survives saving,
+  diary editing and compatible backups. A new food only enters **My dishes**
+  if that option is selected; creating a food without a diary entry also works.
+- **Reliability:** confirmation saves selected new foods and diary entries in
+  one local transaction. Repeated confirmation of the same draft does not
+  duplicate it. Network/model errors do not change the diary; retry keeps the
+  session input and reviewed draft available. Existing food nutrients are scaled
+  locally; new custom food energy still follows YAM's macro-energy policy.
+
+macOS now requires **11.0+** for native speech recognition; iOS remains **13.0+**.
+Linux secure storage needs `libsecret-1-0` and an unlocked Secret Service/keyring;
+Linux builds additionally need `libsecret-1-dev`.
+See [ADR 0037](docs/adr/0037-ai-food-entry-assistant.md).
 
 
 ## Development
@@ -126,7 +171,8 @@ section, and writes that version's Markdown notes to the supplied file. Release 
 replaces the local BUILD with its `github.run_number`; that single number and
 build name are passed to Android, Linux and macOS. A rerun retains the same build
 number. Keep the release workflow counter monotonic if the workflow is ever
-replaced/reset; Android updates require increasing version codes. Download names
+replaced/reset; Android updates require increasing version codes. GitHub Release
+titles show only the public version, for example `YAM 0.4.0`; download names still
 include both the resolved version and build number.
 
 If publication fails after creating a draft, inspect/remove that incomplete
@@ -236,6 +282,10 @@ Unknown incompatible format versions and changes to the ZIP structure are reject
 Compatible future exporters should keep format v3 for additive optional fields and
 preserve the existing required fields and their meaning. Version 3 permits repeated
 food barcodes; older v1/v2 importers reject it rather than losing duplicate foods.
+Diary entries may also carry optional `isEstimated: boolean`; missing values in
+older backups mean `false`. This additive provenance field keeps format v3.
+Older importers that do not understand it can lose the marker on re-export.
+
 A database schema bump
 does not itself require a backup-format bump. An older compatible importer only
 stores fields it understands; unknown fields can be lost on re-export. This does

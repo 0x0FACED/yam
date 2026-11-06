@@ -28,5 +28,9 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Use the microphone to turn a short food description into editable text.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Recognize your spoken food description as editable text before you send it.</string>
 </dict>
 </plist>

@@ -31,6 +31,7 @@ class SettingsScreen extends StatelessWidget {
     this.foodLibraryRepository,
     this.foodLibraryFiles,
     this.appUpdates,
+    this.onOpenAssistant,
     super.key,
   });
 
@@ -45,6 +46,7 @@ class SettingsScreen extends StatelessWidget {
   final FoodLibraryRepository? foodLibraryRepository;
   final FoodLibraryFileService? foodLibraryFiles;
   final AppUpdateController? appUpdates;
+  final VoidCallback? onOpenAssistant;
 
   @override
   Widget build(BuildContext context) {
@@ -150,6 +152,14 @@ class SettingsScreen extends StatelessWidget {
                                         ? l10n.settingsLanguageRussian
                                         : l10n.settingsLanguageEnglish,
                                   ),
+                                  if (onOpenAssistant != null)
+                                    YamSettingsRow(
+                                      key: const ValueKey('settings-assistant'),
+                                      title: l10n.assistantTitle,
+                                      subtitle: l10n.assistantSettingsSubtitle,
+                                      showChevron: true,
+                                      onPressed: onOpenAssistant,
+                                    ),
                                 ],
                               ),
                             ),
