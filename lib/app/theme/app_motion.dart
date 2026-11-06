@@ -7,6 +7,7 @@ abstract final class AppMotion {
   static const onboardingPage = Duration(milliseconds: 260);
   static const entranceFade = Duration(milliseconds: 220);
   static const entranceStagger = Duration(milliseconds: 45);
+  static const dayDetailsExpansion = Duration(milliseconds: 300);
   static const snackBarEnter = Duration(milliseconds: 220);
   static const snackBarExit = Duration(milliseconds: 180);
   static const diaryEntryHighlight = Duration(milliseconds: 1600);

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
@@ -88,5 +89,35 @@ void main() {
         ),
       ),
     );
+  });
+
+  test('clipboard byte limit applies before decoding', () async {
+    final clipboardMedia = AssistantMediaService(
+      readClipboardImage: () async => Uint8List(10 * 1024 * 1024 + 1),
+    );
+    addTearDown(clipboardMedia.dispose);
+    await expectLater(
+      clipboardMedia.pasteImage(),
+      throwsA(
+        isA<AssistantFailure>().having(
+          (error) => error.code,
+          'code',
+          'image_too_large',
+        ),
+      ),
+    );
+  });
+
+  test('closing the service discards a late clipboard image', () async {
+    final clipboard = Completer<Uint8List?>();
+    final clipboardMedia = AssistantMediaService(
+      readClipboardImage: () => clipboard.future,
+    );
+    final paste = clipboardMedia.pasteImage();
+    await clipboardMedia.dispose();
+    clipboard.complete(
+      Uint8List.fromList(image.encodePng(image.Image(width: 2, height: 2))),
+    );
+    expect(await paste, isNull);
   });
 }

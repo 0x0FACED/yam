@@ -21,6 +21,8 @@ class YamTextField extends StatefulWidget {
     this.minLines,
     this.maxLines = 1,
     this.obscureText = false,
+    this.embedded = false,
+    this.contextMenuBuilder,
     super.key,
   });
 
@@ -37,6 +39,11 @@ class YamTextField extends StatefulWidget {
   final int? minLines;
   final int? maxLines;
   final bool obscureText;
+
+  /// Uses the enclosing surface as decoration, retaining the accessible label.
+  final bool embedded;
+
+  final EditableTextContextMenuBuilder? contextMenuBuilder;
 
   @override
   State<YamTextField> createState() => _YamTextFieldState();
@@ -165,52 +172,68 @@ class _YamTextFieldState extends State<YamTextField> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          widget.label,
-          style: AppTypography.label.copyWith(color: colors.onSurfaceVariant),
-        ),
-        const SizedBox(height: AppSpacing.xs),
-        Listener(
-          key: _inputKey,
-          onPointerDown: _onPointerDown,
-          onPointerUp: (event) => _pointerUpTime = event.timeStamp,
-          onPointerCancel: (_) {
-            _lastTap = null;
-            _normalizeSeries = false;
-          },
-          child: ScrollConfiguration(
-            behavior: widget.maxLines == 1
-                ? _TextFieldScrollBehavior(
-                    AppSpacing.md + border.gapPadding - strokeWidth,
-                  )
-                : ScrollConfiguration.of(context),
-            child: TextField(
-              key: widget.fieldKey,
-              controller: widget.controller,
-              focusNode: widget.focusNode,
-              keyboardType: widget.keyboardType,
-              obscureText: widget.obscureText,
-              autocorrect: !widget.obscureText,
-              enableSuggestions: !widget.obscureText,
-              inputFormatters: widget.inputFormatters,
-              minLines: widget.minLines,
-              maxLines: widget.maxLines,
-              onChanged: widget.onChanged,
-              onSubmitted: widget.onSubmitted,
-              onTapAlwaysCalled: true,
-              onTap: _onTap,
-              clipBehavior: widget.maxLines == 1 ? Clip.none : Clip.hardEdge,
-              style: AppTypography.productTitle.copyWith(
-                color: colors.onSurface,
-              ),
-              decoration: InputDecoration(
-                hintText: widget.hintText,
-                errorText: widget.errorText,
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md,
-                  vertical: AppSpacing.sm,
+        if (!widget.embedded) ...[
+          Text(
+            widget.label,
+            style: AppTypography.label.copyWith(color: colors.onSurfaceVariant),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+        ],
+        Semantics(
+          label: widget.embedded ? widget.label : null,
+          child: Listener(
+            key: _inputKey,
+            onPointerDown: _onPointerDown,
+            onPointerUp: (event) => _pointerUpTime = event.timeStamp,
+            onPointerCancel: (_) {
+              _lastTap = null;
+              _normalizeSeries = false;
+            },
+            child: ScrollConfiguration(
+              behavior: widget.maxLines == 1
+                  ? _TextFieldScrollBehavior(
+                      AppSpacing.md + border.gapPadding - strokeWidth,
+                    )
+                  : ScrollConfiguration.of(context),
+              child: TextField(
+                key: widget.fieldKey,
+                controller: widget.controller,
+                focusNode: widget.focusNode,
+                keyboardType: widget.keyboardType,
+                obscureText: widget.obscureText,
+                autocorrect: !widget.obscureText,
+                enableSuggestions: !widget.obscureText,
+                inputFormatters: widget.inputFormatters,
+                minLines: widget.minLines,
+                maxLines: widget.maxLines,
+                onChanged: widget.onChanged,
+                onSubmitted: widget.onSubmitted,
+                contextMenuBuilder:
+                    widget.contextMenuBuilder ?? _defaultContextMenuBuilder,
+                onTapAlwaysCalled: true,
+                onTap: _onTap,
+                clipBehavior: widget.maxLines == 1 ? Clip.none : Clip.hardEdge,
+                style: AppTypography.productTitle.copyWith(
+                  color: colors.onSurface,
                 ),
-                border: border,
+                decoration: InputDecoration(
+                  hintText: widget.hintText,
+                  filled: widget.embedded ? false : null,
+                  isDense: widget.embedded ? true : null,
+                  constraints: widget.embedded
+                      ? const BoxConstraints(minHeight: 44)
+                      : null,
+                  enabledBorder: widget.embedded ? InputBorder.none : null,
+                  focusedBorder: widget.embedded ? InputBorder.none : null,
+                  errorText: widget.errorText,
+                  contentPadding: widget.embedded
+                      ? const EdgeInsets.all(AppSpacing.xs)
+                      : const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.md,
+                          vertical: AppSpacing.sm,
+                        ),
+                  border: widget.embedded ? InputBorder.none : border,
+                ),
               ),
             ),
           ),
@@ -218,6 +241,18 @@ class _YamTextFieldState extends State<YamTextField> {
       ],
     );
   }
+}
+
+Widget _defaultContextMenuBuilder(
+  BuildContext context,
+  EditableTextState editableTextState,
+) {
+  if (SystemContextMenu.isSupportedByField(editableTextState)) {
+    return SystemContextMenu.editableText(editableTextState: editableTextState);
+  }
+  return AdaptiveTextSelectionToolbar.editableText(
+    editableTextState: editableTextState,
+  );
 }
 
 // Clip only the editable viewport, not the decoration. This lets text pass

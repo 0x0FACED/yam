@@ -63,6 +63,12 @@
   transitive win32 у существующего file_picker; общий major-upgrade не нужен.
 - Android OS auto-backup/transfer отключён, чтобы не переносить credentials
   устройства; перенос пользовательских данных остаётся через явный `.yam`.
+- Уточнение dev workflow (2026-11-07): для macOS privacy-сценариев приложение
+  запускается как `.app` через LaunchServices или Xcode, затем подключается
+  debugger. Прямой IDE → flutter run → executable может приписать TCC-запрос
+  IDE и аварийно завершить YAM до Dart catch, хотя UsageDescription присутствует.
+  `.vscode/launch.json`/`tasks.json` и `tool/run_macos.dart` задают безопасный
+  запуск + attach; permissions/данные приложения и сам recognizer не подменяются.
 
 ## Проверка
 
@@ -82,3 +88,4 @@
 - https://developers.openai.com/siwc/token-sharing-open-source/preview-limitations
 - https://developers.openai.com/api/docs/guides/function-calling
 - https://developers.openai.com/api/docs/guides/images-vision
+- https://github.com/flutter/flutter/issues/70374

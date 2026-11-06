@@ -239,6 +239,78 @@ class AppLocalizationsRu extends AppLocalizations {
   String get diaryTitle => 'Дневник';
 
   @override
+  String get dayDetailsTitle => 'День подробно';
+
+  @override
+  String get dayDetailsOpen => 'Открыть подробности дня';
+
+  @override
+  String get dayDetailsByMeal => 'По приёмам пищи';
+
+  @override
+  String get dayDetailsByContribution => 'По вкладу';
+
+  @override
+  String get dayDetailsCalories => 'Калории';
+
+  @override
+  String get dayDetailsDistribution => 'Распределение по приёмам пищи';
+
+  @override
+  String get dayDetailsFood => 'Съеденная еда';
+
+  @override
+  String get dayDetailsContributionHint =>
+      'Доля от записанного за день, не от цели';
+
+  @override
+  String dayDetailsShare(String percent) {
+    return '$percent дня';
+  }
+
+  @override
+  String get dayDetailsNoShare => 'Доля не рассчитывается: итог равен нулю';
+
+  @override
+  String get dayDetailsFacts => 'Коротко о дне';
+
+  @override
+  String get dayDetailsSoFar => 'На данный момент';
+
+  @override
+  String dayDetailsLargestMeal(String meal, String calories) {
+    return 'Больше всего калорий — $meal: $calories ккал';
+  }
+
+  @override
+  String dayDetailsProteinRemaining(String grams) {
+    return 'До цели по белку — $grams г';
+  }
+
+  @override
+  String dayDetailsEstimatedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count записи с оценочными значениями',
+      many: '$count записей с оценочными значениями',
+      few: '$count записи с оценочными значениями',
+      one: '$count запись с оценочными значениями',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get dayDetailsEmptyTitle => 'За этот день пока нет записей';
+
+  @override
+  String get dayDetailsEmptyBody =>
+      'Добавь еду в дневник — здесь появятся подробности дня.';
+
+  @override
+  String get actionClose => 'Закрыть';
+
+  @override
   String get diaryToday => 'Сегодня';
 
   @override
@@ -1311,14 +1383,14 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get backupPersonalDataNote =>
-      'Файл .yam содержит дневник, вес, цели и данные продуктов, включая удалённые записи. Файл не зашифрован — храните его в безопасном месте. Тема приложения в копию не входит.';
+      'Файл .yam содержит дневник, вес, цели, данные продуктов и сохранённый текст ИИ-диалогов, включая метаданные удалённых записей. Фото, черновики и данные подключения не входят в копию. Файл не зашифрован — храните его в безопасном месте. Тема приложения в копию не входит.';
 
   @override
   String get backupReplaceTitle => 'Заменить локальные данные?';
 
   @override
   String get backupReplaceWarning =>
-      'Все локальные продукты, порции, записи дневника, цели, записи веса и кешированные продукты будут удалены и заменены данными из копии. Это действие нельзя отменить. Пустая копия очистит эти записи. Если в копии нет целей, потребуется снова пройти онбординг.';
+      'Все локальные продукты, порции, записи дневника, цели, записи веса, кешированные продукты и сохранённые ИИ-диалоги будут удалены и заменены данными из копии. Это действие нельзя отменить. Пустая копия очистит эти записи. Старые копии без диалогов тоже очистят локальные диалоги. Если в копии нет целей, потребуется снова пройти онбординг.';
 
   @override
   String get backupReplaceConfirm => 'Заменить все данные';
@@ -1416,6 +1488,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get backupCountRemoteFoods => 'Кешированные продукты';
 
   @override
+  String get backupCountAssistantConversations => 'ИИ-диалоги';
+
+  @override
   String get backupRestoreAction => 'Восстановить из копии';
 
   @override
@@ -1443,23 +1518,87 @@ class AppLocalizationsRu extends AppLocalizations {
   String get assistantSettingsSubtitle => 'ChatGPT или собственный ключ OpenAI';
 
   @override
-  String get assistantIntro =>
-      'Опиши еду, продиктуй или приложи фото. Я найду продукты и подготовлю черновик — запись только после твоего подтверждения.';
-
-  @override
   String get assistantPrivacy =>
-      'Провайдер получит твои сообщения, приложенные фото и только запрошенные данные YAM. Вся база заранее не отправляется. Обычный дневник работает без ИИ и сети.';
+      'Провайдер получит отправленные тобой сообщения, приложенные фото и только запрошенные данные YAM. Сохранённые диалоги автоматически не отправляются: при повторном открытии отправку их текста нужно включить отдельно. Вся база заранее не отправляется. Обычный дневник работает без ИИ и сети.';
 
   @override
   String get assistantSessionNote =>
-      'Диалог и несохранённый черновик исчезнут после закрытия экрана.';
+      'Текст диалогов сохраняется на этом устройстве и входит в копии .yam. Фото, неотправленный ввод и несохранённые черновики не сохраняются. Открытый из истории диалог можно просматривать без отправки; передача его текста как контекста по умолчанию выключена.';
+
+  @override
+  String get assistantHistory => 'История диалогов';
+
+  @override
+  String get assistantHistoryEmpty => 'Сохранённых диалогов пока нет';
+
+  @override
+  String get assistantHistoryEmptyNote =>
+      'Диалоги появятся здесь после отправки сообщения. Сохранённый текст доступен без сети.';
+
+  @override
+  String get assistantHistoryPhotoTitle => 'Диалог с фото';
+
+  @override
+  String get assistantPhotoNotStored => 'Фото не сохранено';
+
+  @override
+  String get assistantUseHistory =>
+      'Использовать сохранённую историю как контекст';
+
+  @override
+  String get assistantUseHistoryNote =>
+      'Со следующим запросом отправится только текст последних 12 сообщений, не более 12 000 символов. Фото и прежние вызовы инструментов не отправляются.';
+
+  @override
+  String get assistantHistoryOffNote =>
+      'Сообщения из сохранённого диалога не отправляются. Новая переписка по-прежнему сохраняет собственный контекст.';
+
+  @override
+  String get assistantHistoryStorageError =>
+      'Не удалось загрузить или сохранить локальную историю диалогов. Попробуй ещё раз. Сохранённые сообщения автоматически не отправляются.';
+
+  @override
+  String get assistantHistoryLoading => 'Загружаем сохранённые диалоги…';
+
+  @override
+  String get assistantHistoryLoadError => 'Не удалось загрузить диалоги';
+
+  @override
+  String get assistantHistoryRetry => 'Повторить';
+
+  @override
+  String assistantHistoryUpdatedAt(String date, String time) {
+    return '$date, $time';
+  }
+
+  @override
+  String get assistantHistoryDeleteTitle => 'Удалить диалог?';
+
+  @override
+  String assistantHistoryDeleteMessage(String title) {
+    return '«$title» исчезнет из сохранённых диалогов. Его текст будет стёрт из локальной истории. Записи Дневника не изменятся. Это действие нельзя отменить.';
+  }
+
+  @override
+  String get assistantHistoryDelete => 'Удалить';
+
+  @override
+  String assistantHistoryDeleteAction(String title) {
+    return 'Удалить диалог: $title';
+  }
+
+  @override
+  String get assistantHistoryDeleting => 'Удаляем диалог…';
+
+  @override
+  String get assistantHistoryDeleteError =>
+      'Не удалось удалить диалог. Попробуй удалить его ещё раз.';
 
   @override
   String get assistantPrompt => 'Что ты ел?';
 
   @override
-  String get assistantPromptHint =>
-      'Например: на завтрак два яйца и 200 г творога';
+  String get assistantPromptHint => 'Например: творог 200 г';
 
   @override
   String get assistantSend => 'Отправить';
@@ -1604,11 +1743,15 @@ class AppLocalizationsRu extends AppLocalizations {
   String get assistantSaved => 'Подтверждённый набор сохранён';
 
   @override
+  String get assistantDraftDiscarded =>
+      'Черновик отклонён. Ничего не сохранено.';
+
+  @override
   String get assistantCloseTitle => 'Закрыть помощника?';
 
   @override
   String get assistantCloseNote =>
-      'Диалог, приложенное фото и несохранённый черновик будут удалены. Сохранённые записи останутся в Дневнике.';
+      'Текст диалога останется в локальной истории. Приложенные фото, неотправленный ввод и несохранённый черновик будут удалены. Сохранённые записи останутся в Дневнике.';
 
   @override
   String get assistantCloseConfirm => 'Закрыть';
@@ -1624,10 +1767,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get assistantSwitchNote =>
-      'Смена подключения начнёт новый диалог. Несохранённый черновик будет удалён.';
-
-  @override
-  String get assistantConsent => 'Понятно, открыть помощника';
+      'Смена подключения начнёт новый диалог. Текст останется в локальной истории, а приложенные фото, неотправленный ввод и несохранённый черновик будут удалены.';
 
   @override
   String get assistantInvalidDraft =>
@@ -1692,6 +1832,107 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get assistantErrorGeneric =>
       'Не удалось выполнить запрос. Ввод и черновик сохранены на этом экране; попробуй ещё раз.';
+
+  @override
+  String get proxySettingsTitle => 'Прокси';
+
+  @override
+  String get proxySettingsSubtitle =>
+      'HTTP, HTTPS или SOCKS5 для запросов приложения';
+
+  @override
+  String get proxyScopeNote =>
+      'Применяется к HTTP-запросам самого YAM. Вход в браузере и системное распознавание речи по-прежнему используют сетевые настройки ОС. Локальный дневник работает без сети.';
+
+  @override
+  String get proxyLoading => 'Загружаем настройки прокси…';
+
+  @override
+  String get proxyRouting => 'Подключение';
+
+  @override
+  String get proxyDisabled => 'Выкл. — напрямую';
+
+  @override
+  String get proxyEnabled => 'Вкл. — через прокси';
+
+  @override
+  String get proxyDisabledHelp =>
+      'Сохрани, чтобы подключаться напрямую. Для отключения прокси доступ к сети не нужен.';
+
+  @override
+  String get proxyEnabledHelp =>
+      'Если прокси недоступен, запрос завершится ошибкой — прямого подключения не будет.';
+
+  @override
+  String get proxyProtocol => 'Протокол прокси';
+
+  @override
+  String get proxyProtocolHttp => 'HTTP';
+
+  @override
+  String get proxyProtocolHttps => 'HTTPS';
+
+  @override
+  String get proxyProtocolSocks5 => 'SOCKS5';
+
+  @override
+  String get proxyProtocolHelp =>
+      'HTTP подходит и для HTTPS-сайтов. HTTP и SOCKS5 не шифруют соединение до прокси, включая его логин и пароль; HTTPS шифрует этот участок. HTTPS-сайты сохраняют собственную защиту TLS.';
+
+  @override
+  String get proxyHost => 'Хост';
+
+  @override
+  String get proxyHostHint => 'Имя хоста или IP-адрес без схемы URL';
+
+  @override
+  String get proxyPort => 'Порт';
+
+  @override
+  String get proxyAuthentication => 'Авторизация (необязательно)';
+
+  @override
+  String get proxyAuthenticationHelp =>
+      'Оставь оба поля пустыми, если прокси не требует авторизации. Пробелы в пароле сохраняются.';
+
+  @override
+  String get proxyUsername => 'Имя пользователя';
+
+  @override
+  String get proxyPassword => 'Пароль';
+
+  @override
+  String get proxyStorageNote =>
+      'Настройки и учётные данные хранятся защищённо на этом устройстве и не включаются в резервные копии дневника.';
+
+  @override
+  String get proxyApplyNote =>
+      'Сохранение сразу применит настройки и закроет текущие соединения. Запросы в процессе выполнения, возможно, придётся повторить.';
+
+  @override
+  String get proxyErrorHost =>
+      'Введи корректное имя хоста или IP-адрес без схемы URL, пути и порта.';
+
+  @override
+  String get proxyErrorPort => 'Введи номер порта от 1 до 65535.';
+
+  @override
+  String get proxyErrorCredentials =>
+      'Проверь имя пользователя и пароль: эти учётные данные не подходят для выбранного протокола прокси.';
+
+  @override
+  String get proxyErrorStorage =>
+      'Не удалось безопасно загрузить или сохранить настройки прокси. Проверь системную связку ключей и попробуй сохранить снова. Текущий маршрут не изменён; локальный дневник доступен.';
+
+  @override
+  String get proxySave => 'Сохранить настройки';
+
+  @override
+  String get proxySaving => 'Сохраняем настройки…';
+
+  @override
+  String get proxySaved => 'Настройки прокси сохранены.';
 
   @override
   String get settingsAboutDescription => 'Быстрый локальный дневник питания.';

@@ -4,6 +4,20 @@ A local-first nutrition tracker for Android, iOS, macOS and Linux. Food logging,
 nutrition history, goals and weight are stored locally in SQLite. An account or
 network connection is not required; Open Food Facts search and the AI assistant are optional.
 
+## Day details
+
+Tap the diary's calorie/macro card to expand it into **Day details**. All logged
+foods are shown by meal, with the eaten quantity and its kcal/protein/fat/carbs.
+**By contribution** ranks every entry by the selected nutrient and shows its
+share of the actual daily intake, not the goal. Tap a food to edit it; edits,
+deletions and Undo update the totals immediately.
+
+The summary uses the goal effective on the selected day and the saved diary
+snapshots, so later food or goal changes do not rewrite history. Closing returns
+to the same diary position. The transition respects reduced-motion settings;
+wide windows use two columns. Everything works locally without AI or network.
+See [ADR 0044](docs/adr/0044-expanded-day-details.md).
+
 ## AI food-entry assistant
 
 Open the sparkle action in the diary for the selected day. **Settings → AI
@@ -23,9 +37,14 @@ confirm the whole batch once. Nothing is written by a model tool call.
   configured API key for speech transcription; disconnect the API-key connection
   as well if you want to remove it.
 - **Privacy:** messages, attached images and requested tool results go to OpenAI.
-  The full catalog/history is not sent in advance. Conversation/photos/unsaved
-  drafts are session-only and discarded when the assistant closes. `store:false`
-  is used, but is not a promise of zero provider retention; provider policies apply.
+  The full catalog/history is not sent in advance. Sent text and completed replies
+  are saved locally; **History** opens or deletes conversations, **New conversation**
+  keeps previous chats. Reopened chats do not send old messages unless explicitly
+  enabled: at most the last 12 messages / 12,000 text characters for the next request.
+  The new exchange retains its own session context. Photos, audio, tool payloads
+  and unsaved drafts are not archived. Text chats are included in `.yam` backups;
+  protect exported backups accordingly. `store:false` is used, but is not a promise
+  of zero provider retention; provider policies apply.
 - **Voice:** native speech recognition when available, otherwise transcription
   with the saved API key. ChatGPT plan OAuth does not authorize transcription.
   Permission, language support, network/offline behavior depend on the device.
@@ -48,7 +67,53 @@ macOS now requires **11.0+** for native speech recognition; iOS remains **13.0+*
 Linux secure storage needs `libsecret-1-0` and an unlocked Secret Service/keyring;
 Linux builds additionally need `libsecret-1-dev`.
 See [ADR 0037](docs/adr/0037-ai-food-entry-assistant.md).
+Local chat storage and explicit context: [ADR 0043](docs/adr/0043-assistant-local-chat-history.md).
 
+### macOS development: dictation and privacy permissions
+
+In VS Code, select **YAM macOS (LaunchServices + attach)** and press F5.
+The pre-launch task builds the debug app, opens the `.app` through macOS
+LaunchServices, then attaches Flutter using a generated VM service info file.
+Close the previous YAM window before starting another session; stopping an
+attach session only detaches the debugger.
+
+From a terminal, `dart run tool/run_macos.dart` uses the same safe launch path.
+Xcode (`open macos/Runner.xcworkspace`) is another supported way to test native
+permission prompts. Grant microphone and speech recognition access **to YAM**
+in the system prompts when testing dictation.
+
+Avoid direct `flutter run` from VS Code for first-time permission requests.
+macOS TCC can attribute them to VS Code instead of YAM, then terminate YAM
+because the IDE lacks `NSSpeechRecognitionUsageDescription`, even though the
+key is present in YAM's signed bundle. Dart exception handling cannot catch
+this native termination. Do not edit/re-sign VS Code or reset global privacy
+settings to work around it. Details: [Flutter #70374](https://github.com/flutter/flutter/issues/70374).
+
+
+## Network proxy
+
+Open **Settings → Proxy** to enable a proxy and enter its host (without a URL
+scheme), port, and optional username/password. Leave both authentication fields
+empty for an unauthenticated proxy.
+
+- **HTTP** supports CONNECT tunnels to HTTPS services. **HTTPS** also encrypts
+  the connection to the proxy itself. **SOCKS5** resolves destination hostnames
+  through the proxy and supports username/password authentication.
+- This setting covers YAM's own HTTP traffic: ChatGPT OAuth/token renewal,
+  models, assistant streams and API transcription, Open Food Facts, and Android
+  update metadata/downloads. The external browser and native speech recognition
+  still use the operating system's network configuration.
+- Settings and credentials stay in device secure storage, outside SQLite and
+  exported backups. Saving applies the route without restarting and closes old
+  connections; an in-flight request may need to be retried.
+- An enabled proxy never falls back to a direct connection on failure. A secure
+  storage failure blocks outgoing requests rather than ignoring saved routing.
+  The local diary remains usable; switching the proxy off does not need a network.
+- HTTP and SOCKS5 do not encrypt proxy credentials on the hop to the proxy.
+  HTTPS encrypts that hop. Destination HTTPS certificate validation remains
+  enabled for all protocols; proxy configuration does not guarantee provider access.
+
+See [ADR 0038](docs/adr/0038-application-network-proxy.md).
 
 ## Development
 
@@ -278,6 +343,10 @@ Starting with this importer, additional JSON fields are ignored, while missing
 nullable fields default to null. Required fields, known value types, units,
 relationships and archive limits are still validated before any database change.
 Unknown incompatible format versions and changes to the ZIP structure are rejected.
+The optional `assistant_conversations.json` member contains saved text chats.
+Older backups without it restore with an empty chat archive. New backups containing
+it require a YAM version that supports chat history; old binaries reject that ZIP
+structure. See [ADR 0043](docs/adr/0043-assistant-local-chat-history.md).
 
 Compatible future exporters should keep format v3 for additive optional fields and
 preserve the existing required fields and their meaning. Version 3 permits repeated

@@ -447,6 +447,7 @@ class _BackupCountsSummary extends StatelessWidget {
       (l10n.backupCountGoals, counts.goals),
       (l10n.backupCountWeights, counts.weights),
       (l10n.backupCountRemoteFoods, counts.remoteFoods),
+      (l10n.backupCountAssistantConversations, counts.assistantConversations),
     ];
     return Column(
       children: [

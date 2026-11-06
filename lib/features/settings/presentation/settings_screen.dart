@@ -32,6 +32,7 @@ class SettingsScreen extends StatelessWidget {
     this.foodLibraryFiles,
     this.appUpdates,
     this.onOpenAssistant,
+    this.onOpenProxy,
     super.key,
   });
 
@@ -47,6 +48,7 @@ class SettingsScreen extends StatelessWidget {
   final FoodLibraryFileService? foodLibraryFiles;
   final AppUpdateController? appUpdates;
   final VoidCallback? onOpenAssistant;
+  final VoidCallback? onOpenProxy;
 
   @override
   Widget build(BuildContext context) {
@@ -159,6 +161,14 @@ class SettingsScreen extends StatelessWidget {
                                       subtitle: l10n.assistantSettingsSubtitle,
                                       showChevron: true,
                                       onPressed: onOpenAssistant,
+                                    ),
+                                  if (onOpenProxy != null)
+                                    YamSettingsRow(
+                                      key: const ValueKey('settings-proxy'),
+                                      title: l10n.proxySettingsTitle,
+                                      subtitle: l10n.proxySettingsSubtitle,
+                                      showChevron: true,
+                                      onPressed: onOpenProxy,
                                     ),
                                 ],
                               ),

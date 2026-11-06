@@ -6,7 +6,7 @@ import 'package:yam/features/food_search/data/user_food_repository.dart';
 import '../../food_search/data/generated/schema.dart';
 
 void main() {
-  test('v1 foods and servings survive migration to schema v7', () async {
+  test('v1 foods and servings survive migration to schema v8', () async {
     final verifier = SchemaVerifier(GeneratedHelper());
     final schema = await verifier.schemaAt(1);
     addTearDown(schema.close);
@@ -44,7 +44,7 @@ void main() {
     );
 
     final db = YamDatabase(schema.newConnection());
-    await verifier.migrateAndValidate(db, 7);
+    await verifier.migrateAndValidate(db, 8);
     addTearDown(db.close);
     final foods = await UserFoodRepository(db).loadFoods();
     expect(foods, hasLength(1));
@@ -53,13 +53,14 @@ void main() {
     expect(foods.single.food.description, isNull);
     expect(foods.single.servings.single.id, 'serving-v1');
     expect(await db.select(db.diaryEntries).get(), isEmpty);
+    expect(await db.select(db.assistantConversations).get(), isEmpty);
     expect(
       (await db.select(db.installationValues).getSingle()).value,
       'existing-device',
     );
   });
 
-  test('v2 diary entries survive migration to schema v7', () async {
+  test('v2 diary entries survive migration to schema v8', () async {
     final verifier = SchemaVerifier(GeneratedHelper());
     final schema = await verifier.schemaAt(2);
     addTearDown(schema.close);
@@ -96,7 +97,7 @@ void main() {
       ],
     );
     final db = YamDatabase(schema.newConnection());
-    await verifier.migrateAndValidate(db, 7);
+    await verifier.migrateAndValidate(db, 8);
     addTearDown(db.close);
     final entries = await db.select(db.diaryEntries).get();
     expect(entries.single.foodName, 'Oats');
@@ -104,10 +105,11 @@ void main() {
     expect(entries.single.isEstimated, isFalse);
     expect(await db.select(db.weightEntries).get(), isEmpty);
     expect(await db.select(db.goalVersions).get(), isEmpty);
+    expect(await db.select(db.assistantConversations).get(), isEmpty);
   });
 
-  for (final version in [3, 4, 5, 6]) {
-    test('filled v$version database survives migration to v7', () async {
+  for (final version in [3, 4, 5, 6, 7]) {
+    test('filled v$version database survives migration to v8', () async {
       final verifier = SchemaVerifier(GeneratedHelper());
       final schema = await verifier.schemaAt(version);
       addTearDown(schema.close);
@@ -278,6 +280,9 @@ void main() {
           '  Existing recipe\nKeep precision and whitespace.  ',
         ]);
       }
+      if (version >= 7) {
+        raw.execute('UPDATE diary_entries SET is_estimated = 1');
+      }
 
       final oldTables = [
         'installation_values',
@@ -296,7 +301,7 @@ void main() {
           ],
       };
       final db = YamDatabase(schema.newConnection());
-      await verifier.migrateAndValidate(db, 7);
+      await verifier.migrateAndValidate(db, 8);
       addTearDown(db.close);
       for (final table in oldTables) {
         expect(
@@ -308,12 +313,14 @@ void main() {
                   if ((table != 'user_foods' ||
                           version >= 5 ||
                           entry.key != 'description') &&
-                      (table != 'diary_entries' || entry.key != 'is_estimated'))
+                      (table != 'diary_entries' ||
+                          version >= 7 ||
+                          entry.key != 'is_estimated'))
                     entry.key: entry.value,
               },
           ],
           before[table],
-          reason: '$table changed in v$version→v7 migration',
+          reason: '$table changed in v$version→v8 migration',
         );
       }
       expect(
@@ -328,11 +335,21 @@ void main() {
       );
       expect(
         (await db.select(db.diaryEntries).get()).single.isEstimated,
-        isFalse,
+        version >= 7,
       );
       if (version == 3) {
         expect(await db.select(db.remoteFoods).get(), isEmpty);
       }
+      expect(await db.select(db.assistantConversations).get(), isEmpty);
+      expect(
+        (await db
+                .customSelect(
+                  'PRAGMA index_info(assistant_conversations_history)',
+                )
+                .get())
+            .map((row) => row.read<String>('name')),
+        ['deleted_at', 'updated_at', 'id'],
+      );
     });
   }
 
@@ -402,7 +419,7 @@ void main() {
 
         final db = YamDatabase(schema.newConnection());
         addTearDown(db.close);
-        await verifier.migrateAndValidate(db, 7);
+        await verifier.migrateAndValidate(db, 8);
         for (final table in before.keys) {
           expect([
             for (final row

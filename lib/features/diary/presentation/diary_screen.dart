@@ -5,14 +5,18 @@ import 'package:go_router/go_router.dart';
 import 'package:yam/app/theme/app_breakpoints.dart';
 import 'package:yam/app/session/session_profile.dart';
 import 'package:yam/app/theme/app_motion.dart';
+import 'package:yam/app/theme/app_radius.dart';
 import 'package:yam/app/theme/app_spacing.dart';
 import 'package:yam/app/theme/app_typography.dart';
 import 'package:yam/core/ui/buttons/yam_buttons.dart';
 import 'package:yam/core/ui/feedback/yam_snack_bar.dart';
 import 'package:yam/core/ui/motion/yam_entrance_reveal.dart';
 import 'package:yam/features/diary/data/diary_repository.dart';
+import 'package:yam/features/diary/domain/day_details.dart';
 import 'package:yam/features/diary/domain/diary_entry.dart';
 import 'package:yam/features/diary/presentation/diary_prototype_data.dart';
+import 'package:yam/features/diary/presentation/day_details_route.dart';
+import 'package:yam/features/diary/presentation/day_details_screen.dart';
 import 'package:yam/features/diary/presentation/widgets/edit_diary_entry_sheet.dart';
 import 'package:yam/features/diary/presentation/widgets/daily_nutrition_summary.dart';
 import 'package:yam/features/diary/presentation/widgets/diary_day_selector.dart';
@@ -45,6 +49,10 @@ class DiaryScreen extends StatefulWidget {
 
 class _DiaryScreenState extends State<DiaryScreen> {
   final _scrollController = ScrollController();
+  final _summaryKey = GlobalKey();
+  final _summaryHeroTag = Object();
+  late final ValueNotifier<DayDetailsSnapshot> _dayDetails;
+  bool _detailsOpen = false;
   List<DiaryEntry> _entries = const [];
   bool _entriesReady = false;
   Map<String, List<DiaryPrototypeEntry>> _displayEntriesByMeal = const {};
@@ -74,6 +82,9 @@ class _DiaryScreenState extends State<DiaryScreen> {
     final now = widget.today ?? DateTime.now();
     _today = DateTime(now.year, now.month, now.day);
     _selectedDay = _today;
+    _dayDetails = ValueNotifier(
+      DayDetailsSnapshot(day: _selectedDay, entries: const [], goals: const []),
+    );
     _watchSelectedDay();
     _watchCalendarGoals();
   }
@@ -85,6 +96,7 @@ class _DiaryScreenState extends State<DiaryScreen> {
     if (oldWidget.statisticsRepository != widget.statisticsRepository) {
       _watchCalendarGoals();
     }
+    if (oldWidget.profile != widget.profile) _refreshDayDetails();
   }
 
   @override
@@ -102,6 +114,7 @@ class _DiaryScreenState extends State<DiaryScreen> {
     _entries = const [];
     _displayEntriesByMeal = const {};
     _entriesReady = widget.repository == null;
+    _refreshDayDetails();
     final day = _selectedDay;
     _daySubscription = widget.repository?.watchDay(day).listen((entries) {
       if (mounted && _isSameDay(day, _selectedDay)) {
@@ -109,6 +122,7 @@ class _DiaryScreenState extends State<DiaryScreen> {
           _entries = entries;
           _entriesReady = true;
           _prepareDisplayEntries();
+          _refreshDayDetails();
         });
       }
     });
@@ -121,12 +135,16 @@ class _DiaryScreenState extends State<DiaryScreen> {
     _goalsSubscription?.cancel();
     final epoch = ++_goalsEpoch;
     _goals = const [];
+    _refreshDayDetails();
     final repository = widget.statisticsRepository;
     _goalsReady = repository == null;
     _goalsSubscription = repository?.watchGoals().listen((goals) {
       if (!mounted || epoch != _goalsEpoch) return;
-      _goals = goals;
-      _goalsReady = true;
+      setState(() {
+        _goals = goals;
+        _goalsReady = true;
+        _refreshDayDetails();
+      });
       _recalculateWeek();
     });
     _watchVisibleWeek();
@@ -174,6 +192,29 @@ class _DiaryScreenState extends State<DiaryScreen> {
     });
   }
 
+  void _refreshDayDetails() {
+    final profile = widget.profile;
+    final goals = widget.statisticsRepository == null && profile != null
+        ? [
+            GoalVersion(
+              id: 'session',
+              day: _today,
+              goal: profile.goal,
+              calorieTarget: profile.calorieTarget,
+              proteinTarget: profile.proteinTarget,
+              fatTarget: profile.fatTarget,
+              carbsTarget: profile.carbsTarget,
+              targetWeightKg: profile.targetWeightKg,
+            ),
+          ]
+        : _goals;
+    _dayDetails.value = DayDetailsSnapshot(
+      day: _selectedDay,
+      entries: _entries,
+      goals: goals,
+    );
+  }
+
   @override
   void dispose() {
     _highlightTimer?.cancel();
@@ -181,16 +222,24 @@ class _DiaryScreenState extends State<DiaryScreen> {
     _goalsSubscription?.cancel();
     _weekSubscription?.cancel();
     _scrollController.dispose();
+    _dayDetails.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final day = buildDiaryPrototypeDay(
+    final goal = _dayDetails.value.goal;
+    final meals = buildDiaryPrototypeDay(
       l10n,
       entriesByMeal: _displayEntriesByMeal,
-      profile: widget.profile,
+    ).meals;
+    final day = DiaryPrototypeDay(
+      calorieTarget: goal?.calorieTarget,
+      proteinTarget: goal?.proteinTarget,
+      fatTarget: goal?.fatTarget,
+      carbsTarget: goal?.carbsTarget,
+      meals: meals,
     );
 
     return _buildScaffold(day, l10n);
@@ -359,7 +408,7 @@ class _DiaryScreenState extends State<DiaryScreen> {
                 index: 1,
                 replayKey: _selectedDay,
                 ready: _entriesReady,
-                child: DailyNutritionSummary(day: day),
+                child: _buildSummary(day),
               ),
             ),
           ),
@@ -427,7 +476,7 @@ class _DiaryScreenState extends State<DiaryScreen> {
                         index: 1,
                         replayKey: _selectedDay,
                         ready: _entriesReady,
-                        child: DailyNutritionSummary(day: day),
+                        child: _buildSummary(day),
                       ),
                     ),
                     const SizedBox(width: AppSpacing.xl),
@@ -450,6 +499,68 @@ class _DiaryScreenState extends State<DiaryScreen> {
         ),
       ),
     ];
+  }
+
+  Widget _buildSummary(DiaryPrototypeDay day) => Hero(
+    tag: _summaryHeroTag,
+    flightShuttleBuilder: DailyNutritionSummary.buildFlight,
+    child: Material(
+      key: _summaryKey,
+      type: MaterialType.transparency,
+      child: Semantics(
+        button: true,
+        label: AppLocalizations.of(context).dayDetailsOpen,
+        child: Tooltip(
+          message: AppLocalizations.of(context).dayDetailsOpen,
+          child: InkWell(
+            key: const ValueKey('diary-day-details'),
+            borderRadius: BorderRadius.circular(AppRadius.card),
+            onTap: _entriesReady && _goalsReady ? _openDayDetails : null,
+            child: Stack(
+              children: [
+                DailyNutritionSummary(day: day),
+                PositionedDirectional(
+                  top: AppSpacing.md,
+                  end: AppSpacing.md,
+                  child: Icon(
+                    Icons.open_in_full_rounded,
+                    size: 18,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+
+  Future<void> _openDayDetails() async {
+    if (_detailsOpen) return;
+    final navigator = Navigator.of(context, rootNavigator: true);
+    final overlay = navigator.overlay!.context.findRenderObject()! as RenderBox;
+    Rect sourceRect() {
+      final box = _summaryKey.currentContext?.findRenderObject() as RenderBox?;
+      if (box == null || !box.attached) return Offset.zero & overlay.size;
+      return box.localToGlobal(Offset.zero, ancestor: overlay) & box.size;
+    }
+
+    final route = DayDetailsRoute(
+      sourceRect: sourceRect,
+      reduceMotion: MediaQuery.disableAnimationsOf(context),
+      builder: (detailsContext) => DayDetailsScreen(
+        snapshot: _dayDetails,
+        today: _today,
+        summaryHeroTag: _summaryHeroTag,
+        onEditEntry: (entry) =>
+            _editStoredEntry(entry, feedbackContext: detailsContext),
+      ),
+    );
+    _detailsOpen = true;
+    unawaited(navigator.push(route));
+    await route.completed;
+    _detailsOpen = false;
   }
 
   Widget _buildDaySelector() {
@@ -544,14 +655,22 @@ class _DiaryScreenState extends State<DiaryScreen> {
 
   Future<void> _editEntry(DiaryPrototypeEntry displayEntry) async {
     final entry = displayEntry.storedEntry;
+    if (entry != null) await _editStoredEntry(entry);
+  }
+
+  Future<void> _editStoredEntry(
+    DiaryEntry entry, {
+    BuildContext? feedbackContext,
+  }) async {
     final repository = widget.repository;
-    if (entry == null || repository == null) return;
+    if (repository == null) return;
+    final targetContext = feedbackContext ?? context;
     final change = await showEditDiaryEntrySheet(
-      context: context,
+      context: targetContext,
       entry: entry,
     );
-    if (!mounted || change == null) return;
-    final l10n = AppLocalizations.of(context);
+    if (!mounted || !targetContext.mounted || change == null) return;
+    final l10n = AppLocalizations.of(targetContext);
     try {
       if (change.delete) {
         await repository.delete(entry.id);
@@ -564,9 +683,9 @@ class _DiaryScreenState extends State<DiaryScreen> {
           canonicalQuantity: change.canonicalQuantity!,
         );
       }
-      if (!mounted) return;
+      if (!mounted || !targetContext.mounted) return;
       showYamUndoSnackBar(
-        context: context,
+        context: targetContext,
         message: change.delete
             ? l10n.diaryEntryDeleted(entry.food.name)
             : l10n.diaryEntryUpdated(entry.food.name),
@@ -574,8 +693,8 @@ class _DiaryScreenState extends State<DiaryScreen> {
         onUndo: () => unawaited(_restoreEntry(repository, entry)),
       );
     } on Object {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      if (!mounted || !targetContext.mounted) return;
+      ScaffoldMessenger.of(targetContext).showSnackBar(
         SnackBar(
           content: Text(
             change.delete ? l10n.diaryDeleteFailed : l10n.diarySaveFailed,

@@ -239,6 +239,76 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diaryTitle => 'Diary';
 
   @override
+  String get dayDetailsTitle => 'Day details';
+
+  @override
+  String get dayDetailsOpen => 'Open day details';
+
+  @override
+  String get dayDetailsByMeal => 'By meal';
+
+  @override
+  String get dayDetailsByContribution => 'By contribution';
+
+  @override
+  String get dayDetailsCalories => 'Calories';
+
+  @override
+  String get dayDetailsDistribution => 'Meal distribution';
+
+  @override
+  String get dayDetailsFood => 'Food logged';
+
+  @override
+  String get dayDetailsContributionHint =>
+      'Share of the logged daily total, not the goal';
+
+  @override
+  String dayDetailsShare(String percent) {
+    return '$percent of the day';
+  }
+
+  @override
+  String get dayDetailsNoShare => 'No share: the daily total is zero';
+
+  @override
+  String get dayDetailsFacts => 'Day at a glance';
+
+  @override
+  String get dayDetailsSoFar => 'So far today';
+
+  @override
+  String dayDetailsLargestMeal(String meal, String calories) {
+    return 'Most calories — $meal: $calories kcal';
+  }
+
+  @override
+  String dayDetailsProteinRemaining(String grams) {
+    return 'Protein to goal — $grams g';
+  }
+
+  @override
+  String dayDetailsEstimatedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count entries with estimated values',
+      one: '$count entry with estimated values',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get dayDetailsEmptyTitle => 'No entries for this day';
+
+  @override
+  String get dayDetailsEmptyBody =>
+      'Log food in the diary to see this day\'s details.';
+
+  @override
+  String get actionClose => 'Close';
+
+  @override
   String get diaryToday => 'Today';
 
   @override
@@ -1300,14 +1370,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get backupPersonalDataNote =>
-      'The .yam file contains your diary, weights, goals and food data, including deleted records. It is not encrypted. Store it privately. The app theme is not included.';
+      'The .yam file contains your diary, weights, goals, food data and saved AI chat text, including deleted-record metadata. Photos, drafts and credentials are not included. It is not encrypted. Store it privately. The app theme is not included.';
 
   @override
   String get backupReplaceTitle => 'Replace local data?';
 
   @override
   String get backupReplaceWarning =>
-      'All local foods, servings, diary entries, goals, weight records and cached foods will be removed and replaced with this backup. This cannot be undone. An empty backup clears these records. If the backup has no goals, you will need to go through onboarding again.';
+      'All local foods, servings, diary entries, goals, weight records, cached foods and saved AI chats will be removed and replaced with this backup. This cannot be undone. An empty backup clears these records. Older backups without chats also clear local chats. If the backup has no goals, you will need to go through onboarding again.';
 
   @override
   String get backupReplaceConfirm => 'Replace all data';
@@ -1405,6 +1475,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get backupCountRemoteFoods => 'Cached foods';
 
   @override
+  String get backupCountAssistantConversations => 'AI chats';
+
+  @override
   String get backupRestoreAction => 'Restore from backup';
 
   @override
@@ -1432,23 +1505,86 @@ class AppLocalizationsEn extends AppLocalizations {
   String get assistantSettingsSubtitle => 'ChatGPT or your own OpenAI API key';
 
   @override
-  String get assistantIntro =>
-      'Describe your food, dictate, or attach a photo. I will find foods and prepare a draft. Nothing is saved until you confirm.';
-
-  @override
   String get assistantPrivacy =>
-      'The provider receives your messages, attached photos, and only requested YAM data. Your full database is not sent in advance. The regular diary works without AI or a network.';
+      'The provider receives the messages you send, attached photos, and only requested YAM data. Saved chats are not sent automatically; when reopening a chat, sending its saved text requires turning on history context. Your full database is not sent in advance. The regular diary works without AI or a network.';
 
   @override
   String get assistantSessionNote =>
-      'The conversation and unsaved draft are discarded when you close this screen.';
+      'Chat text is saved on this device and included in .yam backups. Photos, unfinished input and unsaved drafts are not saved. Reopened chats are for viewing until you send a message; sending their saved text as context is off by default.';
+
+  @override
+  String get assistantHistory => 'Chat history';
+
+  @override
+  String get assistantHistoryEmpty => 'No saved chats yet';
+
+  @override
+  String get assistantHistoryEmptyNote =>
+      'Your conversations will appear here after you send a message. Saved chat text is available offline.';
+
+  @override
+  String get assistantHistoryPhotoTitle => 'Photo conversation';
+
+  @override
+  String get assistantPhotoNotStored => 'Photo not saved';
+
+  @override
+  String get assistantUseHistory => 'Use saved history as context';
+
+  @override
+  String get assistantUseHistoryNote =>
+      'Only text from the last 12 messages, up to 12,000 characters, is sent with the next request. Photos and old tool calls are not sent.';
+
+  @override
+  String get assistantHistoryOffNote =>
+      'Archived messages are not sent. The new exchange still keeps its own context.';
+
+  @override
+  String get assistantHistoryStorageError =>
+      'Could not load or save local chat history. Try again. Saved messages are not sent automatically.';
+
+  @override
+  String get assistantHistoryLoading => 'Loading saved chats…';
+
+  @override
+  String get assistantHistoryLoadError => 'Could not load chats';
+
+  @override
+  String get assistantHistoryRetry => 'Try again';
+
+  @override
+  String assistantHistoryUpdatedAt(String date, String time) {
+    return '$date, $time';
+  }
+
+  @override
+  String get assistantHistoryDeleteTitle => 'Delete conversation?';
+
+  @override
+  String assistantHistoryDeleteMessage(String title) {
+    return '“$title” will be removed from saved chats. Its text will be erased from local history. Diary entries will not change. This cannot be undone.';
+  }
+
+  @override
+  String get assistantHistoryDelete => 'Delete';
+
+  @override
+  String assistantHistoryDeleteAction(String title) {
+    return 'Delete conversation: $title';
+  }
+
+  @override
+  String get assistantHistoryDeleting => 'Deleting conversation…';
+
+  @override
+  String get assistantHistoryDeleteError =>
+      'Could not delete the conversation. Try deleting it again.';
 
   @override
   String get assistantPrompt => 'What did you eat?';
 
   @override
-  String get assistantPromptHint =>
-      'For example: two eggs and 200 g of cottage cheese for breakfast';
+  String get assistantPromptHint => 'E.g. 200 g cottage cheese';
 
   @override
   String get assistantSend => 'Send';
@@ -1592,11 +1728,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get assistantSaved => 'The confirmed batch has been saved';
 
   @override
+  String get assistantDraftDiscarded => 'Draft discarded. Nothing was saved.';
+
+  @override
   String get assistantCloseTitle => 'Close assistant?';
 
   @override
   String get assistantCloseNote =>
-      'The conversation, attached photo, and unsaved draft will be discarded. Saved entries remain in the diary.';
+      'Chat text stays in local history. Attached photos, unfinished input and the unsaved draft will be discarded. Saved entries remain in the diary.';
 
   @override
   String get assistantCloseConfirm => 'Close';
@@ -1612,10 +1751,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get assistantSwitchNote =>
-      'Changing the connection starts a new conversation and discards the unsaved draft.';
-
-  @override
-  String get assistantConsent => 'Understood, open assistant';
+      'Changing the connection starts a new conversation. Chat text stays in local history; attached photos, unfinished input and the unsaved draft will be discarded.';
 
   @override
   String get assistantInvalidDraft =>
@@ -1679,6 +1815,106 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get assistantErrorGeneric =>
       'The request failed. Your input and draft remain on this screen; try again.';
+
+  @override
+  String get proxySettingsTitle => 'Proxy';
+
+  @override
+  String get proxySettingsSubtitle => 'HTTP, HTTPS or SOCKS5 for app requests';
+
+  @override
+  String get proxyScopeNote =>
+      'Applies to HTTP requests made by YAM. Browser sign-in and system speech recognition still use the operating system’s network settings. The local diary works without a network.';
+
+  @override
+  String get proxyLoading => 'Loading saved proxy settings…';
+
+  @override
+  String get proxyRouting => 'Connection';
+
+  @override
+  String get proxyDisabled => 'Off — direct connection';
+
+  @override
+  String get proxyEnabled => 'On — use proxy';
+
+  @override
+  String get proxyDisabledHelp =>
+      'Save to use direct connections. No network connection is needed to turn the proxy off.';
+
+  @override
+  String get proxyEnabledHelp =>
+      'If the proxy is unavailable, requests fail instead of connecting directly.';
+
+  @override
+  String get proxyProtocol => 'Proxy protocol';
+
+  @override
+  String get proxyProtocolHttp => 'HTTP';
+
+  @override
+  String get proxyProtocolHttps => 'HTTPS';
+
+  @override
+  String get proxyProtocolSocks5 => 'SOCKS5';
+
+  @override
+  String get proxyProtocolHelp =>
+      'HTTP also supports HTTPS sites. HTTP and SOCKS5 do not encrypt the connection to the proxy, including proxy credentials; HTTPS encrypts this hop. HTTPS sites keep their own TLS protection.';
+
+  @override
+  String get proxyHost => 'Host';
+
+  @override
+  String get proxyHostHint => 'Hostname or IP address, without a URL scheme';
+
+  @override
+  String get proxyPort => 'Port';
+
+  @override
+  String get proxyAuthentication => 'Authentication (optional)';
+
+  @override
+  String get proxyAuthenticationHelp =>
+      'Leave both fields blank if the proxy does not require authentication. Password spaces are preserved.';
+
+  @override
+  String get proxyUsername => 'Username';
+
+  @override
+  String get proxyPassword => 'Password';
+
+  @override
+  String get proxyStorageNote =>
+      'Settings and credentials are kept in secure storage on this device and excluded from diary backups.';
+
+  @override
+  String get proxyApplyNote =>
+      'Saving applies the settings immediately and closes existing connections. Requests in progress may need to be retried.';
+
+  @override
+  String get proxyErrorHost =>
+      'Enter a valid hostname or IP address without a URL scheme, path or port.';
+
+  @override
+  String get proxyErrorPort => 'Enter a port number from 1 to 65535.';
+
+  @override
+  String get proxyErrorCredentials =>
+      'Check the username and password: this proxy protocol cannot use these credentials.';
+
+  @override
+  String get proxyErrorStorage =>
+      'Could not load or save proxy settings securely. Check the system keyring and try saving again. Active routing has not changed; the local diary remains available.';
+
+  @override
+  String get proxySave => 'Save settings';
+
+  @override
+  String get proxySaving => 'Saving settings…';
+
+  @override
+  String get proxySaved => 'Proxy settings saved.';
 
   @override
   String get settingsAboutDescription =>

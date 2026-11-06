@@ -13,6 +13,7 @@ String assistantFailureText(AppLocalizations l10n, String code) =>
       'protocol' => l10n.assistantErrorInterrupted,
       'cancelled' => l10n.assistantErrorCancelled,
       'storage' => l10n.assistantErrorStorage,
+      'history_storage' => l10n.assistantHistoryStorageError,
       'revocation_unconfirmed' => l10n.assistantErrorRevocation,
       'speech_permission' ||
       'microphone_permission' ||

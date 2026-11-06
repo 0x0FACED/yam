@@ -8,6 +8,7 @@ const _tableFiles = {
   'weights': 'weight_entries.json',
   'remoteFoods': 'remote_foods.json',
 };
+const _conversationFile = 'assistant_conversations.json';
 const _serializer = _BackupSerializer();
 
 // Keep isolate closures outside the repository's database-capturing scope.
@@ -50,6 +51,10 @@ Uint8List _encodeBackup(_BackupData data) {
     'remoteFoods': [
       for (final row in data.remoteFoods) row.toJson(serializer: _serializer),
     ],
+    'assistantConversations': [
+      for (final row in data.assistantConversations)
+        row.toJson(serializer: _serializer),
+    ],
   };
   _validateTables(tables, allowDuplicateBarcodes: true);
   final archive = Archive();
@@ -73,7 +78,12 @@ Uint8List _encodeBackup(_BackupData data) {
     },
   });
   for (final entry in tables.entries) {
-    addJson(_tableFiles[entry.key]!, entry.value);
+    addJson(
+      entry.key == 'assistantConversations'
+          ? _conversationFile
+          : _tableFiles[entry.key]!,
+      entry.value,
+    );
   }
   final bytes = ZipEncoder().encodeBytes(archive);
   if (bytes.length > maxBackupFileBytes) {
@@ -119,6 +129,23 @@ _BackupData _decodeBackup(Uint8List bytes) {
       _require(counts[entry.key] is int && counts[entry.key] == rows.length);
       tables[entry.key] = rows;
     }
+    final conversationBytes = members[_conversationFile];
+    if (conversationBytes == null) {
+      _require(
+        !counts.containsKey('assistantConversations') ||
+            counts['assistantConversations'] == 0,
+      );
+      tables['assistantConversations'] = [];
+    } else {
+      final value = jsonDecode(utf8.decode(conversationBytes));
+      _require(value is List);
+      final rows = (value as List).map(_object).toList(growable: false);
+      _require(
+        counts['assistantConversations'] is int &&
+            counts['assistantConversations'] == rows.length,
+      );
+      tables['assistantConversations'] = rows;
+    }
     _validateTables(tables, allowDuplicateBarcodes: version == 3);
     return _BackupData(
       exportedAt: exportedAt,
@@ -147,6 +174,10 @@ _BackupData _decodeBackup(Uint8List bytes) {
         for (final row in tables['remoteFoods']!)
           StoredRemoteFood.fromJson(row, serializer: _serializer),
       ],
+      assistantConversations: [
+        for (final row in tables['assistantConversations']!)
+          StoredAssistantConversation.fromJson(row, serializer: _serializer),
+      ],
     );
   } on BackupException {
     rethrow;
@@ -157,6 +188,7 @@ _BackupData _decodeBackup(Uint8List bytes) {
 
 enum _Value {
   text,
+  string,
   optionalText,
   number,
   integer,
@@ -244,6 +276,13 @@ const _schemas = {
     'source': _Value.text,
     'sourceCode': _Value.text,
     'lastAmount': _Value.number,
+  },
+  'assistantConversations': {
+    ..._metadata,
+    'title': _Value.string,
+    'day': _Value.text,
+    'mealId': _Value.text,
+    'messages': _Value.text,
   },
 };
 final _uuid = RegExp(
@@ -336,6 +375,31 @@ void _validateTables(
   for (final row in tables['diaryEntries']!) {
     _validateDiary(row);
   }
+  for (final row in tables['assistantConversations']!) {
+    _validateConversation(row);
+  }
+}
+
+void _validateConversation(Map<String, dynamic> row) {
+  _day(row['day'] as String);
+  _require(diaryMealIds.contains(row['mealId']));
+  _require((row['title'] as String).runes.length <= 80);
+  final deletedAt = row['deletedAt'];
+  final messages = jsonDecode(row['messages'] as String);
+  _require(messages is List);
+  for (final value in messages as List) {
+    final message = _object(value);
+    _require(
+      message.length == 3 &&
+          message['isUser'] is bool &&
+          message['text'] is String &&
+          message['hasImage'] is bool,
+    );
+  }
+  // Tombstones retain sync identity, never deleted text or photo placeholders.
+  if (deletedAt != null) {
+    _require((row['title'] as String).isEmpty && messages.isEmpty);
+  }
 }
 
 void _validateFields(Map<String, dynamic> row, Map<String, _Value> schema) {
@@ -345,6 +409,8 @@ void _validateFields(Map<String, dynamic> row, Map<String, _Value> schema) {
     switch (entry.value) {
       case _Value.text:
         _require(value is String && value.trim().isNotEmpty);
+      case _Value.string:
+        _require(value is String);
       case _Value.optionalText:
         _require(value == null || value is String);
       case _Value.number:
@@ -479,7 +545,7 @@ class _ZipMember {
 
 // Parse only the bounded archive envelope. Do not call ZipDecoder.readBytes: its
 // default inflater trusts member sizes and can allocate an unbounded ZIP bomb.
-// No names are ever used as filesystem paths; only these seven members exist.
+// No names are ever used as filesystem paths; only known members are accepted.
 Map<String, Uint8List> _readZipMembers(Uint8List bytes) {
   if (bytes.length > maxBackupFileBytes) {
     throw const BackupException(BackupFailure.tooLarge);
@@ -496,18 +562,22 @@ Map<String, Uint8List> _readZipMembers(Uint8List bytes) {
   }
   _require(eocd >= first);
   _require(u16(eocd + 4) == 0 && u16(eocd + 6) == 0);
-  _require(u16(eocd + 8) == 7 && u16(eocd + 10) == 7);
+  final memberCount = u16(eocd + 10);
+  _require(
+    u16(eocd + 8) == memberCount && (memberCount == 7 || memberCount == 8),
+  );
   final centralSize = u32(eocd + 12);
   final centralOffset = u32(eocd + 16);
   _require(centralOffset + centralSize == eocd);
   final expected = {'manifest.json', ..._tableFiles.values};
+  final allowed = {...expected, _conversationFile};
   final members = <_ZipMember>[];
   final directory = InputMemoryStream(
     Uint8List.sublistView(bytes, centralOffset, eocd),
   );
   final input = InputMemoryStream(bytes);
   var totalSize = 0;
-  for (var index = 0; index < 7; index++) {
+  for (var index = 0; index < memberCount; index++) {
     _require(
       directory.length >= 46 &&
           directory.readUint32() == ZipFileHeader.signature,
@@ -522,7 +592,8 @@ Map<String, Uint8List> _readZipMembers(Uint8List bytes) {
     _require(mode == 0 || mode == 0x8000);
     _require(header.externalFileAttributes & 0x10 == 0);
     final name = header.filename;
-    _require(expected.remove(name));
+    _require(allowed.remove(name));
+    expected.remove(name);
     totalSize += header.uncompressedSize;
     if (totalSize > _maxUncompressedBytes) {
       throw const BackupException(BackupFailure.tooLarge);

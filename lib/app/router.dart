@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:yam/app/onboarding_access.dart';
 import 'package:yam/app/navigation/adaptive_navigation_shell.dart';
 import 'package:yam/app/session/session_profile.dart';
+import 'package:yam/core/network/proxy_settings_controller.dart';
 import 'package:yam/features/app_update/presentation/app_update_controller.dart';
 import 'package:yam/features/assistant/data/assistant_connection_manager.dart';
 import 'package:yam/features/assistant/presentation/assistant_connection_screen.dart';
@@ -25,6 +26,7 @@ import 'package:yam/features/food_search/data/remote_food_repository.dart';
 import 'package:yam/features/food_search/presentation/food_search_prototype_data.dart';
 import 'package:yam/features/food_search/presentation/food_search_screen.dart';
 import 'package:yam/features/onboarding/presentation/onboarding_screen.dart';
+import 'package:yam/features/settings/presentation/proxy_settings_screen.dart';
 import 'package:yam/features/settings/presentation/settings_screen.dart';
 import 'package:yam/features/statistics/data/statistics_repository.dart';
 import 'package:yam/features/statistics/presentation/statistics_screen.dart';
@@ -52,6 +54,7 @@ GoRouter createAppRouter({
   FoodLibraryFileService? foodLibraryFiles,
   AppUpdateController? appUpdates,
   AssistantConnectionManager? assistantConnection,
+  ProxySettingsController? proxySettings,
 }) {
   return GoRouter(
     initialLocation: '/diary',
@@ -156,6 +159,9 @@ GoRouter createAppRouter({
                       onOpenAssistant: assistantConnection == null
                           ? null
                           : () => context.push('/assistant/connection'),
+                      onOpenProxy: proxySettings == null
+                          ? null
+                          : () => context.push('/settings/proxy'),
                     ),
                   );
                 },
@@ -164,6 +170,12 @@ GoRouter createAppRouter({
           ),
         ],
       ),
+      if (proxySettings != null)
+        GoRoute(
+          path: '/settings/proxy',
+          builder: (context, state) =>
+              ProxySettingsScreen(controller: proxySettings),
+        ),
       if (assistantConnection != null)
         GoRoute(
           path: '/assistant/connection',

@@ -100,6 +100,13 @@ class _AssistantConnectionScreenState extends State<AssistantConnectionScreen> {
               padding: const EdgeInsets.all(AppSpacing.md),
               children: [
                 Text(l10n.assistantPrivacy, style: AppTypography.body),
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  l10n.assistantSessionNote,
+                  style: AppTypography.caption.copyWith(
+                    color: colors.onSurfaceVariant,
+                  ),
+                ),
                 const SizedBox(height: AppSpacing.lg),
                 if (connection.isConnected) ...[
                   Text(

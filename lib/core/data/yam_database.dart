@@ -169,6 +169,26 @@ class RemoteFoods extends Table {
   ];
 }
 
+@DataClassName('StoredAssistantConversation')
+@TableIndex(
+  name: 'assistant_conversations_history',
+  columns: {#deletedAt, #updatedAt, #id},
+)
+class AssistantConversations extends Table {
+  TextColumn get id => text()();
+  TextColumn get title => text()();
+  TextColumn get day => text()();
+  TextColumn get mealId => text()();
+  TextColumn get messages => text()();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+  DateTimeColumn get deletedAt => dateTime().nullable()();
+  TextColumn get deviceId => text()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
 @DriftDatabase(
   tables: [
     UserFoods,
@@ -178,6 +198,7 @@ class RemoteFoods extends Table {
     GoalVersions,
     WeightEntries,
     RemoteFoods,
+    AssistantConversations,
   ],
 )
 class YamDatabase extends _$YamDatabase {
@@ -187,7 +208,7 @@ class YamDatabase extends _$YamDatabase {
     : super(LazyDatabase(() async => driftDatabase(name: 'yam')));
 
   @override
-  int get schemaVersion => 7;
+  int get schemaVersion => 8;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -241,6 +262,13 @@ class YamDatabase extends _$YamDatabase {
       // v1 creates the current diary table above, including this column.
       if (from >= 2 && from < 7) {
         await migrator.addColumn(diaryEntries, diaryEntries.isEstimated);
+      }
+      if (from < 8) {
+        await migrator.createTable(assistantConversations);
+        await customStatement(
+          'CREATE INDEX assistant_conversations_history '
+          'ON assistant_conversations (deleted_at, updated_at, id)',
+        );
       }
     },
     beforeOpen: (details) async {

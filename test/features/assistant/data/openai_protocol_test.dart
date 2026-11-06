@@ -49,6 +49,7 @@ class OpenAiFixture {
   final bearerHeaders = <String?>[];
   String? transcriptionBearer, multipart;
   bool oauthCatalog = false;
+  ContentType? streamContentType = ContentType('text', 'event-stream');
   String stream =
       'data: {"type":"response.completed","response":{"status":"completed","output":[]}}\n\n';
   final streamStarted = Completer<void>();
@@ -229,7 +230,7 @@ class OpenAiFixture {
           jsonDecode(await utf8.decoder.bind(request).join())
               as Map<String, dynamic>,
         );
-        response.headers.contentType = ContentType('text', 'event-stream');
+        response.headers.contentType = streamContentType;
         for (final byte in utf8.encode(stream)) {
           response.add([byte]);
         }
@@ -400,6 +401,172 @@ void main() {
       expect((fixture.requests.last['input'] as List)[1], output.first);
     },
   );
+
+  test('accepts a completed SSE response without a Content-Type header', () async {
+    fixture.streamContentType = null;
+    final message = {
+      'id': 'message-fixture',
+      'type': 'message',
+      'status': 'completed',
+      'content': [
+        {'type': 'output_text', 'text': 'Порция готова'},
+      ],
+    };
+    fixture.stream =
+        'data: ${jsonEncode({
+          'type': 'response.output_item.added',
+          'output_index': 0,
+          'item': {'type': 'message', 'status': 'in_progress'},
+        })}\n\n'
+        'data: {"type":"response.output_text.delta","delta":"Порция готова"}\n\n'
+        'data: ${jsonEncode({'type': 'response.output_item.done', 'output_index': 0, 'item': message})}\n\n'
+        'data: {"type":"response.completed","response":{"status":"completed","output":[]}}\n\n';
+    final gateway = OpenAiGateway(
+      bearer: () async => 'fixture-key',
+      apiBase: fixture.api,
+    );
+    addTearDown(gateway.close);
+    final deltas = <String>[];
+    final turn = await gateway.respond(
+      model: 'gpt-fixture',
+      instructions: '',
+      input: [],
+      tools: [],
+      onText: deltas.add,
+    );
+    expect(turn.text, 'Порция готова');
+    expect(deltas, ['Порция готова']);
+  });
+
+  test(
+    'missing Content-Type does not make a partial stream successful',
+    () async {
+      fixture.streamContentType = null;
+      fixture.stream =
+          'data: {"type":"response.output_text.delta","delta":"partial"}\n\n';
+      final gateway = OpenAiGateway(
+        bearer: () async => 'fixture-key',
+        apiBase: fixture.api,
+      );
+      addTearDown(gateway.close);
+      await expectLater(
+        gateway.respond(
+          model: 'gpt-fixture',
+          instructions: '',
+          input: [],
+          tools: [],
+        ),
+        throwsA(failure('interrupted')),
+      );
+    },
+  );
+
+  test('still rejects an explicitly non-SSE Content-Type', () async {
+    fixture.streamContentType = ContentType.json;
+    final gateway = OpenAiGateway(
+      bearer: () async => 'fixture-key',
+      apiBase: fixture.api,
+    );
+    addTearDown(gateway.close);
+    await expectLater(
+      gateway.respond(
+        model: 'gpt-fixture',
+        instructions: '',
+        input: [],
+        tools: [],
+      ),
+      throwsA(failure('protocol')),
+    );
+  });
+
+  test(
+    'retains finalized reasoning and tool calls in output-index order',
+    () async {
+      final items = [
+        {
+          'type': 'reasoning',
+          'id': 'reasoning-fixture',
+          'encrypted_content': 'fixture-encrypted',
+          'summary': [],
+        },
+        {
+          'type': 'function_call',
+          'namespace': 'yam',
+          'name': 'search_foods',
+          'call_id': 'call-fixture',
+          'arguments': '{"query":"овсянка"}',
+        },
+      ];
+      fixture.stream = [
+        for (final index in [1, 0])
+          'data: ${jsonEncode({'type': 'response.output_item.done', 'output_index': index, 'item': items[index]})}\n\n',
+        'data: {"type":"response.completed","response":{"status":"completed","output":[]}}\n\n',
+      ].join();
+      final gateway = OpenAiGateway(
+        bearer: () async => 'fixture-key',
+        apiBase: fixture.api,
+      );
+      addTearDown(gateway.close);
+      final turn = await gateway.respond(
+        model: 'gpt-fixture',
+        instructions: '',
+        input: [],
+        tools: [],
+      );
+      expect(turn.output.map((item) => item['type']), [
+        'reasoning',
+        'function_call',
+      ]);
+      expect(turn.output.first['encrypted_content'], 'fixture-encrypted');
+      expect(turn.output.last['name'], 'search_foods');
+      expect(jsonDecode(turn.output.last['arguments'] as String), {
+        'query': 'овсянка',
+      });
+    },
+  );
+
+  for (final entry in {
+    'finished item without terminal completion': (
+      'data: {"type":"response.output_item.done","output_index":0,"item":{"type":"function_call","name":"prepare_draft","call_id":"fixture","arguments":"{}"}}\n\n',
+      'interrupted',
+    ),
+    'unfinished item at terminal completion': (
+      'data: {"type":"response.output_item.added","output_index":0,"item":{"type":"message","status":"in_progress"}}\n\n'
+          'data: {"type":"response.output_text.delta","delta":"partial"}\n\n'
+          'data: {"type":"response.completed","response":{"status":"completed","output":[]}}\n\n',
+      'protocol',
+    ),
+    'gap in finalized items': (
+      'data: {"type":"response.output_item.done","output_index":1,"item":{"type":"message","content":[]}}\n\n'
+          'data: {"type":"response.completed","response":{"status":"completed","output":[]}}\n\n',
+      'protocol',
+    ),
+    'repeated finalized index': (
+      'data: {"type":"response.output_item.done","output_index":0,"item":{"type":"message","content":[]}}\n\n'
+          'data: {"type":"response.output_item.done","output_index":0,"item":{"type":"message","content":[]}}\n\n'
+          'data: {"type":"response.completed","response":{"status":"completed","output":[]}}\n\n',
+      'protocol',
+    ),
+  }.entries) {
+    test('rejects ${entry.key}', () async {
+      fixture.streamContentType = null;
+      fixture.stream = entry.value.$1;
+      final gateway = OpenAiGateway(
+        bearer: () async => 'fixture-key',
+        apiBase: fixture.api,
+      );
+      addTearDown(gateway.close);
+      await expectLater(
+        gateway.respond(
+          model: 'gpt-fixture',
+          instructions: '',
+          input: [],
+          tools: [],
+        ),
+        throwsA(failure(entry.value.$2)),
+      );
+    });
+  }
 
   for (final entry in {
     'data: {"type":"response.output_text.delta","delta":"partial"}\n\n':

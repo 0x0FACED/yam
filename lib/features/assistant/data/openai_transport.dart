@@ -229,9 +229,15 @@ class OpenAiGateway implements AssistantGateway {
         await readAssistantJson(response);
         throw const AssistantFailure('protocol');
       }
-      if (response.headers.contentType?.mimeType != 'text/event-stream') {
+      // ChatGPT plan streams can omit Content-Type. Terminal SSE validation
+      // below remains authoritative; an explicitly different MIME is rejected.
+      final mimeType = response.headers.contentType?.mimeType;
+      if (mimeType != null && mimeType != 'text/event-stream') {
         throw const AssistantFailure('protocol');
       }
+      final streamedOutput = <int, Map<String, dynamic>>{};
+      final unfinishedOutput = <int>{};
+      var receivedText = false;
       await for (final data in assistantSseData(
         response,
       ).timeout(const Duration(seconds: 90))) {
@@ -242,8 +248,28 @@ class OpenAiGateway implements AssistantGateway {
         final dynamic event = jsonDecode(data);
         if (event is! Map) throw const AssistantFailure('protocol');
         switch (event['type']) {
+          case 'response.output_item.added':
+            final addedIndex = event['output_index'];
+            if (addedIndex is! int ||
+                addedIndex < 0 ||
+                streamedOutput.containsKey(addedIndex) ||
+                !unfinishedOutput.add(addedIndex)) {
+              throw const AssistantFailure('protocol');
+            }
+          case 'response.output_item.done':
+            final doneIndex = event['output_index'];
+            final item = event['item'];
+            if (doneIndex is! int ||
+                doneIndex < 0 ||
+                item is! Map<String, dynamic> ||
+                streamedOutput.containsKey(doneIndex)) {
+              throw const AssistantFailure('protocol');
+            }
+            streamedOutput[doneIndex] = item;
+            unfinishedOutput.remove(doneIndex);
           case 'response.output_text.delta':
             if (event['delta'] is String) {
+              receivedText |= (event['delta'] as String).isNotEmpty;
               onText?.call(event['delta'] as String);
             }
           case 'response.completed':
@@ -257,7 +283,24 @@ class OpenAiGateway implements AssistantGateway {
             if (output.any((item) => item is! Map<String, dynamic>)) {
               throw const AssistantFailure('protocol');
             }
-            return AssistantTurn(output: output.cast<Map<String, dynamic>>());
+            var finalOutput = output.cast<Map<String, dynamic>>();
+            // Plan streams finalize items individually and may leave terminal
+            // output empty. Never reconstruct tool calls from partial deltas.
+            if (output.isEmpty &&
+                (streamedOutput.isNotEmpty ||
+                    unfinishedOutput.isNotEmpty ||
+                    receivedText)) {
+              if (unfinishedOutput.isNotEmpty || streamedOutput.isEmpty) {
+                throw const AssistantFailure('protocol');
+              }
+              finalOutput = <Map<String, dynamic>>[];
+              for (var index = 0; index < streamedOutput.length; index++) {
+                final item = streamedOutput[index];
+                if (item == null) throw const AssistantFailure('protocol');
+                finalOutput.add(item);
+              }
+            }
+            return AssistantTurn(output: finalOutput);
           case 'response.failed':
             throw assistantHttpFailure(400, event['response']);
           case 'response.incomplete':

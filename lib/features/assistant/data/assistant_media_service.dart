@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:image/image.dart' as image;
 import 'package:image_picker/image_picker.dart';
+import 'package:pasteboard/pasteboard.dart';
 import 'package:record/record.dart';
 import 'package:speech_to_text/speech_to_text.dart' as speech;
 import 'package:yam/features/assistant/domain/assistant_models.dart';
@@ -27,14 +28,19 @@ class AssistantMediaService {
     })?
     transcribe,
     bool Function()? canTranscribe,
+    Future<Uint8List?> Function()? readClipboardImage,
   }) : _transcribe = transcribe,
-       _canTranscribe = canTranscribe;
+       _canTranscribe = canTranscribe,
+       _readClipboardImage = readClipboardImage ?? _clipboardImage;
 
   // speech_to_text is a singleton and retains its initial callbacks. Route them
   // to the current screen rather than retaining a disposed service on reopening.
   static final _speech = speech.SpeechToText();
   static AssistantMediaService? _speechOwner;
 
+  static Future<Uint8List?> _clipboardImage() => Pasteboard.image;
+
+  final Future<Uint8List?> Function() _readClipboardImage;
   final Future<String> Function(
     Uint8List bytes, {
     required String filename,
@@ -372,6 +378,26 @@ class AssistantMediaService {
     }
   }
 
+  Future<AssistantImage?> pasteImage() async {
+    if (_disposed) throw const AssistantFailure('media_unavailable');
+    try {
+      final bytes = await _readClipboardImage();
+      if (bytes == null) return null;
+      return await _prepareImage(bytes);
+    } on AssistantFailure {
+      rethrow;
+    } on PlatformException catch (error) {
+      final denied =
+          error.code.toLowerCase().contains('denied') ||
+          error.code.toLowerCase().contains('access');
+      throw AssistantFailure(
+        denied ? 'image_permission_denied' : 'image_unavailable',
+      );
+    } catch (_) {
+      throw const AssistantFailure('image_unavailable');
+    }
+  }
+
   Future<AssistantImage?> pickImage({bool camera = false}) async {
     if (_disposed) throw const AssistantFailure('media_unavailable');
     try {
@@ -425,12 +451,7 @@ class AssistantMediaService {
         }
         bytes = builder.takeBytes();
       }
-      if (_disposed) return null;
-      if (bytes.length > _maxImageBytes) {
-        throw const AssistantFailure('image_too_large');
-      }
-      final sanitized = await compute(_sanitizeImage, bytes);
-      return _disposed ? null : sanitized;
+      return await _prepareImage(bytes);
     } on AssistantFailure {
       rethrow;
     } on PlatformException catch (error) {
@@ -443,6 +464,15 @@ class AssistantMediaService {
     } catch (_) {
       throw const AssistantFailure('image_unavailable');
     }
+  }
+
+  Future<AssistantImage?> _prepareImage(Uint8List bytes) async {
+    if (_disposed) return null;
+    if (bytes.length > _maxImageBytes) {
+      throw const AssistantFailure('image_too_large');
+    }
+    final sanitized = await compute(_sanitizeImage, bytes);
+    return _disposed ? null : sanitized;
   }
 
   /// Clears capture without transcribing when changing account or conversation.

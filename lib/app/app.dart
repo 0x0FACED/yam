@@ -9,6 +9,7 @@ import 'package:yam/app/router.dart';
 import 'package:yam/app/session/session_profile.dart';
 import 'package:yam/app/theme/app_theme.dart';
 import 'package:yam/core/data/yam_database.dart';
+import 'package:yam/core/network/proxy_settings_controller.dart';
 import 'package:yam/core/ui/motion/yam_entrance_reveal.dart';
 import 'package:yam/features/app_update/data/android_update_installer.dart';
 import 'package:yam/features/app_update/data/github_update_client.dart';
@@ -67,6 +68,7 @@ class _YamAppState extends State<YamApp> {
   late final FoodLibraryRepository _foodLibrary;
   late final AppUpdateController? _appUpdates;
   late final AssistantConnectionManager _assistantConnection;
+  late final ProxySettingsController _proxySettings;
   StreamSubscription<List<GoalVersion>>? _goalsSubscription;
   StreamSubscription<List<WeightRecord>>? _weightsSubscription;
   List<GoalVersion> _goals = const [];
@@ -87,18 +89,25 @@ class _YamAppState extends State<YamApp> {
     _foodDatabase = widget.database ?? YamDatabase.open();
     _userFoods = UserFoodRepository(_foodDatabase);
     _remoteFoods = RemoteFoodRepository(_foodDatabase);
-    _openFoodFacts = OpenFoodFactsHttpClient();
+    _proxySettings = ProxySettingsController();
+    _openFoodFacts = OpenFoodFactsHttpClient(
+      httpClient: _proxySettings.createHttpClient(),
+    );
     _diary = DiaryRepository(_foodDatabase);
     _statistics = StatisticsRepository(_foodDatabase);
     _backup = BackupRepository(_foodDatabase);
     _foodLibrary = FoodLibraryRepository(_foodDatabase);
-    _assistantConnection = AssistantConnectionManager();
+    _assistantConnection = AssistantConnectionManager(
+      httpClientFactory: _proxySettings.createHttpClient,
+    );
     _appUpdates =
         widget.appUpdates ??
         (!kIsWeb && Platform.isAndroid
             ? AppUpdateController(
                 installedVersion: widget.appVersion,
-                client: GitHubUpdateClient(),
+                client: GitHubUpdateClient(
+                  httpClient: _proxySettings.createHttpClient(),
+                ),
                 installer: const AndroidUpdateInstaller(),
               )
             : null);
@@ -127,6 +136,7 @@ class _YamAppState extends State<YamApp> {
     foodLibraryFiles: widget.foodLibraryFiles,
     appUpdates: _appUpdates,
     assistantConnection: _assistantConnection,
+    proxySettings: _proxySettings,
   );
 
   void _reloadAfterImport() {
@@ -152,6 +162,7 @@ class _YamAppState extends State<YamApp> {
     _openFoodFacts.close();
     _assistantConnection.dispose();
     if (widget.appUpdates == null) _appUpdates?.dispose();
+    _proxySettings.dispose();
     _goalsSubscription?.cancel();
     _weightsSubscription?.cancel();
     if (widget.database == null) unawaited(_foodDatabase.close());

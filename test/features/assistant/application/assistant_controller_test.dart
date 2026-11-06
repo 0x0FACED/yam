@@ -9,6 +9,7 @@ import 'package:yam/core/data/yam_database.dart';
 import 'package:yam/features/assistant/application/assistant_controller.dart';
 import 'package:yam/features/assistant/application/assistant_tools.dart';
 import 'package:yam/features/assistant/domain/assistant_models.dart';
+import 'package:yam/features/assistant/domain/assistant_conversation.dart';
 import 'package:yam/features/diary/data/diary_repository.dart';
 import 'package:yam/features/food_search/data/user_food_repository.dart';
 
@@ -55,6 +56,8 @@ const _finished = AssistantTurn(
 
 class _ScriptedGateway implements AssistantGateway {
   final replies = Queue<Future<AssistantTurn> Function()>();
+  final inputs = <List<Map<String, dynamic>>>[];
+  final started = Completer<void>();
   @override
   Future<AssistantTurn> respond({
     required String model,
@@ -62,7 +65,14 @@ class _ScriptedGateway implements AssistantGateway {
     required List<Map<String, dynamic>> input,
     required List<Map<String, dynamic>> tools,
     void Function(String delta)? onText,
-  }) => replies.removeFirst()();
+  }) {
+    inputs.add(
+      (jsonDecode(jsonEncode(input)) as List).cast<Map<String, dynamic>>(),
+    );
+    if (!started.isCompleted) started.complete();
+    return replies.removeFirst()();
+  }
+
   @override
   Future<List<AssistantModel>> listModels() async => [
     const AssistantModel(id: 'fixture', label: 'Fixture'),
@@ -94,6 +104,8 @@ void main() {
       gateway: () => gateway,
       model: () => 'fixture',
       day: day,
+      savedNote: 'The confirmed batch has been saved',
+      discardedNote: 'Draft discarded. Nothing was saved.',
     );
   });
   tearDown(() async {
@@ -119,7 +131,7 @@ void main() {
       expect(controller.draft!.items.single.food.name, 'Reviewed food');
       expect(controller.failureCode, 'interrupted');
       expect(await diary.watchDay(day).first, isEmpty);
-      controller.dismissDraft();
+      await controller.dismissDraft();
       gateway.replies.add(() async => _finished);
       await controller.send('Just answer a question');
       expect(controller.draft, isNull);
@@ -134,6 +146,7 @@ void main() {
       final late = Completer<AssistantTurn>();
       gateway.replies.add(() => late.future);
       final cancelled = controller.send('Prepare breakfast');
+      await gateway.started.future;
       controller.cancel();
       late.complete(_prepare('Cancelled food'));
       await cancelled;
@@ -163,4 +176,91 @@ void main() {
       expect(controller.draft, isNull);
     },
   );
+
+  test(
+    'archive survives a new controller and is opt-in, text-only context',
+    () async {
+      gateway.replies.add(() async => _finished);
+      await controller.send('Remember breakfast at home');
+      final id = controller.conversationId;
+      final archived = (await controller.conversations.load(id))!;
+      controller.dispose();
+      controller = AssistantController(
+        tools: AssistantTools(
+          database: database,
+          userFoods: UserFoodRepository(database),
+          diary: diary,
+          locale: const Locale('en'),
+        ),
+        gateway: () => gateway,
+        model: () => 'fixture',
+        day: day,
+        savedNote: 'Saved',
+        discardedNote: 'Discarded',
+      );
+      controller.restore(archived);
+      expect(controller.messages.first.text, 'Remember breakfast at home');
+      expect(controller.useArchivedContext, isFalse);
+      expect(controller.draft, isNull);
+      gateway.replies.add(() async => _finished);
+      await controller.send('New question');
+      expect(
+        jsonEncode(gateway.inputs.last),
+        isNot(contains('breakfast at home')),
+      );
+      controller.setUseArchivedContext(true);
+      gateway.replies.add(() async => _finished);
+      await controller.send('Use the saved context');
+      expect(
+        jsonEncode(gateway.inputs.last),
+        contains('Remember breakfast at home'),
+      );
+      expect(controller.useArchivedContext, isFalse);
+      gateway.replies.add(() async => _finished);
+      await controller.send('Next question');
+      expect(
+        jsonEncode(gateway.inputs.last),
+        isNot(contains('breakfast at home')),
+      );
+      expect(
+        (await controller.conversations.load(id))!.messages.last.text,
+        'Review the prepared meal.',
+      );
+      expect(await diary.watchDay(day).first, isEmpty);
+    },
+  );
+
+  test('explicit archive context has a bounded recent text window', () async {
+    controller.restore(
+      AssistantConversation(
+        id: controller.conversationId,
+        title: 'History',
+        day: day,
+        mealId: 'breakfast',
+        updatedAt: day,
+        messages: List.generate(
+          20,
+          (index) => AssistantMessage(
+            isUser: index.isEven,
+            text: '$index:${'x' * 1997}',
+            hasImage: true,
+          ),
+        ),
+      ),
+    );
+    controller.setUseArchivedContext(true);
+    gateway.replies.add(() async => _finished);
+    await controller.send('Use memory');
+    final input = gateway.inputs.single;
+    final excerpts = input.first['content'] as String;
+    final rows = jsonDecode(excerpts.substring(excerpts.indexOf('[{'))) as List;
+    expect(rows.length, lessThanOrEqualTo(12));
+    expect(
+      rows.fold<int>(0, (sum, row) => sum + (row['text'] as String).length),
+      12000,
+    );
+    expect((rows.last as Map)['text'], startsWith('19:'));
+    expect(jsonEncode(input), isNot(contains('input_image')));
+    expect(jsonEncode(input), isNot(contains('function_call')));
+  });
 }

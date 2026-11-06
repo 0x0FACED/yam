@@ -494,6 +494,114 @@ abstract class AppLocalizations {
   /// **'Diary'**
   String get diaryTitle;
 
+  /// No description provided for @dayDetailsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Day details'**
+  String get dayDetailsTitle;
+
+  /// No description provided for @dayDetailsOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Open day details'**
+  String get dayDetailsOpen;
+
+  /// No description provided for @dayDetailsByMeal.
+  ///
+  /// In en, this message translates to:
+  /// **'By meal'**
+  String get dayDetailsByMeal;
+
+  /// No description provided for @dayDetailsByContribution.
+  ///
+  /// In en, this message translates to:
+  /// **'By contribution'**
+  String get dayDetailsByContribution;
+
+  /// No description provided for @dayDetailsCalories.
+  ///
+  /// In en, this message translates to:
+  /// **'Calories'**
+  String get dayDetailsCalories;
+
+  /// No description provided for @dayDetailsDistribution.
+  ///
+  /// In en, this message translates to:
+  /// **'Meal distribution'**
+  String get dayDetailsDistribution;
+
+  /// No description provided for @dayDetailsFood.
+  ///
+  /// In en, this message translates to:
+  /// **'Food logged'**
+  String get dayDetailsFood;
+
+  /// No description provided for @dayDetailsContributionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Share of the logged daily total, not the goal'**
+  String get dayDetailsContributionHint;
+
+  /// No description provided for @dayDetailsShare.
+  ///
+  /// In en, this message translates to:
+  /// **'{percent} of the day'**
+  String dayDetailsShare(String percent);
+
+  /// No description provided for @dayDetailsNoShare.
+  ///
+  /// In en, this message translates to:
+  /// **'No share: the daily total is zero'**
+  String get dayDetailsNoShare;
+
+  /// No description provided for @dayDetailsFacts.
+  ///
+  /// In en, this message translates to:
+  /// **'Day at a glance'**
+  String get dayDetailsFacts;
+
+  /// No description provided for @dayDetailsSoFar.
+  ///
+  /// In en, this message translates to:
+  /// **'So far today'**
+  String get dayDetailsSoFar;
+
+  /// No description provided for @dayDetailsLargestMeal.
+  ///
+  /// In en, this message translates to:
+  /// **'Most calories — {meal}: {calories} kcal'**
+  String dayDetailsLargestMeal(String meal, String calories);
+
+  /// No description provided for @dayDetailsProteinRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'Protein to goal — {grams} g'**
+  String dayDetailsProteinRemaining(String grams);
+
+  /// No description provided for @dayDetailsEstimatedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} entry with estimated values} other{{count} entries with estimated values}}'**
+  String dayDetailsEstimatedCount(int count);
+
+  /// No description provided for @dayDetailsEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No entries for this day'**
+  String get dayDetailsEmptyTitle;
+
+  /// No description provided for @dayDetailsEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Log food in the diary to see this day\'s details.'**
+  String get dayDetailsEmptyBody;
+
+  /// No description provided for @actionClose.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get actionClose;
+
   /// No description provided for @diaryToday.
   ///
   /// In en, this message translates to:
@@ -2312,7 +2420,7 @@ abstract class AppLocalizations {
   /// No description provided for @backupPersonalDataNote.
   ///
   /// In en, this message translates to:
-  /// **'The .yam file contains your diary, weights, goals and food data, including deleted records. It is not encrypted. Store it privately. The app theme is not included.'**
+  /// **'The .yam file contains your diary, weights, goals, food data and saved AI chat text, including deleted-record metadata. Photos, drafts and credentials are not included. It is not encrypted. Store it privately. The app theme is not included.'**
   String get backupPersonalDataNote;
 
   /// No description provided for @backupReplaceTitle.
@@ -2324,7 +2432,7 @@ abstract class AppLocalizations {
   /// No description provided for @backupReplaceWarning.
   ///
   /// In en, this message translates to:
-  /// **'All local foods, servings, diary entries, goals, weight records and cached foods will be removed and replaced with this backup. This cannot be undone. An empty backup clears these records. If the backup has no goals, you will need to go through onboarding again.'**
+  /// **'All local foods, servings, diary entries, goals, weight records, cached foods and saved AI chats will be removed and replaced with this backup. This cannot be undone. An empty backup clears these records. Older backups without chats also clear local chats. If the backup has no goals, you will need to go through onboarding again.'**
   String get backupReplaceWarning;
 
   /// No description provided for @backupReplaceConfirm.
@@ -2501,6 +2609,12 @@ abstract class AppLocalizations {
   /// **'Cached foods'**
   String get backupCountRemoteFoods;
 
+  /// No description provided for @backupCountAssistantConversations.
+  ///
+  /// In en, this message translates to:
+  /// **'AI chats'**
+  String get backupCountAssistantConversations;
+
   /// No description provided for @backupRestoreAction.
   ///
   /// In en, this message translates to:
@@ -2555,23 +2669,131 @@ abstract class AppLocalizations {
   /// **'ChatGPT or your own OpenAI API key'**
   String get assistantSettingsSubtitle;
 
-  /// No description provided for @assistantIntro.
-  ///
-  /// In en, this message translates to:
-  /// **'Describe your food, dictate, or attach a photo. I will find foods and prepare a draft. Nothing is saved until you confirm.'**
-  String get assistantIntro;
-
   /// No description provided for @assistantPrivacy.
   ///
   /// In en, this message translates to:
-  /// **'The provider receives your messages, attached photos, and only requested YAM data. Your full database is not sent in advance. The regular diary works without AI or a network.'**
+  /// **'The provider receives the messages you send, attached photos, and only requested YAM data. Saved chats are not sent automatically; when reopening a chat, sending its saved text requires turning on history context. Your full database is not sent in advance. The regular diary works without AI or a network.'**
   String get assistantPrivacy;
 
   /// No description provided for @assistantSessionNote.
   ///
   /// In en, this message translates to:
-  /// **'The conversation and unsaved draft are discarded when you close this screen.'**
+  /// **'Chat text is saved on this device and included in .yam backups. Photos, unfinished input and unsaved drafts are not saved. Reopened chats are for viewing until you send a message; sending their saved text as context is off by default.'**
   String get assistantSessionNote;
+
+  /// No description provided for @assistantHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat history'**
+  String get assistantHistory;
+
+  /// No description provided for @assistantHistoryEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No saved chats yet'**
+  String get assistantHistoryEmpty;
+
+  /// No description provided for @assistantHistoryEmptyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Your conversations will appear here after you send a message. Saved chat text is available offline.'**
+  String get assistantHistoryEmptyNote;
+
+  /// No description provided for @assistantHistoryPhotoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo conversation'**
+  String get assistantHistoryPhotoTitle;
+
+  /// No description provided for @assistantPhotoNotStored.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo not saved'**
+  String get assistantPhotoNotStored;
+
+  /// No description provided for @assistantUseHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Use saved history as context'**
+  String get assistantUseHistory;
+
+  /// No description provided for @assistantUseHistoryNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Only text from the last 12 messages, up to 12,000 characters, is sent with the next request. Photos and old tool calls are not sent.'**
+  String get assistantUseHistoryNote;
+
+  /// No description provided for @assistantHistoryOffNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Archived messages are not sent. The new exchange still keeps its own context.'**
+  String get assistantHistoryOffNote;
+
+  /// No description provided for @assistantHistoryStorageError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load or save local chat history. Try again. Saved messages are not sent automatically.'**
+  String get assistantHistoryStorageError;
+
+  /// No description provided for @assistantHistoryLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading saved chats…'**
+  String get assistantHistoryLoading;
+
+  /// No description provided for @assistantHistoryLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load chats'**
+  String get assistantHistoryLoadError;
+
+  /// No description provided for @assistantHistoryRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get assistantHistoryRetry;
+
+  /// No description provided for @assistantHistoryUpdatedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'{date}, {time}'**
+  String assistantHistoryUpdatedAt(String date, String time);
+
+  /// No description provided for @assistantHistoryDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete conversation?'**
+  String get assistantHistoryDeleteTitle;
+
+  /// No description provided for @assistantHistoryDeleteMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'“{title}” will be removed from saved chats. Its text will be erased from local history. Diary entries will not change. This cannot be undone.'**
+  String assistantHistoryDeleteMessage(String title);
+
+  /// No description provided for @assistantHistoryDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get assistantHistoryDelete;
+
+  /// No description provided for @assistantHistoryDeleteAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete conversation: {title}'**
+  String assistantHistoryDeleteAction(String title);
+
+  /// No description provided for @assistantHistoryDeleting.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleting conversation…'**
+  String get assistantHistoryDeleting;
+
+  /// No description provided for @assistantHistoryDeleteError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not delete the conversation. Try deleting it again.'**
+  String get assistantHistoryDeleteError;
 
   /// No description provided for @assistantPrompt.
   ///
@@ -2582,7 +2804,7 @@ abstract class AppLocalizations {
   /// No description provided for @assistantPromptHint.
   ///
   /// In en, this message translates to:
-  /// **'For example: two eggs and 200 g of cottage cheese for breakfast'**
+  /// **'E.g. 200 g cottage cheese'**
   String get assistantPromptHint;
 
   /// No description provided for @assistantSend.
@@ -2855,6 +3077,12 @@ abstract class AppLocalizations {
   /// **'The confirmed batch has been saved'**
   String get assistantSaved;
 
+  /// No description provided for @assistantDraftDiscarded.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft discarded. Nothing was saved.'**
+  String get assistantDraftDiscarded;
+
   /// No description provided for @assistantCloseTitle.
   ///
   /// In en, this message translates to:
@@ -2864,7 +3092,7 @@ abstract class AppLocalizations {
   /// No description provided for @assistantCloseNote.
   ///
   /// In en, this message translates to:
-  /// **'The conversation, attached photo, and unsaved draft will be discarded. Saved entries remain in the diary.'**
+  /// **'Chat text stays in local history. Attached photos, unfinished input and the unsaved draft will be discarded. Saved entries remain in the diary.'**
   String get assistantCloseNote;
 
   /// No description provided for @assistantCloseConfirm.
@@ -2894,14 +3122,8 @@ abstract class AppLocalizations {
   /// No description provided for @assistantSwitchNote.
   ///
   /// In en, this message translates to:
-  /// **'Changing the connection starts a new conversation and discards the unsaved draft.'**
+  /// **'Changing the connection starts a new conversation. Chat text stays in local history; attached photos, unfinished input and the unsaved draft will be discarded.'**
   String get assistantSwitchNote;
-
-  /// No description provided for @assistantConsent.
-  ///
-  /// In en, this message translates to:
-  /// **'Understood, open assistant'**
-  String get assistantConsent;
 
   /// No description provided for @assistantInvalidDraft.
   ///
@@ -2998,6 +3220,186 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The request failed. Your input and draft remain on this screen; try again.'**
   String get assistantErrorGeneric;
+
+  /// No description provided for @proxySettingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Proxy'**
+  String get proxySettingsTitle;
+
+  /// No description provided for @proxySettingsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'HTTP, HTTPS or SOCKS5 for app requests'**
+  String get proxySettingsSubtitle;
+
+  /// No description provided for @proxyScopeNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Applies to HTTP requests made by YAM. Browser sign-in and system speech recognition still use the operating system’s network settings. The local diary works without a network.'**
+  String get proxyScopeNote;
+
+  /// No description provided for @proxyLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading saved proxy settings…'**
+  String get proxyLoading;
+
+  /// No description provided for @proxyRouting.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection'**
+  String get proxyRouting;
+
+  /// No description provided for @proxyDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Off — direct connection'**
+  String get proxyDisabled;
+
+  /// No description provided for @proxyEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'On — use proxy'**
+  String get proxyEnabled;
+
+  /// No description provided for @proxyDisabledHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Save to use direct connections. No network connection is needed to turn the proxy off.'**
+  String get proxyDisabledHelp;
+
+  /// No description provided for @proxyEnabledHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'If the proxy is unavailable, requests fail instead of connecting directly.'**
+  String get proxyEnabledHelp;
+
+  /// No description provided for @proxyProtocol.
+  ///
+  /// In en, this message translates to:
+  /// **'Proxy protocol'**
+  String get proxyProtocol;
+
+  /// No description provided for @proxyProtocolHttp.
+  ///
+  /// In en, this message translates to:
+  /// **'HTTP'**
+  String get proxyProtocolHttp;
+
+  /// No description provided for @proxyProtocolHttps.
+  ///
+  /// In en, this message translates to:
+  /// **'HTTPS'**
+  String get proxyProtocolHttps;
+
+  /// No description provided for @proxyProtocolSocks5.
+  ///
+  /// In en, this message translates to:
+  /// **'SOCKS5'**
+  String get proxyProtocolSocks5;
+
+  /// No description provided for @proxyProtocolHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'HTTP also supports HTTPS sites. HTTP and SOCKS5 do not encrypt the connection to the proxy, including proxy credentials; HTTPS encrypts this hop. HTTPS sites keep their own TLS protection.'**
+  String get proxyProtocolHelp;
+
+  /// No description provided for @proxyHost.
+  ///
+  /// In en, this message translates to:
+  /// **'Host'**
+  String get proxyHost;
+
+  /// No description provided for @proxyHostHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Hostname or IP address, without a URL scheme'**
+  String get proxyHostHint;
+
+  /// No description provided for @proxyPort.
+  ///
+  /// In en, this message translates to:
+  /// **'Port'**
+  String get proxyPort;
+
+  /// No description provided for @proxyAuthentication.
+  ///
+  /// In en, this message translates to:
+  /// **'Authentication (optional)'**
+  String get proxyAuthentication;
+
+  /// No description provided for @proxyAuthenticationHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave both fields blank if the proxy does not require authentication. Password spaces are preserved.'**
+  String get proxyAuthenticationHelp;
+
+  /// No description provided for @proxyUsername.
+  ///
+  /// In en, this message translates to:
+  /// **'Username'**
+  String get proxyUsername;
+
+  /// No description provided for @proxyPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get proxyPassword;
+
+  /// No description provided for @proxyStorageNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings and credentials are kept in secure storage on this device and excluded from diary backups.'**
+  String get proxyStorageNote;
+
+  /// No description provided for @proxyApplyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving applies the settings immediately and closes existing connections. Requests in progress may need to be retried.'**
+  String get proxyApplyNote;
+
+  /// No description provided for @proxyErrorHost.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid hostname or IP address without a URL scheme, path or port.'**
+  String get proxyErrorHost;
+
+  /// No description provided for @proxyErrorPort.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a port number from 1 to 65535.'**
+  String get proxyErrorPort;
+
+  /// No description provided for @proxyErrorCredentials.
+  ///
+  /// In en, this message translates to:
+  /// **'Check the username and password: this proxy protocol cannot use these credentials.'**
+  String get proxyErrorCredentials;
+
+  /// No description provided for @proxyErrorStorage.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load or save proxy settings securely. Check the system keyring and try saving again. Active routing has not changed; the local diary remains available.'**
+  String get proxyErrorStorage;
+
+  /// No description provided for @proxySave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save settings'**
+  String get proxySave;
+
+  /// No description provided for @proxySaving.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving settings…'**
+  String get proxySaving;
+
+  /// No description provided for @proxySaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Proxy settings saved.'**
+  String get proxySaved;
 
   /// No description provided for @settingsAboutDescription.
   ///

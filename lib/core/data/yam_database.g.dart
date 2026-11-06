@@ -5440,6 +5440,568 @@ class RemoteFoodsCompanion extends UpdateCompanion<StoredRemoteFood> {
   }
 }
 
+class $AssistantConversationsTable extends AssistantConversations
+    with TableInfo<$AssistantConversationsTable, StoredAssistantConversation> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AssistantConversationsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _dayMeta = const VerificationMeta('day');
+  @override
+  late final GeneratedColumn<String> day = GeneratedColumn<String>(
+    'day',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _mealIdMeta = const VerificationMeta('mealId');
+  @override
+  late final GeneratedColumn<String> mealId = GeneratedColumn<String>(
+    'meal_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _messagesMeta = const VerificationMeta(
+    'messages',
+  );
+  @override
+  late final GeneratedColumn<String> messages = GeneratedColumn<String>(
+    'messages',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _deviceIdMeta = const VerificationMeta(
+    'deviceId',
+  );
+  @override
+  late final GeneratedColumn<String> deviceId = GeneratedColumn<String>(
+    'device_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    title,
+    day,
+    mealId,
+    messages,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    deviceId,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'assistant_conversations';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<StoredAssistantConversation> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('day')) {
+      context.handle(
+        _dayMeta,
+        day.isAcceptableOrUnknown(data['day']!, _dayMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dayMeta);
+    }
+    if (data.containsKey('meal_id')) {
+      context.handle(
+        _mealIdMeta,
+        mealId.isAcceptableOrUnknown(data['meal_id']!, _mealIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_mealIdMeta);
+    }
+    if (data.containsKey('messages')) {
+      context.handle(
+        _messagesMeta,
+        messages.isAcceptableOrUnknown(data['messages']!, _messagesMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_messagesMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    if (data.containsKey('device_id')) {
+      context.handle(
+        _deviceIdMeta,
+        deviceId.isAcceptableOrUnknown(data['device_id']!, _deviceIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_deviceIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  StoredAssistantConversation map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return StoredAssistantConversation(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      day: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}day'],
+      )!,
+      mealId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}meal_id'],
+      )!,
+      messages: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}messages'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+      deviceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}device_id'],
+      )!,
+    );
+  }
+
+  @override
+  $AssistantConversationsTable createAlias(String alias) {
+    return $AssistantConversationsTable(attachedDatabase, alias);
+  }
+}
+
+class StoredAssistantConversation extends DataClass
+    implements Insertable<StoredAssistantConversation> {
+  final String id;
+  final String title;
+  final String day;
+  final String mealId;
+  final String messages;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? deletedAt;
+  final String deviceId;
+  const StoredAssistantConversation({
+    required this.id,
+    required this.title,
+    required this.day,
+    required this.mealId,
+    required this.messages,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+    required this.deviceId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['title'] = Variable<String>(title);
+    map['day'] = Variable<String>(day);
+    map['meal_id'] = Variable<String>(mealId);
+    map['messages'] = Variable<String>(messages);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    map['device_id'] = Variable<String>(deviceId);
+    return map;
+  }
+
+  AssistantConversationsCompanion toCompanion(bool nullToAbsent) {
+    return AssistantConversationsCompanion(
+      id: Value(id),
+      title: Value(title),
+      day: Value(day),
+      mealId: Value(mealId),
+      messages: Value(messages),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+      deviceId: Value(deviceId),
+    );
+  }
+
+  factory StoredAssistantConversation.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return StoredAssistantConversation(
+      id: serializer.fromJson<String>(json['id']),
+      title: serializer.fromJson<String>(json['title']),
+      day: serializer.fromJson<String>(json['day']),
+      mealId: serializer.fromJson<String>(json['mealId']),
+      messages: serializer.fromJson<String>(json['messages']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      deviceId: serializer.fromJson<String>(json['deviceId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'title': serializer.toJson<String>(title),
+      'day': serializer.toJson<String>(day),
+      'mealId': serializer.toJson<String>(mealId),
+      'messages': serializer.toJson<String>(messages),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'deviceId': serializer.toJson<String>(deviceId),
+    };
+  }
+
+  StoredAssistantConversation copyWith({
+    String? id,
+    String? title,
+    String? day,
+    String? mealId,
+    String? messages,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+    String? deviceId,
+  }) => StoredAssistantConversation(
+    id: id ?? this.id,
+    title: title ?? this.title,
+    day: day ?? this.day,
+    mealId: mealId ?? this.mealId,
+    messages: messages ?? this.messages,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    deviceId: deviceId ?? this.deviceId,
+  );
+  StoredAssistantConversation copyWithCompanion(
+    AssistantConversationsCompanion data,
+  ) {
+    return StoredAssistantConversation(
+      id: data.id.present ? data.id.value : this.id,
+      title: data.title.present ? data.title.value : this.title,
+      day: data.day.present ? data.day.value : this.day,
+      mealId: data.mealId.present ? data.mealId.value : this.mealId,
+      messages: data.messages.present ? data.messages.value : this.messages,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      deviceId: data.deviceId.present ? data.deviceId.value : this.deviceId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('StoredAssistantConversation(')
+          ..write('id: $id, ')
+          ..write('title: $title, ')
+          ..write('day: $day, ')
+          ..write('mealId: $mealId, ')
+          ..write('messages: $messages, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('deviceId: $deviceId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    title,
+    day,
+    mealId,
+    messages,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    deviceId,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is StoredAssistantConversation &&
+          other.id == this.id &&
+          other.title == this.title &&
+          other.day == this.day &&
+          other.mealId == this.mealId &&
+          other.messages == this.messages &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt &&
+          other.deviceId == this.deviceId);
+}
+
+class AssistantConversationsCompanion
+    extends UpdateCompanion<StoredAssistantConversation> {
+  final Value<String> id;
+  final Value<String> title;
+  final Value<String> day;
+  final Value<String> mealId;
+  final Value<String> messages;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> deletedAt;
+  final Value<String> deviceId;
+  final Value<int> rowid;
+  const AssistantConversationsCompanion({
+    this.id = const Value.absent(),
+    this.title = const Value.absent(),
+    this.day = const Value.absent(),
+    this.mealId = const Value.absent(),
+    this.messages = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.deviceId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  AssistantConversationsCompanion.insert({
+    required String id,
+    required String title,
+    required String day,
+    required String mealId,
+    required String messages,
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.deletedAt = const Value.absent(),
+    required String deviceId,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       title = Value(title),
+       day = Value(day),
+       mealId = Value(mealId),
+       messages = Value(messages),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt),
+       deviceId = Value(deviceId);
+  static Insertable<StoredAssistantConversation> custom({
+    Expression<String>? id,
+    Expression<String>? title,
+    Expression<String>? day,
+    Expression<String>? mealId,
+    Expression<String>? messages,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+    Expression<String>? deviceId,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (title != null) 'title': title,
+      if (day != null) 'day': day,
+      if (mealId != null) 'meal_id': mealId,
+      if (messages != null) 'messages': messages,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (deviceId != null) 'device_id': deviceId,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  AssistantConversationsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? title,
+    Value<String>? day,
+    Value<String>? mealId,
+    Value<String>? messages,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? deletedAt,
+    Value<String>? deviceId,
+    Value<int>? rowid,
+  }) {
+    return AssistantConversationsCompanion(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      day: day ?? this.day,
+      mealId: mealId ?? this.mealId,
+      messages: messages ?? this.messages,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      deviceId: deviceId ?? this.deviceId,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (day.present) {
+      map['day'] = Variable<String>(day.value);
+    }
+    if (mealId.present) {
+      map['meal_id'] = Variable<String>(mealId.value);
+    }
+    if (messages.present) {
+      map['messages'] = Variable<String>(messages.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (deviceId.present) {
+      map['device_id'] = Variable<String>(deviceId.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AssistantConversationsCompanion(')
+          ..write('id: $id, ')
+          ..write('title: $title, ')
+          ..write('day: $day, ')
+          ..write('mealId: $mealId, ')
+          ..write('messages: $messages, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$YamDatabase extends GeneratedDatabase {
   _$YamDatabase(QueryExecutor e) : super(e);
   $YamDatabaseManager get managers => $YamDatabaseManager(this);
@@ -5451,6 +6013,8 @@ abstract class _$YamDatabase extends GeneratedDatabase {
   late final $GoalVersionsTable goalVersions = $GoalVersionsTable(this);
   late final $WeightEntriesTable weightEntries = $WeightEntriesTable(this);
   late final $RemoteFoodsTable remoteFoods = $RemoteFoodsTable(this);
+  late final $AssistantConversationsTable assistantConversations =
+      $AssistantConversationsTable(this);
   late final Index userFoodsHistory = Index(
     'user_foods_history',
     'CREATE INDEX user_foods_history ON user_foods (deleted_at, created_at)',
@@ -5491,6 +6055,10 @@ abstract class _$YamDatabase extends GeneratedDatabase {
     'remote_foods_favorites',
     'CREATE INDEX remote_foods_favorites ON remote_foods (is_favorite, deleted_at)',
   );
+  late final Index assistantConversationsHistory = Index(
+    'assistant_conversations_history',
+    'CREATE INDEX assistant_conversations_history ON assistant_conversations (deleted_at, updated_at, id)',
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -5503,6 +6071,7 @@ abstract class _$YamDatabase extends GeneratedDatabase {
     goalVersions,
     weightEntries,
     remoteFoods,
+    assistantConversations,
     userFoodsHistory,
     userFoodsName,
     userFoodsBarcode,
@@ -5513,6 +6082,7 @@ abstract class _$YamDatabase extends GeneratedDatabase {
     weightEntriesDay,
     remoteFoodsName,
     remoteFoodsFavorites,
+    assistantConversationsHistory,
   ];
 }
 
@@ -8312,6 +8882,301 @@ typedef $$RemoteFoodsTableProcessedTableManager =
       StoredRemoteFood,
       PrefetchHooks Function()
     >;
+typedef $$AssistantConversationsTableCreateCompanionBuilder =
+    AssistantConversationsCompanion Function({
+      required String id,
+      required String title,
+      required String day,
+      required String mealId,
+      required String messages,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<DateTime?> deletedAt,
+      required String deviceId,
+      Value<int> rowid,
+    });
+typedef $$AssistantConversationsTableUpdateCompanionBuilder =
+    AssistantConversationsCompanion Function({
+      Value<String> id,
+      Value<String> title,
+      Value<String> day,
+      Value<String> mealId,
+      Value<String> messages,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<DateTime?> deletedAt,
+      Value<String> deviceId,
+      Value<int> rowid,
+    });
+
+class $$AssistantConversationsTableFilterComposer
+    extends Composer<_$YamDatabase, $AssistantConversationsTable> {
+  $$AssistantConversationsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get day => $composableBuilder(
+    column: $table.day,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get mealId => $composableBuilder(
+    column: $table.mealId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get messages => $composableBuilder(
+    column: $table.messages,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$AssistantConversationsTableOrderingComposer
+    extends Composer<_$YamDatabase, $AssistantConversationsTable> {
+  $$AssistantConversationsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get day => $composableBuilder(
+    column: $table.day,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get mealId => $composableBuilder(
+    column: $table.mealId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get messages => $composableBuilder(
+    column: $table.messages,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$AssistantConversationsTableAnnotationComposer
+    extends Composer<_$YamDatabase, $AssistantConversationsTable> {
+  $$AssistantConversationsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get day =>
+      $composableBuilder(column: $table.day, builder: (column) => column);
+
+  GeneratedColumn<String> get mealId =>
+      $composableBuilder(column: $table.mealId, builder: (column) => column);
+
+  GeneratedColumn<String> get messages =>
+      $composableBuilder(column: $table.messages, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get deviceId =>
+      $composableBuilder(column: $table.deviceId, builder: (column) => column);
+}
+
+class $$AssistantConversationsTableTableManager
+    extends
+        RootTableManager<
+          _$YamDatabase,
+          $AssistantConversationsTable,
+          StoredAssistantConversation,
+          $$AssistantConversationsTableFilterComposer,
+          $$AssistantConversationsTableOrderingComposer,
+          $$AssistantConversationsTableAnnotationComposer,
+          $$AssistantConversationsTableCreateCompanionBuilder,
+          $$AssistantConversationsTableUpdateCompanionBuilder,
+          (
+            StoredAssistantConversation,
+            BaseReferences<
+              _$YamDatabase,
+              $AssistantConversationsTable,
+              StoredAssistantConversation
+            >,
+          ),
+          StoredAssistantConversation,
+          PrefetchHooks Function()
+        > {
+  $$AssistantConversationsTableTableManager(
+    _$YamDatabase db,
+    $AssistantConversationsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AssistantConversationsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$AssistantConversationsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$AssistantConversationsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<String> day = const Value.absent(),
+                Value<String> mealId = const Value.absent(),
+                Value<String> messages = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<String> deviceId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => AssistantConversationsCompanion(
+                id: id,
+                title: title,
+                day: day,
+                mealId: mealId,
+                messages: messages,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                deviceId: deviceId,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String title,
+                required String day,
+                required String mealId,
+                required String messages,
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<DateTime?> deletedAt = const Value.absent(),
+                required String deviceId,
+                Value<int> rowid = const Value.absent(),
+              }) => AssistantConversationsCompanion.insert(
+                id: id,
+                title: title,
+                day: day,
+                mealId: mealId,
+                messages: messages,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                deviceId: deviceId,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$AssistantConversationsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$YamDatabase,
+      $AssistantConversationsTable,
+      StoredAssistantConversation,
+      $$AssistantConversationsTableFilterComposer,
+      $$AssistantConversationsTableOrderingComposer,
+      $$AssistantConversationsTableAnnotationComposer,
+      $$AssistantConversationsTableCreateCompanionBuilder,
+      $$AssistantConversationsTableUpdateCompanionBuilder,
+      (
+        StoredAssistantConversation,
+        BaseReferences<
+          _$YamDatabase,
+          $AssistantConversationsTable,
+          StoredAssistantConversation
+        >,
+      ),
+      StoredAssistantConversation,
+      PrefetchHooks Function()
+    >;
 
 class $YamDatabaseManager {
   final _$YamDatabase _db;
@@ -8330,4 +9195,9 @@ class $YamDatabaseManager {
       $$WeightEntriesTableTableManager(_db, _db.weightEntries);
   $$RemoteFoodsTableTableManager get remoteFoods =>
       $$RemoteFoodsTableTableManager(_db, _db.remoteFoods);
+  $$AssistantConversationsTableTableManager get assistantConversations =>
+      $$AssistantConversationsTableTableManager(
+        _db,
+        _db.assistantConversations,
+      );
 }

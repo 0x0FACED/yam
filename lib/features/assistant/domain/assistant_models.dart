@@ -142,8 +142,10 @@ class AssistantMessage {
     required this.isUser,
     required this.text,
     this.image,
+    this.hasImage = false,
   });
   final bool isUser;
   final String text;
   final AssistantImage? image;
+  final bool hasImage;
 }

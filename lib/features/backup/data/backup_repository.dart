@@ -17,7 +17,7 @@ part 'backup_codec.dart';
 
 const int maxBackupFileBytes = 64 * 1024 * 1024;
 
-// The sum of all seven uncompressed ZIP members, enforced before inflation and
+// The sum of all known uncompressed ZIP members, enforced before inflation and
 // again while streaming it. Limits also apply to locally generated exports.
 const int _maxUncompressedBytes = 128 * 1024 * 1024;
 const int _maxBackupRows = 250000;
@@ -43,6 +43,7 @@ class BackupCounts {
     required this.goals,
     required this.weights,
     required this.remoteFoods,
+    this.assistantConversations = 0,
   });
 
   final int userFoods;
@@ -51,9 +52,16 @@ class BackupCounts {
   final int goals;
   final int weights;
   final int remoteFoods;
+  final int assistantConversations;
 
   int get total =>
-      userFoods + userServings + diaryEntries + goals + weights + remoteFoods;
+      userFoods +
+      userServings +
+      diaryEntries +
+      goals +
+      weights +
+      remoteFoods +
+      assistantConversations;
 
   BackupCounts _minus(BackupCounts other) => BackupCounts(
     userFoods: userFoods - other.userFoods,
@@ -62,6 +70,8 @@ class BackupCounts {
     goals: goals - other.goals,
     weights: weights - other.weights,
     remoteFoods: remoteFoods - other.remoteFoods,
+    assistantConversations:
+        assistantConversations - other.assistantConversations,
   );
 }
 
@@ -98,6 +108,9 @@ class BackupRepository {
         goals: await _database.select(_database.goalVersions).get(),
         weights: await _database.select(_database.weightEntries).get(),
         remoteFoods: await _database.select(_database.remoteFoods).get(),
+        assistantConversations: await _database
+            .select(_database.assistantConversations)
+            .get(),
       );
     });
     return _encodeInBackground(data);
@@ -123,6 +136,7 @@ class BackupRepository {
       await _database.delete(_database.goalVersions).go();
       await _database.delete(_database.weightEntries).go();
       await _database.delete(_database.remoteFoods).go();
+      await _database.delete(_database.assistantConversations).go();
     }
 
     var foods = data.userFoods;
@@ -131,6 +145,7 @@ class BackupRepository {
     var goals = data.goals;
     var weights = data.weights;
     var remote = data.remoteFoods;
+    var conversations = data.assistantConversations;
     if (mode == BackupImportMode.supplement) {
       // Include tombstones: supplement is deliberately not last-write-wins.
       final existingFoods = await _database.select(_database.userFoods).get();
@@ -200,6 +215,15 @@ class BackupRepository {
               !remoteKeys.contains((row.source, row.sourceCode)))
             row,
       ];
+      final conversationIds = {
+        for (final row
+            in await _database.select(_database.assistantConversations).get())
+          row.id,
+      };
+      conversations = [
+        for (final row in conversations)
+          if (!conversationIds.contains(row.id)) row,
+      ];
     }
 
     await _database.batch((batch) {
@@ -209,6 +233,7 @@ class BackupRepository {
       batch.insertAll(_database.goalVersions, goals);
       batch.insertAll(_database.weightEntries, weights);
       batch.insertAll(_database.remoteFoods, remote);
+      batch.insertAll(_database.assistantConversations, conversations);
     });
     final imported = BackupCounts(
       userFoods: foods.length,
@@ -217,6 +242,7 @@ class BackupRepository {
       goals: goals.length,
       weights: weights.length,
       remoteFoods: remote.length,
+      assistantConversations: conversations.length,
     );
     return BackupImportResult(
       imported: imported,
@@ -235,12 +261,14 @@ class _BackupData {
     required List<StoredGoalVersion> goals,
     required List<StoredWeightEntry> weights,
     required List<StoredRemoteFood> remoteFoods,
+    required List<StoredAssistantConversation> assistantConversations,
   }) : userFoods = List.unmodifiable(userFoods),
        userServings = List.unmodifiable(userServings),
        diaryEntries = List.unmodifiable(diaryEntries),
        goals = List.unmodifiable(goals),
        weights = List.unmodifiable(weights),
-       remoteFoods = List.unmodifiable(remoteFoods);
+       remoteFoods = List.unmodifiable(remoteFoods),
+       assistantConversations = List.unmodifiable(assistantConversations);
 
   final DateTime exportedAt;
   final String sourceDeviceId;
@@ -250,6 +278,7 @@ class _BackupData {
   final List<StoredGoalVersion> goals;
   final List<StoredWeightEntry> weights;
   final List<StoredRemoteFood> remoteFoods;
+  final List<StoredAssistantConversation> assistantConversations;
 
   BackupCounts get counts => BackupCounts(
     userFoods: userFoods.length,
@@ -258,5 +287,6 @@ class _BackupData {
     goals: goals.length,
     weights: weights.length,
     remoteFoods: remoteFoods.length,
+    assistantConversations: assistantConversations.length,
   );
 }

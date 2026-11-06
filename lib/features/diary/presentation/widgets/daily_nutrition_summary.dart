@@ -13,6 +13,24 @@ class DailyNutritionSummary extends StatelessWidget {
 
   final DiaryPrototypeDay day;
 
+  static Widget buildFlight(
+    BuildContext context,
+    Animation<double> animation,
+    HeroFlightDirection direction,
+    BuildContext from,
+    BuildContext to,
+  ) {
+    final details = direction == HeroFlightDirection.push ? to : from;
+    // The interpolated Hero height can differ from intrinsic text height,
+    // especially when width or text scaling changes. Reflow, never scale text.
+    return OverflowBox(
+      alignment: Alignment.topCenter,
+      minHeight: 0,
+      maxHeight: double.infinity,
+      child: (details.widget as Hero).child,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);

@@ -7,6 +7,8 @@ import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:uuid/uuid.dart';
 import 'package:yam/core/data/yam_database.dart';
+import 'package:yam/features/assistant/data/assistant_conversation_repository.dart';
+import 'package:yam/features/assistant/domain/assistant_models.dart';
 import 'package:yam/features/backup/data/backup_repository.dart';
 import 'package:yam/features/diary/data/diary_repository.dart';
 
@@ -22,6 +24,210 @@ void main() {
     addTearDown(db.close);
     return db;
   }
+
+  for (final mode in BackupImportMode.values) {
+    test(
+      'text chats and scrubbed tombstones roundtrip in ${mode.name}',
+      () async {
+        final source = database();
+        await _seed(source);
+        final chats = AssistantConversationRepository(source);
+        for (final value in [100, 101]) {
+          await chats.save(
+            id: _id(value),
+            day: DateTime(2026, 11, 6),
+            mealId: 'lunch',
+            messages: const [
+              AssistantMessage(isUser: true, text: '', hasImage: true),
+              AssistantMessage(isUser: false, text: 'Saved answer\n🥣'),
+              AssistantMessage(isUser: true, text: '  Saved text  '),
+            ],
+          );
+        }
+        await chats.delete(_id(101));
+        final expected = await _state(source);
+        final backup = BackupRepository(source);
+        final files = _jsonFiles(await backup.exportBackup());
+        expect(files['manifest.json']['formatVersion'], 3);
+        expect(_rows(files, 'assistant_conversations.json'), hasLength(2));
+        final destination = database();
+        final repository = BackupRepository(destination);
+        final preview = await repository.inspectBackup(_pack(files));
+        expect(preview.counts.assistantConversations, 2);
+        expect(preview.counts.total, 14);
+        final result = await repository.importBackup(preview, mode);
+        expect(result.imported.assistantConversations, 2);
+        expect(result.skipped.total, 0);
+        expect(await _state(destination), expected);
+        final restored = AssistantConversationRepository(destination);
+        final chat = (await restored.load(_id(100)))!;
+        expect(chat.messages.first.hasImage, isTrue);
+        expect(chat.messages.every((message) => message.image == null), isTrue);
+        expect(chat.messages[1].text, 'Saved answer\n🥣');
+        expect(await restored.load(_id(101)), isNull);
+        final second = database();
+        final reader = BackupRepository(second);
+        await reader.importBackup(
+          await reader.inspectBackup(await repository.exportBackup()),
+          BackupImportMode.replace,
+        );
+        expect(await _state(second), expected);
+        final repeated = await repository.importBackup(
+          preview,
+          BackupImportMode.supplement,
+        );
+        expect(repeated.imported.total, 0);
+        expect(repeated.skipped.assistantConversations, 2);
+      },
+    );
+  }
+
+  for (final version in [1, 2, 3]) {
+    for (final mode in BackupImportMode.values) {
+      test(
+        'old v$version archive without chats imports in ${mode.name}',
+        () async {
+          final source = database();
+          await _seed(source);
+          final files = _jsonFiles(
+            await BackupRepository(source).exportBackup(),
+          );
+          files.remove('assistant_conversations.json');
+          files['manifest.json']['counts'].remove('assistantConversations');
+          files['manifest.json']['formatVersion'] = version;
+          final destination = database();
+          await AssistantConversationRepository(destination).save(
+            id: _id(100),
+            day: DateTime(2026, 11, 6),
+            mealId: 'dinner',
+            messages: const [
+              AssistantMessage(isUser: true, text: 'Local chat'),
+            ],
+          );
+          final repository = BackupRepository(destination);
+          final preview = await repository.inspectBackup(_pack(files));
+          expect(preview.counts.assistantConversations, 0);
+          await repository.importBackup(preview, mode);
+          final state = await _state(destination);
+          final expected = await _state(source);
+          final conversations = state.remove('assistantConversations')!;
+          expected.remove('assistantConversations');
+          expect(state, expected);
+          expect(
+            conversations,
+            hasLength(mode == BackupImportMode.replace ? 0 : 1),
+          );
+        },
+      );
+    }
+  }
+
+  test(
+    'supplement preserves existing chat edits and deletion tombstones',
+    () async {
+      final source = database();
+      final destination = database();
+      for (final db in [source, destination]) {
+        final chats = AssistantConversationRepository(db);
+        for (final value in [100, 101]) {
+          await chats.save(
+            id: _id(value),
+            day: DateTime(2026, 11, 6),
+            mealId: 'lunch',
+            messages: [
+              AssistantMessage(
+                isUser: true,
+                text: db == source ? 'Old backup' : 'Local edit',
+              ),
+            ],
+          );
+        }
+      }
+      await AssistantConversationRepository(destination).delete(_id(101));
+      final before = await _state(destination);
+      final repository = BackupRepository(destination);
+      final result = await repository.importBackup(
+        await repository.inspectBackup(
+          await BackupRepository(source).exportBackup(),
+        ),
+        BackupImportMode.supplement,
+      );
+      expect(result.imported.assistantConversations, 0);
+      expect(result.skipped.assistantConversations, 2);
+      expect(await _state(destination), before);
+    },
+  );
+
+  test(
+    'untrusted chat messages and metadata are rejected before writes',
+    () async {
+      final source = database();
+      await _seed(source);
+      final chats = AssistantConversationRepository(source);
+      await chats.save(
+        id: _id(100),
+        day: DateTime(2026, 11, 6),
+        mealId: 'lunch',
+        messages: const [AssistantMessage(isUser: true, text: 'Saved text')],
+      );
+      final bytes = await BackupRepository(source).exportBackup();
+      final destination = database();
+      await _seed(destination);
+      final before = await _state(destination);
+      final mutations = <String, void Function(Map<String, dynamic>)>{
+        'UUID': (row) => row['id'] = 'bad',
+        'device': (row) => row['deviceId'] = 'bad',
+        'timestamp': (row) => row['updatedAt'] = 'tomorrow',
+        'date': (row) => row['day'] = '2026-02-30',
+        'meal': (row) => row['mealId'] = 'unknown',
+        'title type': (row) => row['title'] = null,
+        'title length': (row) => row['title'] = List.filled(81, 'x').join(),
+        'missing messages': (row) => row.remove('messages'),
+        'JSON': (row) => row['messages'] = '[',
+        'object': (row) => row['messages'] = '{}',
+        'message shape': (row) => row['messages'] = '[null]',
+        'role': (row) =>
+            row['messages'] = '[{"isUser":"true","text":"x","hasImage":false}]',
+        'text': (row) =>
+            row['messages'] = '[{"isUser":true,"text":null,"hasImage":false}]',
+        'image marker': (row) =>
+            row['messages'] = '[{"isUser":true,"text":"x","hasImage":"true"}]',
+        'media': (row) => row['messages'] =
+            '[{"isUser":true,"text":"x","hasImage":true,"image":"data:image/jpeg;base64,YQ=="}]',
+        'tools': (row) => row['messages'] =
+            '[{"isUser":false,"text":"x","hasImage":false,"tool_calls":[]}]',
+        'unscrubbed deletion': (row) => row['deletedAt'] = row['updatedAt'],
+      };
+      for (final mutation in mutations.entries) {
+        final files = _jsonFiles(bytes);
+        mutation.value(_rows(files, 'assistant_conversations.json').single);
+        await expectLater(
+          BackupRepository(destination).inspectBackup(_pack(files)),
+          throwsA(
+            isA<BackupException>().having(
+              (error) => error.failure,
+              'failure',
+              BackupFailure.invalidFile,
+            ),
+          ),
+          reason: mutation.key,
+        );
+        expect(await _state(destination), before, reason: mutation.key);
+      }
+      final missing = _jsonFiles(bytes);
+      missing.remove('assistant_conversations.json');
+      await expectLater(
+        BackupRepository(destination).inspectBackup(_pack(missing)),
+        throwsA(isA<BackupException>()),
+      );
+      final wrongCount = _jsonFiles(bytes);
+      wrongCount['manifest.json']['counts']['assistantConversations'] = 0;
+      await expectLater(
+        BackupRepository(destination).inspectBackup(_pack(wrongCount)),
+        throwsA(isA<BackupException>()),
+      );
+    },
+  );
 
   for (final version in [1, 2, 3]) {
     test(
@@ -636,6 +842,14 @@ void main() {
       final empty = database();
       final destination = database();
       await _seed(destination);
+      await AssistantConversationRepository(destination).save(
+        id: _id(100),
+        day: DateTime(2026, 11, 6),
+        mealId: 'dinner',
+        messages: const [
+          AssistantMessage(isUser: true, text: 'Remove on replace'),
+        ],
+      );
       final identity = await destination.installationDeviceId(const Uuid());
       final repository = BackupRepository(destination);
       final preview = await repository.inspectBackup(
@@ -665,6 +879,14 @@ void main() {
       final destination = database();
       await _seed(destination);
       await destination.into(destination.userFoods).insert(_food(100));
+      await AssistantConversationRepository(destination).save(
+        id: _id(101),
+        day: DateTime(2026, 11, 6),
+        mealId: 'dinner',
+        messages: const [
+          AssistantMessage(isUser: true, text: 'Keep on rollback'),
+        ],
+      );
       final before = await _state(destination);
       final repository = BackupRepository(destination);
       final preview = await repository.inspectBackup(
@@ -1138,6 +1360,11 @@ Future<Map<String, List<Map<String, dynamic>>>> _state(
     ),
     'remoteFoods': sorted(
       (await database.select(database.remoteFoods).get()).map(
+        (row) => row.toJson(),
+      ),
+    ),
+    'assistantConversations': sorted(
+      (await database.select(database.assistantConversations).get()).map(
         (row) => row.toJson(),
       ),
     ),
