@@ -1,249 +1,249 @@
 # Состояние Проекта
 
-> Краткий handoff. Подробная хронология — в Git; рабочие правила — в `AGENTS.md`.
+> Краткий handoff. Подробная хронология — в Git; правила — в `AGENTS.md`.
 
 ## Обновлено
 
-- Дата: 2026-10-27.
-- Рабочая alpha local-first MVP: Дневник, пользовательские продукты, вес/цели,
-  Статистика, необязательный Open Food Facts (OFF), экспорт/импорт `.yam`.
-- SQLite `yam` — schema v5. Новые резервные копии — format v2, импорт v1/v2.
-  Работа с локальными данными и обязательный первый онбординг не требуют сети.
-- GitHub CI/CD: push/PR и релизы Android/Linux/macOS. Android-updater реализован;
-  настоящая установка обновления по-прежнему требует приёмки на устройстве.
+- Дата: 2026-11-07.
+- Рабочая alpha local-first: Дневник, свои продукты, вес/цели, Статистика,
+  необязательный OFF, полный backup `.yam`, обмен «Моими блюдами» JSON.
+- Добавлен необязательный ИИ-помощник: текст/голос/фото → редактируемый черновик
+  → одно явное подтверждение. Ручной трекинг по-прежнему не требует сети/аккаунта.
+- Общие настройки HTTP/HTTPS/SOCKS5-прокси доступны из Настроек; credentials
+  хранятся на устройстве защищённо, без direct fallback при включённом прокси.
+- SQLite `yam` — schema v8. Полные копии — format v3, импорт v1/v2/v3.
+- [Бэклог](../docs/backlog.md): пункты 1/2/3/6 реализованы локально, не выпущены.
+  Новые GitHub Release titles — `YAM MAJOR.MINOR.PATCH`; пакеты/build numbers прежние.
+- Тег `v0.6.0` отправлен владельцем; CI упал на analyze, подготовлен фикс без смены версии.
+- Подготовлен `0.6.0+11`: notes от 2026-11-07 в CHANGELOG, Unreleased очищен,
+  Flutter pin 3.41.6 согласован с lockfile. В этой задаче коммиты/теги/push не создавались.
 
-## Решения И Источники
+## Принятые Решения
 
-- Product/data contract: ADR 0001/0002/0015–0020 и релевантные разделы
-  `agents/PROJECT_BLUEPRINT.md`. Более новые принятые ADR заменяют только явно
-  названные ограничения старых решений.
-- Дизайн: `agents/design/README.md`, ADR 0003/0010–0012, экранные HTML и
-  `yam_components_2.html`. В поиске нет «Для вас», вымышленных подборок,
-  отдельного inline quick add и verified badge вопреки старому HTML.
-- ADR 0021: отдельная OFF-секция, local-first/debounce, выборочный кэш;
-  ADR 0022: локальные подсказки брендов.
-- ADR 0023/0026: правка UserFood не меняет Diary snapshots; категории — исходный
-  текст, а не закрытый enum. ADR 0017 сохраняет расчёт ккал из БЖУ своей еды.
-- ADR 0024: атомарные «Заменить»/«Дополнить», проверка архива до записи,
-  сохранение ID установки-получателя и восстановление из первого онбординга.
-- ADR 0025: CI, подписанные релизы, теги `vMAJOR.MINOR.PATCH`, pubspec и runtime
-  package metadata; ADR 0027: публичные GitHub-обновления только Android.
-- [ADR 0028](../docs/adr/0028-custom-categories-and-food-descriptions.md):
-  свободная категория с подсказками, описание UserFood, schema v5, backup v2
-  с чтением v1; правка/удаление своих продуктов во всех вкладках и поиске.
-  Заменяет соответствующие ограничения ADR 0023/0024/0026.
-- [ADR 0029](../docs/adr/0029-diary-calendar-calorie-status.md): статусы калорий
-  в недельной строке Дневника, общие со Статистикой исторические цели.
-- [ADR 0030](../docs/adr/0030-compatible-backup-fields.md): дополнительные
-  JSON-поля совместимого backup игнорируются, отсутствующие nullable — null;
-  обязательные поля и известные значения проверяются. Необязательные расширения
-  сохраняют поколение формата v2; несовместимые форматы автоматически не принимаются.
-- [ADR 0031](../docs/adr/0031-versioned-changelog-and-release-notes.md):
-  Keep a Changelog — источник заметок, точное сопоставление tag/pubspec/section,
-  проверенный Markdown artifact и публикация через `gh --notes-file`.
-- [ADR 0032](../docs/adr/0032-interactive-statistics-and-native-overscroll.md):
-  Статистика без верхней сводки, интерактивные графики/дни календаря,
-  историческая линия цели с пунктирной легендой и общий нативный overscroll.
-- [ADR 0033](../docs/adr/0033-statistics-contrast-and-compact-day-details.md):
-  плашки регулярности без отклонения/статуса; контрастные светлые столбцы
-  калорий и выбранный период из существующих primary/onPrimary tokens.
+- Product/data: ADR 0001/0002/0015–0020; релевантные разделы blueprint.
+  Более новые ADR заменяют только явно названные ограничения.
+- Дизайн: ADR 0003/0010–0012, экранные HTML и `yam_components_2.html`.
+  Нет «Для вас», вымышленной истории, inline quick add и verified badge.
+- ADR 0017: энергия своей еды рассчитывается из БЖУ; дневные итоги используют
+  сохранённую энергию snapshots, а не пересчитывают её из дневных БЖУ.
+- ADR 0021/0022: отдельный optional OFF/local-first cache и локальные бренды.
+- ADR 0023/0026/0028: редактирование UserFood не меняет историю; категории —
+  исходный текст/код, nullable описание и правка/удаление из всех вкладок поиска.
+- ADR 0024 (backup): атомарные replace/supplement, проверка до записи,
+  сохранение deviceId получателя, восстановление из первого онбординга.
+- ADR 0025 (CI)/0027/0031/0035: подписанные релизы, Android updater, строгие
+  version/changelog contracts; заголовок без build suffix, без правки старых релизов.
+- ADR 0029/0032/0033: календарные статусы, исторические цели, интерактивные
+  графики, native overscroll и контрастные семантические цвета Статистики.
+- ADR 0030/0034: совместимые дополнительные поля backup, `yam-foods` v1,
+  три режима JSON-импорта; повторяющиеся штрихкоды разрешены в schema v6/backup v3.
+- ADR 0036: текст однострочного поля проходит через padding; разнесённые быстрые
+  нажатия ставят курсор, близкие сохраняют штатное выделение.
+- [ADR 0037](../docs/adr/0037-ai-food-entry-assistant.md): официальный ChatGPT
+  OAuth + OpenAI API-key, клиентские инструменты без записи, atomic confirm,
+  сохранение оценки, privacy/credentials, медиа и dependency strategy.
+  Для native STT macOS минимум 11.0 (было 10.15), iOS остаётся 13.0.
+  Android OS auto-backup/transfer отключён; явный перенос остаётся через `.yam`.
+- [ADR 0038](../docs/adr/0038-application-network-proxy.md): явная общая фабрика
+  app HTTP, HTTP/HTTPS CONNECT и SOCKS5, secure per-device settings, fail-closed,
+  немедленная смена маршрута; внешний браузер/native STT остаются на маршруте ОС.
+- [ADR 0039](../docs/adr/0039-assistant-chat-presentation.md)/[0040](../docs/adr/0040-assistant-direct-entry.md):
+  Markdown без HTML/WebView; прямой вход без повторного вступления, composer всегда снизу.
+  [ADR 0041](../docs/adr/0041-assistant-sticky-scroll.md): автоскролл только у нижнего края.
+  [ADR 0042](../docs/adr/0042-assistant-image-paste.md): обычная вставка фото/текста, `pasteboard 0.5`.
+- [ADR 0043](../docs/adr/0043-assistant-local-chat-history.md): локальный текстовый
+  архив чатов, ручное включение контекста (12 сообщений / 12 000 символов), без медиа/tools.
+  `.yam` v3 включает новый optional файл; старые копии читаются, старые бинарники новый ZIP не читают.
+- [ADR 0044](../docs/adr/0044-expanded-day-details.md): карточка КБЖУ раскрывается
+  в подробности дня; все порции с КБЖУ, вклад от факта, исторические цели,
+  локальные факты и обратное сворачивание без потери позиции Дневника.
 
 ## Реализовано И Основные Файлы
 
-### Приложение И Данные
+### Приложение, Дневник И Каталог
 
-- `lib/app/app.dart`, `router.dart`: локализованный adaptive shell с Дневником,
-  Статистикой и Настройками; `/add-food` — task-screen. Первый запуск требует
-  онбординга; ошибки загрузки профиля ведут к Retry, а не к пустому профилю.
-  Состояние — `ValueNotifier` и потоки репозиториев; Riverpod ещё не подключён.
-- `lib/core/data/yam_database.dart`: Drift/SQLite v5, UUID v7, installation
-  deviceId, soft delete, UTC metadata и отдельные локальные diary dates.
-  Миграции v1→v5 аддитивны; v5 добавляет только nullable `UserFoods.description`.
-  Имя базы не менялось. Схемы v1–v5 и generated migration fixtures находятся
-  в `test/features/food_search/data/`; `.g.dart` и fixtures обновлены.
-- `lib/features/diary/data/diary_repository.dart`: точные неизменяемые снимки
-  имени, бренда, базиса, порций и нутриентов; правка/удаление продукта или
-  обновление OFF-кэша не переписывают историю. Recent — последние четыре
-  разных продукта из реальных активных записей SQLite.
-- `lib/features/statistics/`: реальные локальные питание/вес и версии целей.
-  Средние считаются по дням с едой, пустые дни не приравниваются к нулю.
-  Onboarding атомарно сохраняет цели/вес, повторное прохождение доступно
-  из Настроек; неизменный вес не дублируется как новое измерение.
-- `statistics_screen.dart`, `widgets/statistics_charts.dart`: вместо верхней
-  сводки — самостоятельные разделы; среднее БЖУ не изменено. Точки веса и
-  столбцы калорий имеют сохраняемые плашки, ведение/наведение, клавиатуру,
-  отдельную правку веса и подписанные даты. Цель рисуется поверх столбцов.
-- `statistics_models.dart`: календарные пропуски отличаются от записанного нуля;
-  дневные/недельные/месячные диапазоны и цели исторические. Плашки
-  `statistics_regularity_calendar.dart` показывают только дату/КБЖУ/цель,
-  без отклонения и повторного статуса. В светлой теме столбцы и активный
-  период используют primary; подпись периода — onPrimary. Тёмные цвета прежние.
-- `app.dart`: удалено глобальное подавление overscroll; Дневник и поиск больше
-  не требуют локальных исключений, экраны используют MaterialScrollBehavior.
+- `lib/app/app.dart`, `router.dart`: adaptive shell с тремя разделами, task routes,
+  обязательный первый онбординг. State — ValueNotifier/потоки; Riverpod не добавлен.
+  AI connection manager создаётся без сетевого I/O; credentials читаются при входе
+  в помощник/его настройки, а не при обычном запуске Дневника.
+- `lib/core/data/yam_database.dart`: Drift v8, UUIDv7, installation deviceId,
+  soft delete, UTC metadata и отдельные локальные diary dates. v7 добавил
+  `DiaryEntries.isEstimated`, v8 — архив чатов; schemas/helpers актуальны.
+  `_removeBarcodeUniqueness`: транзакционное перестроение через стабильные
+  Migrator API и generated DDL, копирование всех значений, восстановление индексов/FK.
+- `lib/features/diary/data/diary_repository.dart`: точные независимые snapshots,
+  create/update/delete/restore и реальные Recent. Правка каталога/OFF-кэша не меняет
+  историю. Оценочный признак сохраняется при update/restore и виден в row/edit sheet.
+- `diary/domain/day_details.dart`: точные итоги, доли, ранжирование и выбор
+  исторической цели; восемь тестов границ/точности/нулей/порядка.
+- `day_details_screen.dart`: вся еда с порциями/КБЖУ по приёмам или по вкладу,
+  distribution/facts/empty, live edit/delete/Undo; RU/EN, lazy rows, две колонки.
+  Заголовки приёмов выделены подложкой/типографикой; divider вне InkWell в обоих режимах.
+- `diary_screen.dart`, `day_details_route.dart`, `AppMotion`: root route с
+  раскрытием 300 мс и Hero сводки; reduced motion мгновенный. Главная карточка
+  тоже использует историческую цель. Hero сохраняет естественную высоту текста.
+- `user_food_repository.dart`, `custom_food.dart`: атомарные UserFood/порции,
+  metadata, favorite, soft delete и SQL-проверка штрихкода с исключением своего ID.
+  Импортированный дубль не мешает правке неизменного штрихкода.
+- `user_food_form_screen.dart`: общая create/edit форма; category autocomplete
+  с исходным значением, бренды, многострочное описание и реальные локальные данные.
+- `yam_text_field.dart`: viewport/tap fixes и новый `obscureText` для ключа;
+  для скрытого ввода отключены autocorrect/suggestions. `yam_autocomplete_field.dart`
+  переиспользует общий ввод; реальное multiline-поведение сохранено.
+- `food_search_screen.dart`, adapters и `food_quick_add_sheet.dart`: свои/встроенные/
+  OFF продукты, описание, реальный поиск/Recent/favorites, units без `ml == g`.
+- `open_food_facts_client.dart`: Search-a-licious, от трёх символов, debounce 650 мс,
+  ≥6 с между запросами, до 15 результатов; ошибки не блокируют local workflow.
+  `remote_food_repository.dart`: только выбранные OFF продукты; кэш + Diary одной
+  транзакцией, сохранение последнего количества и OFF/ODbL attribution.
+- Builtin common-food каталог пока 10 продуктов; поиск имён/брендов в памяти,
+  без FTS. Запоминание количества всех источников не завершено.
+- Quantity/edit/weight sheets используют `SafeArea.maintainBottomViewPadding`;
+  это не фикс отдельной жалобы на рывки самой клавиатуры.
 
-### Каталог, Категории И Описания
+### ИИ-Помощник
 
-- `user_food_repository.dart` и `custom_food.dart`: атомарное создание/правка
-  UserFood и порций, сохранение идентичности/метаданных/избранного, soft delete
-  удалённых порций и проверка штрихкода. Описание можно записать/изменить/
-  очистить; старые продукты после миграции имеют null. `loadBrands()` и
-  `loadCategories()` читают только активные UserFoods/RemoteFoods, исключают
-  пустые подсказки и стабильно убирают дубли без учёта регистра.
-- `user_food_form_screen.dart`: общая create/edit форма. Категория — обязательный
-  свободный ввод: локализованные предустановки и сохранённые категории,
-  не более пяти подсказок по префиксу; выбор необязателен. Выбранная предустановка
-  сохраняет канонический код, собственная категория — пользовательский текст.
-  Правка других полей сохраняет точное существующее значение категории.
-- `lib/core/ui/forms/yam_autocomplete_field.dart`: общий UI подсказок категории
-  и бренда, управление касанием/мышью/клавиатурой. `yam_text_field.dart`
-  поддерживает многострочное описание без изменения однострочных callers.
-- `food_search_prototype_data.dart`, `custom_food_adapter.dart` и
-  `widgets/food_quick_add_sheet.dart`: каталог передаёт описание в карточку
-  добавления; текст полностью доступен и выделяется, содержимое прокручивается,
-  основная кнопка закреплена. В Diary snapshots описание не добавляется.
-- `food_quick_add_sheet.dart`, `edit_diary_entry_sheet.dart`, `weight_entry_sheet.dart`:
-  `SafeArea.maintainBottomViewPadding` сохраняет нижний безопасный отступ при
-  движении клавиатуры; подъём следует `viewInsets`, без второй анимации.
-- `food_search_screen.dart` и `widgets/food_search_result_row.dart`: меню
-  «Изменить»/«Удалить» у своего продукта в Recent, My dishes, Favorites и
-  текстовой выдаче. После правки сохраняются запрос и вкладка. Встроенная
-  и OFF-еда не редактируется. Удаление — существующее подтверждение/soft delete.
-- `open_food_facts_client.dart`: Search-a-licious GET, 15 результатов, нужные
-  поля, User-Agent и интервал ≥6 с. Поиск от трёх символов после 650 мс;
-  ошибки/Retry/устаревшие ответы не блокируют локальный каталог.
-- `remote_food_repository.dart`: выбор для Дневника/Избранного сохраняет OFF
-  в отдельную таблицу; сырая выдача не кэшируется. OFF-кэш и Diary добавляются
-  одной транзакцией; последнее количество запоминается; `_100g` не становится
-  миллилитрами. В поиске есть OFF/ODbL атрибуция, изображения не загружаются.
-- Встроенный каталог — 10 вручную заданных продуктов, не полноценная common-food
-  база. Поиск имён/брендов пока в памяти, без FTS. Последняя порция сохраняется
-  для OFF; UserFood использует базовую/заданную порцию, встроенная еда — fixture.
+- `lib/features/assistant/domain/assistant_models.dart`: сообщения, image input,
+  gateway/response contract и immutable editable draft (diary/catalog-only items).
+- `application/assistant_controller.dart`: completed-response/tool loop, полная
+  клиентская история, повтор/отмена с epoch guard, сохранение reviewed draft при
+  ошибке/неполном ответе. Отменённый/отклонённый draft не воскресает из tools state.
+- `domain/assistant_conversation.dart`, `data/assistant_conversation_repository.dart`:
+  SQLite-архив, sync metadata, metadata-only stream; soft delete очищает текст,
+  запоздалый save не воскрешает tombstone. `assistant_history_screen.dart`: открыть/удалить.
+  Controller сохраняет отправленный текст до API, только завершённый ответ после;
+  ошибки записи видны и повторяются без повторного inference. Архив по умолчанию
+  исключён из API, включается явно на следующий запрос; tools reset при смене чата.
+- `application/assistant_tools.dart`: search_foods/get_food/read_diary/prepare_draft.
+  Builtin/UserFood/cached OFF через существующие adapters; bounded result, реальные
+  ID/порции, запрет model-supplied catalog nutrients и arbitrary SQL/shell/URL.
+  Только UI вызывает commit: одна транзакция, проверка актуальности каталога,
+  rollback/retry и session idempotence. Новая еда может остаться только snapshot.
+- `data/assistant_connection_manager.dart`: API-key, выбор режима/модели/аккаунта,
+  lazy initialization, защищённое хранилище отдельно от SQLite/backup, serialized
+  refresh/rotation, logout/revocation и отдельный сохранённый ключ для transcription.
+- `data/chatgpt_oauth.dart`: официальный dynamic registration/returning client,
+  UUIDv4 host ID, browser + loopback, PKCE/state/nonce, JWKS RS256 и проверка claims,
+  scopes, refresh/revoke. Токены других приложений/внутренние ChatGPT endpoints не нужны.
+- `data/openai_transport.dart`: два формата model catalog, Responses/SSE,
+  fragmented UTF-8/multiline events, encrypted reasoning history, только terminal
+  completion успешен. OAuth — namespace yam; API-key — plain functions.
+  Ошибки наружу — только стабильные локализуемые коды, без provider body/секретов.
+  Подписочный SSE допускает отсутствие Content-Type; при пустом terminal output
+  используются только output_item.done в порядке индексов, после completed.
+- `data/assistant_media_service.dart`: native STT, либо API ASR с собственным ключом;
+  до 60 с PCM16/16kHz/mono в памяти → WAV, отмена не запускает транскрипцию.
+  Mobile camera/gallery, desktop file dialog; JPEG/PNG/WebP, bounded decode в isolate,
+  EXIF/GPS/прочие метаданные удаляются, ориентация сохраняется. Медиа не пишутся в БД.
+  Clipboard → тот же image pipeline; лимит байтов и отмена late result после dispose.
+  `pasteboard ^0.5.0`: новый native plugin, нужен полный rebuild/restart.
+- macOS dev: `.vscode/launch.json`/`tasks.json`, `tool/run_macos.dart` — `.app`
+  через LaunchServices, затем Flutter attach (с auth token в ignored service-info).
+  Прямой VS Code → flutter run неверно атрибутирует TCC SpeechRecognition редактору
+  и завершает YAM; UsageDescription/entitlements YAM уже корректны (Flutter #70374).
+- `presentation/assistant_screen.dart`, `assistant_draft_review.dart`:
+  `/assistant?day=YYYY-MM-DD&meal=...`, вход из Дневника; две колонки на wide,
+  прокручиваемый review на compact. Редактируются дата/приём/количество/порции,
+  данные нового продукта и сохранение в каталог. На compact Send/Stop — иконка.
+  Текст сохраняется; ввод/фото/незавершённый draft сессионные. Потеря ввода требует подтверждения.
+- `assistant_message_bubble.dart`, `assistant_markdown.dart`: контейнеры сообщений,
+  Markdown/выделение, горизонтальные таблицы/код, только явные HTTP(S)-ссылки.
+  Чат ограничен 720 px; composer всегда снизу, без consent-экрана/инструкции.
+  `YamTextField.embedded` без вложенной рамки/подписи; date/meal content-sized в toolbar
+  (отдельная строка на compact), вместе со строкой модели скрыты при клавиатуре.
+  `assistant_screen.dart`: follow-tail по позиции списка, frame-coalesced доводка
+  после layout/metrics; ручной уход вверх выключает её, возврат вниз включает.
+  `assistant_message_input.dart`: scoped PasteTextIntent + context menu для image-only clipboard,
+  с делегированием штатной вставке текста/undo; остальные поля не меняют поведение.
+- `assistant_connection_screen.dart`: `/assistant/connection` из Настроек/помощника,
+  защищённый key field, saved ChatGPT account picker, модель, welcome и usage link.
+  RU/EN, privacy и правила локальной истории; native permission descriptions тоже RU/EN.
+- Новые зависимости: secure_storage 10.3.4 (11.x конфликтует с win32 file_picker),
+  jose, speech_to_text 7.3.0, record 6.1.2, image_picker 1.2.1; image 4.10.1 уже был
+  транзитивно и теперь прямой. Текущий pinned SDK — Flutter 3.41.6 / Dart 3.11.4.
+- Linux: secure storage требует libsecret/Secret Service; сборка libsecret-1-dev
+  добавлена в CI/release. Голос требует API-key, parecord (pulseaudio-utils) и
+  PulseAudio/PipeWire-Pulse; выбранный PCM stream path не требует ffmpeg.
 
-### Календарь Дневника
+### Сетевой Прокси
 
-- `statistics_models.dart`: `calorieGoalDayStatus()` общий для Статистики и
-  календаря; `calculateGoalDayStatuses()` учитывает исторические цели.
-  90–110% включительно — `within`, выше — `above`, ниже — `below`.
-  Отсутствие еды, отсутствие цели и реальная еда с нулём ккал различаются.
-- `statistics_repository.dart`: `watchNutritionRange()` агрегирует только
-  включительный диапазон видимой недели. `diary_screen.dart` подписывается
-  на неделю и цели вне build, меняет диапазон при навигации, отменяет подписки
-  и защищается от устаревших событий. Router передаёт statisticsRepository.
-- `diary_day_selector.dart`: цвета `goalWithin/Above/Below` совпадают со
-  Статистикой, для еды без цели — нейтральная отметка, пустые дни не окрашены.
-  Выбранный цветной день имеет primary-рамку, сегодня — отдельную точку;
-  семантическая подпись включает статус. Переходы месяца/года календарные.
+- `lib/core/network/proxy_settings.dart`, `proxy_settings_controller.dart`:
+  настройка/валидация, сериализованное secure storage, lazy read до первого
+  соединения; Android isolated namespace + `resetOnError:false`. Отмена доступна
+  во время чтения хранилища: поздний результат не отправляет отменённый запрос.
+- `proxy_transport.dart`: HTTP/HTTPS CONNECT, SOCKS5 auth/remote DNS/IPv6,
+  fragmented handshakes, TLS к прокси и цели с обычной проверкой сертификатов.
+  Смена настроек закрывает active/pending/pooled routes; прямого fallback нет.
+- `lib/app/app.dart`: общая фабрика внедрена в OAuth/OpenAI/ASR/OFF/GitHub updater.
+  `router.dart`, `proxy_settings_screen.dart`: `/settings/proxy`, поля host/port/
+  username/password, скрытый пароль, enable/protocol, ошибки и сохранение RU/EN.
 
-### Резервные Копии И Релизы
 
-- `backup_repository.dart`, `backup_codec.dart`: согласованный снимок шести
-  таблиц, точные числа/метаданные/tombstones и описание UserFood. Кодек вне UI
-  isolate, лимиты файла/распаковки/строк и CRC, полная проверка до транзакции.
-  Экспорт v2, импорт v1/v2 с пропуском дополнительных JSON-полей; отсутствующие
-  nullable description/brand/barcode/label/deletedAt дают null. Обязательные поля,
-  типы, единицы, связи и лимиты проверяются; неизвестное поколение формата отклоняется.
-  «Дополнить» не меняет существующие ID/tombstones и пропускает конфликтующие
-  продукты со всеми порциями; повтор идемпотентен. DeviceId установки не меняется.
-- `backup_file_service.dart`, `backup_settings_section.dart`: системные диалоги,
-  предпросмотр/подтверждение/результат RU/EN. После импорта router и Undo
-  сбрасываются; отсутствие целей возвращает обязательный онбординг.
-- CI/release и setup-flutter action: pinned SDK, enforce-lockfile, l10n,
-  analyze и полный suite с coverage. Теги собирают signed APK, Linux x64 tar,
-  macOS universal zip и checksums; draft до загрузки всех файлов. Старые
-  прототипные goldens удалены по согласованию, исключений в CI нет.
-- `tool/release_metadata.dart`, `package_info_plus`: pubspec — версия, runtime
-  metadata — Settings/About, CI build number — release run counter. Linux
-  `version.json.in`/CMake сохраняют CLI overrides. Release Android требует
-  постоянный ключ через Secrets/env, debug fallback отсутствует.
-- `CHANGELOG.md`: Unreleased, подготовленные заметки 0.2.0 и фактическая история
-  0.1.0 от 2026-10-23; пользователь уже поднял pubspec до `0.2.0+2`.
-  `tool/changelog.dart` разбирает оговорённые version headings, даты, границы
-  секций/fences/комментарии/reference links. `release_metadata.dart` проверяет
-  файл на CI и при `--tag` требует непустые заметки точной версии; `--notes-file`
-  пишет их в Markdown. Prepare передаёт файл через `release-notes` artifact,
-  Publish дополняет прежними инструкциями пакетов/подписей и не исполняет текст.
-- `lib/features/app_update/` и Android installer/provider/receiver: latest
-  stable GitHub Release без токенов, потоковая `.part` загрузка, длина/SHA-256,
-  проверка пакета/версии/подписи, системное подтверждение. Отмена не удаляет APK;
-  очистка после package replacement/запуска новой версии. Linux/iOS/macOS
-  Android-секцию не показывают, SQLite/backup updater не меняет.
+### Статистика, Обмен И Релизы
+
+- `statistics_models.dart`, `statistics_repository.dart`: реальные питание/вес,
+  версии целей, local dates, средние только по дням с едой; пропуск не равен нулю.
+  Onboarding атомарно сохраняет цели/вес; неизменное взвешивание не дублируется.
+- Статистика: interactive weight/calorie points, клавиатура/ведение, historical
+  target line, календарь и day details. Дневник использует общие статусы недели
+  ±10%; selected/today/empty различаются. Нет вымышленных графиков/верхней сводки.
+- `food_library_repository.dart`, `food_library_codec.dart`: активные свои продукты/
+  порции в UTF-8 `yam-foods` v1, точные kcal/БЖУ/basis/units/description. Без Diary,
+  goals/weights/OFF/избранного/device metadata. Atomic replace/mergeDeduplicated/
+  mergeAll; новая UUID/metadata установки, полная проверка до записи, isolate decode.
+  Лимиты 64 МиБ / 50 000 продуктов / 250 000 порций; JSON-path ошибки.
+- `food_library_file_service.dart`, `food_library_settings_section.dart` и общий
+  `yam_action_sheet.dart`: file dialogs, immutable preview, confirm/result, RU/EN.
+  Формат — `docs/food-library-format.md`. `food-library/`: 270 продуктов ВкусВилл/
+  Глобус/Магнит, all.json и 11 категорий, report/excluded; это только content.
+- `backup_repository.dart`, `backup_codec.dart`: согласованный снимок семи таблиц,
+  точные metadata/tombstones, bounded ZIP/CRC/isolate; проверка до atomic replace/
+  supplement. Existing IDs/deviceId не меняются; повтор supplement идемпотентен.
+  v3 допускает повтор barcode; старые v1/v2 нет. Optional isEstimated переносится;
+  отсутствие → false, явный null/не-bool отвергается. Нового поколения формата нет.
+  Optional `assistant_conversations.json` переносит чаты/tombstones; отсутствие → пустой архив.
+  После импорта router/Undo сбрасываются; отсутствие целей ведёт в онбординг.
+- CI/release: pinned SDK, enforce-lockfile, l10n, analyze/full suite/coverage;
+  signed Android APK, Linux x64 bundle, macOS universal zip, SHA256SUMS, draft до
+  загрузки. `tool/changelog.dart`/`release_metadata.dart` проверяют tag/pubspec/notes.
+- Android updater: latest stable GitHub release, .part stream, длина/SHA256,
+  проверка пакета/версии/подписи, system install. Отмена сохраняет APK; package
+  replacement/startup очищает завершённое. Другие платформы updater не показывают.
 
 ## Проверка
 
-- Клавиатура: `dart format`, `flutter analyze --no-pub` (No issues found),
-  31 widget-тест поиска/Дневника/Статистики и штатная debug Linux-сборка прошли.
-- Новый регрессионный тест до исправления обнаружил лишние 8 px уже на первом
-  шаге; после — точное следование inset 0↔300 и доступность поля/CTA.
-- Настоящий Linux runtime с имитацией IME: добавление/правка еды и ввод веса,
-  повторные циклы клавиатуры, RU/EN, светлая/тёмная темы и текст ×2 прошли.
-  Отклонение от inset и доводка — 0; ввод 125,5 сохранён; Flutter errors — 0.
-  Временный runtime удалён; нативная Android/iOS-клавиатура не проверялась.
-- Ранее ADR 0033: Linux UI 390/×2, графики/плашки, overscroll и 2 widget-теста
-  прошли; светлый контраст столбцов — 4,83:1, выбранного периода — 5,69:1.
-- Полный `flutter test --no-pub --reporter expanded`: **196 тестов прошли**.
-  Добавлены проверки исторических целей, пропусков/нуля, границ и средних
-  недель/месяцев, удаления выбранной точки без устаревшей плашки.
-- Для schema v5 ранее выполнены build_runner и schema dump/generate v5;
-  миграции, совместимость backup и точность данных покрыты общим suite.
-  Новых миграций после schema v5 не потребовалось.
-- Changelog: `dart format` изменённых Dart-файлов, `flutter analyze --no-pub`
-  (No issues found), `flutter test --no-pub --reporter expanded test/tool`
-  (16 тестов) и actionlint 1.7.12 обоих workflow прошли.
-- Реальный CLI и команды prepare/сборки notes из YAML подтвердили выбор 0.2.0,
-  сохранение Markdown/ссылок и package footer; отсутствующая/пустая/дублированная
-  версия, неверный тег и notes-file без тега дают отказ без создания файла и
-  изменения GitHub outputs. Shell-метасимволы в тексте остались буквальным текстом.
-  Команды создания/загрузки/публикации GitHub Release не исполнялись.
-- `flutter build linux --debug --no-pub --target lib/main.dart` прошёл:
-  debug bundle собран со штатной точкой входа после удаления runtime smoke.
-- Регрессии: миграции v1–v4→v5 с сохранением всех прежних полей/метаданных,
-  создание/повторное чтение/изменение/очистка описания; backup v2 roundtrip
-  и v1 импорт обоими режимами, tombstones/точность/ошибочные поля; подсказки
-  категорий, RU/EN preset codes/клавиатура; длинные заметки при ширине 390 и ×2;
-  правка/удаление из поиска без изменения старой истории.
-- Календарь: границы 90/110%, исторические цели, noGoal/noEntry/ноль ккал,
-  годовой переход, изменение другого дня недели, правка/удаление/Undo.
-- Настоящий Linux UI smoke с отдельной SQLite: Light/EN и Dark/RU календарь;
-  ввод новой категории и её предложение в следующей форме, выбор клавиатурой;
-  сохранение/повторное открытие многострочного описания и просмотр карточки;
-  меню правки/удаления в поиске с сохранением запроса. Сегодня прошёл переходы
-  170→2040→2380 ккал при цели 2000: недобор→зелёный→жёлтый; удаление убрало
-  статус, Undo вернул его. Удаление продукта сохранило прежнее имя/КБЖУ в
-  Дневнике. Реальный экспорт с описанием прошёл; Flutter errors — **0**.
-- API runtime на приватных сохранённых копиях schema v4/backup v1 подтвердил:
-  миграция сохранила все прежние поля семи таблиц; «Заменить» и «Дополнить»
-  восстановили все поля шести пользовательских таблиц, повторное дополнение
-  идемпотентно. До изменения импортёр отклонял расширенную v2, после — принял;
-  известные данные сохранились при повторном экспорте, nullable defaults и
-  отказ обязательного поля проверены. SHA-256 исходных БД/backup не изменился.
-  Личные данные и временные копии не добавлялись в репозиторий.
-- Сохраняющиеся результаты прежних проходов: Linux version overrides и bundle,
-  Android debug/release с временным ключом, actionlint/preflight/metadata CLI
-  проверялись; пользователь подтвердил экспорт/восстановление на телефоне.
-  Это не приёмка нынешней schema v5/backup v2 на Android.
+- Подробности дня: визуальная правка — 9 native hover/divider проверок, errors=0.
+- Native macOS LaunchServices + изолированная SQLite memory: 16 проверок,
+  промежуточный кадр раскрытия, historical goal, вклад, edit/delete/Undo, scroll
+  return, empty и reduced motion; Flutter errors/overflow = 0. Визуально приняты
+  RU/light/390, EN/dark/1200 и 320 px с текстом ×1.6. Пользовательские данные не тронуты.
+- Обычная macOS debug-сборка прошла; временные сценарии/скриншоты/логи удалены.
+- CI fix: полный `flutter analyze --no-pub` — No issues found; все 427 тестов
+  с coverage и concurrency=1 прошли, включая миграции v1–v7 и экранные переходы.
+  Native file v5→v8 + TickerMode/reveal: 13 проверок, errors=0; данные/порции/FK сохранены.
+- Native archive smoke: save/reopen/delete/context, 3 inference-запроса, errors=0.
+  OAuth/SSE/atomic confirm/media/proxy/Markdown/clipboard проверены ранее.
+- Диктовка: LaunchServices listening → stop без вылета; произнесённый текст ещё не принят.
+- `0.6.0+11`: CLI `--tag v0.6.0` прошёл; enforce-lockfile на 3.41.6 прошёл ранее.
+  macOS bundle 0.6.0/build 11; новый GitHub CI и релизные сборки ещё не запускались.
+- Android debug build не подтверждён: timeout online; offline Gradle/JDK21 —
+  нет Kotlin 2.2.20, engine artifacts, Tink 1.21 и других Maven binaries в кэше.
 
-## Следующее Действие
+## Следующее Действие И Ограничения
 
-- Проверить на Android-телефоне повторное открытие/скрытие цифровой клавиатуры
-  в карточке добавления еды: плавность движения и отсутствие доводки в конце.
-  Android-устройство и настроенный эмулятор сейчас недоступны.
-
-## Ограничения И Непроверенное
-
-- В текущем проходе Android/iOS/macOS не запускались. Приёмка обновления живой
-  Android-установки до schema v5/backup v2 и нативной установки/отмены/очистки
-  updater после package replacement остаётся на устройстве.
-- GitHub Release `v0.1.0` / `YAM 0.1.0+4` опубликован 2026-10-23 (подтверждено
-  read-only запросом GitHub CLI). Версия 0.2.0 не публиковалась; реальный
-  GitHub-run обновлённого changelog workflow ещё предстоит. Подписи, commit,
-  push, теги и публикации остаются действиями владельца.
-- Тема и избранное встроенной еды сессионные. Настройки языка/единиц пока
-  только отображаются, цели меняются через повторный онбординг; отдельного
-  удаления всех данных нет. Riverpod не подключён.
-- Встроенная common-food база и запоминание порций всех источников не завершены.
-  Barcode, USDA, recipes, copy meal/day и sync не реализованы. Описание —
-  текстовая заметка, не структурированный рецепт с расчётом ингредиентов.
-- Дневник требует отдельной обработки полуночи/возврата из фона, сохраняя
-  вручную выбранную историческую дату. Эта задача не расширяла lifecycle.
-- Сохраняется pin Drift 2.31/drift_flutter 0.2.4. Ручная OFF-приёмка на устройствах,
-  системные файловые диалоги iOS/macOS и notarization не проверялись.
+- **Следующее:** владелец коммитит CI fix, удаляет старый `v0.6.0` локально и в origin,
+  пересоздаёт тег на исправленном коммите и проверяет повторный GitHub Release workflow.
+- Реальный текстовый OpenAI inference через подключённую подписку подтверждён;
+  облачный сценарий tools/фото/confirm отдельно не проверялся. Browser OAuth на
+  телефонах, native mic/camera/permissions и Linux voice/Secret Service не проверены.
+- Подробности дня/системный Back на Android/iOS, живая Android миграция, native IME,
+  рывки клавиатуры (backlog 5), file dialogs и установка/очистка updater требуют приёмки.
+- macOS release ad-hoc, без Developer ID/notarization; legacy Keychain без Keychain Sharing.
+- Тема/builtin favorites сессионные; отдельные настройки языка/единиц лишь
+  отображаются. Нет отдельного удаления всех данных. Riverpod не подключён.
+- Common-food база/универсальное запоминание порций, barcode, USDA, recipes,
+  copy meal/day и sync не реализованы. Описание — заметка, не структурированный рецепт.
+- Diary lifecycle полуночи/возврата из фона требует отдельной обработки с
+  сохранением вручную выбранной даты. Pin Drift 2.31/drift_flutter 0.2.4 сохранён.
+- Прежние CocoaPods и другие пользовательские изменения worktree сохранены.
+  В этой задаче коммиты, теги и push не выполнялись.

@@ -67,7 +67,7 @@ class _YamEntranceRevealState extends State<YamEntranceReveal>
     super.didChangeDependencies();
     final epoch = YamEntranceScope.maybeEpochOf(context);
     final reduceMotion = MediaQuery.disableAnimationsOf(context);
-    final active = TickerMode.of(context);
+    final active = TickerMode.valuesOf(context).enabled;
     final changed =
         !_hasDependencies ||
         epoch != _epoch ||

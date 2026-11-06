@@ -251,13 +251,7 @@ class YamDatabase extends _$YamDatabase {
         await migrator.addColumn(userFoods, userFoods.description);
       }
       if (from < 6) {
-        // Rebuild without the barcode UNIQUE constraint. Drift copies every
-        // column, preserves declared indexes, and temporarily disables foreign
-        // keys so existing user servings keep their original parent IDs.
-        await migrator.alterTable(TableMigration(userFoods));
-        await customStatement(
-          'CREATE INDEX user_foods_barcode ON user_foods (barcode, deleted_at)',
-        );
+        await _removeBarcodeUniqueness(migrator);
       }
       // v1 creates the current diary table above, including this column.
       if (from >= 2 && from < 7) {
@@ -275,6 +269,49 @@ class YamDatabase extends _$YamDatabase {
       await customStatement('PRAGMA foreign_keys = ON');
     },
   );
+
+  Future<void> _removeBarcodeUniqueness(Migrator migrator) async {
+    final foreignKeysEnabled =
+        (await customSelect(
+          'PRAGMA foreign_keys',
+        ).getSingle()).read<int>('foreign_keys') !=
+        0;
+    if (foreignKeysEnabled) {
+      await customStatement('PRAGMA foreign_keys = OFF');
+    }
+    try {
+      await transaction(() async {
+        final schemaObjects = await customSelect(
+          "SELECT sql FROM sqlite_master WHERE tbl_name = 'user_foods' "
+          "AND type IN ('index', 'trigger') AND sql IS NOT NULL",
+        ).get();
+        const temporaryName = 'user_foods_without_barcode_unique';
+        // Use the generated schema, not a second handwritten table definition.
+        await migrator.createTable(userFoods.createAlias(temporaryName));
+        final columns = userFoods.$columns
+            .map((column) => '"${column.$name}"')
+            .join(', ');
+        await customStatement(
+          'INSERT INTO "$temporaryName" ($columns) '
+          'SELECT $columns FROM user_foods',
+        );
+        // Keep the original name on referencing tables: only rename the new
+        // table, with foreign keys disabled outside this transaction.
+        await migrator.deleteTable('user_foods');
+        await migrator.renameTable(userFoods, temporaryName);
+        for (final object in schemaObjects) {
+          await customStatement(object.read<String>('sql'));
+        }
+        await customStatement(
+          'CREATE INDEX user_foods_barcode ON user_foods (barcode, deleted_at)',
+        );
+      });
+    } finally {
+      if (foreignKeysEnabled) {
+        await customStatement('PRAGMA foreign_keys = ON');
+      }
+    }
+  }
 
   Future<String> installationDeviceId(Uuid uuid) async {
     const key = 'deviceId';
