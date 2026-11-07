@@ -11,6 +11,9 @@ class DayDetailsRoute extends PageRouteBuilder<void> {
     required bool reduceMotion,
   }) : super(
          settings: const RouteSettings(name: 'day-details'),
+         // Keep the diary visible beneath the clipped surface, including pop.
+         // Hiding it would restart its entrance reveal when it becomes active.
+         opaque: false,
          transitionDuration: reduceMotion
              ? Duration.zero
              : AppMotion.dayDetailsExpansion,
@@ -34,22 +37,33 @@ class DayDetailsRoute extends PageRouteBuilder<void> {
                    Offset.zero & constraints.biggest,
                    progress,
                  )!;
-                 return ClipPath(
-                   clipper: _ExpandingSurfaceClipper(
-                     rect,
-                     AppRadius.card * (1 - progress),
-                   ),
-                   child: ColoredBox(
-                     color: Theme.of(context).colorScheme.surface,
-                     child: Opacity(
-                       opacity: const Interval(
-                         0.15,
-                         1,
-                         curve: AppMotion.standardCurve,
-                       ).transform(animation.value),
-                       child: child,
+                 return Stack(
+                   fit: StackFit.expand,
+                   children: [
+                     // Reveal the whole diary, not just the moving clip edge.
+                     ColoredBox(
+                       color: Theme.of(
+                         context,
+                       ).scaffoldBackgroundColor.withValues(alpha: progress),
                      ),
-                   ),
+                     ClipPath(
+                       clipper: _ExpandingSurfaceClipper(
+                         rect,
+                         AppRadius.card * (1 - progress),
+                       ),
+                       child: ColoredBox(
+                         color: Theme.of(context).colorScheme.surface,
+                         child: Opacity(
+                           opacity: const Interval(
+                             0.15,
+                             1,
+                             curve: AppMotion.standardCurve,
+                           ).transform(animation.value),
+                           child: child,
+                         ),
+                       ),
+                     ),
+                   ],
                  );
                },
              ),

@@ -2,7 +2,6 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:yam/app/theme/app_motion.dart';
 import 'package:yam/app/theme/app_radius.dart';
 import 'package:yam/app/theme/app_semantic_colors.dart';
 import 'package:yam/app/theme/app_spacing.dart';
@@ -250,9 +249,6 @@ class _DayTile extends StatelessWidget {
             status == GoalDayStatus.above
         ? colors.onPrimary
         : colors.onSurface;
-    final animationDuration = MediaQuery.disableAnimationsOf(context)
-        ? Duration.zero
-        : AppMotion.smallChange;
 
     return Semantics(
       button: true,
@@ -274,9 +270,7 @@ class _DayTile extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 2),
-              child: AnimatedContainer(
-                duration: animationDuration,
-                curve: AppMotion.standardCurve,
+              child: Container(
                 decoration: BoxDecoration(
                   color: primarySelection ? colors.primary : statusColor,
                   borderRadius: BorderRadius.circular(AppRadius.control),

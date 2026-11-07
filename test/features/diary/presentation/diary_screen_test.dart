@@ -10,14 +10,111 @@ import 'package:yam/app/router.dart';
 import 'package:yam/app/session/session_profile.dart';
 import 'package:yam/app/theme/app_theme.dart';
 import 'package:yam/core/data/yam_database.dart';
+import 'package:yam/core/ui/motion/yam_entrance_reveal.dart';
 import 'package:yam/features/diary/data/diary_repository.dart';
 import 'package:yam/features/diary/domain/diary_entry.dart';
+import 'package:yam/features/diary/presentation/day_details_screen.dart';
 import 'package:yam/features/diary/presentation/diary_screen.dart';
+import 'package:yam/features/diary/presentation/widgets/diary_day_selector.dart';
 import 'package:yam/features/statistics/data/statistics_repository.dart';
 import 'package:yam/features/statistics/domain/statistics_models.dart';
 import 'package:yam/l10n/generated/app_localizations.dart';
 
 void main() {
+  for (final width in [320.0, 390.0, 1280.0]) {
+    testWidgets('day strip stays fixed through pending day reads at $width', (
+      tester,
+    ) async {
+      await _setWindowSize(tester, Size(width, 844));
+      final database = YamDatabase(NativeDatabase.memory());
+      addTearDown(database.close);
+      final diary = _ControlledDiaryRepository(database);
+      addTearDown(diary.close);
+      final today = DateTime(2020, 9, 25);
+      final selected = DateTime(2020, 9, 24);
+      await tester.pumpWidget(
+        _DiaryTestApp(
+          locale: const Locale('en'),
+          today: today,
+          repository: diary,
+        ),
+      );
+      diary.days.last.add([_readEntry(today)]);
+      await tester.pumpAndSettle();
+      final selector = find.byType(DiaryDaySelector);
+      final before = tester.getRect(selector);
+      await tester.tap(_calendarDay(selected, 'No entry'));
+      await tester.pump();
+      expect(tester.getRect(selector), before);
+      await tester.pump(const Duration(milliseconds: 100));
+      expect(tester.getRect(selector), before);
+      diary.days.last.add([_readEntry(selected)]);
+      await tester.pump();
+      expect(tester.getRect(selector), before);
+      await tester.pumpAndSettle();
+      expect(tester.getRect(selector), before);
+      _expectSelectedDay(tester, selected, 'No entry');
+      await tester.pumpWidget(const SizedBox.shrink());
+    });
+  }
+
+  testWidgets('closing details reveals the diary without a second entrance', (
+    tester,
+  ) async {
+    await _setWindowSize(tester, const Size(390, 844));
+    await tester.pumpWidget(const _DiaryTestApp(locale: Locale('en')));
+    await tester.pumpAndSettle();
+    final selectorRect = tester.getRect(find.byType(DiaryDaySelector));
+    final selectedDay = tester
+        .widget<DiaryDaySelector>(find.byType(DiaryDaySelector))
+        .selectedDay;
+    await tester.tap(find.byKey(const ValueKey('diary-day-details')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('day-details-close')));
+    await tester.pump();
+    for (var frame = 0; frame < 8; frame++) {
+      await tester.pump(const Duration(milliseconds: 40));
+      if (frame == 3) {
+        final clip = find
+            .ancestor(
+              of: find.byType(DayDetailsScreen),
+              matching: find.byType(ClipPath),
+            )
+            .first;
+        final size = tester.getSize(clip);
+        final bounds = tester
+            .widget<ClipPath>(clip)
+            .clipper!
+            .getClip(size)
+            .getBounds();
+        expect(bounds.height, lessThan(size.height));
+        expect(bounds.width, lessThan(size.width));
+      }
+      final fades = find.descendant(
+        of: find.byType(DiaryScreen),
+        matching: find.byType(YamEntranceReveal),
+      );
+      expect(fades, findsWidgets);
+      for (final reveal in fades.evaluate()) {
+        final fade = find
+            .descendant(
+              of: find.byElementPredicate((element) => element == reveal),
+              matching: find.byType(FadeTransition),
+            )
+            .first;
+        expect(tester.widget<FadeTransition>(fade).opacity.value, 1);
+      }
+    }
+    expect(find.byKey(const ValueKey('day-details-close')), findsNothing);
+    expect(tester.getRect(find.byType(DiaryDaySelector)), selectorRect);
+    expect(
+      tester
+          .widget<DiaryDaySelector>(find.byType(DiaryDaySelector))
+          .selectedDay,
+      selectedDay,
+    );
+  });
+
   for (final source in ['day', 'goals', 'week']) {
     for (final afterPayload in [false, true]) {
       testWidgets(
@@ -193,8 +290,10 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const ValueKey('diary-day-details')));
       await tester.pumpAndSettle();
+      Finder details(Finder finder) =>
+          find.descendant(of: find.byType(DayDetailsScreen), matching: finder);
       expect(find.byKey(const ValueKey('day-details-close')), findsOneWidget);
-      expect(find.text('Consumed'), findsOneWidget);
+      expect(details(find.text('Consumed')), findsOneWidget);
       final error = StateError('read failed while details are open');
       switch (source) {
         case 'day':
@@ -206,21 +305,21 @@ void main() {
       }
       await tester.pumpAndSettle();
       expect(find.byKey(const ValueKey('day-details-close')), findsOneWidget);
-      expect(find.text('Diary could not be loaded'), findsOneWidget);
-      expect(find.text('Consumed'), findsNothing);
-      expect(find.text('Calendar food'), findsNothing);
-      await tester.tap(find.text('Retry'));
+      expect(details(find.text('Diary could not be loaded')), findsOneWidget);
+      expect(details(find.text('Consumed')), findsNothing);
+      expect(details(find.text('Calendar food')), findsNothing);
+      await tester.tap(details(find.text('Retry')));
       await tester.pump();
       expect(find.byKey(const ValueKey('day-details-close')), findsOneWidget);
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
-      expect(find.text('Consumed'), findsNothing);
+      expect(details(find.byType(CircularProgressIndicator)), findsOneWidget);
+      expect(details(find.text('Consumed')), findsNothing);
       expect(diary.requestedDays.last, day);
       emit();
       await tester.pumpAndSettle();
       expect(find.byKey(const ValueKey('day-details-close')), findsOneWidget);
-      expect(find.text('Diary could not be loaded'), findsNothing);
-      expect(find.text('Consumed'), findsOneWidget);
-      expect(find.text('Calendar food'), findsOneWidget);
+      expect(details(find.text('Diary could not be loaded')), findsNothing);
+      expect(details(find.text('Consumed')), findsOneWidget);
+      expect(details(find.text('Calendar food')), findsOneWidget);
       await tester.tap(find.byKey(const ValueKey('day-details-close')));
       await tester.pumpAndSettle();
       expect(find.byKey(const ValueKey('day-details-close')), findsNothing);

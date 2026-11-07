@@ -396,15 +396,11 @@ class _DiaryScreenState extends State<DiaryScreen> {
                 controller: _scrollController,
                 slivers: [
                   _buildHeaderSliver(horizontalPadding),
+                  _buildDaySelectorSliver(horizontalPadding),
                   if (!_readReady)
                     SliverToBoxAdapter(
                       child: _ConstrainedDiaryContent(
-                        child: Column(
-                          children: [
-                            if (_calendarReady) _buildDaySelector(),
-                            _buildReadFeedback(l10n),
-                          ],
-                        ),
+                        child: _buildReadFeedback(l10n),
                       ),
                     )
                   else if (constraints.maxWidth >= AppBreakpoints.wideDiary)
@@ -477,13 +473,7 @@ class _DiaryScreenState extends State<DiaryScreen> {
     );
   }
 
-  List<Widget> _buildCompactSlivers(
-    DiaryPrototypeDay day,
-    double horizontalPadding,
-  ) {
-    final contentPadding = EdgeInsets.symmetric(horizontal: horizontalPadding);
-
-    return [
+  Widget _buildDaySelectorSliver(double horizontalPadding) =>
       SliverLayoutBuilder(
         builder: (context, constraints) {
           final calendarPadding =
@@ -508,7 +498,15 @@ class _DiaryScreenState extends State<DiaryScreen> {
             ),
           );
         },
-      ),
+      );
+
+  List<Widget> _buildCompactSlivers(
+    DiaryPrototypeDay day,
+    double horizontalPadding,
+  ) {
+    final contentPadding = EdgeInsets.symmetric(horizontal: horizontalPadding);
+
+    return [
       SliverPadding(
         padding: EdgeInsets.fromLTRB(
           horizontalPadding,
@@ -571,7 +569,7 @@ class _DiaryScreenState extends State<DiaryScreen> {
       SliverPadding(
         padding: EdgeInsets.fromLTRB(
           horizontalPadding,
-          AppSpacing.xs,
+          AppSpacing.lg,
           horizontalPadding,
           AppSpacing.xxl + AppSpacing.xl,
         ),
@@ -580,8 +578,6 @@ class _DiaryScreenState extends State<DiaryScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                YamEntranceReveal(index: 0, child: _buildDaySelector()),
-                const SizedBox(height: AppSpacing.lg),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -617,10 +613,11 @@ class _DiaryScreenState extends State<DiaryScreen> {
   }
 
   Widget _buildSummary(DiaryPrototypeDay day) => Hero(
+    // Hero keeps its layout placeholder mounted while the child is in flight.
+    key: _summaryKey,
     tag: _summaryHeroTag,
     flightShuttleBuilder: DailyNutritionSummary.buildFlight,
     child: Material(
-      key: _summaryKey,
       type: MaterialType.transparency,
       child: Semantics(
         button: true,

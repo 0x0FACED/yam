@@ -10,7 +10,7 @@
 - ИИ-помощник: текст/голос/фото → редактируемый черновик → явное подтверждение; ручной ввод offline.
 - HTTP/HTTPS/SOCKS5-прокси из Настроек: защищённые per-device credentials, без direct fallback.
 - SQLite `yam` — schema v8. Полные копии — format v3, импорт v1/v2/v3.
-- `0.7.0` уже опубликован; подготовлен `0.7.1+14` с исправлениями обоих UI-аудитов. Unreleased пуст.
+- Подготовлен `0.7.2+15` / `v0.7.2`: исправления переключения дней и закрытия подробностей; Unreleased пуст.
 
 ## Принятые Решения
 
@@ -55,6 +55,8 @@
 - [ADR 0046](../docs/adr/0046-viewport-floating-actions.md): viewport-overlay без подложки, тень кнопки и измеряемый end padding.
 - [ADR 0047](../docs/adr/0047-readable-nutrition-and-compact-calendars.md): контрастное БЖУ, компактные календари и точечный polish.
 - [ADR 0048](../docs/adr/0048-ui-consistency-and-recovery.md): исправлены 11 замечаний consistency-аудита без редизайна и изменения данных.
+- [ADR 0049](../docs/adr/0049-stable-diary-day-navigation.md): неподвижная полоска дней без анимации выделения; возврат из подробностей без повторного reveal.
+- [ADR 0050](../docs/adr/0050-day-details-background-transition.md): полноэкранная fade-подложка согласует проявление всего Дневника со сворачиванием подробностей.
 
 ## Реализовано И Основные Файлы
 
@@ -77,9 +79,11 @@
 - `day_details_screen.dart`: вся еда с порциями/КБЖУ по приёмам или по вкладу,
   distribution/facts/empty, live edit/delete/Undo; RU/EN, lazy rows, две колонки.
   Заголовки приёмов выделены подложкой/типографикой; divider вне InkWell в обоих режимах.
-- `diary_screen.dart`, `day_details_route.dart`, `AppMotion`: root route с
-  раскрытием 300 мс и Hero сводки; reduced motion мгновенный. Главная карточка
-  тоже использует историческую цель. Hero сохраняет естественную высоту текста.
+- `diary_screen.dart`, `diary_day_selector.dart`: календарная навигация вынесена
+  в постоянный sliver перед loading/error/data; геометрия и reveal не сбрасываются при чтении дня.
+- `day_details_route.dart`, `AppMotion`: раскрытие/сворачивание 300 мс и Hero сводки;
+  `opaque: false` не перезапускает reveal; подложка плавно открывает весь UI, а не только край карточки.
+  Ключ измерения на Hero сохраняет границы placeholder в полёте; Reduced motion мгновенный.
 - `user_food_repository.dart`, `custom_food.dart`: атомарные UserFood/порции,
   metadata, favorite, soft delete и SQL-проверка штрихкода с исключением своего ID.
   Импортированный дубль не мешает правке неизменного штрихкода.
@@ -223,18 +227,19 @@
 
 ## Проверка
 
-- `0.7.1`: release metadata CLI и 16 tool-тестов прошли; UI: `gen-l10n`, `dart format`, `flutter analyze` — чисто.
-- Прошли 129 фокусных проверок, включая 4 временных воспроизведения; 22 новых
-  постоянных regression-сценария покрывают read error/Retry/устаревшие события и disabled/focus.
-- Native macOS/SQLite memory: RU/EN, Light/Dark, 320/360/700 px, низкие окна, текст ×2;
-  все 11 вариантов меню, Retry, edit-название и disabled/dialog flows; Flutter errors=0.
-- Стенд удалён, обычная macOS debug-сборка `lib/main.dart` успешна; пользовательская БД не открывалась.
+- `dart format`, `flutter analyze`: чисто. 32 фокусных теста Дневника/route/entrance прошли.
+  `day_details_route_test.dart` проверяет фактические промежуточные пиксели вне карточки:
+  фон постепенно открывается. Реальный Дневник проверяет уменьшение clip и сохранение даты/recovery.
+- Native macOS: промежуточные кадры показывают сворачивание поверхности и плавное проявление
+  шапки/календаря/приёмов/FAB/навигации; Light/Dark, Reduced Motion, Flutter errors=0. Стенд удалён.
+- `v0.7.2`: CLI подтвердил `0.7.2+15` и извлёк заметки нужного релиза; 16 tool-тестов прошли.
+- Предыдущая UI-приёмка: 129 проверок; RU/EN, Light/Dark, низкие окна, текст ×2, меню/Retry/edit/disabled.
 - Android debug не подтверждён: offline-кэш без Kotlin 2.2.20/engine/Tink 1.21 и других Maven binaries.
 
 ## Следующее Действие И Ограничения
 
-- **Следующее:** мобильная приёмка исправленных меню, edit-названия и floating с
-  системной клавиатурой на Android/iOS 320–360 px и крупным текстом; устройство не проверялось.
+- **Следующее:** Android/iOS-приёмка выбора дня и закрытия подробностей кнопкой/системным Back;
+  затем меню/edit/floating с системной клавиатурой на 320–360 px и крупным текстом. Устройства не проверялись.
 - Реальный текстовый OpenAI inference через подключённую подписку подтверждён;
   облачный сценарий tools/фото/confirm отдельно не проверялся. Browser OAuth на
   телефонах, native mic/camera/permissions и Linux voice/Secret Service не проверены.

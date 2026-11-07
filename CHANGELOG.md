@@ -6,6 +6,16 @@
 
 ## [Unreleased]
 
+## [0.7.2] - 2026-11-08
+
+### Fixed
+
+- Полоска дней Дневника больше не скачет и не появляется заново при выборе дня;
+  анимация выделения дня убрана.
+- Подробности дня плавно сворачиваются в главную карточку; весь остальной
+  интерфейс Дневника проявляется одновременно с ней, без резкого открытия
+  по границе карточки и без повторного каскадного появления блоков.
+
 ## [0.7.1] - 2026-11-08
 
 ### Fixed
@@ -256,7 +266,8 @@
 - Проверка и загрузка Android-обновлений из GitHub Releases с системной
   установкой; релизные APK, Linux bundle и macOS universal archive с SHA256SUMS.
 
-[Unreleased]: https://github.com/0x0FACED/yam/compare/v0.7.1...HEAD
+[Unreleased]: https://github.com/0x0FACED/yam/compare/v0.7.2...HEAD
+[0.7.2]: https://github.com/0x0FACED/yam/compare/v0.7.1...v0.7.2
 [0.7.1]: https://github.com/0x0FACED/yam/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/0x0FACED/yam/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/0x0FACED/yam/compare/v0.5.0...v0.6.0
