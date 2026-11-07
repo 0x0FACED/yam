@@ -58,6 +58,7 @@ class _ScriptedGateway implements AssistantGateway {
   final replies = Queue<Future<AssistantTurn> Function()>();
   final inputs = <List<Map<String, dynamic>>>[];
   final started = Completer<void>();
+  final instructionHistory = <String>[];
   @override
   Future<AssistantTurn> respond({
     required String model,
@@ -66,6 +67,7 @@ class _ScriptedGateway implements AssistantGateway {
     required List<Map<String, dynamic>> tools,
     void Function(String delta)? onText,
   }) {
+    instructionHistory.add(instructions);
     inputs.add(
       (jsonDecode(jsonEncode(input)) as List).cast<Map<String, dynamic>>(),
     );
@@ -147,6 +149,7 @@ void main() {
       gateway.replies.add(() => late.future);
       final cancelled = controller.send('Prepare breakfast');
       await gateway.started.future;
+      final sentAt = controller.messages.single.sentAt!;
       controller.cancel();
       late.complete(_prepare('Cancelled food'));
       await cancelled;
@@ -162,6 +165,9 @@ void main() {
         controller.messages.where((message) => message.isUser),
         hasLength(1),
       );
+      expect(controller.messages.first.sentAt, sentAt);
+      expect(controller.messages.last.sentAt!.isUtc, isTrue);
+      expect(controller.messages.last.sentAt!.isBefore(sentAt), isFalse);
       expect(await diary.watchDay(day).first, isEmpty);
       final first = controller.confirm();
       final second = controller.confirm();
@@ -215,9 +221,16 @@ void main() {
         jsonEncode(gateway.inputs.last),
         contains('Remember breakfast at home'),
       );
-      expect(controller.useArchivedContext, isFalse);
+      expect(controller.useArchivedContext, isTrue);
       gateway.replies.add(() async => _finished);
       await controller.send('Next question');
+      expect(
+        jsonEncode(gateway.inputs.last),
+        contains('Remember breakfast at home'),
+      );
+      controller.setUseArchivedContext(false);
+      gateway.replies.add(() async => _finished);
+      await controller.send('Without archive');
       expect(
         jsonEncode(gateway.inputs.last),
         isNot(contains('breakfast at home')),
@@ -262,5 +275,45 @@ void main() {
     expect((rows.last as Map)['text'], startsWith('19:'));
     expect(jsonEncode(input), isNot(contains('input_image')));
     expect(jsonEncode(input), isNot(contains('function_call')));
+  });
+
+  test('next-request controls do not mutate an active tool round', () async {
+    controller.restore(
+      AssistantConversation(
+        id: controller.conversationId,
+        title: 'History',
+        day: day,
+        mealId: 'breakfast',
+        updatedAt: day,
+        messages: const [
+          AssistantMessage(isUser: true, text: 'My archived breakfast'),
+        ],
+      ),
+    );
+    final firstRound = Completer<AssistantTurn>();
+    gateway.replies.addAll([
+      () => firstRound.future,
+      () async => _finished,
+      () async => _finished,
+    ]);
+    final active = controller.send('Prepare breakfast');
+    await gateway.started.future;
+    controller.day = DateTime(2026, 11, 7);
+    controller.mealId = 'dinner';
+    controller.setUseArchivedContext(true);
+    firstRound.complete(_prepare('Breakfast'));
+    await active;
+    expect(gateway.instructionHistory[0], gateway.instructionHistory[1]);
+    expect(
+      jsonEncode(gateway.inputs[1]),
+      isNot(contains('My archived breakfast')),
+    );
+    await controller.send('Now dinner');
+    expect(gateway.instructionHistory[2], contains('2026-11-07'));
+    expect(gateway.instructionHistory[2], contains('Selected meal: dinner'));
+    expect(jsonEncode(gateway.inputs[2]), contains('My archived breakfast'));
+    expect(controller.draft!.day, day);
+    controller.clear();
+    expect(controller.useArchivedContext, isFalse);
   });
 }

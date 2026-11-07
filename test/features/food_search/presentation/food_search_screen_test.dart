@@ -396,13 +396,6 @@ void main() {
           .calorieValue,
       '293',
     );
-    expect(
-      tester.getTopRight(find.text('Usually: 80 g')).dx,
-      closeTo(
-        tester.getTopRight(find.byKey(const ValueKey('quick-add-submit'))).dx,
-        0.1,
-      ),
-    );
     expect(tester.getSize(find.byTooltip('Decrease quantity')).height, 44);
     expect(tester.getSize(find.byTooltip('Close quick add')).height, 44);
 

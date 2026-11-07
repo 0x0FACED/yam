@@ -390,11 +390,15 @@ void _validateConversation(Map<String, dynamic> row) {
   for (final value in messages as List) {
     final message = _object(value);
     _require(
-      message.length == 3 &&
+      message.keys.every(
+            (key) =>
+                const {'isUser', 'text', 'hasImage', 'sentAt'}.contains(key),
+          ) &&
           message['isUser'] is bool &&
           message['text'] is String &&
           message['hasImage'] is bool,
     );
+    if (message.containsKey('sentAt')) _timestamp(message['sentAt']);
   }
   // Tombstones retain sync identity, never deleted text or photo placeholders.
   if (deletedAt != null) {

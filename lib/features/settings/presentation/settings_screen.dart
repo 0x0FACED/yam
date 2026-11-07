@@ -269,6 +269,7 @@ class SettingsScreen extends StatelessWidget {
   Future<void> _showThemePicker(BuildContext context) async {
     final selected = await showModalBottomSheet<ThemeMode>(
       context: context,
+      isScrollControlled: true,
       showDragHandle: true,
       useSafeArea: true,
       constraints: const BoxConstraints(maxWidth: 480),
@@ -349,36 +350,42 @@ class _ThemePicker extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     return SafeArea(
       top: false,
+      maintainBottomViewPadding: true,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(
-          AppSpacing.md,
-          0,
-          AppSpacing.md,
-          AppSpacing.md,
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.viewInsetsOf(context).bottom,
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Semantics(
-              header: true,
-              child: Text(
-                l10n.settingsTheme,
-                style: AppTypography.sectionTitle.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface,
-                  fontWeight: FontWeight.w700,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.md,
+            0,
+            AppSpacing.md,
+            AppSpacing.md,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Semantics(
+                header: true,
+                child: Text(
+                  l10n.settingsTheme,
+                  style: AppTypography.sectionTitle.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: AppSpacing.xs),
-            for (final mode in ThemeMode.values)
-              _ThemeModeRow(
-                key: ValueKey('settings-theme-${mode.name}'),
-                label: _themeModeLabel(l10n, mode),
-                selected: selectedMode == mode,
-                onPressed: () => Navigator.of(context).pop(mode),
-              ),
-          ],
+              const SizedBox(height: AppSpacing.xs),
+              for (final mode in ThemeMode.values)
+                _ThemeModeRow(
+                  key: ValueKey('settings-theme-${mode.name}'),
+                  label: _themeModeLabel(l10n, mode),
+                  selected: selectedMode == mode,
+                  onPressed: () => Navigator.of(context).pop(mode),
+                ),
+            ],
+          ),
         ),
       ),
     );

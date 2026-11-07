@@ -62,9 +62,9 @@ class _AssistantHistoryScreenState extends State<AssistantHistoryScreen> {
           content: Text(l10n.assistantHistoryDeleteMessage(title)),
           scrollable: true,
           actions: [
-            TextButton(
+            YamTextButton(
+              label: l10n.backupCancel,
               onPressed: () => Navigator.pop(dialogContext, false),
-              child: Text(l10n.backupCancel),
             ),
             YamTextButton(
               label: l10n.assistantHistoryDelete,
@@ -114,7 +114,7 @@ class _AssistantHistoryScreenState extends State<AssistantHistoryScreen> {
                     stream: _conversations,
                     builder: (context, snapshot) {
                       if (snapshot.hasError) {
-                        return _HistoryFeedback(
+                        return YamFeedbackViewport(
                           child: YamFeedbackState(
                             icon: Icons.error_outline_rounded,
                             title: l10n.assistantHistoryLoadError,
@@ -135,7 +135,7 @@ class _AssistantHistoryScreenState extends State<AssistantHistoryScreen> {
                       }
                       final conversations = snapshot.data!;
                       if (conversations.isEmpty) {
-                        return _HistoryFeedback(
+                        return YamFeedbackViewport(
                           child: YamFeedbackState(
                             icon: Icons.chat_bubble_outline_rounded,
                             title: l10n.assistantHistoryEmpty,
@@ -228,24 +228,6 @@ class _AssistantHistoryScreenState extends State<AssistantHistoryScreen> {
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _HistoryFeedback extends StatelessWidget {
-  const _HistoryFeedback({required this.child});
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) => SingleChildScrollView(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(minHeight: constraints.maxHeight),
-          child: child,
         ),
       ),
     );

@@ -22,26 +22,26 @@ class AssistantDraftReview extends StatefulWidget {
     required this.draft,
     required this.tools,
     required this.onChanged,
-    required this.onConfirm,
-    required this.onDiscard,
+    required this.invalidAmounts,
+    required this.onAmountValidityChanged,
     required this.disabled,
-    required this.saving,
     super.key,
   });
   final AssistantDraft draft;
   final AssistantTools tools;
   final ValueChanged<AssistantDraft> onChanged;
-  final VoidCallback onConfirm;
-  final VoidCallback onDiscard;
+  final Set<String> invalidAmounts;
+  final void Function(String itemId, bool valid) onAmountValidityChanged;
   final bool disabled;
-  final bool saving;
 
   @override
   State<AssistantDraftReview> createState() => _AssistantDraftReviewState();
 }
 
-class _AssistantDraftReviewState extends State<AssistantDraftReview> {
-  final Set<String> _invalidAmounts = {};
+class _AssistantDraftReviewState extends State<AssistantDraftReview>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
 
   void _replace(AssistantDraftItem replacement) => widget.onChanged(
     widget.draft.copyWith(
@@ -54,12 +54,13 @@ class _AssistantDraftReviewState extends State<AssistantDraftReview> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final l10n = AppLocalizations.of(context);
     final draft = widget.draft;
     final colors = Theme.of(context).colorScheme;
     final valid =
         draft.items.isNotEmpty &&
-        !_invalidAmounts.any(
+        !widget.invalidAmounts.any(
           (id) => draft.items.any((item) => item.id == id),
         ) &&
         draft.items.every(
@@ -105,18 +106,16 @@ class _AssistantDraftReviewState extends State<AssistantDraftReview> {
                     },
             ),
             const SizedBox(height: AppSpacing.sm),
-            IgnorePointer(
-              ignoring: widget.disabled,
-              child: YamSelectField<String>(
-                label: l10n.assistantMeal,
-                value: draft.mealId,
-                items: [
-                  for (final meal in buildFoodSearchPrototypeMeals(l10n))
-                    YamDropdownOption(value: meal.id, label: meal.name),
-                ],
-                onChanged: (meal) =>
-                    widget.onChanged(draft.copyWith(mealId: meal)),
-              ),
+            YamSelectField<String>(
+              label: l10n.assistantMeal,
+              value: draft.mealId,
+              items: [
+                for (final meal in buildFoodSearchPrototypeMeals(l10n))
+                  YamDropdownOption(value: meal.id, label: meal.name),
+              ],
+              onChanged: widget.disabled
+                  ? null
+                  : (meal) => widget.onChanged(draft.copyWith(mealId: meal)),
             ),
             const SizedBox(height: AppSpacing.md),
             for (final item in draft.items) ...[
@@ -125,15 +124,10 @@ class _AssistantDraftReviewState extends State<AssistantDraftReview> {
                 item: item,
                 disabled: widget.disabled,
                 onChanged: _replace,
-                onValidity: (valid) => setState(() {
-                  if (valid) {
-                    _invalidAmounts.remove(item.id);
-                  } else {
-                    _invalidAmounts.add(item.id);
-                  }
-                }),
+                onValidity: (valid) =>
+                    widget.onAmountValidityChanged(item.id, valid),
                 onRemove: () {
-                  _invalidAmounts.remove(item.id);
+                  widget.onAmountValidityChanged(item.id, true);
                   widget.onChanged(
                     draft.copyWith(
                       items: draft.items
@@ -193,19 +187,6 @@ class _AssistantDraftReviewState extends State<AssistantDraftReview> {
                   style: AppTypography.label.copyWith(color: colors.error),
                 ),
               ),
-            YamPrimaryButton(
-              key: const ValueKey('assistant-confirm-draft'),
-              label: draft.hasDiaryItems
-                  ? l10n.assistantAddToDiary
-                  : l10n.assistantSaveProducts,
-              expanded: true,
-              loading: widget.saving,
-              onPressed: widget.disabled || !valid ? null : widget.onConfirm,
-            ),
-            YamTextButton(
-              label: l10n.assistantDiscard,
-              onPressed: widget.disabled ? null : widget.onDiscard,
-            ),
           ],
         ),
       ),
@@ -300,88 +281,96 @@ class _DraftItemEditorState extends State<_DraftItemEditor> {
           ],
         ),
         const SizedBox(height: AppSpacing.sm),
-        IgnorePointer(
-          ignoring: widget.disabled,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              YamNumberField(
-                label: l10n.assistantAmount,
-                unit: '',
-                controller: _amount,
-                decimal: true,
-                style: YamNumberFieldStyle.prominent,
-                errorText: _valid ? null : l10n.createProductPositiveAmount,
-                onChanged: (text) {
-                  final amount = double.tryParse(text.replaceAll(',', '.'));
-                  final valid = amount != null && amount.isFinite && amount > 0;
-                  setState(() => _valid = valid);
-                  widget.onValidity(valid);
-                  if (valid) widget.onChanged(item.copyWith(amount: amount));
-                },
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              YamSelectField<String>(
-                label: l10n.assistantUnit,
-                value: item.servingId,
-                items: [
-                  for (final serving in item.food.servings)
-                    YamDropdownOption(
-                      value: serving.id,
-                      label: _servingLabel(l10n, serving),
-                    ),
-                ],
-                onChanged: (id) {
-                  final serving = item.food.serving(id);
-                  setState(() => _valid = true);
-                  widget.onValidity(true);
-                  widget.onChanged(
-                    item.copyWith(
-                      servingId: id,
-                      amount: item.canonicalQuantity / serving.baseAmount,
-                    ),
-                  );
-                },
-              ),
-              if (item.food.serving(item.servingId).baseAmount != 1)
-                Padding(
-                  padding: const EdgeInsets.only(top: AppSpacing.xs),
-                  child: Text(
-                    '${formatFoodSearchNumber(context, item.canonicalQuantity)} ${item.food.baseUnit == DiaryBaseUnit.grams ? l10n.unitGrams : l10n.unitMilliliters}',
-                    style: AppTypography.caption,
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            YamNumberField(
+              label: l10n.assistantAmount,
+              unit: '',
+              controller: _amount,
+              decimal: true,
+              style: YamNumberFieldStyle.prominent,
+              errorText: _valid ? null : l10n.createProductPositiveAmount,
+              onChanged: widget.disabled
+                  ? null
+                  : (text) {
+                      final amount = double.tryParse(text.replaceAll(',', '.'));
+                      final valid =
+                          amount != null && amount.isFinite && amount > 0;
+                      setState(() => _valid = valid);
+                      widget.onValidity(valid);
+                      if (valid) {
+                        widget.onChanged(item.copyWith(amount: amount));
+                      }
+                    },
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            YamSelectField<String>(
+              label: l10n.assistantUnit,
+              value: item.servingId,
+              items: [
+                for (final serving in item.food.servings)
+                  YamDropdownOption(
+                    value: serving.id,
+                    label: _servingLabel(l10n, serving),
                   ),
-                ),
-              if (item.newFood != null) ...[
-                CheckboxListTile(
-                  contentPadding: EdgeInsets.zero,
-                  dense: true,
-                  title: Text(
-                    l10n.assistantSaveToCatalog,
-                    style: AppTypography.label,
-                  ),
-                  value: item.saveToCatalog,
-                  onChanged: (value) =>
-                      widget.onChanged(item.copyWith(saveToCatalog: value)),
-                ),
-                CheckboxListTile(
-                  contentPadding: EdgeInsets.zero,
-                  dense: true,
-                  title: Text(
-                    l10n.assistantAddToDiary,
-                    style: AppTypography.label,
-                  ),
-                  value: item.addToDiary,
-                  onChanged: (value) =>
-                      widget.onChanged(item.copyWith(addToDiary: value)),
-                ),
-                YamTextButton(
-                  label: l10n.assistantEditProduct,
-                  icon: Icons.edit_outlined,
-                  onPressed: widget.onEdit,
-                ),
               ],
+              onChanged: widget.disabled
+                  ? null
+                  : (id) {
+                      final serving = item.food.serving(id);
+                      setState(() => _valid = true);
+                      widget.onValidity(true);
+                      widget.onChanged(
+                        item.copyWith(
+                          servingId: id,
+                          amount: item.canonicalQuantity / serving.baseAmount,
+                        ),
+                      );
+                    },
+            ),
+            if (item.food.serving(item.servingId).baseAmount != 1)
+              Padding(
+                padding: const EdgeInsets.only(top: AppSpacing.xs),
+                child: Text(
+                  '${formatFoodSearchNumber(context, item.canonicalQuantity)} ${item.food.baseUnit == DiaryBaseUnit.grams ? l10n.unitGrams : l10n.unitMilliliters}',
+                  style: AppTypography.caption,
+                ),
+              ),
+            if (item.newFood != null) ...[
+              CheckboxListTile(
+                contentPadding: EdgeInsets.zero,
+                dense: true,
+                title: Text(
+                  l10n.assistantSaveToCatalog,
+                  style: AppTypography.label,
+                ),
+                value: item.saveToCatalog,
+                onChanged: widget.disabled
+                    ? null
+                    : (value) =>
+                          widget.onChanged(item.copyWith(saveToCatalog: value)),
+              ),
+              CheckboxListTile(
+                contentPadding: EdgeInsets.zero,
+                dense: true,
+                title: Text(
+                  l10n.assistantAddToDiary,
+                  style: AppTypography.label,
+                ),
+                value: item.addToDiary,
+                onChanged: widget.disabled
+                    ? null
+                    : (value) =>
+                          widget.onChanged(item.copyWith(addToDiary: value)),
+              ),
+              YamTextButton(
+                label: l10n.assistantEditProduct,
+                icon: Icons.edit_outlined,
+                onPressed: widget.disabled ? null : widget.onEdit,
+              ),
             ],
-          ),
+          ],
         ),
         if (item.addToDiary)
           Padding(
@@ -409,9 +398,9 @@ class _NutritionLine extends StatelessWidget {
           style: AppTypography.productTitle,
         ),
         for (final entry in [
-          (l10n.macroProteinShort, nutrition.protein, macro.protein),
-          (l10n.macroFatShort, nutrition.fat, macro.fat),
-          (l10n.macroCarbsShort, nutrition.carbs, macro.carbs),
+          (l10n.macroProteinShort, nutrition.protein, macro.proteinText),
+          (l10n.macroFatShort, nutrition.fat, macro.fatText),
+          (l10n.macroCarbsShort, nutrition.carbs, macro.carbsText),
         ])
           Text(
             '${entry.$1} ${formatFoodSearchNumber(context, entry.$2)} ${l10n.unitGrams}',
@@ -610,11 +599,15 @@ class _NewFoodEditorState extends State<_NewFoodEditor> {
         ),
       ),
       actions: [
-        TextButton(
+        YamTextButton(
+          label: l10n.backupCancel,
           onPressed: () => Navigator.pop(context),
-          child: Text(l10n.backupCancel),
         ),
-        TextButton(onPressed: _save, child: Text(l10n.diaryEditSave)),
+        YamTextButton(
+          label: l10n.diaryEditSave,
+          tone: YamTextButtonTone.accent,
+          onPressed: _save,
+        ),
       ],
     );
   }

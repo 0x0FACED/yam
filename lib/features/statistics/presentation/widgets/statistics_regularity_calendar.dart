@@ -27,60 +27,74 @@ class StatisticsRegularityCalendar extends StatelessWidget {
     if (cells.isEmpty) return const SizedBox.shrink();
     final locale = Localizations.localeOf(context).toLanguageTag();
     final weekdays = DateFormat.E(locale).dateSymbols.SHORTWEEKDAYS;
-    const gap = AppSpacing.xxs / 2;
+    const minimumWidth =
+        DateTime.daysPerWeek * kMinInteractiveDimensionCupertino;
+    final leadingDays = cells.first.day.weekday - DateTime.monday;
     return LayoutBuilder(
       builder: (context, constraints) {
-        final width = math.max(
-          constraints.maxWidth,
-          7 * kMinInteractiveDimensionCupertino + 6 * gap,
-        );
-        final cellWidth = (width - 6 * gap) / 7;
-        return SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: SizedBox(
-            width: width,
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    for (var weekday = 1; weekday <= 7; weekday++)
-                      Expanded(
-                        child: Text(
-                          weekdays[weekday % 7],
-                          textAlign: TextAlign.center,
-                          style: AppTypography.caption.copyWith(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onSurfaceVariant,
-                          ),
+        final width = math.max(constraints.maxWidth, minimumWidth);
+        final calendar = SizedBox(
+          width: width,
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  for (
+                    var weekday = 1;
+                    weekday <= DateTime.daysPerWeek;
+                    weekday++
+                  )
+                    Expanded(
+                      child: Text(
+                        weekdays[weekday % DateTime.daysPerWeek],
+                        textAlign: TextAlign.center,
+                        style: AppTypography.caption.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ),
-                  ],
-                ),
+                    ),
+                ],
+              ),
+              for (
+                var start = -leadingDays;
+                start < cells.length;
+                start += DateTime.daysPerWeek
+              ) ...[
                 const SizedBox(height: AppSpacing.xxs),
-                Wrap(
-                  spacing: gap,
-                  runSpacing: AppSpacing.xxs,
+                Row(
                   children: [
-                    for (var i = 0; i < cells.first.day.weekday - 1; i++)
-                      SizedBox(width: cellWidth),
-                    for (final cell in cells)
-                      SizedBox(
-                        width: cellWidth,
-                        child: _RegularityDayTile(
-                          key: ValueKey(
-                            'stats-day-${cell.day.toIso8601String()}',
-                          ),
-                          cell: cell,
-                          semanticLabel: semanticLabelBuilder(cell),
-                          detailsBuilder: () => detailsBuilder(cell),
-                        ),
+                    for (
+                      var weekday = 0;
+                      weekday < DateTime.daysPerWeek;
+                      weekday++
+                    )
+                      Expanded(
+                        child:
+                            start + weekday < 0 ||
+                                start + weekday >= cells.length
+                            ? const SizedBox.shrink()
+                            : _RegularityDayTile(
+                                key: ValueKey(
+                                  'stats-day-${cells[start + weekday].day.toIso8601String()}',
+                                ),
+                                cell: cells[start + weekday],
+                                semanticLabel: semanticLabelBuilder(
+                                  cells[start + weekday],
+                                ),
+                                detailsBuilder: () =>
+                                    detailsBuilder(cells[start + weekday]),
+                              ),
                       ),
                   ],
                 ),
               ],
-            ),
+            ],
           ),
+        );
+        if (constraints.maxWidth >= minimumWidth) return calendar;
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: calendar,
         );
       },
     );
@@ -153,6 +167,7 @@ class _RegularityDayTileState extends State<_RegularityDayTile> {
       GoalDayStatus.within => semantic.goalWithin,
       GoalDayStatus.below => semantic.goalBelow,
       GoalDayStatus.above => semantic.goalAbove,
+      GoalDayStatus.noGoal => colors.surfaceContainerHighest,
       _ => colors.surface,
     };
     return Focus(
@@ -203,34 +218,57 @@ class _RegularityDayTileState extends State<_RegularityDayTile> {
             excludeSemantics: true,
             onTap: _toggle,
             child: Material(
-              color: background,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppRadius.small),
-                side: _overlay.isShowing
-                    ? BorderSide(color: colors.primary, width: 2)
-                    : BorderSide.none,
-              ),
-              clipBehavior: Clip.antiAlias,
+              color: Colors.transparent,
               child: InkWell(
                 focusNode: _focus,
                 onTap: _toggle,
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: math.max(
-                      kMinInteractiveDimensionCupertino,
-                      MediaQuery.textScalerOf(context).scale(16) +
-                          AppSpacing.sm,
+                borderRadius: BorderRadius.circular(AppRadius.small),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 1),
+                  child: Ink(
+                    decoration: ShapeDecoration(
+                      color: background,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppRadius.small),
+                        side: _overlay.isShowing
+                            ? BorderSide(color: colors.primary, width: 2)
+                            : BorderSide.none,
+                      ),
                     ),
-                  ),
-                  child: Center(
-                    child: Text(
-                      '${widget.cell.day.day}',
-                      style: AppTypography.caption.copyWith(
-                        color:
-                            widget.cell.status == GoalDayStatus.within ||
-                                widget.cell.status == GoalDayStatus.above
-                            ? colors.onPrimary
-                            : colors.onSurfaceVariant,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: math.max(
+                          kMinInteractiveDimensionCupertino,
+                          MediaQuery.textScalerOf(context).scale(16) +
+                              AppSpacing.sm,
+                        ),
+                      ),
+                      child: Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              '${widget.cell.day.day}',
+                              style: AppTypography.caption.copyWith(
+                                color:
+                                    widget.cell.status ==
+                                            GoalDayStatus.within ||
+                                        widget.cell.status ==
+                                            GoalDayStatus.above
+                                    ? colors.onPrimary
+                                    : colors.onSurfaceVariant,
+                              ),
+                            ),
+                            if (widget.cell.status == GoalDayStatus.noGoal) ...[
+                              const SizedBox(height: AppSpacing.xxs),
+                              Container(
+                                width: AppSpacing.sm,
+                                height: 2,
+                                color: colors.onSurfaceVariant,
+                              ),
+                            ],
+                          ],
+                        ),
                       ),
                     ),
                   ),

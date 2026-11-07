@@ -38,7 +38,7 @@ class YamDropdown<T> extends StatefulWidget {
 
   final T? value;
   final List<YamDropdownOption<T>> options;
-  final ValueChanged<T> onSelected;
+  final ValueChanged<T>? onSelected;
   final YamDropdownTriggerBuilder triggerBuilder;
 
   @override
@@ -51,11 +51,20 @@ class _YamDropdownState<T> extends State<YamDropdown<T>> {
   static const _maxHeight = _itemHeight * 7 + AppSpacing.xs;
 
   final _focusNode = FocusNode();
+  final _menuController = MenuController();
 
   @override
   void initState() {
     super.initState();
+    _focusNode.canRequestFocus = widget.onSelected != null;
     _focusNode.addListener(_focusChanged);
+  }
+
+  @override
+  void didUpdateWidget(YamDropdown<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _focusNode.canRequestFocus = widget.onSelected != null;
+    if (widget.onSelected == null) _menuController.close();
   }
 
   @override
@@ -77,6 +86,7 @@ class _YamDropdownState<T> extends State<YamDropdown<T>> {
             ? math.min(constraints.maxWidth, _maxWidth)
             : _maxWidth;
         return MenuAnchor(
+          controller: _menuController,
           childFocusNode: _focusNode,
           style: MenuStyle(
             backgroundColor: WidgetStatePropertyAll(colors.surfaceContainer),
@@ -103,6 +113,7 @@ class _YamDropdownState<T> extends State<YamDropdown<T>> {
           builder: (context, controller, _) => widget.triggerBuilder(
             context,
             () {
+              if (widget.onSelected == null) return;
               if (controller.isOpen) {
                 controller.close();
               } else {
@@ -129,7 +140,9 @@ class _YamDropdownState<T> extends State<YamDropdown<T>> {
       selected: selected,
       child: MenuItemButton(
         key: option.key,
-        onPressed: () => widget.onSelected(option.value),
+        onPressed: widget.onSelected == null
+            ? null
+            : () => widget.onSelected?.call(option.value),
         style: ButtonStyle(
           minimumSize: const WidgetStatePropertyAll(Size(0, _itemHeight)),
           padding: const WidgetStatePropertyAll(

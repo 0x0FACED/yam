@@ -143,9 +143,13 @@ class AssistantMessage {
     required this.text,
     this.image,
     this.hasImage = false,
+    this.sentAt,
   });
   final bool isUser;
   final String text;
   final AssistantImage? image;
   final bool hasImage;
+
+  /// UTC instant; absent for messages archived before timestamps were recorded.
+  final DateTime? sentAt;
 }

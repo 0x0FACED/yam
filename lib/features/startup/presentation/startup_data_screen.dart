@@ -19,14 +19,16 @@ class StartupDataScreen extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         child: access == OnboardingAccess.failure
-            ? YamFeedbackState(
-                icon: Icons.storage_rounded,
-                title: l10n.startupDataErrorTitle,
-                message: l10n.startupDataErrorMessage,
-                actionKey: const ValueKey('startup-data-retry'),
-                actionLabel: l10n.actionRetry,
-                onAction: onRetry,
-                error: true,
+            ? YamFeedbackViewport(
+                child: YamFeedbackState(
+                  icon: Icons.storage_rounded,
+                  title: l10n.startupDataErrorTitle,
+                  message: l10n.startupDataErrorMessage,
+                  actionKey: const ValueKey('startup-data-retry'),
+                  actionLabel: l10n.actionRetry,
+                  onAction: onRetry,
+                  error: true,
+                ),
               )
             : Center(
                 child: Semantics(

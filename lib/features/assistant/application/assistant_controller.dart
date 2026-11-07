@@ -63,7 +63,7 @@ class AssistantController extends ChangeNotifier {
   bool get storageDirty => _storageDirty;
 
   void setUseArchivedContext(bool value) {
-    if (_busy || _saving) return;
+    if (_saving) return;
     _useArchivedContext = value;
     notifyListeners();
   }
@@ -162,6 +162,8 @@ Look up existing food IDs and servings with tools. Never invent catalog IDs or c
 Clarify ambiguous food, raw versus cooked state, missing quantity, meal or unknown portion coefficients.
 Use an explicitly provided date/meal; otherwise use the selected context above. Dates are local, not UTC.
 Never equate milliliters to grams. Only product-specific servings define piece/glass/portion conversion.
+Use short serving labels such as "sandwich", "slice" or "cup". Never put weight, volume,
+numbers or estimate qualifiers in a serving label: baseAmount already defines one serving.
 For missing food, prepare a new product only from supplied label data or an EXPLICITLY disclosed estimate.
 For a plate photo, state assumptions and uncertainty, mark estimated nutrition isEstimated=true,
 ask about weight/ingredients when necessary. Never present a visual estimate as a measurement.
@@ -180,6 +182,7 @@ Use tool schemas exactly. If validation fails, fix the request or ask a question
       isUser: true,
       text: text.trim(),
       image: image,
+      sentAt: DateTime.now().toUtc(),
     );
     _messages.add(message);
     _pending = message;
@@ -209,6 +212,7 @@ Use tool schemas exactly. If validation fails, fix the request or ask a question
     final working = List<Map<String, dynamic>>.of(_history);
     final archiveContext = _archiveContext();
     if (archiveContext != null) working.add(archiveContext);
+    final instructions = _instructions;
     AssistantDraft? preparedDraft;
     if (_draft case final reviewed?) {
       working.add({
@@ -249,7 +253,7 @@ Use tool schemas exactly. If validation fails, fix the request or ask a question
         _streamingText = '';
         final response = await gateway.respond(
           model: model,
-          instructions: _instructions,
+          instructions: instructions,
           input: working,
           tools: tools.definitions,
           onText: (delta) {
@@ -269,11 +273,16 @@ Use tool schemas exactly. If validation fails, fix the request or ask a question
               .toList();
           final text = response.text.trim();
           if (text.isNotEmpty) {
-            _messages.add(AssistantMessage(isUser: false, text: text));
+            _messages.add(
+              AssistantMessage(
+                isUser: false,
+                text: text,
+                sentAt: DateTime.now().toUtc(),
+              ),
+            );
           }
           if (preparedDraft != null) _draft = preparedDraft;
           _pending = null;
-          _useArchivedContext = false;
           await _persist();
           return;
         }
@@ -339,7 +348,13 @@ Use tool schemas exactly. If validation fails, fix the request or ask a question
       'role': 'developer',
       'content': 'The user discarded the pending draft. Nothing was saved.',
     });
-    _messages.add(AssistantMessage(isUser: false, text: discardedNote));
+    _messages.add(
+      AssistantMessage(
+        isUser: false,
+        text: discardedNote,
+        sentAt: DateTime.now().toUtc(),
+      ),
+    );
     _storageDirty = true;
     _saving = true;
     notifyListeners();
@@ -370,7 +385,13 @@ Use tool schemas exactly. If validation fails, fix the request or ask a question
               ],
             })}. Do not add it again unless separately requested.',
       });
-      _messages.add(AssistantMessage(isUser: false, text: savedNote));
+      _messages.add(
+        AssistantMessage(
+          isUser: false,
+          text: savedNote,
+          sentAt: DateTime.now().toUtc(),
+        ),
+      );
       _storageDirty = true;
       await flush();
       return true;

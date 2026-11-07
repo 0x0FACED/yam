@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui' show Tristate;
 
 import 'package:drift/native.dart';
@@ -13,9 +14,221 @@ import 'package:yam/features/diary/data/diary_repository.dart';
 import 'package:yam/features/diary/domain/diary_entry.dart';
 import 'package:yam/features/diary/presentation/diary_screen.dart';
 import 'package:yam/features/statistics/data/statistics_repository.dart';
+import 'package:yam/features/statistics/domain/statistics_models.dart';
 import 'package:yam/l10n/generated/app_localizations.dart';
 
 void main() {
+  for (final source in ['day', 'goals', 'week']) {
+    for (final afterPayload in [false, true]) {
+      testWidgets(
+        '$source read error recovers on retry, loaded=$afterPayload',
+        (tester) async {
+          await _setWindowSize(tester, const Size(390, 844));
+          final database = YamDatabase(NativeDatabase.memory());
+          addTearDown(database.close);
+          final diary = _ControlledDiaryRepository(database);
+          final statistics = _ControlledCalendarRepository(database);
+          addTearDown(diary.close);
+          addTearDown(statistics.close);
+          final today = DateTime(2020, 9, 25);
+          await tester.pumpWidget(
+            _DiaryTestApp(
+              locale: const Locale('en'),
+              today: today,
+              repository: diary,
+              statisticsRepository: statistics,
+            ),
+          );
+          expect(find.byType(CircularProgressIndicator), findsOneWidget);
+          expect(find.text('No foods yet'), findsNothing);
+          void emit() {
+            diary.days.last.add([_readEntry(today)]);
+            statistics.goals.last.add(const []);
+            statistics.weeks.last.add(const []);
+          }
+
+          if (afterPayload) {
+            emit();
+            await tester.pumpAndSettle();
+            expect(find.text('Calendar food'), findsOneWidget);
+          }
+          final error = StateError('read unavailable');
+          switch (source) {
+            case 'day':
+              diary.days.last.addError(error);
+            case 'goals':
+              statistics.goals.last.addError(error);
+            case 'week':
+              statistics.weeks.last.addError(error);
+          }
+          await tester.pumpAndSettle();
+          expect(find.text('Diary could not be loaded'), findsOneWidget);
+          expect(find.text('Calendar food'), findsNothing);
+          expect(find.byType(CircularProgressIndicator), findsNothing);
+          expect(find.text('Consumed'), findsNothing);
+          expect(find.text('No foods yet'), findsNothing);
+          expect(find.byKey(const ValueKey('diary-add-food')), findsOneWidget);
+          await tester.tap(find.text('Retry'));
+          await tester.pump();
+          expect(diary.days.length, 2);
+          expect(statistics.goals.length, 2);
+          expect(statistics.weeks.length, 2);
+          expect(diary.requestedDays.last, today);
+          emit();
+          await tester.pumpAndSettle();
+          expect(find.text('Calendar food'), findsOneWidget);
+          expect(find.text('Diary could not be loaded'), findsNothing);
+          await tester.pumpWidget(const SizedBox.shrink());
+        },
+      );
+    }
+  }
+
+  testWidgets('late old day and week errors cannot replace the selected day', (
+    tester,
+  ) async {
+    await _setWindowSize(tester, const Size(390, 844));
+    final database = YamDatabase(NativeDatabase.memory());
+    addTearDown(database.close);
+    final diary = _ControlledDiaryRepository(database);
+    final statistics = _ControlledCalendarRepository(database);
+    addTearDown(diary.close);
+    addTearDown(statistics.close);
+    final today = DateTime(2020, 9, 28);
+    await tester.pumpWidget(
+      _DiaryTestApp(
+        locale: const Locale('en'),
+        today: today,
+        repository: diary,
+        statisticsRepository: statistics,
+      ),
+    );
+    diary.days.last.add([_readEntry(today)]);
+    statistics.goals.last.add(const []);
+    statistics.weeks.last.add(const []);
+    await tester.pumpAndSettle();
+    final oldDay = diary.days.last;
+    final oldWeek = statistics.weeks.last;
+    await tester.tap(find.byTooltip('Previous day'));
+    await tester.pump();
+    diary.days.last.add([_readEntry(DateTime(2020, 9, 27))]);
+    statistics.weeks.last.add(const []);
+    oldDay.addError(StateError('old day'));
+    oldWeek.addError(StateError('old week'));
+    await tester.pumpAndSettle();
+    expect(find.text('Calendar food'), findsOneWidget);
+    expect(find.text('Diary could not be loaded'), findsNothing);
+    diary.days.last.addError(StateError('current day'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Retry'));
+    await tester.pump();
+    expect(diary.requestedDays.last, DateTime(2020, 9, 27));
+    diary.days.last.add([_readEntry(DateTime(2020, 9, 27))]);
+    statistics.goals.last.add(const []);
+    statistics.weeks.last.add(const []);
+    await tester.pumpAndSettle();
+    expect(find.text('Calendar food'), findsOneWidget);
+    expect(find.text('Diary could not be loaded'), findsNothing);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
+  testWidgets('repository replacement resets a diary error for the same day', (
+    tester,
+  ) async {
+    await _setWindowSize(tester, const Size(390, 844));
+    final database = YamDatabase(NativeDatabase.memory());
+    addTearDown(database.close);
+    final old = _ControlledDiaryRepository(database);
+    final current = _ControlledDiaryRepository(database);
+    addTearDown(old.close);
+    addTearDown(current.close);
+    final day = DateTime(2020, 9, 25);
+    Widget app(DiaryRepository repository) => _DiaryTestApp(
+      locale: const Locale('en'),
+      today: day,
+      repository: repository,
+    );
+    await tester.pumpWidget(app(old));
+    old.days.last.addError(StateError('old repository'));
+    await tester.pumpAndSettle();
+    expect(find.text('Diary could not be loaded'), findsOneWidget);
+    await tester.pumpWidget(app(current));
+    expect(find.text('Diary could not be loaded'), findsNothing);
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    current.days.last.add([_readEntry(day)]);
+    old.days.last.addError(StateError('late old repository'));
+    await tester.pumpAndSettle();
+    expect(find.text('Calendar food'), findsOneWidget);
+    expect(find.text('Diary could not be loaded'), findsNothing);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
+  for (final source in ['day', 'goals', 'week']) {
+    testWidgets('open day details shows $source error and retries in place', (
+      tester,
+    ) async {
+      await _setWindowSize(tester, const Size(390, 844));
+      final database = YamDatabase(NativeDatabase.memory());
+      addTearDown(database.close);
+      final diary = _ControlledDiaryRepository(database);
+      final statistics = _ControlledCalendarRepository(database);
+      addTearDown(diary.close);
+      addTearDown(statistics.close);
+      final day = DateTime(2020, 9, 25);
+      await tester.pumpWidget(
+        _DiaryTestApp(
+          locale: const Locale('en'),
+          today: day,
+          repository: diary,
+          statisticsRepository: statistics,
+        ),
+      );
+      void emit() {
+        diary.days.last.add([_readEntry(day)]);
+        statistics.goals.last.add(const []);
+        statistics.weeks.last.add(const []);
+      }
+
+      emit();
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('diary-day-details')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('day-details-close')), findsOneWidget);
+      expect(find.text('Consumed'), findsOneWidget);
+      final error = StateError('read failed while details are open');
+      switch (source) {
+        case 'day':
+          diary.days.last.addError(error);
+        case 'goals':
+          statistics.goals.last.addError(error);
+        case 'week':
+          statistics.weeks.last.addError(error);
+      }
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('day-details-close')), findsOneWidget);
+      expect(find.text('Diary could not be loaded'), findsOneWidget);
+      expect(find.text('Consumed'), findsNothing);
+      expect(find.text('Calendar food'), findsNothing);
+      await tester.tap(find.text('Retry'));
+      await tester.pump();
+      expect(find.byKey(const ValueKey('day-details-close')), findsOneWidget);
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(find.text('Consumed'), findsNothing);
+      expect(diary.requestedDays.last, day);
+      emit();
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('day-details-close')), findsOneWidget);
+      expect(find.text('Diary could not be loaded'), findsNothing);
+      expect(find.text('Consumed'), findsOneWidget);
+      expect(find.text('Calendar food'), findsOneWidget);
+      await tester.tap(find.byKey(const ValueKey('day-details-close')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('day-details-close')), findsNothing);
+      expect(find.text('Calendar food'), findsOneWidget);
+      await tester.pumpWidget(const SizedBox.shrink());
+    });
+  }
+
   testWidgets('shows an empty current day and empty adjacent day', (
     tester,
   ) async {
@@ -511,3 +724,66 @@ DiaryEntryDraft _calendarDraft(DateTime day, double kcal) => DiaryEntryDraft(
   amount: kcal,
   canonicalQuantity: kcal,
 );
+
+DiaryEntry _readEntry(DateTime day) {
+  final draft = _calendarDraft(day, 100);
+  return DiaryEntry(
+    id: 'read-entry',
+    day: day,
+    mealId: draft.mealId,
+    food: draft.food,
+    servingId: draft.servingId,
+    amount: draft.amount,
+    canonicalQuantity: draft.canonicalQuantity,
+    nutrition: draft.food.nutritionFor(draft.canonicalQuantity),
+  );
+}
+
+class _ControlledDiaryRepository extends DiaryRepository {
+  _ControlledDiaryRepository(super.database);
+  final days = <StreamController<List<DiaryEntry>>>[];
+  final requestedDays = <DateTime>[];
+
+  @override
+  Stream<List<DiaryEntry>> watchDay(DateTime day) {
+    requestedDays.add(day);
+    final controller = StreamController<List<DiaryEntry>>.broadcast();
+    days.add(controller);
+    return controller.stream;
+  }
+
+  Future<void> close() async {
+    for (final controller in days) {
+      await controller.close();
+    }
+  }
+}
+
+class _ControlledCalendarRepository extends StatisticsRepository {
+  _ControlledCalendarRepository(super.database);
+  final goals = <StreamController<List<GoalVersion>>>[];
+  final weeks = <StreamController<List<NutritionDay>>>[];
+
+  @override
+  Stream<List<GoalVersion>> watchGoals() {
+    final controller = StreamController<List<GoalVersion>>.broadcast();
+    goals.add(controller);
+    return controller.stream;
+  }
+
+  @override
+  Stream<List<NutritionDay>> watchNutritionRange({
+    required DateTime start,
+    required DateTime end,
+  }) {
+    final controller = StreamController<List<NutritionDay>>.broadcast();
+    weeks.add(controller);
+    return controller.stream;
+  }
+
+  Future<void> close() async {
+    for (final controller in [...goals, ...weeks]) {
+      await controller.close();
+    }
+  }
+}

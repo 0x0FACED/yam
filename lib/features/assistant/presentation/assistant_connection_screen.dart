@@ -53,9 +53,10 @@ class _AssistantConnectionScreenState extends State<AssistantConnectionScreen> {
         title: Text(l10n.assistantPlanWelcomeTitle),
         content: Text(l10n.assistantPlanWelcome),
         actions: [
-          TextButton(
+          YamTextButton(
+            label: l10n.backupDone,
+            tone: YamTextButtonTone.accent,
             onPressed: () => Navigator.pop(context),
-            child: Text(l10n.backupDone),
           ),
         ],
       ),
@@ -115,24 +116,22 @@ class _AssistantConnectionScreenState extends State<AssistantConnectionScreen> {
                   ),
                   const SizedBox(height: AppSpacing.md),
                 ],
-                IgnorePointer(
-                  ignoring: connection.isLoading,
-                  child: YamSelectField<AssistantConnectionMode>(
-                    label: l10n.assistantConnectionMode,
-                    value: connection.mode,
-                    items: [
-                      YamDropdownOption(
-                        value: AssistantConnectionMode.chatgpt,
-                        label: l10n.assistantChatGpt,
-                      ),
-                      YamDropdownOption(
-                        value: AssistantConnectionMode.apiKey,
-                        label: l10n.assistantApiKey,
-                      ),
-                    ],
-                    onChanged: (mode) =>
-                        _act(() => connection.selectMode(mode)),
-                  ),
+                YamSelectField<AssistantConnectionMode>(
+                  label: l10n.assistantConnectionMode,
+                  value: connection.mode,
+                  items: [
+                    YamDropdownOption(
+                      value: AssistantConnectionMode.chatgpt,
+                      label: l10n.assistantChatGpt,
+                    ),
+                    YamDropdownOption(
+                      value: AssistantConnectionMode.apiKey,
+                      label: l10n.assistantApiKey,
+                    ),
+                  ],
+                  onChanged: connection.isLoading
+                      ? null
+                      : (mode) => _act(() => connection.selectMode(mode)),
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 Text(l10n.assistantChatGpt, style: AppTypography.sectionTitle),
@@ -149,21 +148,20 @@ class _AssistantConnectionScreenState extends State<AssistantConnectionScreen> {
                       (account) =>
                           account.clientId == connection.activeChatGptClientId,
                     )) ...[
-                  IgnorePointer(
-                    ignoring: connection.isLoading,
-                    child: YamSelectField<String>(
-                      label: l10n.assistantChatGptAccount,
-                      value: connection.activeChatGptClientId!,
-                      items: [
-                        for (final account in connection.savedChatGptAccounts)
-                          YamDropdownOption(
-                            value: account.clientId,
-                            label: account.label,
-                          ),
-                      ],
-                      onChanged: (id) =>
-                          _act(() => connection.selectChatGptAccount(id)),
-                    ),
+                  YamSelectField<String>(
+                    label: l10n.assistantChatGptAccount,
+                    value: connection.activeChatGptClientId!,
+                    items: [
+                      for (final account in connection.savedChatGptAccounts)
+                        YamDropdownOption(
+                          value: account.clientId,
+                          label: account.label,
+                        ),
+                    ],
+                    onChanged: connection.isLoading
+                        ? null
+                        : (id) =>
+                              _act(() => connection.selectChatGptAccount(id)),
                   ),
                   const SizedBox(height: AppSpacing.sm),
                 ],
@@ -237,21 +235,16 @@ class _AssistantConnectionScreenState extends State<AssistantConnectionScreen> {
                       (model) => model.id == connection.model,
                     )) ...[
                   const Divider(height: AppSpacing.xl),
-                  IgnorePointer(
-                    ignoring: connection.isLoading,
-                    child: YamSelectField<String>(
-                      label: l10n.assistantModel,
-                      value: connection.model!,
-                      items: [
-                        for (final model in connection.models)
-                          YamDropdownOption(
-                            value: model.id,
-                            label: model.label,
-                          ),
-                      ],
-                      onChanged: (model) =>
-                          _act(() => connection.selectModel(model)),
-                    ),
+                  YamSelectField<String>(
+                    label: l10n.assistantModel,
+                    value: connection.model!,
+                    items: [
+                      for (final model in connection.models)
+                        YamDropdownOption(value: model.id, label: model.label),
+                    ],
+                    onChanged: connection.isLoading
+                        ? null
+                        : (model) => _act(() => connection.selectModel(model)),
                   ),
                 ],
                 if (connection.isConnected) ...[

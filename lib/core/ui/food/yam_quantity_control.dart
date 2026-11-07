@@ -214,8 +214,8 @@ class YamQuickAmountPresets extends StatelessWidget {
               child: Row(
                 children: [
                   for (var index = 0; index < labels.length; index++) ...[
-                    SizedBox(
-                      width: itemWidth,
+                    ConstrainedBox(
+                      constraints: BoxConstraints(minWidth: itemWidth),
                       child: _AmountPresetButton(
                         label: labels[index],
                         selected: selectedIndex == index,
@@ -289,16 +289,19 @@ class YamNutritionSummary extends StatelessWidget {
           label: proteinLabel,
           value: proteinValue,
           color: semanticColors.protein,
+          textColor: semanticColors.proteinText,
         ),
         _NutritionMacro(
           label: fatLabel,
           value: fatValue,
           color: semanticColors.fat,
+          textColor: semanticColors.fatText,
         ),
         _NutritionMacro(
           label: carbsLabel,
           value: carbsValue,
           color: semanticColors.carbs,
+          textColor: semanticColors.carbsText,
         ),
       ],
     );
@@ -398,32 +401,29 @@ class _AmountPresetButton extends StatelessWidget {
           child: ConstrainedBox(
             constraints: const BoxConstraints(minHeight: 44),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxs),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
               child: Row(
+                mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  if (selected) ...[
-                    Icon(
-                      Icons.check_rounded,
-                      size: 14,
-                      color: theme.colorScheme.onPrimary,
-                    ),
-                    const SizedBox(width: 2),
-                  ],
-                  Flexible(
-                    child: Text(
-                      label,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                      style: AppTypography.label.copyWith(
-                        color: selected
-                            ? theme.colorScheme.onPrimary
-                            : theme.colorScheme.onSurfaceVariant,
-                        fontWeight: selected
-                            ? FontWeight.w700
-                            : FontWeight.w500,
-                      ),
+                  SizedBox(
+                    width: 16,
+                    child: selected
+                        ? Icon(
+                            Icons.check_rounded,
+                            size: 14,
+                            color: theme.colorScheme.onPrimary,
+                          )
+                        : null,
+                  ),
+                  Text(
+                    label,
+                    textAlign: TextAlign.center,
+                    style: AppTypography.label.copyWith(
+                      color: selected
+                          ? theme.colorScheme.onPrimary
+                          : theme.colorScheme.onSurfaceVariant,
+                      fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
                     ),
                   ),
                 ],
@@ -441,11 +441,13 @@ class _NutritionMacro extends StatelessWidget {
     required this.label,
     required this.value,
     required this.color,
+    required this.textColor,
   });
 
   final String label;
   final String value;
   final Color color;
+  final Color textColor;
 
   @override
   Widget build(BuildContext context) {
@@ -461,7 +463,7 @@ class _NutritionMacro extends StatelessWidget {
         Text(
           '$label $value',
           style: AppTypography.label.copyWith(
-            color: color,
+            color: textColor,
             fontWeight: FontWeight.w600,
             fontFeatures: AppTypography.tabularFigures,
           ),

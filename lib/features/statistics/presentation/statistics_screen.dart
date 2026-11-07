@@ -8,6 +8,7 @@ import 'package:yam/app/theme/app_semantic_colors.dart';
 import 'package:yam/app/theme/app_spacing.dart';
 import 'package:yam/app/theme/app_typography.dart';
 import 'package:yam/core/ui/buttons/yam_buttons.dart';
+import 'package:yam/core/ui/feedback/yam_feedback_state.dart';
 import 'package:yam/core/ui/feedback/yam_snack_bar.dart';
 import 'package:yam/core/ui/motion/yam_entrance_reveal.dart';
 import 'package:yam/core/ui/nutrition/yam_progress_bar.dart';
@@ -45,6 +46,14 @@ class _StatisticsScreenState extends State<StatisticsScreen>
   bool _weightsReady = false;
   bool _nutritionReady = false;
   bool _frequentReady = false;
+  bool _goalsError = false;
+  bool _weightsError = false;
+  bool _nutritionError = false;
+  bool _frequentError = false;
+  int _repositoryEpoch = 0;
+
+  bool get _readError =>
+      _goalsError || _weightsError || _nutritionError || _frequentError;
   int _rangeEpoch = 0;
   StatisticsSnapshot? _snapshot;
 
@@ -61,10 +70,6 @@ class _StatisticsScreenState extends State<StatisticsScreen>
   void didUpdateWidget(StatisticsScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.repository != widget.repository) {
-      _goalsSubscription?.cancel();
-      _weightsSubscription?.cancel();
-      _goalsReady = false;
-      _weightsReady = false;
       _subscribe();
     }
   }
@@ -75,12 +80,26 @@ class _StatisticsScreenState extends State<StatisticsScreen>
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     if (today != _today) {
-      _today = today;
-      _subscribePeriod();
+      setState(() {
+        _today = today;
+        if (_goalsError || _weightsError) {
+          _subscribe();
+        } else {
+          _subscribePeriod();
+        }
+      });
     }
   }
 
   void _subscribe() {
+    final epoch = ++_repositoryEpoch;
+    _goalsSubscription?.cancel();
+    _weightsSubscription?.cancel();
+    _goals = const [];
+    _weights = const [];
+    _goalsReady = _weightsReady = false;
+    _goalsError = _weightsError = false;
+    _snapshot = null;
     final repository = widget.repository;
     if (repository == null) {
       _goalsReady = _weightsReady = true;
@@ -89,26 +108,53 @@ class _StatisticsScreenState extends State<StatisticsScreen>
       _subscribePeriod();
       return;
     }
-    _goalsSubscription = repository.watchGoals().listen((goals) {
-      if (!mounted) return;
-      _goals = goals;
-      _goalsReady = true;
-      _recalculate();
-    });
-    _weightsSubscription = repository.watchWeights().listen((weights) {
-      if (!mounted) return;
-      _weights = weights;
-      _weightsReady = true;
-      _recalculate();
-    });
+    _goalsSubscription = repository.watchGoals().listen(
+      (goals) {
+        if (!mounted || epoch != _repositoryEpoch) return;
+        _goals = goals;
+        _goalsError = false;
+        _goalsReady = true;
+        _recalculate();
+      },
+      onError: (Object error, StackTrace stackTrace) {
+        if (!mounted || epoch != _repositoryEpoch) return;
+        setState(() {
+          _goalsError = true;
+          _goalsReady = false;
+          _goals = const [];
+          _snapshot = null;
+        });
+      },
+    );
+    _weightsSubscription = repository.watchWeights().listen(
+      (weights) {
+        if (!mounted || epoch != _repositoryEpoch) return;
+        _weights = weights;
+        _weightsError = false;
+        _weightsReady = true;
+        _recalculate();
+      },
+      onError: (Object error, StackTrace stackTrace) {
+        if (!mounted || epoch != _repositoryEpoch) return;
+        setState(() {
+          _weightsError = true;
+          _weightsReady = false;
+          _weights = const [];
+          _snapshot = null;
+        });
+      },
+    );
     _subscribePeriod();
   }
 
   void _subscribePeriod() {
+    final epoch = ++_rangeEpoch;
     _nutritionSubscription?.cancel();
     _frequentSubscription?.cancel();
-    final epoch = ++_rangeEpoch;
     _nutritionReady = _frequentReady = false;
+    _nutritionError = _frequentError = false;
+    _nutrition = const [];
+    _frequent = const [];
     _snapshot = null;
     final repository = widget.repository;
     if (repository == null) {
@@ -120,24 +166,49 @@ class _StatisticsScreenState extends State<StatisticsScreen>
     }
     _nutritionSubscription = repository
         .watchNutrition(today: _today, period: _period)
-        .listen((days) {
-          if (!mounted || epoch != _rangeEpoch) return;
-          _nutrition = days;
-          _nutritionReady = true;
-          _recalculate();
-        });
+        .listen(
+          (days) {
+            if (!mounted || epoch != _rangeEpoch) return;
+            _nutrition = days;
+            _nutritionError = false;
+            _nutritionReady = true;
+            _recalculate();
+          },
+          onError: (Object error, StackTrace stackTrace) {
+            if (!mounted || epoch != _rangeEpoch) return;
+            setState(() {
+              _nutritionError = true;
+              _nutritionReady = false;
+              _nutrition = const [];
+              _snapshot = null;
+            });
+          },
+        );
     _frequentSubscription = repository
         .watchFrequentFoods(today: _today, period: _period)
-        .listen((foods) {
-          if (!mounted || epoch != _rangeEpoch) return;
-          _frequent = foods;
-          _frequentReady = true;
-          _recalculate();
-        });
+        .listen(
+          (foods) {
+            if (!mounted || epoch != _rangeEpoch) return;
+            _frequent = foods;
+            _frequentError = false;
+            _frequentReady = true;
+            _recalculate();
+          },
+          onError: (Object error, StackTrace stackTrace) {
+            if (!mounted || epoch != _rangeEpoch) return;
+            setState(() {
+              _frequentError = true;
+              _frequentReady = false;
+              _frequent = const [];
+              _snapshot = null;
+            });
+          },
+        );
   }
 
   void _recalculate() {
     if (!mounted ||
+        _readError ||
         !_goalsReady ||
         !_weightsReady ||
         !_nutritionReady ||
@@ -158,9 +229,17 @@ class _StatisticsScreenState extends State<StatisticsScreen>
 
   void _selectPeriod(StatisticsPeriod period) {
     if (period == _period) return;
-    setState(() => _period = period);
-    _subscribePeriod();
+    setState(() {
+      _period = period;
+      if (_goalsError || _weightsError) {
+        _subscribe();
+      } else {
+        _subscribePeriod();
+      }
+    });
   }
+
+  void _retryReads() => setState(_subscribe);
 
   @override
   void dispose() {
@@ -337,15 +416,26 @@ class _StatisticsScreenState extends State<StatisticsScreen>
                 constraints.maxWidth >= AppBreakpoints.navigationRail
                 ? AppSpacing.xl
                 : AppSpacing.md;
+            final calendarPadding =
+                ((constraints.maxWidth - DateTime.daysPerWeek * 44) / 2).clamp(
+                  0.0,
+                  padding,
+                );
+            Widget insetContent(Widget child) => Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: padding - calendarPadding,
+              ),
+              child: child,
+            );
             return CustomScrollView(
               key: const ValueKey('statistics-scroll-view'),
               physics: const AlwaysScrollableScrollPhysics(),
               slivers: [
                 SliverPadding(
                   padding: EdgeInsets.fromLTRB(
-                    padding,
+                    calendarPadding,
                     AppSpacing.md,
-                    padding,
+                    calendarPadding,
                     AppSpacing.xl,
                   ),
                   sliver: SliverToBoxAdapter(
@@ -357,33 +447,50 @@ class _StatisticsScreenState extends State<StatisticsScreen>
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            Wrap(
-                              crossAxisAlignment: WrapCrossAlignment.center,
-                              spacing: AppSpacing.xs,
-                              children: [
-                                Text(
-                                  l10n.statisticsTitle,
-                                  style: AppTypography.screenTitle.copyWith(
-                                    color: theme.colorScheme.onSurface,
-                                  ),
-                                ),
-                                if (snapshot != null)
+                            insetContent(
+                              Wrap(
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                spacing: AppSpacing.xs,
+                                children: [
                                   Text(
-                                    _periodDates(snapshot),
-                                    style: AppTypography.label.copyWith(
-                                      color: theme.colorScheme.onSurfaceVariant,
+                                    l10n.statisticsTitle,
+                                    style: AppTypography.screenTitle.copyWith(
+                                      color: theme.colorScheme.onSurface,
                                     ),
                                   ),
-                              ],
+                                  if (snapshot != null)
+                                    Text(
+                                      _periodDates(snapshot),
+                                      style: AppTypography.label.copyWith(
+                                        color:
+                                            theme.colorScheme.onSurfaceVariant,
+                                      ),
+                                    ),
+                                ],
+                              ),
                             ),
                             const SizedBox(height: AppSpacing.sm),
-                            _buildPeriodSelector(l10n),
+                            insetContent(_buildPeriodSelector(l10n)),
                             const SizedBox(height: AppSpacing.lg),
-                            if (snapshot == null)
-                              Center(
-                                child: Semantics(
-                                  label: l10n.statsLoading,
-                                  child: const CircularProgressIndicator(),
+                            if (_readError)
+                              insetContent(
+                                YamFeedbackState(
+                                  icon: Icons.error_outline_rounded,
+                                  title: l10n.statsReadErrorTitle,
+                                  message: l10n.statsReadErrorMessage,
+                                  actionLabel: l10n.actionRetry,
+                                  actionIcon: Icons.refresh_rounded,
+                                  onAction: _retryReads,
+                                  error: true,
+                                ),
+                              )
+                            else if (snapshot == null)
+                              insetContent(
+                                Center(
+                                  child: Semantics(
+                                    label: l10n.statsLoading,
+                                    child: const CircularProgressIndicator(),
+                                  ),
                                 ),
                               )
                             else ...[
@@ -442,15 +549,15 @@ class _StatisticsScreenState extends State<StatisticsScreen>
                                         )
                                       : Column(
                                           children: [
-                                            weight,
+                                            insetContent(weight),
                                             const SizedBox(
                                               height: AppSpacing.md,
                                             ),
-                                            calories,
+                                            insetContent(calories),
                                             const SizedBox(
                                               height: AppSpacing.md,
                                             ),
-                                            macros,
+                                            insetContent(macros),
                                             const SizedBox(
                                               height: AppSpacing.md,
                                             ),
@@ -460,10 +567,12 @@ class _StatisticsScreenState extends State<StatisticsScreen>
                                 },
                               ),
                               const SizedBox(height: AppSpacing.md),
-                              YamEntranceReveal(
-                                index: 4,
-                                replayKey: _rangeEpoch,
-                                child: _frequentCard(snapshot, l10n),
+                              insetContent(
+                                YamEntranceReveal(
+                                  index: 4,
+                                  replayKey: _rangeEpoch,
+                                  child: _frequentCard(snapshot, l10n),
+                                ),
                               ),
                             ],
                           ],
@@ -778,6 +887,7 @@ class _StatisticsScreenState extends State<StatisticsScreen>
               consumed: data.averageProtein!,
               goal: data.averageProteinTarget,
               color: semantic.protein,
+              textColor: semantic.proteinText,
             ),
             const SizedBox(height: AppSpacing.md),
             _MacroMetric(
@@ -785,6 +895,7 @@ class _StatisticsScreenState extends State<StatisticsScreen>
               consumed: data.averageFat!,
               goal: data.averageFatTarget,
               color: semantic.fat,
+              textColor: semantic.fatText,
             ),
             const SizedBox(height: AppSpacing.md),
             _MacroMetric(
@@ -792,6 +903,7 @@ class _StatisticsScreenState extends State<StatisticsScreen>
               consumed: data.averageCarbs!,
               goal: data.averageCarbsTarget,
               color: semantic.carbs,
+              textColor: semantic.carbsText,
             ),
           ],
         ],
@@ -802,67 +914,94 @@ class _StatisticsScreenState extends State<StatisticsScreen>
   Widget _regularityCard(StatisticsSnapshot data, AppLocalizations l10n) {
     final colors = Theme.of(context).colorScheme;
     final semantic = AppSemanticColors.of(context);
+    Widget insetContent(Widget child) => Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+      child: child,
+    );
     return _StatsPanel(
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            l10n.statsRegularity,
-            style: AppTypography.sectionTitle.copyWith(color: colors.onSurface),
+          insetContent(
+            Text(
+              l10n.statsRegularity,
+              style: AppTypography.sectionTitle.copyWith(
+                color: colors.onSurface,
+              ),
+            ),
           ),
           const SizedBox(height: AppSpacing.xs),
           if (data.days.isEmpty)
-            _EmptyInCard(title: l10n.statsNoNutrition, message: '')
+            insetContent(
+              _EmptyInCard(title: l10n.statsNoNutrition, message: ''),
+            )
           else ...[
-            Text(
-              data.goalEvaluatedDays == 0
-                  ? l10n.statsNoGoalDays
-                  : l10n.statsGoalDaysSummary(
-                      _format(data.withinGoalDays),
-                      _format(data.goalEvaluatedDays),
-                      _format(data.withinGoalPercent),
-                    ),
-              style: AppTypography.label.copyWith(
-                color: colors.onSurfaceVariant,
+            insetContent(
+              Text(
+                data.goalEvaluatedDays == 0
+                    ? l10n.statsNoGoalDays
+                    : l10n.statsGoalDaysSummary(
+                        _format(data.withinGoalDays),
+                        _format(data.goalEvaluatedDays),
+                        _format(data.withinGoalPercent),
+                      ),
+                style: AppTypography.label.copyWith(
+                  color: colors.onSurfaceVariant,
+                ),
               ),
             ),
             const SizedBox(height: AppSpacing.sm),
             if (data.heatmap.isNotEmpty) ...[
-              Text(
-                l10n.statsWindow(
-                  _date(data.heatmap.first.day),
-                  _date(data.heatmap.last.day),
-                ),
-                style: AppTypography.caption.copyWith(
-                  color: colors.onSurfaceVariant,
+              insetContent(
+                Text(
+                  l10n.statsWindow(
+                    _date(data.heatmap.first.day),
+                    _date(data.heatmap.last.day),
+                  ),
+                  style: AppTypography.caption.copyWith(
+                    color: colors.onSurfaceVariant,
+                  ),
                 ),
               ),
               const SizedBox(height: AppSpacing.xs),
-              StatisticsRegularityCalendar(
-                key: ValueKey('stats-calendar-${_period.name}'),
-                cells: data.heatmap,
-                detailsBuilder: _regularityDetails,
-                semanticLabelBuilder: (cell) =>
-                    '${_fullDate(cell.day)}, ${_statusLabel(cell.status, l10n)}',
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final inset =
+                      ((constraints.maxWidth - DateTime.daysPerWeek * 44) / 2)
+                          .clamp(0.0, AppSpacing.md);
+                  return Padding(
+                    padding: EdgeInsets.symmetric(horizontal: inset),
+                    child: StatisticsRegularityCalendar(
+                      key: ValueKey('stats-calendar-${_period.name}'),
+                      cells: data.heatmap,
+                      detailsBuilder: _regularityDetails,
+                      semanticLabelBuilder: (cell) =>
+                          '${_fullDate(cell.day)}, ${_statusLabel(cell.status, l10n)}',
+                    ),
+                  );
+                },
               ),
               const SizedBox(height: AppSpacing.sm),
-              Wrap(
-                spacing: AppSpacing.sm,
-                runSpacing: AppSpacing.xs,
-                children: [
-                  _Legend(
-                    color: semantic.goalWithin,
-                    label: l10n.statsGoalWithin,
-                  ),
-                  _Legend(
-                    color: semantic.goalBelow,
-                    label: l10n.statsGoalBelow,
-                  ),
-                  _Legend(
-                    color: semantic.goalAbove,
-                    label: l10n.statsGoalAbove,
-                  ),
-                ],
+              insetContent(
+                Wrap(
+                  spacing: AppSpacing.sm,
+                  runSpacing: AppSpacing.xs,
+                  children: [
+                    _Legend(
+                      color: semantic.goalWithin,
+                      label: l10n.statsGoalWithin,
+                    ),
+                    _Legend(
+                      color: semantic.goalBelow,
+                      label: l10n.statsGoalBelow,
+                    ),
+                    _Legend(
+                      color: semantic.goalAbove,
+                      label: l10n.statsGoalAbove,
+                    ),
+                  ],
+                ),
               ),
             ],
           ],
@@ -974,8 +1113,12 @@ class _StatisticsScreenState extends State<StatisticsScreen>
 }
 
 class _StatsPanel extends StatelessWidget {
-  const _StatsPanel({required this.child});
+  const _StatsPanel({
+    required this.child,
+    this.padding = const EdgeInsets.all(AppSpacing.md),
+  });
   final Widget child;
+  final EdgeInsets padding;
 
   @override
   Widget build(BuildContext context) => DecoratedBox(
@@ -983,7 +1126,7 @@ class _StatsPanel extends StatelessWidget {
       color: Theme.of(context).colorScheme.surfaceContainer,
       borderRadius: BorderRadius.circular(AppRadius.card),
     ),
-    child: Padding(padding: const EdgeInsets.all(AppSpacing.md), child: child),
+    child: Padding(padding: padding, child: child),
   );
 }
 
@@ -993,11 +1136,13 @@ class _MacroMetric extends StatelessWidget {
     required this.consumed,
     required this.goal,
     required this.color,
+    required this.textColor,
   });
   final String label;
   final double consumed;
   final double? goal;
   final Color color;
+  final Color textColor;
 
   @override
   Widget build(BuildContext context) {
@@ -1013,7 +1158,7 @@ class _MacroMetric extends StatelessWidget {
             Expanded(
               child: Text(
                 label,
-                style: AppTypography.label.copyWith(color: color),
+                style: AppTypography.label.copyWith(color: textColor),
               ),
             ),
             Text(

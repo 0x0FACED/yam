@@ -131,17 +131,17 @@ class YamProductRow extends StatelessWidget {
                           _MacroValue(
                             label: proteinLabel,
                             value: proteinValue,
-                            color: semanticColors.protein,
+                            color: semanticColors.proteinText,
                           ),
                           _MacroValue(
                             label: fatLabel,
                             value: fatValue,
-                            color: semanticColors.fat,
+                            color: semanticColors.fatText,
                           ),
                           _MacroValue(
                             label: carbsLabel,
                             value: carbsValue,
-                            color: semanticColors.carbs,
+                            color: semanticColors.carbsText,
                           ),
                         ],
                       ),

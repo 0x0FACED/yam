@@ -4,12 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:yam/app/session/session_profile.dart';
 import 'package:yam/app/theme/app_motion.dart';
+import 'package:yam/app/theme/app_radius.dart';
 import 'package:yam/app/theme/app_semantic_colors.dart';
 import 'package:yam/app/theme/app_spacing.dart';
 import 'package:yam/app/theme/app_typography.dart';
 import 'package:yam/core/ui/buttons/yam_buttons.dart';
+import 'package:yam/core/ui/buttons/yam_floating_actions.dart';
 import 'package:yam/core/ui/forms/yam_goal_slider_field.dart';
 import 'package:yam/core/ui/forms/yam_number_field.dart';
+import 'package:yam/core/ui/layout/yam_floating_layout.dart';
 import 'package:yam/core/ui/navigation/yam_step_progress.dart';
 import 'package:yam/core/ui/selection/yam_choice_card.dart';
 import 'package:yam/features/backup/data/backup_file_service.dart';
@@ -242,84 +245,108 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     ),
                   ),
                   Expanded(
-                    child: PageView(
-                      controller: _pageController,
-                      physics: const NeverScrollableScrollPhysics(),
-                      children: [
-                        _buildPage(
-                          index: 0,
-                          title: l10n.onboardingGoalTitle,
-                          description: l10n.onboardingGoalDescription,
-                          content: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              _buildGoalChoices(l10n),
-                              if (widget.requiredFirstRun &&
-                                  widget.backupRepository != null) ...[
-                                const SizedBox(height: AppSpacing.md),
-                                BackupImportButton(
-                                  repository: widget.backupRepository!,
-                                  files:
-                                      widget.backupFiles ??
-                                      const BackupFileService(),
-                                  onImported: widget.onBackupImported,
-                                  onBusyChanged: (busy) {
-                                    if (mounted) {
-                                      setState(() => _restoring = busy);
-                                    }
-                                  },
-                                ),
+                    child: YamFloatingLayout(
+                      contentBuilder: (context, bottomClearance) => PageView(
+                        controller: _pageController,
+                        physics: const NeverScrollableScrollPhysics(),
+                        children: [
+                          _buildPage(
+                            index: 0,
+                            bottomClearance: bottomClearance,
+                            title: l10n.onboardingGoalTitle,
+                            description: l10n.onboardingGoalDescription,
+                            content: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                _buildGoalChoices(l10n),
+                                if (widget.requiredFirstRun &&
+                                    widget.backupRepository != null) ...[
+                                  const SizedBox(height: AppSpacing.md),
+                                  BackupImportButton(
+                                    repository: widget.backupRepository!,
+                                    files:
+                                        widget.backupFiles ??
+                                        const BackupFileService(),
+                                    onImported: widget.onBackupImported,
+                                    onBusyChanged: (busy) {
+                                      if (mounted) {
+                                        setState(() => _restoring = busy);
+                                      }
+                                    },
+                                  ),
+                                ],
                               ],
-                            ],
-                          ),
-                        ),
-                        _buildPage(
-                          index: 1,
-                          title: l10n.onboardingWeightTitle,
-                          description: l10n.onboardingWeightDescription,
-                          content: _buildWeightFields(l10n),
-                        ),
-                        _buildPage(
-                          index: 2,
-                          title: l10n.onboardingNutritionTitle,
-                          description: l10n.onboardingNutritionDescription,
-                          content: _buildNutritionFields(l10n),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(
-                      AppSpacing.md,
-                      AppSpacing.xs,
-                      AppSpacing.md,
-                      AppSpacing.lg,
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (_saveError != null)
-                          Text(
-                            _saveError!,
-                            style: AppTypography.caption.copyWith(
-                              color: Theme.of(context).colorScheme.error,
                             ),
                           ),
-                        YamPrimaryButton(
-                          key: const ValueKey('onboarding-continue'),
-                          label: _step == 2
-                              ? (_saving
-                                    ? l10n.createProductSaving
-                                    : l10n.onboardingStart)
-                              : l10n.onboardingContinue,
-                          trailingIcon: _step == 2
-                              ? null
-                              : Icons.arrow_forward_rounded,
-                          expanded: true,
-                          onPressed: _saving || _restoring ? null : _continue,
-                          loading: _saving,
+                          _buildPage(
+                            index: 1,
+                            bottomClearance: bottomClearance,
+                            title: l10n.onboardingWeightTitle,
+                            description: l10n.onboardingWeightDescription,
+                            content: _buildWeightFields(l10n),
+                          ),
+                          _buildPage(
+                            index: 2,
+                            bottomClearance: bottomClearance,
+                            title: l10n.onboardingNutritionTitle,
+                            description: l10n.onboardingNutritionDescription,
+                            content: _buildNutritionFields(l10n),
+                          ),
+                        ],
+                      ),
+                      floating: YamFloatingActions(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (_saveError != null) ...[
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Material(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.errorContainer,
+                                  borderRadius: BorderRadius.circular(
+                                    AppRadius.small,
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(
+                                      AppSpacing.sm,
+                                    ),
+                                    child: Semantics(
+                                      liveRegion: true,
+                                      child: Text(
+                                        _saveError!,
+                                        style: AppTypography.caption.copyWith(
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onErrorContainer,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: AppSpacing.xs),
+                            ],
+                            YamPrimaryButton(
+                              key: const ValueKey('onboarding-continue'),
+                              label: _step == 2
+                                  ? (_saving
+                                        ? l10n.createProductSaving
+                                        : l10n.onboardingStart)
+                                  : l10n.onboardingContinue,
+                              trailingIcon: _step == 2
+                                  ? null
+                                  : Icons.arrow_forward_rounded,
+                              expanded: true,
+                              onPressed: _saving || _restoring
+                                  ? null
+                                  : _continue,
+                              loading: _saving,
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
                 ],
@@ -333,6 +360,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   Widget _buildPage({
     required int index,
+    required double bottomClearance,
     required String title,
     required String description,
     required Widget content,
@@ -340,11 +368,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final theme = Theme.of(context);
     return SingleChildScrollView(
       key: PageStorageKey('onboarding-page-$index'),
-      padding: const EdgeInsets.fromLTRB(
+      padding: EdgeInsets.fromLTRB(
         AppSpacing.md,
         AppSpacing.md,
         AppSpacing.md,
-        AppSpacing.lg,
+        AppSpacing.lg + bottomClearance,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

@@ -7,6 +7,7 @@ import 'package:yam/app/theme/app_semantic_colors.dart';
 import 'package:yam/app/theme/app_spacing.dart';
 import 'package:yam/app/theme/app_typography.dart';
 import 'package:yam/core/ui/buttons/yam_buttons.dart';
+import 'package:yam/core/ui/feedback/yam_feedback_state.dart';
 import 'package:yam/core/ui/nutrition/yam_progress_bar.dart';
 import 'package:yam/core/ui/selection/yam_selection_controls.dart';
 import 'package:yam/features/diary/domain/day_details.dart';
@@ -20,13 +21,15 @@ import 'package:yam/l10n/generated/app_localizations.dart';
 class DayDetailsScreen extends StatefulWidget {
   const DayDetailsScreen({
     required this.snapshot,
+    required this.onRetry,
     required this.today,
     required this.onEditEntry,
     required this.summaryHeroTag,
     super.key,
   });
 
-  final ValueListenable<DayDetailsSnapshot> snapshot;
+  final ValueListenable<AsyncSnapshot<DayDetailsSnapshot>> snapshot;
+  final VoidCallback onRetry;
   final DateTime today;
   final Future<void> Function(DiaryEntry) onEditEntry;
   final Object summaryHeroTag;
@@ -40,6 +43,7 @@ class _DayDetailsScreenState extends State<DayDetailsScreen> {
   final _foodScrollController = ScrollController();
   Locale? _locale;
   late _DayDisplay _display;
+  bool _hasDisplay = false;
   bool _byContribution = false;
   DayDetailsMetric _metric = DayDetailsMetric.calories;
 
@@ -78,12 +82,15 @@ class _DayDetailsScreenState extends State<DayDetailsScreen> {
   }
 
   void _prepareDisplay() {
-    if (_locale == null) return;
-    _display = _DayDisplay.prepare(
-      context,
-      widget.snapshot.value,
-      widget.today,
-    );
+    final snapshot = widget.snapshot.value;
+    if (_locale == null ||
+        snapshot.connectionState != ConnectionState.done ||
+        snapshot.hasError ||
+        !snapshot.hasData) {
+      return;
+    }
+    _display = _DayDisplay.prepare(context, snapshot.requireData, widget.today);
+    _hasDisplay = true;
   }
 
   @override
@@ -98,6 +105,11 @@ class _DayDetailsScreenState extends State<DayDetailsScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
+    final snapshot = widget.snapshot.value;
+    final ready =
+        snapshot.connectionState == ConnectionState.done &&
+        !snapshot.hasError &&
+        snapshot.hasData;
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -129,21 +141,23 @@ class _DayDetailsScreenState extends State<DayDetailsScreen> {
                                 style: AppTypography.screenTitle,
                               ),
                             ),
-                            const SizedBox(height: AppSpacing.xxs),
-                            Text(
-                              _display.date,
-                              style: AppTypography.body.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                            if (_display.isToday) ...[
+                            if (_hasDisplay) ...[
                               const SizedBox(height: AppSpacing.xxs),
                               Text(
-                                l10n.dayDetailsSoFar,
-                                style: AppTypography.label.copyWith(
-                                  color: theme.colorScheme.primary,
+                                _display.date,
+                                style: AppTypography.body.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
                                 ),
                               ),
+                              if (_display.isToday) ...[
+                                const SizedBox(height: AppSpacing.xxs),
+                                Text(
+                                  l10n.dayDetailsSoFar,
+                                  style: AppTypography.label.copyWith(
+                                    color: theme.colorScheme.primary,
+                                  ),
+                                ),
+                              ],
                             ],
                           ],
                         ),
@@ -162,21 +176,65 @@ class _DayDetailsScreenState extends State<DayDetailsScreen> {
                 Expanded(
                   child: LayoutBuilder(
                     builder: (context, constraints) {
-                      if (constraints.maxWidth < AppBreakpoints.wideDiary) {
-                        return _foodScroll(includeOverview: true);
-                      }
-                      return Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      return Stack(
+                        fit: StackFit.expand,
                         children: [
-                          Expanded(
-                            flex: 4,
-                            child: SingleChildScrollView(
-                              controller: _overviewScroll,
-                              padding: const EdgeInsets.all(AppSpacing.md),
-                              child: _overview(),
+                          if (_hasDisplay)
+                            ExcludeFocus(
+                              excluding: !ready,
+                              child: Offstage(
+                                offstage: !ready,
+                                child:
+                                    constraints.maxWidth <
+                                        AppBreakpoints.wideDiary
+                                    ? _foodScroll(includeOverview: true)
+                                    : Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Expanded(
+                                            flex: 4,
+                                            child: SingleChildScrollView(
+                                              controller: _overviewScroll,
+                                              padding: const EdgeInsets.all(
+                                                AppSpacing.md,
+                                              ),
+                                              child: _overview(),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            flex: 6,
+                                            child: _foodScroll(),
+                                          ),
+                                        ],
+                                      ),
+                              ),
                             ),
-                          ),
-                          Expanded(flex: 6, child: _foodScroll()),
+                          if (!ready)
+                            SingleChildScrollView(
+                              child: snapshot.hasError
+                                  ? YamFeedbackState(
+                                      icon: Icons.error_outline_rounded,
+                                      title: l10n.diaryReadErrorTitle,
+                                      message: l10n.diaryReadErrorMessage,
+                                      actionLabel: l10n.actionRetry,
+                                      actionIcon: Icons.refresh_rounded,
+                                      onAction: widget.onRetry,
+                                      error: true,
+                                    )
+                                  : Padding(
+                                      padding: const EdgeInsets.all(
+                                        AppSpacing.xl,
+                                      ),
+                                      child: Center(
+                                        child: Semantics(
+                                          label: l10n.startupDataLoading,
+                                          child:
+                                              const CircularProgressIndicator(),
+                                        ),
+                                      ),
+                                    ),
+                            ),
                         ],
                       );
                     },
@@ -504,9 +562,9 @@ class _EntryRow extends StatelessWidget {
     final colors = theme.colorScheme;
     final semantic = AppSemanticColors.of(context);
     final valueColor = switch (food.metric) {
-      DayDetailsMetric.protein => semantic.protein,
-      DayDetailsMetric.fat => semantic.fat,
-      DayDetailsMetric.carbs => semantic.carbs,
+      DayDetailsMetric.protein => semantic.proteinText,
+      DayDetailsMetric.fat => semantic.fatText,
+      DayDetailsMetric.carbs => semantic.carbsText,
       DayDetailsMetric.calories || null => colors.onSurface,
     };
     return Semantics(
@@ -596,21 +654,21 @@ class _MacroLabels extends StatelessWidget {
             Text(
               nutrition.protein,
               style: AppTypography.label.copyWith(
-                color: colors.protein,
+                color: colors.proteinText,
                 fontFeatures: AppTypography.tabularFigures,
               ),
             ),
             Text(
               nutrition.fat,
               style: AppTypography.label.copyWith(
-                color: colors.fat,
+                color: colors.fatText,
                 fontFeatures: AppTypography.tabularFigures,
               ),
             ),
             Text(
               nutrition.carbs,
               style: AppTypography.label.copyWith(
-                color: colors.carbs,
+                color: colors.carbsText,
                 fontFeatures: AppTypography.tabularFigures,
               ),
             ),

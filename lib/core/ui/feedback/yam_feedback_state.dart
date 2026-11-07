@@ -89,6 +89,23 @@ class YamFeedbackState extends StatelessWidget {
   }
 }
 
+/// Centers feedback when it fits and keeps its action reachable in low windows.
+class YamFeedbackViewport extends StatelessWidget {
+  const YamFeedbackViewport({required this.child, super.key});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, constraints) => SingleChildScrollView(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(minHeight: constraints.maxHeight),
+        child: child,
+      ),
+    ),
+  );
+}
+
 class YamProductRowSkeleton extends StatelessWidget {
   const YamProductRowSkeleton({super.key});
 

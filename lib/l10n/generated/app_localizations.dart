@@ -494,6 +494,18 @@ abstract class AppLocalizations {
   /// **'Diary'**
   String get diaryTitle;
 
+  /// No description provided for @diaryReadErrorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Diary could not be loaded'**
+  String get diaryReadErrorTitle;
+
+  /// No description provided for @diaryReadErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Entries or goals are unavailable. Try loading local diary data again.'**
+  String get diaryReadErrorMessage;
+
   /// No description provided for @dayDetailsTitle.
   ///
   /// In en, this message translates to:
@@ -983,14 +995,20 @@ abstract class AppLocalizations {
   /// No description provided for @createProductServingName.
   ///
   /// In en, this message translates to:
-  /// **'Name (optional)'**
+  /// **'Serving name (optional)'**
   String get createProductServingName;
 
   /// No description provided for @createProductServingNameHint.
   ///
   /// In en, this message translates to:
-  /// **'For example, bottle'**
+  /// **'For example, sandwich'**
   String get createProductServingNameHint;
+
+  /// No description provided for @createProductServingNameHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter just the name; set its weight or volume separately below.'**
+  String get createProductServingNameHelper;
 
   /// No description provided for @createProductServingAmount.
   ///
@@ -1705,6 +1723,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Loading statistics'**
   String get statsLoading;
+
+  /// No description provided for @statsReadErrorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Statistics could not be loaded'**
+  String get statsReadErrorTitle;
+
+  /// No description provided for @statsReadErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Some local data is unavailable. Try loading your statistics again.'**
+  String get statsReadErrorMessage;
 
   /// No description provided for @statsCurrentGoal.
   ///
@@ -2654,7 +2684,7 @@ abstract class AppLocalizations {
   /// No description provided for @assistantTitle.
   ///
   /// In en, this message translates to:
-  /// **'AI assistant'**
+  /// **'YAM'**
   String get assistantTitle;
 
   /// No description provided for @assistantSettings.
@@ -2714,19 +2744,19 @@ abstract class AppLocalizations {
   /// No description provided for @assistantUseHistory.
   ///
   /// In en, this message translates to:
-  /// **'Use saved history as context'**
+  /// **'Saved chat context'**
   String get assistantUseHistory;
 
   /// No description provided for @assistantUseHistoryNote.
   ///
   /// In en, this message translates to:
-  /// **'Only text from the last 12 messages, up to 12,000 characters, is sent with the next request. Photos and old tool calls are not sent.'**
+  /// **'Up to 12 messages / 12,000 characters. On for this chat.'**
   String get assistantUseHistoryNote;
 
   /// No description provided for @assistantHistoryOffNote.
   ///
   /// In en, this message translates to:
-  /// **'Archived messages are not sent. The new exchange still keeps its own context.'**
+  /// **'Saved messages are not sent.'**
   String get assistantHistoryOffNote;
 
   /// No description provided for @assistantHistoryStorageError.
@@ -3092,7 +3122,7 @@ abstract class AppLocalizations {
   /// No description provided for @assistantCloseNote.
   ///
   /// In en, this message translates to:
-  /// **'Chat text stays in local history. Attached photos, unfinished input and the unsaved draft will be discarded. Saved entries remain in the diary.'**
+  /// **'The current request will stop. Chat text stays in local history. Attached photos, unfinished input and the unsaved draft will be discarded. Saved entries remain in the diary.'**
   String get assistantCloseNote;
 
   /// No description provided for @assistantCloseConfirm.
@@ -3122,7 +3152,7 @@ abstract class AppLocalizations {
   /// No description provided for @assistantSwitchNote.
   ///
   /// In en, this message translates to:
-  /// **'Changing the connection starts a new conversation. Chat text stays in local history; attached photos, unfinished input and the unsaved draft will be discarded.'**
+  /// **'The current request will stop, and changing the connection starts a new conversation. Chat text stays in local history; attached photos, unfinished input and the unsaved draft will be discarded.'**
   String get assistantSwitchNote;
 
   /// No description provided for @assistantInvalidDraft.

@@ -1,15 +1,18 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:yam/app/theme/app_elevation.dart';
 import 'package:yam/app/theme/app_radius.dart';
 import 'package:yam/app/theme/app_spacing.dart';
 import 'package:yam/app/theme/app_breakpoints.dart';
 import 'package:yam/app/theme/app_typography.dart';
 import 'package:yam/core/data/yam_database.dart';
 import 'package:yam/core/ui/buttons/yam_buttons.dart';
+import 'package:yam/core/ui/buttons/yam_floating_actions.dart';
+import 'package:yam/core/ui/layout/yam_floating_layout.dart';
 import 'package:yam/core/ui/feedback/yam_snack_bar.dart';
 import 'package:yam/core/ui/selection/yam_dropdown.dart';
 import 'package:yam/features/assistant/application/assistant_controller.dart';
@@ -22,6 +25,7 @@ import 'package:yam/features/assistant/presentation/assistant_history_screen.dar
 import 'package:yam/features/assistant/presentation/assistant_failure_text.dart';
 import 'package:yam/features/assistant/presentation/assistant_message_bubble.dart';
 import 'package:yam/features/assistant/presentation/assistant_message_input.dart';
+import 'package:yam/features/assistant/presentation/assistant_thinking_indicator.dart';
 import 'package:yam/features/diary/data/diary_repository.dart';
 import 'package:yam/features/food_search/data/user_food_repository.dart';
 import 'package:yam/features/food_search/presentation/food_search_meals.dart';
@@ -53,17 +57,20 @@ class _AssistantScreenState extends State<AssistantScreen> {
   final _input = TextEditingController();
   final _inputFocus = FocusNode();
   final _scroll = ScrollController();
+  final _reviewKey = GlobalKey();
   late final AssistantMediaService _media;
   AssistantController? _controller;
   AssistantImage? _image;
   String? _mediaFailure;
   bool _mediaBusy = false;
   bool _allowPop = false;
-  bool _closePromptOpen = false;
+  bool _transitioning = false;
   bool _hasInput = false;
   bool _followTail = true;
   bool _tailScrollPending = false;
   bool _scrollingToTail = false;
+  String? _reviewDraftId;
+  final Set<String> _invalidDraftAmounts = {};
 
   @override
   void initState() {
@@ -74,7 +81,6 @@ class _AssistantScreenState extends State<AssistantScreen> {
     );
     widget.connection.addListener(_changed);
     _input.addListener(_inputChanged);
-    _inputFocus.addListener(_changed);
     _scroll.addListener(_scrollChanged);
     unawaited(_initializeConnection());
   }
@@ -118,6 +124,15 @@ class _AssistantScreenState extends State<AssistantScreen> {
 
   void _changed() {
     if (!mounted) return;
+    final draft = _controller?.draft;
+    if (_reviewDraftId != draft?.id) {
+      _reviewDraftId = draft?.id;
+      _invalidDraftAmounts.clear();
+    } else {
+      _invalidDraftAmounts.removeWhere(
+        (id) => draft == null || !draft.items.any((item) => item.id == id),
+      );
+    }
     setState(() {});
     _scheduleTailScroll();
   }
@@ -176,19 +191,20 @@ class _AssistantScreenState extends State<AssistantScreen> {
               switching ? l10n.assistantSwitchNote : l10n.assistantCloseNote,
             ),
             actions: [
-              TextButton(
+              YamTextButton(
+                label: l10n.assistantKeepEditing,
                 onPressed: () => Navigator.pop(context, false),
-                child: Text(l10n.assistantKeepEditing),
               ),
-              TextButton(
+              YamTextButton(
+                label: switching
+                    ? l10n.backupDone
+                    : clearing
+                    ? l10n.assistantClear
+                    : l10n.assistantCloseConfirm,
+                tone: switching
+                    ? YamTextButtonTone.accent
+                    : YamTextButtonTone.destructive,
                 onPressed: () => Navigator.pop(context, true),
-                child: Text(
-                  switching
-                      ? l10n.backupDone
-                      : clearing
-                      ? l10n.assistantClear
-                      : l10n.assistantCloseConfirm,
-                ),
               ),
             ],
           ),
@@ -196,34 +212,45 @@ class _AssistantScreenState extends State<AssistantScreen> {
         false;
   }
 
-  Future<void> _close() async {
-    if (_closePromptOpen || _controller?.saving == true) return;
-    _closePromptOpen = true;
-    final close = await _confirmDiscard();
-    _closePromptOpen = false;
-    if (!mounted || !close) return;
-    _controller?.cancel();
-    if (!await _controller!.flush() || !mounted) return;
-    setState(() => _allowPop = true);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) context.pop();
-    });
+  Future<void> _transition(Future<void> Function() action) async {
+    if (_transitioning || _controller!.saving || _mediaBusy) return;
+    setState(() => _transitioning = true);
+    _inputFocus.unfocus();
+    try {
+      await action();
+    } finally {
+      if (mounted) setState(() => _transitioning = false);
+    }
   }
 
-  Future<void> _connectionSettings() async {
-    if (_controller?.busy == true ||
-        _controller?.saving == true ||
-        _mediaBusy) {
-      return;
-    }
+  Future<void> _close() => _transition(() async {
+    if (!await _confirmDiscard() || !mounted) return;
+    _controller!.cancel();
+    await _media.cancelSpeech();
+    if (!await _controller!.flush() || !mounted) return;
+    setState(() => _allowPop = true);
+    await WidgetsBinding.instance.endOfFrame;
+    if (mounted) context.pop();
+  });
+
+  Future<void> _connectionSettings() => _transition(() async {
     if (!await _confirmDiscard(switching: true) || !mounted) return;
     await _clearSession();
     if (!mounted || _controller!.storageDirty) return;
     await context.push('/assistant/connection');
-  }
+  });
 
-  Future<void> _openHistory() async {
+  Future<void> _newConversation() => _transition(() async {
+    if (await _confirmDiscard(clearing: true) && mounted) {
+      await _clearSession();
+    }
+  });
+
+  Future<void> _openHistory() => _transition(() async {
     if (!await _confirmDiscard() || !mounted) return;
+    _controller!.cancel();
+    await _media.cancelSpeech();
+    if (!mounted) return;
     if (!await _controller!.flush() || !mounted) return;
     final id = await Navigator.of(context).push<String>(
       MaterialPageRoute(
@@ -248,9 +275,10 @@ class _AssistantScreenState extends State<AssistantScreen> {
     } catch (_) {
       if (mounted) setState(() => _mediaFailure = 'history_storage');
     }
-  }
+  });
 
   Future<void> _clearSession({bool persist = true}) async {
+    _controller?.cancel();
     if (persist && (!await _controller!.flush() || !mounted)) return;
     await _media.cancelSpeech();
     if (!mounted) return;
@@ -267,7 +295,8 @@ class _AssistantScreenState extends State<AssistantScreen> {
 
   Future<void> _send() async {
     final controller = _controller!;
-    if (controller.busy ||
+    if (_transitioning ||
+        controller.busy ||
         controller.saving ||
         _mediaBusy ||
         _media.isListening) {
@@ -285,6 +314,7 @@ class _AssistantScreenState extends State<AssistantScreen> {
   }
 
   Future<void> _pickPhoto({bool camera = false}) async {
+    if (_transitioning || _mediaBusy || _controller!.saving) return;
     setState(() {
       _mediaBusy = true;
       _mediaFailure = null;
@@ -304,7 +334,7 @@ class _AssistantScreenState extends State<AssistantScreen> {
   Future<bool> _pastePhoto() async {
     if (!mounted) return true;
     final controller = _controller!;
-    if (controller.busy ||
+    if (_transitioning ||
         controller.saving ||
         _mediaBusy ||
         _media.isListening) {
@@ -330,6 +360,7 @@ class _AssistantScreenState extends State<AssistantScreen> {
   }
 
   Future<void> _toggleVoice() async {
+    if (_transitioning || _mediaBusy || _controller!.saving) return;
     final locale = Localizations.localeOf(context).toLanguageTag();
     setState(() {
       _mediaBusy = true;
@@ -391,22 +422,46 @@ class _AssistantScreenState extends State<AssistantScreen> {
     final colors = Theme.of(context).colorScheme;
     final error =
         _mediaFailure ?? controller.failureCode ?? connection.failureCode;
-    final disabled = controller.busy || controller.saving || _mediaBusy;
+    final disabled = _transitioning || controller.saving || _mediaBusy;
     return PopScope<Object?>(
-      canPop: _allowPop || !_hasSession && !controller.saving,
+      canPop: _allowPop || !_hasSession && !disabled,
       onPopInvokedWithResult: (didPop, result) {
         if (!didPop) unawaited(_close());
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text(
-            l10n.assistantTitle,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+          toolbarHeight: math.max(
+            kToolbarHeight,
+            MediaQuery.textScalerOf(
+                      context,
+                    ).scale(AppTypography.screenTitle.fontSize!) *
+                    AppTypography.screenTitle.height! +
+                MediaQuery.textScalerOf(
+                      context,
+                    ).scale(AppTypography.caption.fontSize!) *
+                    AppTypography.caption.height! +
+                AppSpacing.sm,
+          ),
+          titleSpacing: AppSpacing.xxs,
+          title: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(l10n.appName, maxLines: 1, overflow: TextOverflow.ellipsis),
+              Text(
+                connection.isConnected && connection.model != null
+                    ? '${connection.mode == AssistantConnectionMode.chatgpt ? l10n.assistantChatGpt : l10n.assistantApiKey} · ${connection.model}'
+                    : l10n.assistantNotConnected,
+                style: AppTypography.caption.copyWith(
+                  color: colors.onSurfaceVariant,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
           ),
           leading: BackButton(onPressed: _close),
           actions: [
-            const SizedBox(width: AppSpacing.xs),
             YamIconButton(
               key: const ValueKey('assistant-history'),
               icon: Icons.history_rounded,
@@ -414,20 +469,12 @@ class _AssistantScreenState extends State<AssistantScreen> {
               surface: false,
               onPressed: disabled ? null : _openHistory,
             ),
-            const SizedBox(width: AppSpacing.xs),
             YamIconButton(
               icon: Icons.add_comment_outlined,
               tooltip: l10n.assistantClear,
               surface: false,
-              onPressed: disabled
-                  ? null
-                  : () async {
-                      if (await _confirmDiscard(clearing: true) && mounted) {
-                        await _clearSession();
-                      }
-                    },
+              onPressed: disabled ? null : _newConversation,
             ),
-            const SizedBox(width: AppSpacing.xs),
             YamIconButton(
               key: const ValueKey('assistant-connection-settings'),
               icon: Icons.tune_rounded,
@@ -435,7 +482,7 @@ class _AssistantScreenState extends State<AssistantScreen> {
               surface: false,
               onPressed: disabled ? null : _connectionSettings,
             ),
-            const SizedBox(width: AppSpacing.md),
+            const SizedBox(width: AppSpacing.xs),
           ],
         ),
         body: SafeArea(
@@ -446,256 +493,71 @@ class _AssistantScreenState extends State<AssistantScreen> {
               constraints: BoxConstraints(
                 maxWidth: controller.draft == null ? 720 : 1120,
               ),
-              child: Column(
-                children: [
-                  if (MediaQuery.viewInsetsOf(context).bottom == 0) ...[
-                    if (!connection.isConnected || connection.model == null)
-                      Padding(
-                        padding: const EdgeInsets.all(AppSpacing.md),
-                        child: YamPrimaryButton(
-                          label: l10n.assistantNotConnected,
-                          loading: connection.isLoading,
-                          onPressed: _connectionSettings,
-                          icon: Icons.link_rounded,
-                          expanded: true,
-                        ),
-                      )
-                    else
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.lg,
-                          vertical: AppSpacing.xs,
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                '${connection.mode == AssistantConnectionMode.chatgpt ? l10n.assistantChatGpt : l10n.assistantApiKey} · ${connection.model}',
-                                style: AppTypography.caption.copyWith(
-                                  color: colors.onSurfaceVariant,
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            if (connection.mode ==
-                                AssistantConnectionMode.chatgpt)
-                              YamIconButton(
-                                icon: Icons.open_in_new_rounded,
-                                tooltip: l10n.assistantManageUsage,
-                                surface: false,
-                                onPressed: () async {
-                                  try {
-                                    await launchUrl(
-                                      Uri.parse(
-                                        'https://chatgpt.com/settings/usage',
-                                      ),
-                                      mode: LaunchMode.externalApplication,
-                                    );
-                                  } catch (_) {
-                                    if (mounted) {
-                                      setState(() => _mediaFailure = 'network');
-                                    }
-                                  }
-                                },
-                              ),
-                          ],
-                        ),
-                      ),
-                  ],
-                  Expanded(
-                    child: LayoutBuilder(
-                      builder: (context, viewport) => Column(
+              child: LayoutBuilder(
+                builder: (context, viewport) {
+                  final draft = controller.draft;
+                  final wide = viewport.maxWidth >= 1040 && draft != null;
+                  return YamFloatingLayout(
+                    contentBuilder: (context, bottomClearance) {
+                      final chat = _conversation(
+                        bottomClearance,
+                        wide: wide,
+                        width: wide ? viewport.maxWidth / 2 : viewport.maxWidth,
+                      );
+                      if (!wide) return chat;
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
+                          Expanded(child: chat),
+                          const VerticalDivider(width: 1),
                           Expanded(
-                            child: LayoutBuilder(
-                              builder: (context, constraints) {
-                                final draft = controller.draft;
-                                final wide =
-                                    constraints.maxWidth >= 1040 &&
-                                    draft != null;
-                                final chat = NotificationListener<ScrollMetricsNotification>(
-                                  onNotification: (notification) {
-                                    if (notification.depth == 0) {
-                                      _scheduleTailScroll();
-                                    }
-                                    return false;
-                                  },
-                                  child: ListView.builder(
-                                    key: const ValueKey(
-                                      'assistant-conversation',
-                                    ),
-                                    controller: _scroll,
-                                    keyboardDismissBehavior:
-                                        ScrollViewKeyboardDismissBehavior
-                                            .onDrag,
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal:
-                                          constraints.maxWidth <
-                                              AppBreakpoints.navigationRail
-                                          ? AppSpacing.md
-                                          : AppSpacing.lg,
-                                      vertical: controller.messages.isEmpty
-                                          ? AppSpacing.xs
-                                          : AppSpacing.lg,
-                                    ),
-                                    itemCount:
-                                        controller.messages.length +
-                                        1 +
-                                        (!wide && draft != null ? 1 : 0),
-                                    itemBuilder: (context, index) {
-                                      if (index < controller.messages.length) {
-                                        return AssistantMessageBubble(
-                                          message: controller.messages[index],
-                                        );
-                                      }
-                                      if (index == controller.messages.length) {
-                                        return controller.busy
-                                            ? Semantics(
-                                                liveRegion: true,
-                                                child:
-                                                    controller
-                                                        .streamingText
-                                                        .isEmpty
-                                                    ? Padding(
-                                                        padding:
-                                                            const EdgeInsets.all(
-                                                              AppSpacing.md,
-                                                            ),
-                                                        child: Row(
-                                                          children: [
-                                                            Icon(
-                                                              Icons
-                                                                  .auto_awesome_outlined,
-                                                              size: 18,
-                                                              color: colors
-                                                                  .primary,
-                                                            ),
-                                                            const SizedBox(
-                                                              width:
-                                                                  AppSpacing.sm,
-                                                            ),
-                                                            Expanded(
-                                                              child: Text(
-                                                                l10n.assistantThinking,
-                                                                style: AppTypography
-                                                                    .body
-                                                                    .copyWith(
-                                                                      color: colors
-                                                                          .onSurfaceVariant,
-                                                                    ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      )
-                                                    : AssistantMessageBubble(
-                                                        message:
-                                                            AssistantMessage(
-                                                              isUser: false,
-                                                              text: controller
-                                                                  .streamingText,
-                                                            ),
-                                                      ),
-                                              )
-                                            : const SizedBox.shrink();
-                                      }
-                                      return _review(draft!);
-                                    },
-                                  ),
-                                );
-                                if (!wide) return chat;
-                                return Row(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: [
-                                    Expanded(child: chat),
-                                    const VerticalDivider(width: 1),
-                                    Expanded(
-                                      child: SingleChildScrollView(
-                                        padding: const EdgeInsets.all(
-                                          AppSpacing.md,
-                                        ),
-                                        child: _review(draft),
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            ),
-                          ),
-                          if (error != null)
-                            ConstrainedBox(
-                              constraints: BoxConstraints(
-                                maxHeight: viewport.maxHeight * 0.25,
+                            child: SingleChildScrollView(
+                              padding: EdgeInsets.fromLTRB(
+                                AppSpacing.md,
+                                AppSpacing.md,
+                                AppSpacing.md,
+                                bottomClearance,
                               ),
-                              child: SingleChildScrollView(
-                                child: Container(
-                                  margin: const EdgeInsets.symmetric(
-                                    horizontal: AppSpacing.md,
-                                    vertical: AppSpacing.xs,
-                                  ),
-                                  padding: const EdgeInsets.all(AppSpacing.sm),
-                                  decoration: BoxDecoration(
-                                    color: colors.errorContainer,
-                                    borderRadius: BorderRadius.circular(
-                                      AppRadius.control,
-                                    ),
-                                  ),
-                                  child: Semantics(
-                                    liveRegion: true,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.stretch,
-                                      children: [
-                                        Text(
-                                          assistantFailureText(l10n, error),
-                                          style: AppTypography.label.copyWith(
-                                            color: colors.onErrorContainer,
-                                          ),
-                                        ),
-                                        if (controller.canRetry)
-                                          Align(
-                                            alignment: Alignment.centerLeft,
-                                            child: YamTextButton(
-                                              label: l10n.assistantRetry,
-                                              onPressed:
-                                                  !controller.busy &&
-                                                      !controller.saving &&
-                                                      !_mediaBusy &&
-                                                      (controller
-                                                              .storageDirty ||
-                                                          connection
-                                                              .isConnected)
-                                                  ? controller.retry
-                                                  : null,
-                                            ),
-                                          ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ConstrainedBox(
-                            constraints: BoxConstraints(
-                              maxHeight:
-                                  viewport.maxHeight *
-                                  (error == null ? 1 : 0.75),
-                            ),
-                            child: _composer(
-                              disabled,
-                              inlineContext:
-                                  viewport.maxWidth >=
-                                  600 *
-                                      MediaQuery.textScalerOf(context).scale(1),
+                              child: _review(draft),
                             ),
                           ),
                         ],
-                      ),
-                    ),
-                  ),
-                ],
+                      );
+                    },
+                    floating: wide
+                        ? Row(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    if (error != null) _error(error),
+                                    _composer(disabled, inlineContext: false),
+                                  ],
+                                ),
+                              ),
+                              Expanded(child: _draftActions(draft, disabled)),
+                            ],
+                          )
+                        : Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (error != null) _error(error),
+                              if (draft != null) _draftActions(draft, disabled),
+                              _composer(
+                                disabled,
+                                inlineContext:
+                                    viewport.maxWidth >=
+                                    600 *
+                                        MediaQuery.textScalerOf(
+                                          context,
+                                        ).scale(1),
+                              ),
+                            ],
+                          ),
+                  );
+                },
               ),
             ),
           ),
@@ -704,22 +566,171 @@ class _AssistantScreenState extends State<AssistantScreen> {
     );
   }
 
+  Widget _conversation(
+    double bottomClearance, {
+    required bool wide,
+    required double width,
+  }) {
+    final controller = _controller!;
+    final draft = controller.draft;
+    return NotificationListener<ScrollMetricsNotification>(
+      onNotification: (notification) {
+        if (notification.depth == 0) _scheduleTailScroll();
+        return false;
+      },
+      child: ListView.builder(
+        key: const ValueKey('assistant-conversation'),
+        controller: _scroll,
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+        padding: EdgeInsets.fromLTRB(
+          width < AppBreakpoints.navigationRail ? AppSpacing.md : AppSpacing.lg,
+          controller.messages.isEmpty ? AppSpacing.xs : AppSpacing.lg,
+          width < AppBreakpoints.navigationRail ? AppSpacing.md : AppSpacing.lg,
+          bottomClearance,
+        ),
+        itemCount:
+            controller.messages.length + 1 + (!wide && draft != null ? 1 : 0),
+        itemBuilder: (context, index) {
+          if (index < controller.messages.length) {
+            return AssistantMessageBubble(message: controller.messages[index]);
+          }
+          if (index == controller.messages.length) {
+            return controller.busy
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const AssistantThinkingIndicator(),
+                      if (controller.streamingText.isNotEmpty)
+                        AssistantMessageBubble(
+                          message: AssistantMessage(
+                            isUser: false,
+                            text: controller.streamingText,
+                          ),
+                        ),
+                    ],
+                  )
+                : const SizedBox.shrink();
+          }
+          return _review(draft!);
+        },
+      ),
+    );
+  }
+
+  Widget _error(String error) {
+    final l10n = AppLocalizations.of(context);
+    final colors = Theme.of(context).colorScheme;
+    final controller = _controller!;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.sm,
+        AppSpacing.sm,
+        AppSpacing.sm,
+        AppSpacing.xs,
+      ),
+      child: Material(
+        key: const ValueKey('assistant-error'),
+        color: colors.errorContainer,
+        elevation: AppElevation.floatingAction,
+        shadowColor: AppElevation.floatingShadow(colors),
+        borderRadius: BorderRadius.circular(AppRadius.control),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.sm),
+          child: Semantics(
+            liveRegion: true,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  assistantFailureText(l10n, error),
+                  style: AppTypography.label.copyWith(
+                    color: colors.onErrorContainer,
+                  ),
+                ),
+                if (controller.canRetry)
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: YamTextButton(
+                      label: l10n.assistantRetry,
+                      onPressed:
+                          !_transitioning &&
+                              !controller.saving &&
+                              !_mediaBusy &&
+                              (controller.storageDirty ||
+                                  widget.connection.isConnected)
+                          ? controller.retry
+                          : null,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _draftActions(AssistantDraft draft, bool disabled) {
+    final l10n = AppLocalizations.of(context);
+    final valid =
+        draft.items.isNotEmpty &&
+        _invalidDraftAmounts.isEmpty &&
+        draft.items.every(
+          (item) =>
+              item.addToDiary || item.newFood != null && item.saveToCatalog,
+        );
+    return YamFloatingActions(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          YamPrimaryButton(
+            key: const ValueKey('assistant-confirm-draft'),
+            label: draft.hasDiaryItems
+                ? l10n.assistantAddToDiary
+                : l10n.assistantSaveProducts,
+            expanded: true,
+            loading: _controller!.saving,
+            onPressed: disabled || _controller!.busy || !valid
+                ? null
+                : _confirmDraft,
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          YamTextButton(
+            label: l10n.assistantDiscard,
+            onPressed: disabled || _controller!.busy
+                ? null
+                : _controller!.dismissDraft,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _confirmDraft() async {
+    final saved = await _controller!.confirm();
+    if (!mounted || !saved) return;
+    showYamSuccessSnackBar(
+      context: context,
+      message: AppLocalizations.of(context).assistantSaved,
+    );
+  }
+
   Widget _review(AssistantDraft draft) => AssistantDraftReview(
-    key: ValueKey(draft.id),
+    key: _reviewKey,
     draft: draft,
     tools: _controller!.tools,
-    disabled: _controller!.busy || _controller!.saving,
-    saving: _controller!.saving,
+    disabled: _transitioning || _controller!.busy || _controller!.saving,
+    invalidAmounts: _invalidDraftAmounts,
+    onAmountValidityChanged: (id, valid) => setState(() {
+      if (valid) {
+        _invalidDraftAmounts.remove(id);
+      } else {
+        _invalidDraftAmounts.add(id);
+      }
+    }),
     onChanged: _controller!.updateDraft,
-    onDiscard: _controller!.dismissDraft,
-    onConfirm: () async {
-      final saved = await _controller!.confirm();
-      if (!mounted || !saved) return;
-      showYamSuccessSnackBar(
-        context: context,
-        message: AppLocalizations.of(context).assistantSaved,
-      );
-    },
   );
 
   Widget _composer(bool disabled, {required bool inlineContext}) {
@@ -728,45 +739,47 @@ class _AssistantScreenState extends State<AssistantScreen> {
     final connected =
         widget.connection.isConnected && widget.connection.model != null;
     final colors = Theme.of(context).colorScheme;
-    final showContext =
-        controller.messages.isEmpty &&
-        MediaQuery.viewInsetsOf(context).bottom == 0;
+    // Keep context controls mounted while the keyboard changes the viewport.
+    // Scaffold is the sole owner of keyboard insets; do not tween them again.
     final send =
-        disabled ||
+        controller.busy ||
+            disabled ||
             !connected ||
             _media.isListening ||
             !_hasInput && _image == null
         ? null
         : _send;
-    return Container(
-      key: const ValueKey('assistant-composer'),
-      margin: const EdgeInsets.fromLTRB(
-        AppSpacing.md,
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.sm,
         AppSpacing.xxs,
-        AppSpacing.md,
-        AppSpacing.md,
+        AppSpacing.sm,
+        AppSpacing.sm,
       ),
-      padding: const EdgeInsets.all(AppSpacing.xs),
-      decoration: BoxDecoration(
-        color: colors.surface,
-        border: Border.all(
-          color: _inputFocus.hasFocus ? colors.primary : colors.outlineVariant,
-        ),
+      child: Material(
+        key: const ValueKey('assistant-composer'),
+        color: colors.surfaceContainerLow,
+        elevation: AppElevation.floatingAction,
+        shadowColor: AppElevation.floatingShadow(colors),
         borderRadius: BorderRadius.circular(AppRadius.card),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Flexible(
-            child: SingleChildScrollView(
-              child: Column(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.xs),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   if (controller.hasArchivedContext)
-                    SwitchListTile.adaptive(
+                    SwitchListTile(
                       key: const ValueKey('assistant-use-history'),
+                      dense: true,
+                      inactiveThumbColor: colors.onSurfaceVariant,
+                      inactiveTrackColor: colors.surfaceContainerHighest,
+                      activeThumbColor: colors.onPrimary,
+                      activeTrackColor: colors.primary,
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.xs,
                       ),
@@ -785,8 +798,7 @@ class _AssistantScreenState extends State<AssistantScreen> {
                           ? null
                           : controller.setUseArchivedContext,
                     ),
-                  if (showContext && !inlineContext)
-                    _contextSelectors(disabled),
+                  if (!inlineContext) _contextSelectors(disabled),
                   if (_image case final image?)
                     Padding(
                       padding: const EdgeInsets.all(AppSpacing.xs),
@@ -825,78 +837,79 @@ class _AssistantScreenState extends State<AssistantScreen> {
                         style: AppTypography.label,
                       ),
                     ),
-                  AssistantMessageInput(
-                    controller: _input,
-                    focusNode: _inputFocus,
-                    onPasteImage: _pastePhoto,
+                  AbsorbPointer(
+                    absorbing: _transitioning,
+                    child: AssistantMessageInput(
+                      controller: _input,
+                      focusNode: _inputFocus,
+                      onPasteImage: _pastePhoto,
+                    ),
                   ),
                 ],
               ),
-            ),
-          ),
-          const SizedBox(height: AppSpacing.xxs),
-          Row(
-            children: [
-              YamIconButton(
-                icon: Icons.photo_outlined,
-                tooltip: l10n.assistantPhoto,
-                surface: false,
-                onPressed: disabled || _media.isListening
-                    ? null
-                    : () => _pickPhoto(),
-              ),
-              const SizedBox(width: AppSpacing.xs),
-              if (Platform.isAndroid || Platform.isIOS) ...[
-                YamIconButton(
-                  icon: Icons.photo_camera_outlined,
-                  tooltip: l10n.assistantCamera,
-                  surface: false,
-                  onPressed: disabled || _media.isListening
-                      ? null
-                      : () => _pickPhoto(camera: true),
-                ),
-                const SizedBox(width: AppSpacing.xs),
-              ],
-              YamIconButton(
-                key: const ValueKey('assistant-microphone'),
-                icon: _media.isListening
-                    ? Icons.stop_circle_outlined
-                    : Icons.mic_none_rounded,
-                tooltip: _media.isListening
-                    ? l10n.assistantVoiceStop
-                    : l10n.assistantVoice,
-                surface: false,
-                selected: _media.isListening,
-                onPressed: disabled ? null : _toggleVoice,
-              ),
-              if (_mediaBusy)
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: AppSpacing.xs),
-                  child: SizedBox.square(
-                    dimension: AppSpacing.md,
-                    child: CircularProgressIndicator(strokeWidth: 2),
+              const SizedBox(height: AppSpacing.xxs),
+              Row(
+                children: [
+                  YamIconButton(
+                    icon: Icons.photo_outlined,
+                    tooltip: l10n.assistantPhoto,
+                    surface: false,
+                    onPressed: disabled || _media.isListening
+                        ? null
+                        : () => _pickPhoto(),
                   ),
-                ),
-              if (showContext && inlineContext) ...[
-                const SizedBox(width: AppSpacing.md),
-                _contextSelectors(disabled),
-              ],
-              const Spacer(),
-              YamIconButton(
-                key: const ValueKey('assistant-send'),
-                icon: controller.busy
-                    ? Icons.stop_rounded
-                    : Icons.arrow_upward_rounded,
-                tooltip: controller.busy
-                    ? l10n.assistantStop
-                    : l10n.assistantSend,
-                surface: false,
-                selected: !controller.busy && send != null,
-                onPressed: controller.busy ? controller.cancel : send,
+                  if (Platform.isAndroid || Platform.isIOS) ...[
+                    YamIconButton(
+                      icon: Icons.photo_camera_outlined,
+                      tooltip: l10n.assistantCamera,
+                      surface: false,
+                      onPressed: disabled || _media.isListening
+                          ? null
+                          : () => _pickPhoto(camera: true),
+                    ),
+                  ],
+                  YamIconButton(
+                    key: const ValueKey('assistant-microphone'),
+                    icon: _media.isListening
+                        ? Icons.stop_circle_outlined
+                        : Icons.mic_none_rounded,
+                    tooltip: _media.isListening
+                        ? l10n.assistantVoiceStop
+                        : l10n.assistantVoice,
+                    surface: false,
+                    selected: _media.isListening,
+                    onPressed: disabled ? null : _toggleVoice,
+                  ),
+                  if (_mediaBusy)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+                      child: SizedBox.square(
+                        dimension: AppSpacing.md,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    ),
+                  if (inlineContext) ...[
+                    const SizedBox(width: AppSpacing.xxs),
+                    _contextSelectors(disabled),
+                  ],
+                  const Spacer(),
+                  YamIconButton(
+                    key: const ValueKey('assistant-send'),
+                    icon: controller.busy
+                        ? Icons.stop_rounded
+                        : Icons.arrow_upward_rounded,
+                    tooltip: controller.busy
+                        ? l10n.assistantStop
+                        : l10n.assistantSend,
+                    surface: false,
+                    selected: !controller.busy && send != null,
+                    onPressed: controller.busy ? controller.cancel : send,
+                  ),
+                ],
               ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -939,7 +952,9 @@ class _AssistantScreenState extends State<AssistantScreen> {
             for (final meal in meals)
               YamDropdownOption(value: meal.id, label: meal.name),
           ],
-          onSelected: (meal) => setState(() => controller.mealId = meal),
+          onSelected: disabled
+              ? null
+              : (meal) => setState(() => controller.mealId = meal),
           triggerBuilder: (context, toggle, focusNode, isOpen) => Tooltip(
             message: l10n.assistantMeal,
             child: TextButton(

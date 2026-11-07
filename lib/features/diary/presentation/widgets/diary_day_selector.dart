@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:yam/app/theme/app_motion.dart';
@@ -120,28 +122,89 @@ class DiaryDaySelector extends StatelessWidget {
           ],
         ),
         const SizedBox(height: AppSpacing.xs),
-        Row(
+        _DiaryWeekStrip(
+          selectedDay: selectedDay,
           children: [
             for (
               var day = startOfWeek;
               !day.isAfter(endOfWeek);
               day = DateTime(day.year, day.month, day.day + 1)
             )
-              Expanded(
-                child: _DayTile(
-                  day: day,
-                  status: dayStatuses[day] ?? GoalDayStatus.noEntry,
-                  selectedDay: selectedDay,
-                  today: today,
-                  locale: locale,
-                  onSelected: onDaySelected,
-                ),
+              _DayTile(
+                day: day,
+                status: dayStatuses[day] ?? GoalDayStatus.noEntry,
+                selectedDay: selectedDay,
+                today: today,
+                locale: locale,
+                onSelected: onDaySelected,
               ),
           ],
         ),
       ],
     );
   }
+}
+
+class _DiaryWeekStrip extends StatefulWidget {
+  const _DiaryWeekStrip({required this.selectedDay, required this.children});
+
+  final DateTime selectedDay;
+  final List<Widget> children;
+
+  @override
+  State<_DiaryWeekStrip> createState() => _DiaryWeekStripState();
+}
+
+class _DiaryWeekStripState extends State<_DiaryWeekStrip> {
+  final _controller = ScrollController();
+  DateTime? _visibleDay;
+  double? _viewportWidth;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, constraints) {
+      const minimumWidth = DateTime.daysPerWeek * 44.0;
+      final width = math.max(constraints.maxWidth, minimumWidth);
+      final row = Row(
+        children: [for (final child in widget.children) Expanded(child: child)],
+      );
+      if (constraints.maxWidth >= minimumWidth) {
+        _viewportWidth = null;
+        return row;
+      }
+      if (_visibleDay != widget.selectedDay ||
+          _viewportWidth != constraints.maxWidth) {
+        _visibleDay = widget.selectedDay;
+        _viewportWidth = constraints.maxWidth;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted || !_controller.hasClients) return;
+          final position = _controller.position;
+          final start = (widget.selectedDay.weekday - DateTime.monday) * 44.0;
+          final end = start + 44;
+          final offset = position.pixels;
+          final target = start < offset
+              ? start
+              : end > offset + position.viewportDimension
+              ? end - position.viewportDimension
+              : offset;
+          _controller.jumpTo(
+            target.clamp(position.minScrollExtent, position.maxScrollExtent),
+          );
+        });
+      }
+      return SingleChildScrollView(
+        controller: _controller,
+        scrollDirection: Axis.horizontal,
+        child: SizedBox(width: width, child: row),
+      );
+    },
+  );
 }
 
 class _DayTile extends StatelessWidget {
@@ -191,110 +254,121 @@ class _DayTile extends StatelessWidget {
         ? Duration.zero
         : AppMotion.smallChange;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 2),
-      child: Semantics(
-        button: true,
-        selected: selected,
-        onTap: () => onSelected(day),
-        label: [
-          DateFormat.yMMMMEEEEd(locale).format(day),
-          if (isToday) l10n.diaryToday,
-          switch (status) {
-            GoalDayStatus.within => l10n.statsGoalWithin,
-            GoalDayStatus.below => l10n.statsGoalBelow,
-            GoalDayStatus.above => l10n.statsGoalAbove,
-            GoalDayStatus.noGoal => l10n.statsNoGoal,
-            GoalDayStatus.noEntry => l10n.statsNoEntry,
-          },
-        ].join(', '),
-        child: ExcludeSemantics(
-          child: AnimatedContainer(
-            duration: animationDuration,
-            curve: AppMotion.standardCurve,
-            decoration: BoxDecoration(
-              color: primarySelection ? colors.primary : statusColor,
-              borderRadius: BorderRadius.circular(AppRadius.control),
-            ),
-            foregroundDecoration: BoxDecoration(
-              border: Border.all(
-                color: selected ? colors.primary : Colors.transparent,
-                width: 2,
-              ),
-              borderRadius: BorderRadius.circular(AppRadius.control),
-            ),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(AppRadius.control),
-              onTap: () => onSelected(day),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(minHeight: 44),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: AppSpacing.xxs),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        DateFormat.E(locale).format(day),
-                        maxLines: 1,
-                        overflow: TextOverflow.clip,
-                        style: AppTypography.caption.copyWith(
-                          color: colored || primarySelection
-                              ? foreground
-                              : colors.onSurfaceVariant,
-                          fontWeight: selected
-                              ? FontWeight.w600
-                              : FontWeight.w400,
+    return Semantics(
+      button: true,
+      selected: selected,
+      onTap: () => onSelected(day),
+      label: [
+        DateFormat.yMMMMEEEEd(locale).format(day),
+        if (isToday) l10n.diaryToday,
+        switch (status) {
+          GoalDayStatus.within => l10n.statsGoalWithin,
+          GoalDayStatus.below => l10n.statsGoalBelow,
+          GoalDayStatus.above => l10n.statsGoalAbove,
+          GoalDayStatus.noGoal => l10n.statsNoGoal,
+          GoalDayStatus.noEntry => l10n.statsNoEntry,
+        },
+      ].join(', '),
+      child: ExcludeSemantics(
+        child: Stack(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 2),
+              child: AnimatedContainer(
+                duration: animationDuration,
+                curve: AppMotion.standardCurve,
+                decoration: BoxDecoration(
+                  color: primarySelection ? colors.primary : statusColor,
+                  borderRadius: BorderRadius.circular(AppRadius.control),
+                ),
+                foregroundDecoration: BoxDecoration(
+                  border: Border.all(
+                    color: selected ? colors.primary : Colors.transparent,
+                    width: 2,
+                  ),
+                  borderRadius: BorderRadius.circular(AppRadius.control),
+                ),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(minHeight: 44),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: AppSpacing.xxs,
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          DateFormat.E(locale).format(day),
+                          maxLines: 1,
+                          overflow: TextOverflow.clip,
+                          style: AppTypography.caption.copyWith(
+                            color: colored || primarySelection
+                                ? foreground
+                                : colors.onSurfaceVariant,
+                            fontWeight: selected
+                                ? FontWeight.w600
+                                : FontWeight.w400,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        '${day.day}',
-                        style: AppTypography.label.copyWith(
-                          color: foreground,
-                          fontWeight: selected
-                              ? FontWeight.w700
-                              : FontWeight.w500,
-                          fontFeatures: AppTypography.tabularFigures,
+                        const SizedBox(height: 2),
+                        Text(
+                          '${day.day}',
+                          style: AppTypography.label.copyWith(
+                            color: foreground,
+                            fontWeight: selected
+                                ? FontWeight.w700
+                                : FontWeight.w500,
+                            fontFeatures: AppTypography.tabularFigures,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 2),
-                      SizedBox(
-                        height: 5,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            if (isToday)
-                              Container(
-                                key: const ValueKey('diary-today-marker'),
-                                width: 5,
-                                height: 5,
-                                decoration: BoxDecoration(
-                                  color: colored || primarySelection
-                                      ? foreground
-                                      : colors.primary,
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                            if (status == GoalDayStatus.noGoal) ...[
+                        const SizedBox(height: 2),
+                        SizedBox(
+                          height: 5,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
                               if (isToday)
-                                const SizedBox(width: AppSpacing.xxs),
-                              Container(
-                                width: AppSpacing.sm,
-                                height: 2,
-                                color: primarySelection
-                                    ? foreground
-                                    : colors.onSurfaceVariant,
-                              ),
+                                Container(
+                                  key: const ValueKey('diary-today-marker'),
+                                  width: 5,
+                                  height: 5,
+                                  decoration: BoxDecoration(
+                                    color: colored || primarySelection
+                                        ? foreground
+                                        : colors.primary,
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                              if (status == GoalDayStatus.noGoal) ...[
+                                if (isToday)
+                                  const SizedBox(width: AppSpacing.xxs),
+                                Container(
+                                  width: AppSpacing.sm,
+                                  height: 2,
+                                  color: primarySelection
+                                      ? foreground
+                                      : colors.onSurfaceVariant,
+                                ),
+                              ],
                             ],
-                          ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
+            Positioned.fill(
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(AppRadius.control),
+                  onTap: () => onSelected(day),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

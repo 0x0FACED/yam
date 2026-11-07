@@ -50,7 +50,7 @@ class YamPrimaryButton extends StatelessWidget {
               dimension: 16,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
-                color: theme.colorScheme.onPrimary,
+                color: theme.colorScheme.onSurfaceVariant,
               ),
             )
           else if (icon != null)

@@ -96,6 +96,7 @@ void main() {
             servings: [
               CustomServingDraft(
                 unit: CustomServingUnit.serving,
+                label: 'сэндвич',
                 baseAmount: 75,
                 defaultAmount: 0.5,
               ),
@@ -146,10 +147,12 @@ void main() {
       'Mix the oats.\nChill overnight.',
     );
     expect(fieldValue('create-serving-size'), '75.0');
+    expect(fieldValue('create-serving-name'), 'сэндвич');
     expect(fieldValue('create-food-protein'), '9.875');
     expect(fieldValue('create-food-fat'), '4.125');
     expect(fieldValue('create-food-carbs'), '16.75');
     expect(fieldValue('create-serving-0-amount'), '40.0');
+    expect(fieldValue('create-serving-0-name'), 'bar');
 
     final l10n = AppLocalizations.of(
       tester.element(find.byKey(const ValueKey('create-food-name'))),
@@ -314,6 +317,59 @@ void main() {
     await _saveForm(tester);
     expect(find.text(l10n.createProductCategoryRequired), findsOneWidget);
     expect(await repository.loadFoods(), isEmpty);
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
+  testWidgets('custom serving name saves and reopens without embedded grams', (
+    tester,
+  ) async {
+    final database = YamDatabase(NativeDatabase.memory());
+    addTearDown(database.close);
+    final repository = UserFoodRepository(database);
+    final router = await _pumpForm(tester, repository);
+    await _fillRequired(tester);
+    final basis = find.byKey(const ValueKey('create-basis-perServing'));
+    await tester.ensureVisible(basis);
+    await tester.tap(basis);
+    await tester.pumpAndSettle();
+    final name = find.byKey(const ValueKey('create-serving-name'));
+    final size = find.byKey(const ValueKey('create-serving-size'));
+    await tester.ensureVisible(name);
+    await tester.enterText(name, 'сэндвич');
+    await tester.ensureVisible(size);
+    await tester.enterText(size, '142.75');
+    await _saveForm(tester);
+
+    final created = (await repository.loadFoods()).single;
+    final serving = created.servings.single;
+    expect(serving.label, 'сэндвич');
+    expect(serving.unit, CustomServingUnit.serving.name);
+    expect(serving.baseAmount, 142.75);
+    expect(serving.defaultAmount, 1);
+
+    router.push<void>('/form', extra: created);
+    await tester.pumpAndSettle();
+    expect(tester.widget<TextField>(name).controller!.text, 'сэндвич');
+    expect(tester.widget<TextField>(size).controller!.text, '142.75');
+    await tester.ensureVisible(name);
+    await tester.enterText(name, 'половина сэндвича');
+    await _saveForm(tester, editing: true);
+    final edited = (await repository.loadFoods()).single;
+    final editedServing = edited.servings.single;
+    expect(editedServing.id, serving.id);
+    expect(editedServing.label, 'половина сэндвича');
+    expect(editedServing.baseAmount, 142.75);
+    expect(editedServing.defaultAmount, 1);
+    expect(edited.food.basisAmount, 142.75);
+
+    router.push<void>('/form', extra: edited);
+    await tester.pumpAndSettle();
+    expect(
+      tester.widget<TextField>(name).controller!.text,
+      'половина сэндвича',
+    );
+    expect(tester.widget<TextField>(size).controller!.text, '142.75');
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump();
   });

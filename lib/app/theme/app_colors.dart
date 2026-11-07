@@ -11,6 +11,8 @@ abstract final class AppColors {
 
   static const lightSurface = Color(0xFFFFFFFF);
   static const lightSurfaceSecondary = Color(0xFFF0ECE4);
+  static const lightProteinText = Color(0xFFAD490C);
+  static const lightCarbsText = Color(0xFF087566);
   static const lightTextSecondary = Color(0xFF706B78);
   static const lightBorder = Color(0xFFDED8CE);
   static const lightPrimaryContainer = Color(0xFFEEE7FF);

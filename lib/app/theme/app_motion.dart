@@ -11,6 +11,7 @@ abstract final class AppMotion {
   static const snackBarEnter = Duration(milliseconds: 220);
   static const snackBarExit = Duration(milliseconds: 180);
   static const diaryEntryHighlight = Duration(milliseconds: 1600);
+  static const assistantThinking = Duration(milliseconds: 1200);
   static const quantityHoldDelay = Duration(milliseconds: 400);
   static const quantityRepeatInitial = Duration(milliseconds: 140);
   static const quantityRepeatMedium = Duration(milliseconds: 85);

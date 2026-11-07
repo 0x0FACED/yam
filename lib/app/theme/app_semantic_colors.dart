@@ -6,6 +6,9 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     required this.protein,
     required this.fat,
     required this.carbs,
+    required this.proteinText,
+    required this.fatText,
+    required this.carbsText,
     required this.success,
     required this.warning,
     required this.goalWithin,
@@ -16,6 +19,9 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
   final Color protein;
   final Color fat;
   final Color carbs;
+  final Color proteinText;
+  final Color fatText;
+  final Color carbsText;
   final Color success;
   final Color warning;
   final Color goalWithin;
@@ -31,6 +37,9 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     Color? protein,
     Color? fat,
     Color? carbs,
+    Color? proteinText,
+    Color? fatText,
+    Color? carbsText,
     Color? success,
     Color? warning,
     Color? goalWithin,
@@ -41,6 +50,9 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
       protein: protein ?? this.protein,
       fat: fat ?? this.fat,
       carbs: carbs ?? this.carbs,
+      proteinText: proteinText ?? this.proteinText,
+      fatText: fatText ?? this.fatText,
+      carbsText: carbsText ?? this.carbsText,
       success: success ?? this.success,
       warning: warning ?? this.warning,
       goalWithin: goalWithin ?? this.goalWithin,
@@ -61,6 +73,9 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
       protein: Color.lerp(protein, other.protein, t)!,
       fat: Color.lerp(fat, other.fat, t)!,
       carbs: Color.lerp(carbs, other.carbs, t)!,
+      proteinText: Color.lerp(proteinText, other.proteinText, t)!,
+      fatText: Color.lerp(fatText, other.fatText, t)!,
+      carbsText: Color.lerp(carbsText, other.carbsText, t)!,
       success: Color.lerp(success, other.success, t)!,
       warning: Color.lerp(warning, other.warning, t)!,
       goalWithin: Color.lerp(goalWithin, other.goalWithin, t)!,

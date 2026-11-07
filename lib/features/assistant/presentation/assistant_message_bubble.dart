@@ -15,43 +15,15 @@ class AssistantMessageBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final l10n = AppLocalizations.of(context);
-    final bubble = Container(
+    final sentAt = message.sentAt?.toLocal();
+    final content = ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 680),
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: message.isUser ? colors.primaryContainer : colors.surface,
-        border: Border.all(
-          color: message.isUser
-              ? colors.primary.withValues(alpha: 0.2)
-              : colors.outlineVariant,
-        ),
-        borderRadius: BorderRadius.circular(AppRadius.card),
-      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: message.isUser
+            ? CrossAxisAlignment.end
+            : CrossAxisAlignment.start,
         children: [
-          if (!message.isUser) ...[
-            Row(
-              children: [
-                Icon(
-                  Icons.auto_awesome_outlined,
-                  size: 16,
-                  color: colors.primary,
-                ),
-                const SizedBox(width: AppSpacing.xs),
-                Expanded(
-                  child: Text(
-                    l10n.assistantTitle,
-                    style: AppTypography.label.copyWith(
-                      color: colors.onSurfaceVariant,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.sm),
-          ],
           if (message.image case final image?) ...[
             ClipRRect(
               borderRadius: BorderRadius.circular(AppRadius.small),
@@ -85,6 +57,20 @@ class AssistantMessageBubble extends StatelessWidget {
               )
             else
               AssistantMarkdown(text: message.text),
+          if (sentAt != null) ...[
+            const SizedBox(height: AppSpacing.xxs),
+            Text(
+              MaterialLocalizations.of(context).formatTimeOfDay(
+                TimeOfDay.fromDateTime(sentAt),
+                alwaysUse24HourFormat: MediaQuery.alwaysUse24HourFormatOf(
+                  context,
+                ),
+              ),
+              style: AppTypography.caption.copyWith(
+                color: colors.onSurfaceVariant,
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -97,9 +83,9 @@ class AssistantMessageBubble extends StatelessWidget {
         child: message.isUser
             ? Padding(
                 padding: const EdgeInsets.only(left: AppSpacing.xl),
-                child: bubble,
+                child: content,
               )
-            : bubble,
+            : content,
       ),
     );
   }

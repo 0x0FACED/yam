@@ -155,19 +155,24 @@ class YamSettingsRow extends StatelessWidget {
               ],
             ],
           )
-        : Row(
-            children: [
-              Expanded(child: details),
-              if (value != null || showChevron) ...[
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: trailing,
-                  ),
-                ),
+        : LayoutBuilder(
+            builder: (context, constraints) => Row(
+              children: [
+                Expanded(child: details),
+                if (value != null || showChevron) ...[
+                  const SizedBox(width: AppSpacing.md),
+                  if (value == null)
+                    trailing
+                  else
+                    ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: constraints.maxWidth / 2,
+                      ),
+                      child: trailing,
+                    ),
+                ],
               ],
-            ],
+            ),
           );
     final row = ConstrainedBox(
       constraints: BoxConstraints(minHeight: minHeight),

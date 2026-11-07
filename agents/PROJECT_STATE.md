@@ -4,19 +4,13 @@
 
 ## Обновлено
 
-- Дата: 2026-11-07.
+- Дата: 2026-11-08.
 - Рабочая alpha local-first: Дневник, свои продукты, вес/цели, Статистика,
   необязательный OFF, полный backup `.yam`, обмен «Моими блюдами» JSON.
-- Добавлен необязательный ИИ-помощник: текст/голос/фото → редактируемый черновик
-  → одно явное подтверждение. Ручной трекинг по-прежнему не требует сети/аккаунта.
-- Общие настройки HTTP/HTTPS/SOCKS5-прокси доступны из Настроек; credentials
-  хранятся на устройстве защищённо, без direct fallback при включённом прокси.
+- ИИ-помощник: текст/голос/фото → редактируемый черновик → явное подтверждение; ручной ввод offline.
+- HTTP/HTTPS/SOCKS5-прокси из Настроек: защищённые per-device credentials, без direct fallback.
 - SQLite `yam` — schema v8. Полные копии — format v3, импорт v1/v2/v3.
-- [Бэклог](../docs/backlog.md): пункты 1/2/3/6 реализованы локально, не выпущены.
-  Новые GitHub Release titles — `YAM MAJOR.MINOR.PATCH`; пакеты/build numbers прежние.
-- Тег `v0.6.0` отправлен владельцем; CI упал на analyze, подготовлен фикс без смены версии.
-- Подготовлен `0.6.0+11`: notes от 2026-11-07 в CHANGELOG, Unreleased очищен,
-  Flutter pin 3.41.6 согласован с lockfile. В этой задаче коммиты/теги/push не создавались.
+- `0.7.0` уже опубликован; подготовлен `0.7.1+14` с исправлениями обоих UI-аудитов. Unreleased пуст.
 
 ## Принятые Решения
 
@@ -57,6 +51,10 @@
 - [ADR 0044](../docs/adr/0044-expanded-day-details.md): карточка КБЖУ раскрывается
   в подробности дня; все порции с КБЖУ, вклад от факта, исторические цели,
   локальные факты и обратное сворачивание без потери позиции Дневника.
+- [ADR 0045](../docs/adr/0045-yam-chat-and-floating-actions.md): YAM, думающий маскот, контекст на открытый чат, UTC `sentAt`, именованные порции.
+- [ADR 0046](../docs/adr/0046-viewport-floating-actions.md): viewport-overlay без подложки, тень кнопки и измеряемый end padding.
+- [ADR 0047](../docs/adr/0047-readable-nutrition-and-compact-calendars.md): контрастное БЖУ, компактные календари и точечный polish.
+- [ADR 0048](../docs/adr/0048-ui-consistency-and-recovery.md): исправлены 11 замечаний consistency-аудита без редизайна и изменения данных.
 
 ## Реализовано И Основные Файлы
 
@@ -85,8 +83,11 @@
 - `user_food_repository.dart`, `custom_food.dart`: атомарные UserFood/порции,
   metadata, favorite, soft delete и SQL-проверка штрихкода с исключением своего ID.
   Импортированный дубль не мешает правке неизменного штрихкода.
-- `user_food_form_screen.dart`: общая create/edit форма; category autocomplete
-  с исходным значением, бренды, многострочное описание и реальные локальные данные.
+- `user_food_form_screen.dart`: общая create/edit форма; category/brand suggestions,
+  описание, редактируемые названия всех порций с сохранением ID/коэффициентов.
+- `core/ui/layout/yam_floating_layout.dart`: Stack/Positioned + измеряемый end padding.
+  `yam_floating_actions.dart`: только прозрачные отступы и тень из `AppElevation`.
+  Общий паттерн форм/листов/целей/прокси/обмена; safe area/IME учитывает caller.
 - `yam_text_field.dart`: viewport/tap fixes и новый `obscureText` для ключа;
   для скрытого ввода отключены autocorrect/suggestions. `yam_autocomplete_field.dart`
   переиспользует общий ввод; реальное multiline-поведение сохранено.
@@ -96,10 +97,18 @@
   ≥6 с между запросами, до 15 результатов; ошибки не блокируют local workflow.
   `remote_food_repository.dart`: только выбранные OFF продукты; кэш + Diary одной
   транзакцией, сохранение последнего количества и OFF/ODbL attribution.
-- Builtin common-food каталог пока 10 продуктов; поиск имён/брендов в памяти,
-  без FTS. Запоминание количества всех источников не завершено.
-- Quantity/edit/weight sheets используют `SafeArea.maintainBottomViewPadding`;
-  это не фикс отдельной жалобы на рывки самой клавиатуры.
+- Builtin common-food каталог — 10 продуктов, поиск в памяти без FTS; универсальное запоминание количества не завершено.
+- Quantity/edit/weight sheets используют `SafeArea.maintainBottomViewPadding`; мобильные IME-рывки отдельно не исправлялись.
+- Unslop: в `app/theme` отдельные macro Text-токены; текстовые consumers
+  мигрированы, цвета полос/маркеров сохранены. Настройки без пустой половины,
+  full-width название quick-add, фильтры без цветной тени, иконка чата вместо искр.
+- `diary_screen.dart`, `statistics_screen.dart`: локализованные read error/loading/Retry,
+  epoch-защита и отсутствие ложных нулей; `DayDetailsScreen` получает live `AsyncSnapshot`,
+  сохраняет route/scroll и показывает те же ошибки с повтором без автоматического закрытия.
+- Меню темы/приёма/единицы прокручиваются; startup и архив используют `YamFeedbackViewport`.
+  Общие кнопки/chips/presets: контрастный spinner, target ≥44×44, полные подписи.
+- `YamSelectField`/`YamNumberField`/`YamDropdown`: nullable callbacks отключают ввод/focus;
+  меню закрывается при отключении. Полные edit-названия, flex-header, noGoal-отметка и YAM dialog actions.
 
 ### ИИ-Помощник
 
@@ -112,8 +121,8 @@
   SQLite-архив, sync metadata, metadata-only stream; soft delete очищает текст,
   запоздалый save не воскрешает tombstone. `assistant_history_screen.dart`: открыть/удалить.
   Controller сохраняет отправленный текст до API, только завершённый ответ после;
-  ошибки записи видны и повторяются без повторного inference. Архив по умолчанию
-  исключён из API, включается явно на следующий запрос; tools reset при смене чата.
+  ошибки записи видны и повторяются без повторного inference. Контекст архива
+  включается явно один раз на открытый чат; tools reset при смене чата.
 - `application/assistant_tools.dart`: search_foods/get_food/read_diary/prepare_draft.
   Builtin/UserFood/cached OFF через существующие adapters; bounded result, реальные
   ID/порции, запрет model-supplied catalog nutrients и arbitrary SQL/shell/URL.
@@ -146,15 +155,17 @@
   прокручиваемый review на compact. Редактируются дата/приём/количество/порции,
   данные нового продукта и сохранение в каталог. На compact Send/Stop — иконка.
   Текст сохраняется; ввод/фото/незавершённый draft сессионные. Потеря ввода требует подтверждения.
-- `assistant_message_bubble.dart`, `assistant_markdown.dart`: контейнеры сообщений,
-  Markdown/выделение, горизонтальные таблицы/код, только явные HTTP(S)-ссылки.
-  Чат ограничен 720 px; composer всегда снизу, без consent-экрана/инструкции.
-  `YamTextField.embedded` без вложенной рамки/подписи; date/meal content-sized в toolbar
-  (отдельная строка на compact), вместе со строкой модели скрыты при клавиатуре.
-  `assistant_screen.dart`: follow-tail по позиции списка, frame-coalesced доводка
-  после layout/metrics; ручной уход вверх выключает её, возврат вниз включает.
-  `assistant_message_input.dart`: scoped PasteTextIntent + context menu для image-only clipboard,
-  с делегированием штатной вставке текста/undo; остальные поля не меняют поведение.
+- `assistant_message_bubble.dart`, `assistant_markdown.dart`: сообщения без карточек,
+  local time для новых `sentAt`, Markdown/выделение, таблицы/код, явные HTTP(S)-ссылки.
+  `assistant_thinking_indicator.dart`: циклический маскот и текст; reduced motion без ticker.
+- `assistant_screen.dart`: YAM + connection/model в шапке; composer/errors и confirm
+  поверх полной прокрутки, без обрезающего футера; ввод review сохраняется при reparent.
+  ≥44 px кнопки без лишних зазоров, контрастный Switch. Запрос не блокирует следующий
+  ввод/медиа/день/приём; контекст активного запроса фиксируется при старте.
+  Навигация отменяет запрос/голос после подтверждения и защищена от async re-entry.
+  Context controls не исчезают с IME; малый viewport прокручивается целиком.
+  Follow-tail только у нижнего края, без пересчёта по фокусу. `assistant_message_input.dart`:
+  PasteTextIntent/context menu для image-only clipboard, штатная вставка текста/undo.
 - `assistant_connection_screen.dart`: `/assistant/connection` из Настроек/помощника,
   защищённый key field, saved ChatGPT account picker, модель, welcome и usage link.
   RU/EN, privacy и правила локальной истории; native permission descriptions тоже RU/EN.
@@ -178,7 +189,6 @@
   `router.dart`, `proxy_settings_screen.dart`: `/settings/proxy`, поля host/port/
   username/password, скрытый пароль, enable/protocol, ошибки и сохранение RU/EN.
 
-
 ### Статистика, Обмен И Релизы
 
 - `statistics_models.dart`, `statistics_repository.dart`: реальные питание/вес,
@@ -187,6 +197,7 @@
 - Статистика: interactive weight/calorie points, клавиатура/ведение, historical
   target line, календарь и day details. Дневник использует общие статусы недели
   ±10%; selected/today/empty различаются. Нет вымышленных графиков/верхней сводки.
+  Календари на 320/360 px показывают семь дней с hit targets ≥44 px; ниже 308 px — scroll fallback.
 - `food_library_repository.dart`, `food_library_codec.dart`: активные свои продукты/
   порции в UTF-8 `yam-foods` v1, точные kcal/БЖУ/basis/units/description. Без Diary,
   goals/weights/OFF/избранного/device metadata. Atomic replace/mergeDeduplicated/
@@ -212,32 +223,23 @@
 
 ## Проверка
 
-- Подробности дня: визуальная правка — 9 native hover/divider проверок, errors=0.
-- Native macOS LaunchServices + изолированная SQLite memory: 16 проверок,
-  промежуточный кадр раскрытия, historical goal, вклад, edit/delete/Undo, scroll
-  return, empty и reduced motion; Flutter errors/overflow = 0. Визуально приняты
-  RU/light/390, EN/dark/1200 и 320 px с текстом ×1.6. Пользовательские данные не тронуты.
-- Обычная macOS debug-сборка прошла; временные сценарии/скриншоты/логи удалены.
-- CI fix: полный `flutter analyze --no-pub` — No issues found; все 427 тестов
-  с coverage и concurrency=1 прошли, включая миграции v1–v7 и экранные переходы.
-  Native file v5→v8 + TickerMode/reveal: 13 проверок, errors=0; данные/порции/FK сохранены.
-- Native archive smoke: save/reopen/delete/context, 3 inference-запроса, errors=0.
-  OAuth/SSE/atomic confirm/media/proxy/Markdown/clipboard проверены ранее.
-- Диктовка: LaunchServices listening → stop без вылета; произнесённый текст ещё не принят.
-- `0.6.0+11`: CLI `--tag v0.6.0` прошёл; enforce-lockfile на 3.41.6 прошёл ранее.
-  macOS bundle 0.6.0/build 11; новый GitHub CI и релизные сборки ещё не запускались.
-- Android debug build не подтверждён: timeout online; offline Gradle/JDK21 —
-  нет Kotlin 2.2.20, engine artifacts, Tink 1.21 и других Maven binaries в кэше.
+- `0.7.1`: release metadata CLI и 16 tool-тестов прошли; UI: `gen-l10n`, `dart format`, `flutter analyze` — чисто.
+- Прошли 129 фокусных проверок, включая 4 временных воспроизведения; 22 новых
+  постоянных regression-сценария покрывают read error/Retry/устаревшие события и disabled/focus.
+- Native macOS/SQLite memory: RU/EN, Light/Dark, 320/360/700 px, низкие окна, текст ×2;
+  все 11 вариантов меню, Retry, edit-название и disabled/dialog flows; Flutter errors=0.
+- Стенд удалён, обычная macOS debug-сборка `lib/main.dart` успешна; пользовательская БД не открывалась.
+- Android debug не подтверждён: offline-кэш без Kotlin 2.2.20/engine/Tink 1.21 и других Maven binaries.
 
 ## Следующее Действие И Ограничения
 
-- **Следующее:** владелец коммитит CI fix, удаляет старый `v0.6.0` локально и в origin,
-  пересоздаёт тег на исправленном коммите и проверяет повторный GitHub Release workflow.
+- **Следующее:** мобильная приёмка исправленных меню, edit-названия и floating с
+  системной клавиатурой на Android/iOS 320–360 px и крупным текстом; устройство не проверялось.
 - Реальный текстовый OpenAI inference через подключённую подписку подтверждён;
   облачный сценарий tools/фото/confirm отдельно не проверялся. Browser OAuth на
   телефонах, native mic/camera/permissions и Linux voice/Secret Service не проверены.
 - Подробности дня/системный Back на Android/iOS, живая Android миграция, native IME,
-  рывки клавиатуры (backlog 5), file dialogs и установка/очистка updater требуют приёмки.
+  клавиатура/floating на телефоне, file dialogs и updater требуют приёмки.
 - macOS release ad-hoc, без Developer ID/notarization; legacy Keychain без Keychain Sharing.
 - Тема/builtin favorites сессионные; отдельные настройки языка/единиц лишь
   отображаются. Нет отдельного удаления всех данных. Riverpod не подключён.
@@ -245,5 +247,4 @@
   copy meal/day и sync не реализованы. Описание — заметка, не структурированный рецепт.
 - Diary lifecycle полуночи/возврата из фона требует отдельной обработки с
   сохранением вручную выбранной даты. Pin Drift 2.31/drift_flutter 0.2.4 сохранён.
-- Прежние CocoaPods и другие пользовательские изменения worktree сохранены.
-  В этой задаче коммиты, теги и push не выполнялись.
+- Прежние CocoaPods/остальные пользовательские изменения сохранены; коммитов/тегов/push нет.

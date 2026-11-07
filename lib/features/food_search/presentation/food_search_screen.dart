@@ -692,36 +692,48 @@ class _FoodSearchScreenState extends State<FoodSearchScreen> {
     final meals = buildFoodSearchPrototypeMeals(l10n);
     return showModalBottomSheet<String>(
       context: context,
+      isScrollControlled: true,
       showDragHandle: true,
       useSafeArea: true,
       constraints: const BoxConstraints(maxWidth: 480),
-      builder: (context) => Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.lg,
-              0,
-              AppSpacing.lg,
-              AppSpacing.sm,
-            ),
-            child: Text(
-              l10n.foodSearchSelectMealTitle,
-              style: Theme.of(context).textTheme.titleLarge,
+      builder: (context) => SafeArea(
+        top: false,
+        maintainBottomViewPadding: true,
+        child: Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.viewInsetsOf(context).bottom,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.lg,
+                    0,
+                    AppSpacing.lg,
+                    AppSpacing.sm,
+                  ),
+                  child: Text(
+                    l10n.foodSearchSelectMealTitle,
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                ),
+                for (final meal in meals)
+                  ListTile(
+                    leading: Icon(meal.icon),
+                    title: Text(meal.name),
+                    trailing: meal.id == _selectedMealId
+                        ? const Icon(Icons.check_rounded)
+                        : null,
+                    onTap: () => Navigator.of(context).pop(meal.id),
+                  ),
+                const SizedBox(height: AppSpacing.sm),
+              ],
             ),
           ),
-          for (final meal in meals)
-            ListTile(
-              leading: Icon(meal.icon),
-              title: Text(meal.name),
-              trailing: meal.id == _selectedMealId
-                  ? const Icon(Icons.check_rounded)
-                  : null,
-              onTap: () => Navigator.of(context).pop(meal.id),
-            ),
-          const SizedBox(height: AppSpacing.sm),
-        ],
+        ),
       ),
     );
   }

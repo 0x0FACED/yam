@@ -1,5 +1,8 @@
+import 'dart:ui' show Tristate;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart' show RenderAnimatedOpacity;
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:yam/app/theme/app_colors.dart';
 import 'package:yam/app/theme/app_theme.dart';
@@ -11,6 +14,9 @@ import 'package:yam/core/ui/diary/yam_diary_rows.dart';
 import 'package:yam/core/ui/feedback/yam_snack_bar.dart';
 import 'package:yam/core/ui/food/yam_product_row.dart';
 import 'package:yam/core/ui/forms/yam_search_field.dart';
+import 'package:yam/core/ui/forms/yam_number_field.dart';
+import 'package:yam/core/ui/forms/yam_select_field.dart';
+import 'package:yam/core/ui/selection/yam_dropdown.dart';
 import 'package:yam/core/ui/selection/yam_selection_controls.dart';
 
 void main() {
@@ -294,6 +300,107 @@ void main() {
     await tester.tap(find.text('Undo'));
     await tester.pump();
     expect(find.byType(YamSnackBar), findsNothing);
+  });
+  testWidgets('disabling a select closes its menu and skips keyboard focus', (
+    tester,
+  ) async {
+    final enabled = ValueNotifier(true);
+    addTearDown(enabled.dispose);
+    final nextFocus = FocusNode();
+    addTearDown(nextFocus.dispose);
+    var selected = 1;
+    await tester.pumpWidget(
+      _TestApp(
+        child: ValueListenableBuilder(
+          valueListenable: enabled,
+          builder: (context, active, _) => Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              YamSelectField<int>(
+                label: 'Meal',
+                value: selected,
+                items: const [
+                  YamDropdownOption(value: 1, label: 'One'),
+                  YamDropdownOption(value: 2, label: 'Two'),
+                ],
+                onChanged: active ? (value) => selected = value : null,
+              ),
+              TextField(focusNode: nextFocus),
+            ],
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('One'));
+    await tester.pumpAndSettle();
+    expect(find.text('Two').hitTestable(), findsOneWidget);
+
+    enabled.value = false;
+    await tester.pumpAndSettle();
+    final disabledSemantics = find.byWidgetPredicate(
+      (widget) => widget is Semantics && widget.properties.label == 'Meal',
+    );
+    expect(
+      tester.getSemantics(disabledSemantics).flagsCollection.isEnabled,
+      Tristate.isFalse,
+    );
+    expect(find.text('Two'), findsNothing);
+    await tester.tap(find.text('One'));
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pumpAndSettle();
+    expect(find.text('Two'), findsNothing);
+    expect(selected, 1);
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.pump();
+    expect(nextFocus.hasFocus, isTrue);
+
+    enabled.value = true;
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('One'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Two'));
+    await tester.pumpAndSettle();
+    expect(selected, 2);
+  });
+
+  testWidgets('disabling a focused number prevents further edits', (
+    tester,
+  ) async {
+    final enabled = ValueNotifier(true);
+    final controller = TextEditingController(text: '1');
+    addTearDown(enabled.dispose);
+    addTearDown(controller.dispose);
+    final edits = <String>[];
+    await tester.pumpWidget(
+      _TestApp(
+        child: ValueListenableBuilder(
+          valueListenable: enabled,
+          builder: (context, active, _) => YamNumberField(
+            label: 'Amount',
+            unit: 'g',
+            controller: controller,
+            onChanged: active ? edits.add : null,
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.byType(TextField));
+    await tester.enterText(find.byType(TextField), '25');
+    enabled.value = false;
+    await tester.pumpAndSettle();
+    final editable = tester.widget<EditableText>(find.byType(EditableText));
+    expect(editable.focusNode.hasFocus, isFalse);
+    await tester.tap(find.byType(TextField));
+    await tester.pump();
+    expect(editable.focusNode.hasFocus, isFalse);
+    expect(controller.text, '25');
+    expect(edits, ['25']);
+
+    enabled.value = true;
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), '50');
+    expect(controller.text, '50');
+    expect(edits, ['25', '50']);
   });
 }
 

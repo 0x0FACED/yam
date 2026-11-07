@@ -39,11 +39,13 @@ class _FoodLibrarySettingsSectionState
   Future<T?> _showSheet<T>({
     required String title,
     required List<Widget> Function(BuildContext, ValueChanged<T?>) content,
+    Widget Function(BuildContext, ValueChanged<T?>)? actions,
   }) => showYamActionSheet<T>(
     context: context,
     title: title,
     closeLabel: AppLocalizations.of(context).backupClose,
     content: content,
+    actions: actions,
   );
 
   void _showFailure(String message) {
@@ -113,20 +115,23 @@ class _FoodLibrarySettingsSectionState
       if (mode == FoodLibraryImportMode.replace) {
         final confirmed = await _showSheet<bool>(
           title: l10n.foodLibraryReplaceTitle,
-          content: (context, close) => [
-            Text(l10n.foodLibraryReplaceWarning),
-            const SizedBox(height: AppSpacing.lg),
-            YamTextButton(
-              key: const ValueKey('food-library-confirm-replace'),
-              label: l10n.foodLibraryReplaceConfirm,
-              tone: YamTextButtonTone.destructive,
-              onPressed: () => close(true),
-            ),
-            YamTextButton(
-              label: l10n.backupCancel,
-              onPressed: () => close(false),
-            ),
-          ],
+          content: (context, close) => [Text(l10n.foodLibraryReplaceWarning)],
+          actions: (context, close) => Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              YamTextButton(
+                key: const ValueKey('food-library-confirm-replace'),
+                label: l10n.foodLibraryReplaceConfirm,
+                tone: YamTextButtonTone.destructive,
+                onPressed: () => close(true),
+              ),
+              YamTextButton(
+                label: l10n.backupCancel,
+                onPressed: () => close(false),
+              ),
+            ],
+          ),
         );
         if (confirmed != true || !mounted) return;
       }
@@ -147,14 +152,13 @@ class _FoodLibrarySettingsSectionState
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(l10n.foodLibraryResultNote),
-          const SizedBox(height: AppSpacing.lg),
-          YamPrimaryButton(
-            key: const ValueKey('food-library-import-done'),
-            label: l10n.backupDone,
-            expanded: true,
-            onPressed: () => close(true),
-          ),
         ],
+        actions: (context, close) => YamPrimaryButton(
+          key: const ValueKey('food-library-import-done'),
+          label: l10n.backupDone,
+          expanded: true,
+          onPressed: () => close(true),
+        ),
       );
     } on FoodLibraryException catch (error) {
       _showFailure(_failureMessage(l10n, error));
@@ -209,12 +213,12 @@ class _FoodLibrarySettingsSectionState
           tone: YamTextButtonTone.destructive,
           onPressed: () => close(FoodLibraryImportMode.replace),
         ),
-        YamTextButton(
-          key: const ValueKey('food-library-cancel-import'),
-          label: l10n.backupCancel,
-          onPressed: () => close(null),
-        ),
       ],
+      actions: (context, close) => YamTextButton(
+        key: const ValueKey('food-library-cancel-import'),
+        label: l10n.backupCancel,
+        onPressed: () => close(null),
+      ),
     );
   }
 
@@ -247,17 +251,16 @@ class _FoodLibrarySettingsSectionState
           SelectableText(example, style: AppTypography.caption),
           const SizedBox(height: AppSpacing.md),
           Text(l10n.foodLibraryOptionalFields),
-          const SizedBox(height: AppSpacing.lg),
-          YamPrimaryButton(
-            key: const ValueKey('food-library-copy-example'),
-            label: l10n.foodLibraryCopyExample,
-            expanded: true,
-            onPressed: () async {
-              await Clipboard.setData(ClipboardData(text: example));
-              if (context.mounted) close(true);
-            },
-          ),
         ],
+        actions: (context, close) => YamPrimaryButton(
+          key: const ValueKey('food-library-copy-example'),
+          label: l10n.foodLibraryCopyExample,
+          expanded: true,
+          onPressed: () async {
+            await Clipboard.setData(ClipboardData(text: example));
+            if (context.mounted) close(true);
+          },
+        ),
       );
     } finally {
       _setBusy(false);

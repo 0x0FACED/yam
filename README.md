@@ -18,13 +18,20 @@ to the same diary position. The transition respects reduced-motion settings;
 wide windows use two columns. Everything works locally without AI or network.
 See [ADR 0044](docs/adr/0044-expanded-day-details.md).
 
-## AI food-entry assistant
+## YAM food-entry assistant
 
-Open the sparkle action in the diary for the selected day. **Settings → AI
-assistant** configures the connection. The assistant accepts text, dictation and
+Open the sparkle action in the diary for the selected day. **Settings → YAM**
+configures the connection. The assistant accepts text, dictation and
 photos, searches local foods/portions, asks clarifying questions and prepares an
 editable review. Check the date, meal, quantities and new-food nutrition, then
 confirm the whole batch once. Nothing is written by a model tool call.
+Messages are unboxed and show local send times; older archived messages without
+a timestamp do not get an invented time. The floating composer remains usable
+during a request, with a small thinking mascot that respects reduced motion.
+Bottom actions float over the scroll viewport without an opaque footer panel.
+Content remains visible through the surrounding gaps; measured end padding keeps
+the last fields reachable above the action. The same pattern is used in forms,
+food/weight sheets and data-transfer confirmations.
 
 - **ChatGPT plan:** official Sign in with ChatGPT for eligible accounts/plans.
   The system browser returns to a local `127.0.0.1` OAuth callback. Return to YAM
@@ -40,9 +47,11 @@ confirm the whole batch once. Nothing is written by a model tool call.
   The full catalog/history is not sent in advance. Sent text and completed replies
   are saved locally; **History** opens or deletes conversations, **New conversation**
   keeps previous chats. Reopened chats do not send old messages unless explicitly
-  enabled: at most the last 12 messages / 12,000 text characters for the next request.
-  The new exchange retains its own session context. Photos, audio, tool payloads
-  and unsaved drafts are not archived. Text chats are included in `.yam` backups;
+  enabled: at most the last 12 messages / 12,000 text characters per request.
+  The choice stays on until disabled or the chat is left; reopening requires
+  explicit opt-in again. The new exchange retains its own session context.
+  Photos, audio, tool payloads and unsaved drafts are not archived.
+  Text chats are included in `.yam` backups;
   protect exported backups accordingly. `store:false` is used, but is not a promise
   of zero provider retention; provider policies apply.
 - **Voice:** native speech recognition when available, otherwise transcription
@@ -57,6 +66,8 @@ confirm the whole batch once. Nothing is written by a model tool call.
   estimate, not a weighing. The **AI estimate** marker survives saving,
   diary editing and compatible backups. A new food only enters **My dishes**
   if that option is selected; creating a food without a diary entry also works.
+  Serving names are editable in the manual create/edit form independently of the
+  weight/volume coefficient; use “sandwich” rather than “sandwich (250 g)”.
 - **Reliability:** confirmation saves selected new foods and diary entries in
   one local transaction. Repeated confirmation of the same draft does not
   duplicate it. Network/model errors do not change the diary; retry keeps the

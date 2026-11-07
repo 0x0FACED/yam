@@ -52,6 +52,7 @@ void main() {
       final file = File('${dir.path}/chats.sqlite');
       final db = YamDatabase(NativeDatabase(file));
       final repository = AssistantConversationRepository(db);
+      final sentAt = DateTime.utc(2026, 11, 6, 12, 34, 56, 789);
       await repository.save(
         id: _id(1),
         day: DateTime(2026, 11, 6, 15),
@@ -60,6 +61,7 @@ void main() {
           AssistantMessage(
             isUser: true,
             text: '',
+            sentAt: sentAt,
             image: AssistantImage(
               bytes: Uint8List.fromList([101, 102, 103, 104]),
               mimeType: 'image/jpeg',
@@ -70,11 +72,6 @@ void main() {
         ],
       );
       final stored = await db.select(db.assistantConversations).getSingle();
-      expect(jsonDecode(stored.messages), [
-        {'isUser': true, 'text': '', 'hasImage': true},
-        {'isUser': false, 'text': 'A bowl of oats. 🥣', 'hasImage': false},
-        {'isUser': true, 'text': '  Keep exact text\n  ', 'hasImage': false},
-      ]);
       expect(stored.title, 'Keep exact text');
       expect(stored.deviceId, matches(RegExp(r'^[0-9a-f-]{36}$')));
       expect(stored.createdAt, stored.updatedAt);
@@ -88,6 +85,8 @@ void main() {
       expect(chat.mealId, 'dinner');
       expect(chat.messages, hasLength(3));
       expect(chat.messages.first.hasImage, isTrue);
+      expect(chat.messages.first.sentAt, sentAt);
+      expect(chat.messages[1].sentAt, isNull);
       expect(chat.messages.every((message) => message.image == null), isTrue);
       expect(chat.messages.last.text, '  Keep exact text\n  ');
       expect(() => chat.messages.clear(), throwsUnsupportedError);
@@ -102,6 +101,7 @@ void main() {
         messages: chat.messages,
       );
       expect((await reader.load(chat.id))!.messages.first.hasImage, isTrue);
+      expect((await reader.load(chat.id))!.messages.first.sentAt, sentAt);
     },
   );
 

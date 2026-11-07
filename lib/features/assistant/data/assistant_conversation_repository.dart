@@ -62,6 +62,9 @@ class AssistantConversationRepository {
             isUser: value['isUser'] as bool,
             text: value['text'] as String,
             hasImage: value['hasImage'] as bool,
+            sentAt: value['sentAt'] == null
+                ? null
+                : DateTime.parse(value['sentAt'] as String).toUtc(),
           ),
       ],
     );
@@ -79,6 +82,8 @@ class AssistantConversationRepository {
           'isUser': message.isUser,
           'text': message.text,
           'hasImage': message.image != null || message.hasImage,
+          if (message.sentAt case final sentAt?)
+            'sentAt': sentAt.toUtc().toIso8601String(),
         },
     ]);
     final firstText = messages

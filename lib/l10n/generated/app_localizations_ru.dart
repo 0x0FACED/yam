@@ -239,6 +239,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get diaryTitle => 'Дневник';
 
   @override
+  String get diaryReadErrorTitle => 'Не удалось загрузить дневник';
+
+  @override
+  String get diaryReadErrorMessage =>
+      'Записи или цели недоступны. Попробуйте загрузить локальные данные дневника ещё раз.';
+
+  @override
   String get dayDetailsTitle => 'День подробно';
 
   @override
@@ -522,10 +529,14 @@ class AppLocalizationsRu extends AppLocalizations {
   String get createProductAddServing => 'Добавить единицу';
 
   @override
-  String get createProductServingName => 'Название (необязательно)';
+  String get createProductServingName => 'Название порции (необязательно)';
 
   @override
-  String get createProductServingNameHint => 'Например, бутылка';
+  String get createProductServingNameHint => 'Например, сэндвич';
+
+  @override
+  String get createProductServingNameHelper =>
+      'Только название — вес или объём укажите отдельно ниже.';
 
   @override
   String get createProductServingAmount => 'В одной единице';
@@ -959,6 +970,13 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get statsLoading => 'Загружаем статистику';
+
+  @override
+  String get statsReadErrorTitle => 'Не удалось загрузить статистику';
+
+  @override
+  String get statsReadErrorMessage =>
+      'Часть локальных данных недоступна. Попробуйте загрузить статистику ещё раз.';
 
   @override
   String statsCurrentGoal(String value) {
@@ -1509,7 +1527,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsVersion => 'Версия';
 
   @override
-  String get assistantTitle => 'ИИ-помощник';
+  String get assistantTitle => 'YAM';
 
   @override
   String get assistantSettings => 'Подключение ИИ';
@@ -1542,16 +1560,14 @@ class AppLocalizationsRu extends AppLocalizations {
   String get assistantPhotoNotStored => 'Фото не сохранено';
 
   @override
-  String get assistantUseHistory =>
-      'Использовать сохранённую историю как контекст';
+  String get assistantUseHistory => 'Контекст сохранённого чата';
 
   @override
   String get assistantUseHistoryNote =>
-      'Со следующим запросом отправится только текст последних 12 сообщений, не более 12 000 символов. Фото и прежние вызовы инструментов не отправляются.';
+      'До 12 сообщений / 12 000 символов. Включено для этого чата.';
 
   @override
-  String get assistantHistoryOffNote =>
-      'Сообщения из сохранённого диалога не отправляются. Новая переписка по-прежнему сохраняет собственный контекст.';
+  String get assistantHistoryOffNote => 'Старые сообщения не отправляются.';
 
   @override
   String get assistantHistoryStorageError =>
@@ -1751,7 +1767,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get assistantCloseNote =>
-      'Текст диалога останется в локальной истории. Приложенные фото, неотправленный ввод и несохранённый черновик будут удалены. Сохранённые записи останутся в Дневнике.';
+      'Текущий запрос будет остановлен. Текст диалога останется в локальной истории. Приложенные фото, неотправленный ввод и несохранённый черновик будут удалены. Сохранённые записи останутся в Дневнике.';
 
   @override
   String get assistantCloseConfirm => 'Закрыть';
@@ -1767,7 +1783,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get assistantSwitchNote =>
-      'Смена подключения начнёт новый диалог. Текст останется в локальной истории, а приложенные фото, неотправленный ввод и несохранённый черновик будут удалены.';
+      'Текущий запрос будет остановлен, а смена подключения начнёт новый диалог. Текст останется в локальной истории, а приложенные фото, неотправленный ввод и несохранённый черновик будут удалены.';
 
   @override
   String get assistantInvalidDraft =>

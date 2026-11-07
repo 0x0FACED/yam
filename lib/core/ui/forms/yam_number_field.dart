@@ -24,7 +24,7 @@ class YamNumberField extends StatefulWidget {
   final String label;
   final String unit;
   final TextEditingController controller;
-  final ValueChanged<String> onChanged;
+  final ValueChanged<String>? onChanged;
   final YamNumberFieldStyle style;
   final bool decimal;
   final Color? indicatorColor;
@@ -88,6 +88,7 @@ class _YamNumberFieldState extends State<YamNumberField> {
             label: '${widget.label}, ${widget.unit}',
             child: TextField(
               key: widget.fieldKey,
+              enabled: widget.onChanged != null,
               focusNode: _focusNode,
               controller: widget.controller,
               keyboardType: TextInputType.numberWithOptions(
@@ -104,7 +105,11 @@ class _YamNumberFieldState extends State<YamNumberField> {
                   (compact
                           ? AppTypography.screenTitle
                           : AppTypography.prominentMetric)
-                      .copyWith(color: colors.onSurface),
+                      .copyWith(
+                        color: widget.onChanged == null
+                            ? colors.onSurfaceVariant
+                            : colors.onSurface,
+                      ),
               decoration: const InputDecoration.collapsed(hintText: '0'),
               onChanged: widget.onChanged,
             ),
@@ -120,7 +125,7 @@ class _YamNumberFieldState extends State<YamNumberField> {
     );
     final input = GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: _focusNode.requestFocus,
+      onTap: widget.onChanged == null ? null : _focusNode.requestFocus,
       child: Container(
         constraints: BoxConstraints(
           minHeight: compact ? AppSpacing.xxl : AppSpacing.xxl + AppSpacing.md,
@@ -130,7 +135,7 @@ class _YamNumberFieldState extends State<YamNumberField> {
           border: Border.all(
             color: widget.errorText != null
                 ? colors.error
-                : _focusNode.hasFocus
+                : widget.onChanged != null && _focusNode.hasFocus
                 ? colors.primary
                 : Colors.transparent,
           ),

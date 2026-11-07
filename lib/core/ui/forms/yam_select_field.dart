@@ -17,12 +17,13 @@ class YamSelectField<T> extends StatelessWidget {
   final String label;
   final T value;
   final List<YamDropdownOption<T>> items;
-  final ValueChanged<T> onChanged;
+  final ValueChanged<T>? onChanged;
   final Key? fieldKey;
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final enabled = onChanged != null;
     final selectedLabel = items.firstWhere((item) => item.value == value).label;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -38,9 +39,10 @@ class YamSelectField<T> extends StatelessWidget {
           onSelected: onChanged,
           triggerBuilder: (context, toggle, focusNode, isOpen) => Semantics(
             button: true,
+            enabled: enabled,
             label: label,
             value: selectedLabel,
-            onTap: toggle,
+            onTap: enabled ? toggle : null,
             child: ExcludeSemantics(
               child: Material(
                 color: Colors.transparent,
@@ -49,11 +51,13 @@ class YamSelectField<T> extends StatelessWidget {
                 child: InkWell(
                   key: fieldKey,
                   focusNode: focusNode,
-                  onTap: toggle,
+                  onTap: enabled ? toggle : null,
                   child: InputDecorator(
-                    isFocused: focusNode.hasFocus || isOpen,
+                    isFocused: enabled && (focusNode.hasFocus || isOpen),
                     isEmpty: false,
                     decoration: InputDecoration(
+                      enabled: enabled,
+                      fillColor: enabled ? null : colors.surfaceContainer,
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.md,
                         vertical: AppSpacing.sm,
@@ -72,7 +76,9 @@ class YamSelectField<T> extends StatelessWidget {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: AppTypography.productTitle.copyWith(
-                                color: colors.onSurface,
+                                color: enabled
+                                    ? colors.onSurface
+                                    : colors.onSurfaceVariant,
                               ),
                             ),
                           ),

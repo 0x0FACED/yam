@@ -6,9 +6,11 @@ import 'package:yam/app/theme/app_semantic_colors.dart';
 import 'package:yam/app/theme/app_spacing.dart';
 import 'package:yam/app/theme/app_typography.dart';
 import 'package:yam/core/ui/buttons/yam_buttons.dart';
+import 'package:yam/core/ui/buttons/yam_floating_actions.dart';
 import 'package:yam/core/ui/forms/yam_autocomplete_field.dart';
 import 'package:yam/core/ui/forms/yam_number_field.dart';
 import 'package:yam/core/ui/forms/yam_text_field.dart';
+import 'package:yam/core/ui/layout/yam_floating_layout.dart';
 import 'package:yam/core/ui/selection/yam_selection_controls.dart';
 import 'package:yam/core/data/yam_database.dart';
 import 'package:yam/features/food_search/data/user_food_repository.dart';
@@ -60,9 +62,9 @@ class _UserFoodFormScreenState extends State<UserFoodFormScreen> {
   final _fat = TextEditingController();
   final _carbs = TextEditingController();
   final _servingSize = TextEditingController();
+  final _basisServingName = TextEditingController();
   final List<_ServingEditor> _servings = [];
   String? _basisServingId;
-  String? _basisServingLabel;
   double _basisServingDefaultAmount = 1;
 
   String? _selectedCategory = FoodSearchPrototypeCategory.other.name;
@@ -156,6 +158,7 @@ class _UserFoodFormScreenState extends State<UserFoodFormScreen> {
     _fat.clear();
     _carbs.clear();
     _servingSize.clear();
+    _basisServingName.clear();
     _selectedCategory =
         widget.initialFood?.food.category ??
         FoodSearchPrototypeCategory.other.name;
@@ -165,7 +168,6 @@ class _UserFoodFormScreenState extends State<UserFoodFormScreen> {
     _displayBasis = CustomFoodDisplayBasis.perHundredGrams;
     _servingBasis = CustomFoodBasis.grams;
     _basisServingId = null;
-    _basisServingLabel = null;
     _basisServingDefaultAmount = 1;
     _errors = const {};
     _attempted = false;
@@ -197,7 +199,7 @@ class _UserFoodFormScreenState extends State<UserFoodFormScreen> {
       }
     }
     _basisServingId = basisServing?.id;
-    _basisServingLabel = basisServing?.label;
+    _basisServingName.text = basisServing?.label ?? '';
     _basisServingDefaultAmount = basisServing?.defaultAmount ?? 1;
 
     for (final serving in initialFood.servings) {
@@ -230,6 +232,7 @@ class _UserFoodFormScreenState extends State<UserFoodFormScreen> {
       _fat,
       _carbs,
       _servingSize,
+      _basisServingName,
     ]) {
       controller.dispose();
     }
@@ -316,7 +319,9 @@ class _UserFoodFormScreenState extends State<UserFoodFormScreen> {
         if (_displayBasis == CustomFoodDisplayBasis.perServing)
           CustomServingDraft(
             unit: CustomServingUnit.serving,
-            label: _basisServingLabel,
+            label: _basisServingName.text.trim().isEmpty
+                ? null
+                : _basisServingName.text.trim(),
             existingId: _basisServingId,
             baseAmount: basisAmount,
             defaultAmount: _basisServingDefaultAmount,
@@ -411,18 +416,28 @@ class _UserFoodFormScreenState extends State<UserFoodFormScreen> {
     final l10n = AppLocalizations.of(context);
     final unit = await showModalBottomSheet<CustomServingUnit>(
       context: context,
+      isScrollControlled: true,
       showDragHandle: true,
+      useSafeArea: true,
       builder: (context) => SafeArea(
         top: false,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            for (final candidate in CustomServingUnit.values)
-              ListTile(
-                title: Text(_servingName(l10n, candidate)),
-                onTap: () => Navigator.of(context).pop(candidate),
-              ),
-          ],
+        maintainBottomViewPadding: true,
+        child: Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.viewInsetsOf(context).bottom,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (final candidate in CustomServingUnit.values)
+                  ListTile(
+                    title: Text(_servingUnitName(l10n, candidate)),
+                    onTap: () => Navigator.of(context).pop(candidate),
+                  ),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -431,7 +446,7 @@ class _UserFoodFormScreenState extends State<UserFoodFormScreen> {
     }
   }
 
-  String _servingName(AppLocalizations l10n, CustomServingUnit unit) =>
+  String _servingUnitName(AppLocalizations l10n, CustomServingUnit unit) =>
       switch (unit) {
         CustomServingUnit.serving => l10n.createProductUnitServing,
         CustomServingUnit.piece => l10n.createProductUnitPiece,
@@ -471,304 +486,363 @@ class _UserFoodFormScreenState extends State<UserFoodFormScreen> {
                         surface: false,
                       ),
                       const SizedBox(width: AppSpacing.xs),
-                      Text(
-                        widget.initialFood == null
-                            ? l10n.foodSearchCreateFood
-                            : l10n.createProductEditTitle,
-                        style: AppTypography.sectionTitle.copyWith(
-                          color: theme.colorScheme.onSurface,
+                      Expanded(
+                        child: Text(
+                          widget.initialFood == null
+                              ? l10n.foodSearchCreateFood
+                              : l10n.createProductEditTitle,
+                          style: AppTypography.sectionTitle.copyWith(
+                            color: theme.colorScheme.onSurface,
+                          ),
                         ),
                       ),
                     ],
                   ),
                 ),
                 Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(
-                      AppSpacing.md,
-                      AppSpacing.md,
-                      AppSpacing.md,
-                      AppSpacing.xl,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        YamTextField(
-                          fieldKey: const ValueKey('create-food-name'),
-                          label: l10n.createProductName,
-                          hintText: l10n.createProductNameHint,
-                          controller: _name,
-                          errorText: _errors['name'],
-                          onChanged: _changed,
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                        YamAutocompleteField<String>(
-                          fieldKey: const ValueKey('create-food-brand'),
-                          label: l10n.createProductBrand,
-                          hintText: l10n.createProductBrandHint,
-                          controller: _brand,
-                          focusNode: _brandFocus,
-                          displayStringForOption: (brand) => brand,
-                          optionsBuilder: (value) async =>
-                              UserFoodRepository.matchingBrands(
-                                await _brands,
-                                value.text,
-                              ),
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                        YamAutocompleteField<_CategorySuggestion>(
-                          fieldKey: const ValueKey('create-food-category'),
-                          label: l10n.createProductCategory,
-                          hintText: l10n.createProductCategoryHint,
-                          controller: _categoryText,
-                          focusNode: _categoryFocus,
-                          errorText: _errors['category'],
-                          displayStringForOption: (category) => category.label,
-                          optionsBuilder: (value) async {
-                            final prefix = value.text.trim().toLowerCase();
-                            if (prefix.isEmpty) return const [];
-                            return (await _categorySuggestions)
-                                .where(
-                                  (category) => category.label
-                                      .toLowerCase()
-                                      .startsWith(prefix),
-                                )
-                                .take(5);
-                          },
-                          onChanged: _categoryChanged,
-                          onSelected: (category) {
-                            _selectedCategory = category.value;
-                            _changed(category.label);
-                          },
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                        YamTextField(
-                          fieldKey: const ValueKey('create-food-description'),
-                          label: l10n.createProductDescription,
-                          hintText: l10n.createProductDescriptionHint,
-                          controller: _description,
-                          keyboardType: TextInputType.multiline,
-                          minLines: 3,
-                          maxLines: 8,
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        Divider(color: theme.colorScheme.outlineVariant),
-                        const SizedBox(height: AppSpacing.sm),
-                        Text(
-                          l10n.createProductNutrition,
-                          style: AppTypography.sectionTitle.copyWith(
-                            color: theme.colorScheme.onSurface,
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                        Text(
-                          l10n.createProductNutritionBasis,
-                          style: AppTypography.label.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.xs),
+                  child: YamFloatingLayout(
+                    contentBuilder: (context, bottomClearance) =>
                         SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
+                          padding: EdgeInsets.fromLTRB(
+                            AppSpacing.md,
+                            AppSpacing.md,
+                            AppSpacing.md,
+                            AppSpacing.xl + bottomClearance,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              for (final basis
-                                  in CustomFoodDisplayBasis.values) ...[
-                                YamFilterChip(
-                                  key: ValueKey('create-basis-${basis.name}'),
-                                  label: switch (basis) {
-                                    CustomFoodDisplayBasis.perHundredGrams =>
-                                      l10n.createProductPerHundredGrams,
-                                    CustomFoodDisplayBasis
-                                        .perHundredMilliliters =>
-                                      l10n.createProductPerHundredMilliliters,
-                                    CustomFoodDisplayBasis.perServing =>
-                                      l10n.createProductPerServing,
-                                  },
-                                  selected: _displayBasis == basis,
-                                  onPressed: () => setState(() {
-                                    _displayBasis = basis;
-                                    _errors = const {};
-                                  }),
+                              YamTextField(
+                                fieldKey: const ValueKey('create-food-name'),
+                                label: l10n.createProductName,
+                                hintText: l10n.createProductNameHint,
+                                controller: _name,
+                                errorText: _errors['name'],
+                                onChanged: _changed,
+                              ),
+                              const SizedBox(height: AppSpacing.md),
+                              YamAutocompleteField<String>(
+                                fieldKey: const ValueKey('create-food-brand'),
+                                label: l10n.createProductBrand,
+                                hintText: l10n.createProductBrandHint,
+                                controller: _brand,
+                                focusNode: _brandFocus,
+                                displayStringForOption: (brand) => brand,
+                                optionsBuilder: (value) async =>
+                                    UserFoodRepository.matchingBrands(
+                                      await _brands,
+                                      value.text,
+                                    ),
+                              ),
+                              const SizedBox(height: AppSpacing.md),
+                              YamAutocompleteField<_CategorySuggestion>(
+                                fieldKey: const ValueKey(
+                                  'create-food-category',
                                 ),
-                                const SizedBox(width: AppSpacing.xs),
+                                label: l10n.createProductCategory,
+                                hintText: l10n.createProductCategoryHint,
+                                controller: _categoryText,
+                                focusNode: _categoryFocus,
+                                errorText: _errors['category'],
+                                displayStringForOption: (category) =>
+                                    category.label,
+                                optionsBuilder: (value) async {
+                                  final prefix = value.text
+                                      .trim()
+                                      .toLowerCase();
+                                  if (prefix.isEmpty) return const [];
+                                  return (await _categorySuggestions)
+                                      .where(
+                                        (category) => category.label
+                                            .toLowerCase()
+                                            .startsWith(prefix),
+                                      )
+                                      .take(5);
+                                },
+                                onChanged: _categoryChanged,
+                                onSelected: (category) {
+                                  _selectedCategory = category.value;
+                                  _changed(category.label);
+                                },
+                              ),
+                              const SizedBox(height: AppSpacing.md),
+                              YamTextField(
+                                fieldKey: const ValueKey(
+                                  'create-food-description',
+                                ),
+                                label: l10n.createProductDescription,
+                                hintText: l10n.createProductDescriptionHint,
+                                controller: _description,
+                                keyboardType: TextInputType.multiline,
+                                minLines: 3,
+                                maxLines: 8,
+                              ),
+                              const SizedBox(height: AppSpacing.sm),
+                              Divider(color: theme.colorScheme.outlineVariant),
+                              const SizedBox(height: AppSpacing.sm),
+                              Text(
+                                l10n.createProductNutrition,
+                                style: AppTypography.sectionTitle.copyWith(
+                                  color: theme.colorScheme.onSurface,
+                                ),
+                              ),
+                              const SizedBox(height: AppSpacing.md),
+                              Text(
+                                l10n.createProductNutritionBasis,
+                                style: AppTypography.label.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                              const SizedBox(height: AppSpacing.xs),
+                              SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  children: [
+                                    for (final basis
+                                        in CustomFoodDisplayBasis.values) ...[
+                                      YamFilterChip(
+                                        key: ValueKey(
+                                          'create-basis-${basis.name}',
+                                        ),
+                                        label: switch (basis) {
+                                          CustomFoodDisplayBasis
+                                              .perHundredGrams =>
+                                            l10n.createProductPerHundredGrams,
+                                          CustomFoodDisplayBasis
+                                              .perHundredMilliliters =>
+                                            l10n.createProductPerHundredMilliliters,
+                                          CustomFoodDisplayBasis.perServing =>
+                                            l10n.createProductPerServing,
+                                        },
+                                        selected: _displayBasis == basis,
+                                        onPressed: () => setState(() {
+                                          _displayBasis = basis;
+                                          _errors = const {};
+                                        }),
+                                      ),
+                                      const SizedBox(width: AppSpacing.xs),
+                                    ],
+                                  ],
+                                ),
+                              ),
+                              if (_displayBasis ==
+                                  CustomFoodDisplayBasis.perServing) ...[
+                                const SizedBox(height: AppSpacing.sm),
+                                Row(
+                                  children: [
+                                    for (final basis
+                                        in CustomFoodBasis.values) ...[
+                                      YamFilterChip(
+                                        label: basis == CustomFoodBasis.grams
+                                            ? l10n.unitGrams
+                                            : l10n.unitMilliliters,
+                                        selected: _servingBasis == basis,
+                                        onPressed: () => setState(
+                                          () => _servingBasis = basis,
+                                        ),
+                                      ),
+                                      const SizedBox(width: AppSpacing.xs),
+                                    ],
+                                  ],
+                                ),
+                                const SizedBox(height: AppSpacing.sm),
+                                YamTextField(
+                                  fieldKey: const ValueKey(
+                                    'create-serving-name',
+                                  ),
+                                  label: l10n.createProductServingName,
+                                  hintText: l10n.createProductServingNameHint,
+                                  controller: _basisServingName,
+                                ),
+                                const SizedBox(height: AppSpacing.xxs),
+                                Text(
+                                  l10n.createProductServingNameHelper,
+                                  style: AppTypography.caption.copyWith(
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                                const SizedBox(height: AppSpacing.sm),
+                                YamNumberField(
+                                  fieldKey: const ValueKey(
+                                    'create-serving-size',
+                                  ),
+                                  label: l10n.createProductServingSize,
+                                  unit: baseUnit,
+                                  controller: _servingSize,
+                                  onChanged: _changed,
+                                  decimal: true,
+                                  style: YamNumberFieldStyle.compact,
+                                  errorText: _errors['servingSize'],
+                                ),
                               ],
+                              const SizedBox(height: AppSpacing.md),
+                              LayoutBuilder(
+                                builder: (context, constraints) {
+                                  final stacked =
+                                      constraints.maxWidth < 350 ||
+                                      MediaQuery.textScalerOf(
+                                            context,
+                                          ).scale(14) >
+                                          20;
+                                  final fields = [
+                                    YamNumberField(
+                                      fieldKey: const ValueKey(
+                                        'create-food-protein',
+                                      ),
+                                      label: l10n.macroProtein,
+                                      unit: l10n.unitGrams,
+                                      controller: _protein,
+                                      onChanged: _changed,
+                                      decimal: true,
+                                      style: YamNumberFieldStyle.compact,
+                                      indicatorColor: macroColors.protein,
+                                      errorText: _errors['protein'],
+                                    ),
+                                    YamNumberField(
+                                      fieldKey: const ValueKey(
+                                        'create-food-fat',
+                                      ),
+                                      label: l10n.macroFat,
+                                      unit: l10n.unitGrams,
+                                      controller: _fat,
+                                      onChanged: _changed,
+                                      decimal: true,
+                                      style: YamNumberFieldStyle.compact,
+                                      indicatorColor: macroColors.fat,
+                                      errorText: _errors['fat'],
+                                    ),
+                                    YamNumberField(
+                                      fieldKey: const ValueKey(
+                                        'create-food-carbs',
+                                      ),
+                                      label: l10n.macroCarbs,
+                                      unit: l10n.unitGrams,
+                                      controller: _carbs,
+                                      onChanged: _changed,
+                                      decimal: true,
+                                      style: YamNumberFieldStyle.compact,
+                                      indicatorColor: macroColors.carbs,
+                                      errorText: _errors['carbs'],
+                                    ),
+                                  ];
+                                  return stacked
+                                      ? Column(
+                                          children: [
+                                            for (final field in fields) ...[
+                                              field,
+                                              const SizedBox(
+                                                height: AppSpacing.xs,
+                                              ),
+                                            ],
+                                          ],
+                                        )
+                                      : Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            for (final field in fields) ...[
+                                              Expanded(child: field),
+                                              if (field != fields.last)
+                                                const SizedBox(
+                                                  width: AppSpacing.xs,
+                                                ),
+                                            ],
+                                          ],
+                                        );
+                                },
+                              ),
+                              if (_calculatedEnergy case final energy?) ...[
+                                const SizedBox(height: AppSpacing.sm),
+                                Text(
+                                  l10n.createProductCalculatedCalories(
+                                    formatFoodSearchNumber(context, energy),
+                                  ),
+                                  style: AppTypography.label.copyWith(
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              ],
+                              const SizedBox(height: AppSpacing.lg),
+                              Divider(color: theme.colorScheme.outlineVariant),
+                              const SizedBox(height: AppSpacing.sm),
+                              Text(
+                                l10n.createProductServings,
+                                style: AppTypography.sectionTitle.copyWith(
+                                  color: theme.colorScheme.onSurface,
+                                ),
+                              ),
+                              const SizedBox(height: AppSpacing.sm),
+                              for (
+                                var index = 0;
+                                index < _servings.length;
+                                index++
+                              ) ...[
+                                _buildServing(l10n, index, baseUnit),
+                                const SizedBox(height: AppSpacing.sm),
+                              ],
+                              YamSecondaryButton(
+                                label: l10n.createProductAddServing,
+                                onPressed: _addServing,
+                                icon: Icons.add_rounded,
+                              ),
+                              const SizedBox(height: AppSpacing.lg),
+                              YamTextField(
+                                fieldKey: const ValueKey('create-food-barcode'),
+                                label: l10n.createProductBarcode,
+                                controller: _barcode,
+                                keyboardType: TextInputType.number,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                ],
+                                errorText: _errors['barcode'],
+                                onChanged: _changed,
+                              ),
                             ],
                           ),
                         ),
-                        if (_displayBasis ==
-                            CustomFoodDisplayBasis.perServing) ...[
-                          const SizedBox(height: AppSpacing.sm),
-                          Row(
-                            children: [
-                              for (final basis in CustomFoodBasis.values) ...[
-                                YamFilterChip(
-                                  label: basis == CustomFoodBasis.grams
-                                      ? l10n.unitGrams
-                                      : l10n.unitMilliliters,
-                                  selected: _servingBasis == basis,
-                                  onPressed: () =>
-                                      setState(() => _servingBasis = basis),
+                    floating: YamFloatingActions(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          if (_saveError != null) ...[
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Material(
+                                color: theme.colorScheme.errorContainer,
+                                borderRadius: BorderRadius.circular(
+                                  AppRadius.small,
                                 ),
-                                const SizedBox(width: AppSpacing.xs),
-                              ],
-                            ],
-                          ),
-                          const SizedBox(height: AppSpacing.sm),
-                          YamNumberField(
-                            fieldKey: const ValueKey('create-serving-size'),
-                            label: l10n.createProductServingSize,
-                            unit: baseUnit,
-                            controller: _servingSize,
-                            onChanged: _changed,
-                            decimal: true,
-                            style: YamNumberFieldStyle.compact,
-                            errorText: _errors['servingSize'],
-                          ),
-                        ],
-                        const SizedBox(height: AppSpacing.md),
-                        LayoutBuilder(
-                          builder: (context, constraints) {
-                            final stacked =
-                                constraints.maxWidth < 350 ||
-                                MediaQuery.textScalerOf(context).scale(14) > 20;
-                            final fields = [
-                              YamNumberField(
-                                fieldKey: const ValueKey('create-food-protein'),
-                                label: l10n.macroProtein,
-                                unit: l10n.unitGrams,
-                                controller: _protein,
-                                onChanged: _changed,
-                                decimal: true,
-                                style: YamNumberFieldStyle.compact,
-                                indicatorColor: macroColors.protein,
-                                errorText: _errors['protein'],
+                                child: Padding(
+                                  padding: const EdgeInsets.all(AppSpacing.sm),
+                                  child: Semantics(
+                                    liveRegion: true,
+                                    child: Text(
+                                      _saveError!,
+                                      style: AppTypography.caption.copyWith(
+                                        color:
+                                            theme.colorScheme.onErrorContainer,
+                                      ),
+                                    ),
+                                  ),
+                                ),
                               ),
-                              YamNumberField(
-                                fieldKey: const ValueKey('create-food-fat'),
-                                label: l10n.macroFat,
-                                unit: l10n.unitGrams,
-                                controller: _fat,
-                                onChanged: _changed,
-                                decimal: true,
-                                style: YamNumberFieldStyle.compact,
-                                indicatorColor: macroColors.fat,
-                                errorText: _errors['fat'],
-                              ),
-                              YamNumberField(
-                                fieldKey: const ValueKey('create-food-carbs'),
-                                label: l10n.macroCarbs,
-                                unit: l10n.unitGrams,
-                                controller: _carbs,
-                                onChanged: _changed,
-                                decimal: true,
-                                style: YamNumberFieldStyle.compact,
-                                indicatorColor: macroColors.carbs,
-                                errorText: _errors['carbs'],
-                              ),
-                            ];
-                            return stacked
-                                ? Column(
-                                    children: [
-                                      for (final field in fields) ...[
-                                        field,
-                                        const SizedBox(height: AppSpacing.xs),
-                                      ],
-                                    ],
-                                  )
-                                : Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      for (final field in fields) ...[
-                                        Expanded(child: field),
-                                        if (field != fields.last)
-                                          const SizedBox(width: AppSpacing.xs),
-                                      ],
-                                    ],
-                                  );
-                          },
-                        ),
-                        if (_calculatedEnergy case final energy?) ...[
-                          const SizedBox(height: AppSpacing.sm),
-                          Text(
-                            l10n.createProductCalculatedCalories(
-                              formatFoodSearchNumber(context, energy),
                             ),
-                            style: AppTypography.label.copyWith(
-                              color: theme.colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                        ],
-                        const SizedBox(height: AppSpacing.lg),
-                        Divider(color: theme.colorScheme.outlineVariant),
-                        const SizedBox(height: AppSpacing.sm),
-                        Text(
-                          l10n.createProductServings,
-                          style: AppTypography.sectionTitle.copyWith(
-                            color: theme.colorScheme.onSurface,
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        for (
-                          var index = 0;
-                          index < _servings.length;
-                          index++
-                        ) ...[
-                          _buildServing(l10n, index, baseUnit),
-                          const SizedBox(height: AppSpacing.sm),
-                        ],
-                        YamSecondaryButton(
-                          label: l10n.createProductAddServing,
-                          onPressed: _addServing,
-                          icon: Icons.add_rounded,
-                        ),
-                        const SizedBox(height: AppSpacing.lg),
-                        YamTextField(
-                          fieldKey: const ValueKey('create-food-barcode'),
-                          label: l10n.createProductBarcode,
-                          controller: _barcode,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
+                            const SizedBox(height: AppSpacing.xs),
                           ],
-                          errorText: _errors['barcode'],
-                          onChanged: _changed,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    AppSpacing.md,
-                    AppSpacing.xs,
-                    AppSpacing.md,
-                    AppSpacing.md,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      if (_saveError != null) ...[
-                        Text(
-                          _saveError!,
-                          style: AppTypography.caption.copyWith(
-                            color: theme.colorScheme.error,
+                          YamPrimaryButton(
+                            label: _saving
+                                ? l10n.createProductSaving
+                                : widget.initialFood == null
+                                ? l10n.createProductSave
+                                : l10n.createProductUpdate,
+                            onPressed: _saving ? null : _save,
+                            expanded: true,
+                            loading: _saving,
                           ),
-                        ),
-                        const SizedBox(height: AppSpacing.xs),
-                      ],
-                      YamPrimaryButton(
-                        label: _saving
-                            ? l10n.createProductSaving
-                            : widget.initialFood == null
-                            ? l10n.createProductSave
-                            : l10n.createProductUpdate,
-                        onPressed: _saving ? null : _save,
-                        expanded: true,
-                        loading: _saving,
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ],
@@ -793,7 +867,7 @@ class _UserFoodFormScreenState extends State<UserFoodFormScreen> {
               children: [
                 Expanded(
                   child: Text(
-                    _servingName(l10n, editor.unit),
+                    _servingUnitName(l10n, editor.unit),
                     style: AppTypography.productTitle.copyWith(
                       color: theme.colorScheme.onSurface,
                     ),
@@ -812,14 +886,20 @@ class _UserFoodFormScreenState extends State<UserFoodFormScreen> {
                 ),
               ],
             ),
-            if (editor.unit == CustomServingUnit.serving) ...[
-              YamTextField(
-                label: l10n.createProductServingName,
-                hintText: l10n.createProductServingNameHint,
-                controller: editor.name,
+            YamTextField(
+              fieldKey: ValueKey('create-serving-$index-name'),
+              label: l10n.createProductServingName,
+              hintText: l10n.createProductServingNameHint,
+              controller: editor.name,
+            ),
+            const SizedBox(height: AppSpacing.xxs),
+            Text(
+              l10n.createProductServingNameHelper,
+              style: AppTypography.caption.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
               ),
-              const SizedBox(height: AppSpacing.sm),
-            ],
+            ),
+            const SizedBox(height: AppSpacing.sm),
             YamNumberField(
               fieldKey: ValueKey('create-serving-$index-amount'),
               label: l10n.createProductServingAmount,

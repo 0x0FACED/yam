@@ -258,11 +258,13 @@ class _BackupActionsState extends State<_BackupActions> {
   Future<T?> _showSheet<T>({
     required String title,
     required List<Widget> Function(BuildContext, ValueChanged<T?>) content,
+    Widget Function(BuildContext, ValueChanged<T?>)? actions,
   }) => showYamActionSheet<T>(
     context: context,
     title: title,
     closeLabel: AppLocalizations.of(context).backupClose,
     content: content,
+    actions: actions,
   );
 
   Future<bool?> _confirm({required bool replace}) {
@@ -271,31 +273,36 @@ class _BackupActionsState extends State<_BackupActions> {
       title: replace ? l10n.backupReplaceTitle : l10n.settingsExportData,
       content: (context, close) => [
         Text(replace ? l10n.backupReplaceWarning : l10n.backupPersonalDataNote),
-        const SizedBox(height: AppSpacing.lg),
-        if (replace)
-          YamTextButton(
-            key: const ValueKey('backup-confirm-replace'),
-            label: l10n.backupReplaceConfirm,
-            tone: YamTextButtonTone.destructive,
-            onPressed: () => close(true),
-          )
-        else
-          YamPrimaryButton(
-            key: const ValueKey('backup-confirm-export'),
-            label: l10n.backupSaveAction,
-            icon: Icons.save_alt_rounded,
-            expanded: true,
-            onPressed: () => close(true),
-          ),
-        const SizedBox(height: AppSpacing.xs),
-        YamTextButton(
-          key: ValueKey(
-            replace ? 'backup-cancel-replace' : 'backup-cancel-export',
-          ),
-          label: l10n.backupCancel,
-          onPressed: () => close(false),
-        ),
       ],
+      actions: (context, close) => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (replace)
+            YamTextButton(
+              key: const ValueKey('backup-confirm-replace'),
+              label: l10n.backupReplaceConfirm,
+              tone: YamTextButtonTone.destructive,
+              onPressed: () => close(true),
+            )
+          else
+            YamPrimaryButton(
+              key: const ValueKey('backup-confirm-export'),
+              label: l10n.backupSaveAction,
+              icon: Icons.save_alt_rounded,
+              expanded: true,
+              onPressed: () => close(true),
+            ),
+          const SizedBox(height: AppSpacing.xs),
+          YamTextButton(
+            key: ValueKey(
+              replace ? 'backup-cancel-replace' : 'backup-cancel-export',
+            ),
+            label: l10n.backupCancel,
+            onPressed: () => close(false),
+          ),
+        ],
+      ),
     );
   }
 
@@ -336,13 +343,12 @@ class _BackupActionsState extends State<_BackupActions> {
           expanded: true,
           onPressed: () => close(BackupImportMode.replace),
         ),
-        const SizedBox(height: AppSpacing.xs),
-        YamTextButton(
-          key: const ValueKey('backup-cancel-import'),
-          label: l10n.backupCancel,
-          onPressed: () => close(null),
-        ),
       ],
+      actions: (context, close) => YamTextButton(
+        key: const ValueKey('backup-cancel-import'),
+        label: l10n.backupCancel,
+        onPressed: () => close(null),
+      ),
     );
   }
 
@@ -372,14 +378,13 @@ class _BackupActionsState extends State<_BackupActions> {
           const SizedBox(height: AppSpacing.xs),
           Text(l10n.backupSkippedNote),
         ],
-        const SizedBox(height: AppSpacing.lg),
-        YamPrimaryButton(
-          key: const ValueKey('backup-import-done'),
-          label: l10n.backupDone,
-          expanded: true,
-          onPressed: () => close(true),
-        ),
       ],
+      actions: (context, close) => YamPrimaryButton(
+        key: const ValueKey('backup-import-done'),
+        label: l10n.backupDone,
+        expanded: true,
+        onPressed: () => close(true),
+      ),
     );
   }
 

@@ -34,7 +34,7 @@ class YamFilterChip extends StatelessWidget {
           onTap: onPressed,
           excludeFromSemantics: true,
           child: ConstrainedBox(
-            constraints: const BoxConstraints(minHeight: 44),
+            constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
             child: Center(
               child: AnimatedContainer(
                 duration: reduceMotion ? Duration.zero : AppMotion.smallChange,
@@ -49,17 +49,6 @@ class YamFilterChip extends StatelessWidget {
                         : theme.colorScheme.outlineVariant,
                   ),
                   borderRadius: BorderRadius.circular(AppRadius.pill),
-                  boxShadow: selected
-                      ? [
-                          BoxShadow(
-                            color: theme.colorScheme.primary.withValues(
-                              alpha: 0.14,
-                            ),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ]
-                      : null,
                 ),
                 child: Material(
                   color: Colors.transparent,

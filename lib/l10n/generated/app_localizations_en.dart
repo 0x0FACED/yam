@@ -239,6 +239,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diaryTitle => 'Diary';
 
   @override
+  String get diaryReadErrorTitle => 'Diary could not be loaded';
+
+  @override
+  String get diaryReadErrorMessage =>
+      'Entries or goals are unavailable. Try loading local diary data again.';
+
+  @override
   String get dayDetailsTitle => 'Day details';
 
   @override
@@ -520,10 +527,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get createProductAddServing => 'Add a unit';
 
   @override
-  String get createProductServingName => 'Name (optional)';
+  String get createProductServingName => 'Serving name (optional)';
 
   @override
-  String get createProductServingNameHint => 'For example, bottle';
+  String get createProductServingNameHint => 'For example, sandwich';
+
+  @override
+  String get createProductServingNameHelper =>
+      'Enter just the name; set its weight or volume separately below.';
 
   @override
   String get createProductServingAmount => 'Amount in one unit';
@@ -948,6 +959,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get statsLoading => 'Loading statistics';
+
+  @override
+  String get statsReadErrorTitle => 'Statistics could not be loaded';
+
+  @override
+  String get statsReadErrorMessage =>
+      'Some local data is unavailable. Try loading your statistics again.';
 
   @override
   String statsCurrentGoal(String value) {
@@ -1496,7 +1514,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsVersion => 'Version';
 
   @override
-  String get assistantTitle => 'AI assistant';
+  String get assistantTitle => 'YAM';
 
   @override
   String get assistantSettings => 'AI connection';
@@ -1529,15 +1547,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get assistantPhotoNotStored => 'Photo not saved';
 
   @override
-  String get assistantUseHistory => 'Use saved history as context';
+  String get assistantUseHistory => 'Saved chat context';
 
   @override
   String get assistantUseHistoryNote =>
-      'Only text from the last 12 messages, up to 12,000 characters, is sent with the next request. Photos and old tool calls are not sent.';
+      'Up to 12 messages / 12,000 characters. On for this chat.';
 
   @override
-  String get assistantHistoryOffNote =>
-      'Archived messages are not sent. The new exchange still keeps its own context.';
+  String get assistantHistoryOffNote => 'Saved messages are not sent.';
 
   @override
   String get assistantHistoryStorageError =>
@@ -1735,7 +1752,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get assistantCloseNote =>
-      'Chat text stays in local history. Attached photos, unfinished input and the unsaved draft will be discarded. Saved entries remain in the diary.';
+      'The current request will stop. Chat text stays in local history. Attached photos, unfinished input and the unsaved draft will be discarded. Saved entries remain in the diary.';
 
   @override
   String get assistantCloseConfirm => 'Close';
@@ -1751,7 +1768,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get assistantSwitchNote =>
-      'Changing the connection starts a new conversation. Chat text stays in local history; attached photos, unfinished input and the unsaved draft will be discarded.';
+      'The current request will stop, and changing the connection starts a new conversation. Chat text stays in local history; attached photos, unfinished input and the unsaved draft will be discarded.';
 
   @override
   String get assistantInvalidDraft =>

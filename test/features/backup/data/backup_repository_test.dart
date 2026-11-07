@@ -37,10 +37,15 @@ void main() {
             id: _id(value),
             day: DateTime(2026, 11, 6),
             mealId: 'lunch',
-            messages: const [
-              AssistantMessage(isUser: true, text: '', hasImage: true),
-              AssistantMessage(isUser: false, text: 'Saved answer\n🥣'),
-              AssistantMessage(isUser: true, text: '  Saved text  '),
+            messages: [
+              AssistantMessage(
+                isUser: true,
+                text: '',
+                hasImage: true,
+                sentAt: DateTime.utc(2026, 11, 6, 12, 34, 56, 789),
+              ),
+              const AssistantMessage(isUser: false, text: 'Saved answer\n🥣'),
+              const AssistantMessage(isUser: true, text: '  Saved text  '),
             ],
           );
         }
@@ -64,6 +69,11 @@ void main() {
         expect(chat.messages.first.hasImage, isTrue);
         expect(chat.messages.every((message) => message.image == null), isTrue);
         expect(chat.messages[1].text, 'Saved answer\n🥣');
+        expect(
+          chat.messages.first.sentAt,
+          DateTime.utc(2026, 11, 6, 12, 34, 56, 789),
+        );
+        expect(chat.messages.last.sentAt, isNull);
         expect(await restored.load(_id(101)), isNull);
         final second = database();
         final reader = BackupRepository(second);
@@ -158,76 +168,79 @@ void main() {
     },
   );
 
-  test(
-    'untrusted chat messages and metadata are rejected before writes',
-    () async {
-      final source = database();
-      await _seed(source);
-      final chats = AssistantConversationRepository(source);
-      await chats.save(
-        id: _id(100),
-        day: DateTime(2026, 11, 6),
-        mealId: 'lunch',
-        messages: const [AssistantMessage(isUser: true, text: 'Saved text')],
-      );
-      final bytes = await BackupRepository(source).exportBackup();
-      final destination = database();
-      await _seed(destination);
-      final before = await _state(destination);
-      final mutations = <String, void Function(Map<String, dynamic>)>{
-        'UUID': (row) => row['id'] = 'bad',
-        'device': (row) => row['deviceId'] = 'bad',
-        'timestamp': (row) => row['updatedAt'] = 'tomorrow',
-        'date': (row) => row['day'] = '2026-02-30',
-        'meal': (row) => row['mealId'] = 'unknown',
-        'title type': (row) => row['title'] = null,
-        'title length': (row) => row['title'] = List.filled(81, 'x').join(),
-        'missing messages': (row) => row.remove('messages'),
-        'JSON': (row) => row['messages'] = '[',
-        'object': (row) => row['messages'] = '{}',
-        'message shape': (row) => row['messages'] = '[null]',
-        'role': (row) =>
-            row['messages'] = '[{"isUser":"true","text":"x","hasImage":false}]',
-        'text': (row) =>
-            row['messages'] = '[{"isUser":true,"text":null,"hasImage":false}]',
-        'image marker': (row) =>
-            row['messages'] = '[{"isUser":true,"text":"x","hasImage":"true"}]',
-        'media': (row) => row['messages'] =
-            '[{"isUser":true,"text":"x","hasImage":true,"image":"data:image/jpeg;base64,YQ=="}]',
-        'tools': (row) => row['messages'] =
-            '[{"isUser":false,"text":"x","hasImage":false,"tool_calls":[]}]',
-        'unscrubbed deletion': (row) => row['deletedAt'] = row['updatedAt'],
-      };
-      for (final mutation in mutations.entries) {
-        final files = _jsonFiles(bytes);
-        mutation.value(_rows(files, 'assistant_conversations.json').single);
-        await expectLater(
-          BackupRepository(destination).inspectBackup(_pack(files)),
-          throwsA(
-            isA<BackupException>().having(
-              (error) => error.failure,
-              'failure',
-              BackupFailure.invalidFile,
-            ),
+  test('untrusted chat messages and metadata are rejected before writes', () async {
+    final source = database();
+    await _seed(source);
+    final chats = AssistantConversationRepository(source);
+    await chats.save(
+      id: _id(100),
+      day: DateTime(2026, 11, 6),
+      mealId: 'lunch',
+      messages: const [AssistantMessage(isUser: true, text: 'Saved text')],
+    );
+    final bytes = await BackupRepository(source).exportBackup();
+    final destination = database();
+    await _seed(destination);
+    final before = await _state(destination);
+    final mutations = <String, void Function(Map<String, dynamic>)>{
+      'UUID': (row) => row['id'] = 'bad',
+      'device': (row) => row['deviceId'] = 'bad',
+      'timestamp': (row) => row['updatedAt'] = 'tomorrow',
+      'date': (row) => row['day'] = '2026-02-30',
+      'meal': (row) => row['mealId'] = 'unknown',
+      'title type': (row) => row['title'] = null,
+      'title length': (row) => row['title'] = List.filled(81, 'x').join(),
+      'missing messages': (row) => row.remove('messages'),
+      'JSON': (row) => row['messages'] = '[',
+      'object': (row) => row['messages'] = '{}',
+      'message shape': (row) => row['messages'] = '[null]',
+      'role': (row) =>
+          row['messages'] = '[{"isUser":"true","text":"x","hasImage":false}]',
+      'text': (row) =>
+          row['messages'] = '[{"isUser":true,"text":null,"hasImage":false}]',
+      'image marker': (row) =>
+          row['messages'] = '[{"isUser":true,"text":"x","hasImage":"true"}]',
+      'media': (row) => row['messages'] =
+          '[{"isUser":true,"text":"x","hasImage":true,"image":"data:image/jpeg;base64,YQ=="}]',
+      'tools': (row) => row['messages'] =
+          '[{"isUser":false,"text":"x","hasImage":false,"tool_calls":[]}]',
+      'null sent time': (row) => row['messages'] =
+          '[{"isUser":true,"text":"x","hasImage":false,"sentAt":null}]',
+      'invalid sent time': (row) => row['messages'] =
+          '[{"isUser":true,"text":"x","hasImage":false,"sentAt":"tomorrow"}]',
+      'local sent time': (row) => row['messages'] =
+          '[{"isUser":true,"text":"x","hasImage":false,"sentAt":"2026-11-06T12:34:56"}]',
+      'unscrubbed deletion': (row) => row['deletedAt'] = row['updatedAt'],
+    };
+    for (final mutation in mutations.entries) {
+      final files = _jsonFiles(bytes);
+      mutation.value(_rows(files, 'assistant_conversations.json').single);
+      await expectLater(
+        BackupRepository(destination).inspectBackup(_pack(files)),
+        throwsA(
+          isA<BackupException>().having(
+            (error) => error.failure,
+            'failure',
+            BackupFailure.invalidFile,
           ),
-          reason: mutation.key,
-        );
-        expect(await _state(destination), before, reason: mutation.key);
-      }
-      final missing = _jsonFiles(bytes);
-      missing.remove('assistant_conversations.json');
-      await expectLater(
-        BackupRepository(destination).inspectBackup(_pack(missing)),
-        throwsA(isA<BackupException>()),
+        ),
+        reason: mutation.key,
       );
-      final wrongCount = _jsonFiles(bytes);
-      wrongCount['manifest.json']['counts']['assistantConversations'] = 0;
-      await expectLater(
-        BackupRepository(destination).inspectBackup(_pack(wrongCount)),
-        throwsA(isA<BackupException>()),
-      );
-    },
-  );
+      expect(await _state(destination), before, reason: mutation.key);
+    }
+    final missing = _jsonFiles(bytes);
+    missing.remove('assistant_conversations.json');
+    await expectLater(
+      BackupRepository(destination).inspectBackup(_pack(missing)),
+      throwsA(isA<BackupException>()),
+    );
+    final wrongCount = _jsonFiles(bytes);
+    wrongCount['manifest.json']['counts']['assistantConversations'] = 0;
+    await expectLater(
+      BackupRepository(destination).inspectBackup(_pack(wrongCount)),
+      throwsA(isA<BackupException>()),
+    );
+  });
 
   for (final version in [1, 2, 3]) {
     test(
