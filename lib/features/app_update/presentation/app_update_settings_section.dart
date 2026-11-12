@@ -55,14 +55,12 @@ class _AppUpdateSettingsSectionState extends State<AppUpdateSettingsSection> {
         AppUpdateStatus.checking => l10n.updateChecking,
         AppUpdateStatus.upToDate => l10n.updateUpToDate,
         AppUpdateStatus.available => l10n.updateAvailable(
-          release!.version.displayVersion,
+          release!.version.version,
         ),
         AppUpdateStatus.downloading => l10n.updateDownloading(
           NumberFormat.percentPattern(locale).format(controller.progress),
         ),
-        AppUpdateStatus.ready => l10n.updateReady(
-          release!.version.displayVersion,
-        ),
+        AppUpdateStatus.ready => l10n.updateReady(release!.version.version),
         AppUpdateStatus.installing => l10n.updateOpeningInstaller,
       };
       final failure = controller.failure;

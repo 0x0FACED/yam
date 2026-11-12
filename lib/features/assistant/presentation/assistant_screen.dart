@@ -498,6 +498,7 @@ class _AssistantScreenState extends State<AssistantScreen> {
                   final draft = controller.draft;
                   final wide = viewport.maxWidth >= 1040 && draft != null;
                   return YamFloatingLayout(
+                    inset: AppSpacing.xxs,
                     contentBuilder: (context, bottomClearance) {
                       final chat = _conversation(
                         bottomClearance,
@@ -633,7 +634,7 @@ class _AssistantScreenState extends State<AssistantScreen> {
         color: colors.errorContainer,
         elevation: AppElevation.floatingAction,
         shadowColor: AppElevation.floatingShadow(colors),
-        borderRadius: BorderRadius.circular(AppRadius.control),
+        borderRadius: const BorderRadius.all(Radius.circular(AppRadius.small)),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.sm),
           child: Semantics(
@@ -761,9 +762,9 @@ class _AssistantScreenState extends State<AssistantScreen> {
         color: colors.surfaceContainerLow,
         elevation: AppElevation.floatingAction,
         shadowColor: AppElevation.floatingShadow(colors),
-        borderRadius: BorderRadius.circular(AppRadius.card),
+        borderRadius: const BorderRadius.all(Radius.circular(AppRadius.small)),
         child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.xs),
+          padding: const EdgeInsets.all(AppSpacing.xxs),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -967,6 +968,11 @@ class _AssistantScreenState extends State<AssistantScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
                 foregroundColor: colors.onSurfaceVariant,
                 textStyle: AppTypography.label,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(AppRadius.small),
+                  ),
+                ),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,

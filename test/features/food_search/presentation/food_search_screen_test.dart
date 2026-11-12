@@ -597,7 +597,7 @@ void main() {
         await tester.ensureVisible(field);
         await tester.enterText(field, entry.value);
       }
-      await tester.tap(find.text('Save changes'));
+      await tester.tap(find.byKey(const ValueKey('create-food-save')));
       await tester.pumpAndSettle();
       expect(find.byKey(ValueKey('food-result-$id')), findsOneWidget);
       expect(find.text('Updated oats'), findsOneWidget);
@@ -735,7 +735,7 @@ void main() {
       find.byKey(const ValueKey('create-food-name')),
       'Новое молоко',
     );
-    await tester.tap(find.text('Сохранить изменения'));
+    await tester.tap(find.byKey(const ValueKey('create-food-save')));
     await tester.pumpAndSettle();
     expect(find.byKey(ValueKey('food-result-$id')), findsOneWidget);
     expect(find.text('Продукт «Новое молоко» обновлён'), findsOneWidget);

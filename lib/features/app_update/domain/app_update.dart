@@ -34,7 +34,7 @@ class AppUpdateVersion {
   final int buildNumber;
   final List<int> _components;
 
-  String get displayVersion => '$version+$buildNumber';
+  String get artifactVersion => '$version+$buildNumber';
 
   /// Android requires a greater code, even when the public version increases.
   bool isNewerThan(AppUpdateVersion installed) {

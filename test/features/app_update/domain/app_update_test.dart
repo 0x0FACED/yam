@@ -6,7 +6,7 @@ void main() {
     final version = AppUpdateVersion.parse('0.10.0+2100000000');
     expect(version.version, '0.10.0');
     expect(version.buildNumber, 2100000000);
-    expect(version.displayVersion, '0.10.0+2100000000');
+    expect(version.artifactVersion, '0.10.0+2100000000');
   });
 
   test('compares numeric SemVer components and requires a greater build', () {

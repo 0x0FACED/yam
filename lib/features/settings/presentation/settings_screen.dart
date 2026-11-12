@@ -50,6 +50,13 @@ class SettingsScreen extends StatelessWidget {
   final VoidCallback? onOpenAssistant;
   final VoidCallback? onOpenProxy;
 
+  String get _displayVersion {
+    final buildSeparator = appVersion.indexOf('+');
+    return buildSeparator < 0
+        ? appVersion
+        : appVersion.substring(0, buildSeparator);
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -238,7 +245,7 @@ class SettingsScreen extends StatelessWidget {
                                   ),
                                   YamSettingsRow(
                                     title: l10n.settingsVersion,
-                                    value: appVersion,
+                                    value: _displayVersion,
                                   ),
                                 ],
                               ),
@@ -285,7 +292,7 @@ class SettingsScreen extends StatelessWidget {
     showAboutDialog(
       context: context,
       applicationName: l10n.appName,
-      applicationVersion: appVersion,
+      applicationVersion: _displayVersion,
       applicationIcon: Icon(
         Icons.restaurant_menu_rounded,
         color: Theme.of(context).colorScheme.primary,

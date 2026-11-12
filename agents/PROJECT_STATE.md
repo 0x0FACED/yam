@@ -4,13 +4,13 @@
 
 ## Обновлено
 
-- Дата: 2026-11-08.
+- Дата: 2026-11-13.
 - Рабочая alpha local-first: Дневник, свои продукты, вес/цели, Статистика,
   необязательный OFF, полный backup `.yam`, обмен «Моими блюдами» JSON.
 - ИИ-помощник: текст/голос/фото → редактируемый черновик → явное подтверждение; ручной ввод offline.
 - HTTP/HTTPS/SOCKS5-прокси из Настроек: защищённые per-device credentials, без direct fallback.
 - SQLite `yam` — schema v8. Полные копии — format v3, импорт v1/v2/v3.
-- Подготовлен `0.7.2+15` / `v0.7.2`: исправления переключения дней и закрытия подробностей; Unreleased пуст.
+- Подготовлен релиз `0.7.2+15`: изменения из Unreleased включены в заметки 0.7.2.
 
 ## Принятые Решения
 
@@ -57,6 +57,11 @@
 - [ADR 0048](../docs/adr/0048-ui-consistency-and-recovery.md): исправлены 11 замечаний consistency-аудита без редизайна и изменения данных.
 - [ADR 0049](../docs/adr/0049-stable-diary-day-navigation.md): неподвижная полоска дней без анимации выделения; возврат из подробностей без повторного reveal.
 - [ADR 0050](../docs/adr/0050-day-details-background-transition.md): полноэкранная fade-подложка согласует проявление всего Дневника со сворачиванием подробностей.
+- [ADR 0051](../docs/adr/0051-header-save-actions.md): верхний Save/check вместо
+  floating только у продукта, прокси, записи Дневника и веса; остальные flow не меняются.
+- [ADR 0052](../docs/adr/0052-compact-assistant-composer.md): чат — inset 16, padding 4, радиусы ввода/ошибки/meal 8; targets 44.
+- [ADR 0053](../docs/adr/0053-app-version-display.md): пользовательские версии
+  без `+BUILD`; package metadata и проверки обновлений сохраняют номер сборки.
 
 ## Реализовано И Основные Файлы
 
@@ -89,9 +94,11 @@
   Импортированный дубль не мешает правке неизменного штрихкода.
 - `user_food_form_screen.dart`: общая create/edit форма; category/brand suggestions,
   описание, редактируемые названия всех порций с сохранением ID/коэффициентов.
-- `core/ui/layout/yam_floating_layout.dart`: Stack/Positioned + измеряемый end padding.
-  `yam_floating_actions.dart`: только прозрачные отступы и тень из `AppElevation`.
-  Общий паттерн форм/листов/целей/прокси/обмена; safe area/IME учитывает caller.
+- `user_food_form_screen.dart`, `proxy_settings_screen.dart`, `edit_diary_entry_sheet.dart`,
+  `weight_entry_sheet.dart`: фиксированная шапка с галочкой; Close слева, Delete сохранён.
+  У продукта ошибка вне прокрутки; `YamIconButton.loading` блокирует повторное нажатие.
+- `yam_floating_layout.dart`/`yam_floating_actions.dart`: overlay/end padding остаётся
+  для quick add, онбординга, чата и обмена; safe area/IME учитывает caller.
 - `yam_text_field.dart`: viewport/tap fixes и новый `obscureText` для ключа;
   для скрытого ввода отключены autocorrect/suggestions. `yam_autocomplete_field.dart`
   переиспользует общий ввод; реальное multiline-поведение сохранено.
@@ -162,14 +169,13 @@
 - `assistant_message_bubble.dart`, `assistant_markdown.dart`: сообщения без карточек,
   local time для новых `sentAt`, Markdown/выделение, таблицы/код, явные HTTP(S)-ссылки.
   `assistant_thinking_indicator.dart`: циклический маскот и текст; reduced motion без ticker.
-- `assistant_screen.dart`: YAM + connection/model в шапке; composer/errors и confirm
-  поверх полной прокрутки, без обрезающего футера; ввод review сохраняется при reparent.
-  ≥44 px кнопки без лишних зазоров, контрастный Switch. Запрос не блокирует следующий
-  ввод/медиа/день/приём; контекст активного запроса фиксируется при старте.
+- `assistant_screen.dart`: шапка YAM/connection/model; composer/errors/confirm над прокруткой, без футера.
+  Review сохраняет ввод при reparent; видимый inset 16, padding 4, радиусы 8, targets ≥44; Switch контрастный.
+  Запрос не блокирует следующий ввод/медиа/день/приём; его контекст фиксируется при старте.
   Навигация отменяет запрос/голос после подтверждения и защищена от async re-entry.
-  Context controls не исчезают с IME; малый viewport прокручивается целиком.
-  Follow-tail только у нижнего края, без пересчёта по фокусу. `assistant_message_input.dart`:
-  PasteTextIntent/context menu для image-only clipboard, штатная вставка текста/undo.
+  Context controls не исчезают с IME; meal — явный default, не ограничение ИИ. Малый viewport прокручивается.
+  Follow-tail только у нижнего края; `assistant_message_input.dart`: image-paste/context menu,
+  штатная вставка текста/undo. Геометрия общего floating-layout по умолчанию не изменилась.
 - `assistant_connection_screen.dart`: `/assistant/connection` из Настроек/помощника,
   защищённый key field, saved ChatGPT account picker, модель, welcome и usage link.
   RU/EN, privacy и правила локальной истории; native permission descriptions тоже RU/EN.
@@ -221,35 +227,41 @@
 - CI/release: pinned SDK, enforce-lockfile, l10n, analyze/full suite/coverage;
   signed Android APK, Linux x64 bundle, macOS universal zip, SHA256SUMS, draft до
   загрузки. `tool/changelog.dart`/`release_metadata.dart` проверяют tag/pubspec/notes.
+- `settings_screen.dart`, `app_update_settings_section.dart`: отображают только
+  публичную версию; `app_update.dart`/`github_update_client.dart` сохраняют
+  `+BUILD` для сравнения и имени Android APK.
 - Android updater: latest stable GitHub release, .part stream, длина/SHA256,
   проверка пакета/версии/подписи, system install. Отмена сохраняет APK; package
   replacement/startup очищает завершённое. Другие платформы updater не показывают.
+- `CHANGELOG.md`: заметки 0.7.2 включают верхний Save, компактный чат, стабильную
+  навигацию по дням и версию без номера сборки. GitHub Release отсутствует;
+  локальный и удалённый тег `v0.7.2` указывают на предыдущий commit, не на эти изменения.
+- `test/core/network/proxy_fixture.dart`: при ошибке чтения туннеля target
+  закрывается в `finally`; RST раньше оставлял origin открытым и блокировал тест.
 
 ## Проверка
 
-- `dart format`, `flutter analyze`: чисто. 32 фокусных теста Дневника/route/entrance прошли.
-  `day_details_route_test.dart` проверяет фактические промежуточные пиксели вне карточки:
-  фон постепенно открывается. Реальный Дневник проверяет уменьшение clip и сохранение даты/recovery.
-- Native macOS: промежуточные кадры показывают сворачивание поверхности и плавное проявление
-  шапки/календаря/приёмов/FAB/навигации; Light/Dark, Reduced Motion, Flutter errors=0. Стенд удалён.
-- `v0.7.2`: CLI подтвердил `0.7.2+15` и извлёк заметки нужного релиза; 16 tool-тестов прошли.
-- Предыдущая UI-приёмка: 129 проверок; RU/EN, Light/Dark, низкие окна, текст ×2, меню/Retry/edit/disabled.
-- Android debug не подтверждён: offline-кэш без Kotlin 2.2.20/engine/Tink 1.21 и других Maven binaries.
+- `dart format`, `flutter analyze`, `flutter pub get --enforce-lockfile`,
+  `flutter gen-l10n` и проверка release metadata для `v0.7.2` прошли.
+- Фокусные тесты настроек и updater: 58 прошли, включая версии в UI и имя APK.
+- Полный `flutter test --no-pub --coverage` без системного прокси: 460 прошли.
+  В диагностике воспроизведён TCP RST с оставшимся открытым origin;
+  после исправления 300 отмен и отдельный сценарий RST завершились успешно.
+- macOS debug собран и запущен, Дневник виден; переход в настройки через
+  автоматизацию недоступен из-за запрета macOS на System Events.
+- Native macOS чата: RU/EN, Light/Dark, 320–1120 px, текст ×2, synthetic IME.
+  Ввод/ошибка/meal: радиус 8; targets ≥44; UI-выбор Dinner передан в запрос; focus/selection сохранены.
+  Плотность: inset 28→16, начало текста 44→28, высота 152→144 при ширине 390. Flutter/runtime errors=0.
+  Toolbar/draft/error compact/wide и четыре формы Save/cancel/delete, product SQLite/proxy storage проверены.
 
 ## Следующее Действие И Ограничения
 
-- **Следующее:** Android/iOS-приёмка выбора дня и закрытия подробностей кнопкой/системным Back;
-  затем меню/edit/floating с системной клавиатурой на 320–360 px и крупным текстом. Устройства не проверялись.
-- Реальный текстовый OpenAI inference через подключённую подписку подтверждён;
-  облачный сценарий tools/фото/confirm отдельно не проверялся. Browser OAuth на
-  телефонах, native mic/camera/permissions и Linux voice/Secret Service не проверены.
-- Подробности дня/системный Back на Android/iOS, живая Android миграция, native IME,
-  клавиатура/floating на телефоне, file dialogs и updater требуют приёмки.
+- **Следующее:** владельцу зафиксировать изменения и перенести существующий локальный
+  и удалённый тег `v0.7.2` на итоговый commit; проверить release workflow на GitHub.
+- Приёмка новой APK на Android с реальной IME не выполнена; физические Android/iOS недоступны.
+- OpenAI text inference через подписку подтверждён; tools/фото/confirm и mobile OAuth не проверялись.
+- Android/iOS Back/миграции, native permissions, Linux voice/Secret Service, file dialogs/updater требуют приёмки.
 - macOS release ad-hoc, без Developer ID/notarization; legacy Keychain без Keychain Sharing.
-- Тема/builtin favorites сессионные; отдельные настройки языка/единиц лишь
-  отображаются. Нет отдельного удаления всех данных. Riverpod не подключён.
-- Common-food база/универсальное запоминание порций, barcode, USDA, recipes,
-  copy meal/day и sync не реализованы. Описание — заметка, не структурированный рецепт.
-- Diary lifecycle полуночи/возврата из фона требует отдельной обработки с
-  сохранением вручную выбранной даты. Pin Drift 2.31/drift_flutter 0.2.4 сохранён.
-- Прежние CocoaPods/остальные пользовательские изменения сохранены; коммитов/тегов/push нет.
+- Тема/builtin favorites сессионные; язык/единицы пока только UI. Удаления всех данных и Riverpod нет.
+- Не реализованы common-food база/запоминание порций, barcode, USDA, recipes, copy meal/day и sync.
+- Diary midnight/lifecycle требует обработки с сохранением выбранной даты; Drift/drift_flutter pins сохранены.

@@ -438,6 +438,45 @@ void main() {
     },
   );
 
+  test('tunnel fixture closes origin when the client resets TCP', () async {
+    final sourceServer = await RawServerSocket.bind(
+      InternetAddress.loopbackIPv4,
+      0,
+    );
+    final originServer = await ServerSocket.bind(
+      InternetAddress.loopbackIPv4,
+      0,
+    );
+    final sourceAccepted = sourceServer.first;
+    final input = await Socket.connect('127.0.0.1', sourceServer.port);
+    final source = await sourceAccepted;
+    final originAccepted = originServer.first;
+    final target = await Socket.connect('127.0.0.1', originServer.port);
+    final origin = await originAccepted;
+    final closed = origin.drain<void>();
+    try {
+      final failure = expectLater(
+        FixturePeer(input).forward(target),
+        throwsA(isA<SocketException>()),
+      );
+      // Closing with unread incoming data sends TCP RST rather than FIN.
+      final reset = source.firstWhere((event) => event == RawSocketEvent.read);
+      input.add([1]);
+      await input.flush();
+      await reset;
+      await source.close();
+      await failure;
+      await closed;
+    } finally {
+      input.destroy();
+      target.destroy();
+      origin.destroy();
+      await source.close();
+      await sourceServer.close();
+      await originServer.close();
+    }
+  });
+
   test('handshakes have a finite deadline', () async {
     final tunnel = await proxy(ProxyProtocol.http);
     tunnel.stall = true;

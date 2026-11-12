@@ -147,7 +147,7 @@ class GitHubUpdateClient {
     Directory directory, {
     required void Function(int received, int total) onProgress,
   }) async {
-    final expectedName = 'yam-${release.version.displayVersion}-android.apk';
+    final expectedName = 'yam-${release.version.artifactVersion}-android.apk';
     if (release.apkName != expectedName ||
         release.sizeBytes <= 0 ||
         !_digestPattern.hasMatch(release.sha256) ||

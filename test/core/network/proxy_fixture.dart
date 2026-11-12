@@ -241,11 +241,14 @@ class FixturePeer {
   }
 
   Future<void> forward(Socket target) async {
-    if (offset < pending.length) target.add(pending.sublist(offset));
-    while (await iterator.moveNext()) {
-      target.add(iterator.current);
-      await target.flush();
+    try {
+      if (offset < pending.length) target.add(pending.sublist(offset));
+      while (await iterator.moveNext()) {
+        target.add(iterator.current);
+        await target.flush();
+      }
+    } finally {
+      target.destroy();
     }
-    target.destroy();
   }
 }

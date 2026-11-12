@@ -10,6 +10,7 @@ class YamFloatingLayout extends StatefulWidget {
     required this.contentBuilder,
     required this.floating,
     this.expand = true,
+    this.inset = AppSpacing.md,
     super.key,
   });
 
@@ -19,6 +20,9 @@ class YamFloatingLayout extends StatefulWidget {
 
   /// False preserves a modal sheet's natural height until its viewport fills.
   final bool expand;
+
+  /// Space around the overlay; child padding can reserve room for its shadow.
+  final double inset;
 
   @override
   State<YamFloatingLayout> createState() => _YamFloatingLayoutState();
@@ -61,14 +65,17 @@ class _YamFloatingLayoutState extends State<YamFloatingLayout> {
     builder: (context, constraints) => Stack(
       fit: widget.expand ? StackFit.expand : StackFit.loose,
       children: [
-        widget.contentBuilder(context, _floatingHeight + AppSpacing.md * 2),
+        widget.contentBuilder(
+          context,
+          _floatingHeight + widget.inset + AppSpacing.md,
+        ),
         Positioned(
-          left: AppSpacing.md,
-          right: AppSpacing.md,
-          bottom: AppSpacing.md,
+          left: widget.inset,
+          right: widget.inset,
+          bottom: widget.inset,
           child: ConstrainedBox(
             constraints: BoxConstraints(
-              maxHeight: math.max(0, constraints.maxHeight - AppSpacing.md),
+              maxHeight: math.max(0, constraints.maxHeight - widget.inset),
             ),
             child: NotificationListener<SizeChangedLayoutNotification>(
               onNotification: (_) {

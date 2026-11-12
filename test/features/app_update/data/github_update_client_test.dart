@@ -33,7 +33,7 @@ void main() {
 
   test('resolves a stable release and the exact APK checksum', () async {
     final release = await client.latest();
-    expect(release.version.displayVersion, '0.10.0+42');
+    expect(release.version.artifactVersion, '0.10.0+42');
     expect(release.apkName, _ReleaseServer.apkName);
     expect(release.apkUrl, server.assetUri(_ReleaseServer.apkName));
     expect(release.sizeBytes, server.payload.length);

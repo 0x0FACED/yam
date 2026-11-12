@@ -4,9 +4,7 @@ import 'package:yam/app/theme/app_radius.dart';
 import 'package:yam/app/theme/app_spacing.dart';
 import 'package:yam/app/theme/app_typography.dart';
 import 'package:yam/core/ui/buttons/yam_buttons.dart';
-import 'package:yam/core/ui/buttons/yam_floating_actions.dart';
 import 'package:yam/core/ui/food/yam_quantity_control.dart';
-import 'package:yam/core/ui/layout/yam_floating_layout.dart';
 import 'package:yam/core/ui/selection/yam_dropdown.dart';
 import 'package:yam/core/ui/selection/yam_selection_controls.dart';
 import 'package:yam/features/diary/domain/diary_entry.dart';
@@ -178,161 +176,172 @@ class _EditDiaryEntrySheetState extends State<_EditDiaryEntrySheet> {
         padding: EdgeInsets.only(
           bottom: MediaQuery.viewInsetsOf(context).bottom,
         ),
-        child: YamFloatingLayout(
-          expand: false,
-          contentBuilder: (context, bottomClearance) => SingleChildScrollView(
-            padding: EdgeInsets.fromLTRB(
-              AppSpacing.md,
-              0,
-              AppSpacing.md,
-              AppSpacing.lg + bottomClearance,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+              child: Row(
+                children: [
+                  YamIconButton(
+                    icon: Icons.close_rounded,
+                    tooltip: l10n.diaryEditClose,
+                    onPressed: () => Navigator.of(context).pop(),
+                    iconSize: 18,
+                    visualSize: 32,
+                    visualBorderRadius: AppRadius.small,
+                  ),
+                  Expanded(
+                    child: Text(
+                      l10n.diaryEditEntry,
+                      style: AppTypography.label.copyWith(
+                        color: colors.primary,
+                      ),
+                    ),
+                  ),
+                  YamIconButton(
+                    key: const ValueKey('diary-edit-delete'),
+                    icon: Icons.delete_outline_rounded,
+                    tooltip: l10n.diaryDeleteEntry,
+                    onPressed: () => Navigator.of(
+                      context,
+                    ).pop(const DiaryEntryChange.delete()),
+                    destructive: true,
+                    iconSize: 20,
+                    visualSize: 32,
+                    visualBorderRadius: AppRadius.small,
+                  ),
+                  YamIconButton(
+                    key: const ValueKey('diary-edit-save'),
+                    icon: Icons.check_rounded,
+                    tooltip: l10n.diaryEditSave,
+                    surface: false,
+                    onPressed: _save,
+                  ),
+                ],
+              ),
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
+            Flexible(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.md,
+                  0,
+                  AppSpacing.md,
+                  AppSpacing.lg,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Expanded(
-                      child: Text(
-                        l10n.diaryEditEntry,
-                        style: AppTypography.label.copyWith(
-                          color: colors.primary,
-                        ),
+                    Text(
+                      entry.food.name,
+                      style: AppTypography.screenTitle.copyWith(
+                        color: colors.onSurface,
                       ),
                     ),
-                    YamIconButton(
-                      key: const ValueKey('diary-edit-delete'),
-                      icon: Icons.delete_outline_rounded,
-                      tooltip: l10n.diaryDeleteEntry,
-                      onPressed: () => Navigator.of(
-                        context,
-                      ).pop(const DiaryEntryChange.delete()),
-                      destructive: true,
-                      iconSize: 20,
-                      visualSize: 32,
-                      visualBorderRadius: AppRadius.small,
-                    ),
-                    YamIconButton(
-                      icon: Icons.close_rounded,
-                      tooltip: l10n.diaryEditClose,
-                      onPressed: () => Navigator.of(context).pop(),
-                      iconSize: 18,
-                      visualSize: 32,
-                      visualBorderRadius: AppRadius.small,
-                    ),
-                  ],
-                ),
-                Text(
-                  entry.food.name,
-                  style: AppTypography.screenTitle.copyWith(
-                    color: colors.onSurface,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.xxs),
-                Text(
-                  [
-                    if (entry.food.brand != null) entry.food.brand!,
-                    if (entry.isEstimated) l10n.assistantEstimatedLabel,
-                    l10n.foodSearchCaloriesPerReference(
-                      formatFoodSearchNumber(
-                        context,
-                        entry.food.nutritionPerBasis.kcal,
-                      ),
-                      formatFoodSearchQuantity(
-                        context,
-                        baseUnit,
-                        entry.food.basisAmount,
-                      ),
-                    ),
-                  ].join(' · '),
-                  style: AppTypography.caption.copyWith(
-                    color: colors.onSurfaceVariant,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.md),
-                YamQuantityControl(
-                  amountFieldKey: const ValueKey('diary-edit-quantity'),
-                  controller: _controller,
-                  unitLabels: [
-                    for (final serving in entry.food.servings)
-                      serving.label ??
-                          foodSearchUnitLabel(
-                            l10n,
-                            FoodSearchPrototypeUnit.values.byName(serving.unit),
+                    const SizedBox(height: AppSpacing.xxs),
+                    Text(
+                      [
+                        if (entry.food.brand != null) entry.food.brand!,
+                        if (entry.isEstimated) l10n.assistantEstimatedLabel,
+                        l10n.foodSearchCaloriesPerReference(
+                          formatFoodSearchNumber(
+                            context,
+                            entry.food.nutritionPerBasis.kcal,
                           ),
-                  ],
-                  selectedUnitIndex: entry.food.servings.indexOf(_serving),
-                  amountSemanticLabel: l10n.quickAddQuantity,
-                  unitTooltip: l10n.quickAddUnit,
-                  decreaseTooltip: l10n.quickAddDecrease,
-                  increaseTooltip: l10n.quickAddIncrease,
-                  onAmountChanged: (text) => setState(() {
-                    _amount = double.tryParse(text.trim().replaceAll(',', '.'));
-                    _canonicalQuantity = _amount == null
-                        ? null
-                        : _amount! * _serving.baseAmount;
-                  }),
-                  onUnitSelected: _selectServing,
-                  onDecrease: () {
-                    final next = (_amount ?? 1) - 1;
-                    if (next > 0) _setAmount(next);
-                  },
-                  onIncrease: () => _setAmount((_amount ?? 0) + 1),
-                  errorText: _attempted && !valid
-                      ? l10n.quickAddAmountInvalid
-                      : null,
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                YamDropdown<String>(
-                  value: _mealId,
-                  options: [
-                    for (final meal in meals)
-                      YamDropdownOption(
-                        value: meal.id,
-                        label: meal.name,
-                        icon: meal.icon,
+                          formatFoodSearchQuantity(
+                            context,
+                            baseUnit,
+                            entry.food.basisAmount,
+                          ),
+                        ),
+                      ].join(' · '),
+                      style: AppTypography.caption.copyWith(
+                        color: colors.onSurfaceVariant,
                       ),
-                  ],
-                  onSelected: (id) => setState(() => _mealId = id),
-                  triggerBuilder: (context, toggle, focusNode, isOpen) =>
-                      YamMealChip(
-                        key: const ValueKey('diary-edit-meal'),
-                        icon: selectedMeal.icon,
-                        label: l10n.quickAddSelectedMeal(selectedMeal.name),
-                        onPressed: toggle,
-                        focusNode: focusNode,
-                        focused: focusNode.hasFocus || isOpen,
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    YamQuantityControl(
+                      amountFieldKey: const ValueKey('diary-edit-quantity'),
+                      controller: _controller,
+                      unitLabels: [
+                        for (final serving in entry.food.servings)
+                          serving.label ??
+                              foodSearchUnitLabel(
+                                l10n,
+                                FoodSearchPrototypeUnit.values.byName(
+                                  serving.unit,
+                                ),
+                              ),
+                      ],
+                      selectedUnitIndex: entry.food.servings.indexOf(_serving),
+                      amountSemanticLabel: l10n.quickAddQuantity,
+                      unitTooltip: l10n.quickAddUnit,
+                      decreaseTooltip: l10n.quickAddDecrease,
+                      increaseTooltip: l10n.quickAddIncrease,
+                      onAmountChanged: (text) => setState(() {
+                        _amount = double.tryParse(
+                          text.trim().replaceAll(',', '.'),
+                        );
+                        _canonicalQuantity = _amount == null
+                            ? null
+                            : _amount! * _serving.baseAmount;
+                      }),
+                      onUnitSelected: _selectServing,
+                      onDecrease: () {
+                        final next = (_amount ?? 1) - 1;
+                        if (next > 0) _setAmount(next);
+                      },
+                      onIncrease: () => _setAmount((_amount ?? 0) + 1),
+                      errorText: _attempted && !valid
+                          ? l10n.quickAddAmountInvalid
+                          : null,
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    YamDropdown<String>(
+                      value: _mealId,
+                      options: [
+                        for (final meal in meals)
+                          YamDropdownOption(
+                            value: meal.id,
+                            label: meal.name,
+                            icon: meal.icon,
+                          ),
+                      ],
+                      onSelected: (id) => setState(() => _mealId = id),
+                      triggerBuilder: (context, toggle, focusNode, isOpen) =>
+                          YamMealChip(
+                            key: const ValueKey('diary-edit-meal'),
+                            icon: selectedMeal.icon,
+                            label: l10n.quickAddSelectedMeal(selectedMeal.name),
+                            onPressed: toggle,
+                            focusNode: focusNode,
+                            focused: focusNode.hasFocus || isOpen,
+                          ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    YamNutritionSummary(
+                      calorieValue: formatFoodSearchNumber(
+                        context,
+                        nutrition.kcal.round(),
                       ),
+                      calorieUnit: l10n.unitKilocalories,
+                      proteinLabel: l10n.macroProteinShort,
+                      proteinValue:
+                          '${formatFoodSearchNumber(context, nutrition.protein)} ${l10n.unitGrams}',
+                      fatLabel: l10n.macroFatShort,
+                      fatValue:
+                          '${formatFoodSearchNumber(context, nutrition.fat)} ${l10n.unitGrams}',
+                      carbsLabel: l10n.macroCarbsShort,
+                      carbsValue:
+                          '${formatFoodSearchNumber(context, nutrition.carbs)} ${l10n.unitGrams}',
+                    ),
+                  ],
                 ),
-                const SizedBox(height: AppSpacing.sm),
-                YamNutritionSummary(
-                  calorieValue: formatFoodSearchNumber(
-                    context,
-                    nutrition.kcal.round(),
-                  ),
-                  calorieUnit: l10n.unitKilocalories,
-                  proteinLabel: l10n.macroProteinShort,
-                  proteinValue:
-                      '${formatFoodSearchNumber(context, nutrition.protein)} ${l10n.unitGrams}',
-                  fatLabel: l10n.macroFatShort,
-                  fatValue:
-                      '${formatFoodSearchNumber(context, nutrition.fat)} ${l10n.unitGrams}',
-                  carbsLabel: l10n.macroCarbsShort,
-                  carbsValue:
-                      '${formatFoodSearchNumber(context, nutrition.carbs)} ${l10n.unitGrams}',
-                ),
-              ],
+              ),
             ),
-          ),
-          floating: YamFloatingActions(
-            child: YamPrimaryButton(
-              key: const ValueKey('diary-edit-save'),
-              label: l10n.diaryEditSave,
-              onPressed: _save,
-              expanded: true,
-            ),
-          ),
+          ],
         ),
       ),
     );

@@ -159,7 +159,6 @@ void main() {
     );
     expect(find.text(l10n.foodCategoryDairy), findsOneWidget);
     expect(find.text(l10n.createProductEditTitle), findsOneWidget);
-    expect(find.text(l10n.createProductUpdate), findsOneWidget);
   });
 
   testWidgets('editing a name preserves a stored custom category', (
@@ -206,11 +205,7 @@ void main() {
       find.byKey(const ValueKey('create-food-name')),
       'Renamed local meal',
     );
-    final l10n = AppLocalizations.of(
-      tester.element(find.byKey(const ValueKey('create-food-name'))),
-    );
-    final save = find.text(l10n.createProductUpdate);
-    await tester.ensureVisible(save);
+    final save = find.byKey(const ValueKey('create-food-save'));
     await tester.tap(save);
     await tester.pumpAndSettle();
     final saved = (await repository.loadFoods()).single.food;
@@ -354,7 +349,7 @@ void main() {
     expect(tester.widget<TextField>(size).controller!.text, '142.75');
     await tester.ensureVisible(name);
     await tester.enterText(name, 'половина сэндвича');
-    await _saveForm(tester, editing: true);
+    await _saveForm(tester);
     final edited = (await repository.loadFoods()).single;
     final editedServing = edited.servings.single;
     expect(editedServing.id, serving.id);
@@ -398,7 +393,7 @@ void main() {
     );
     await tester.ensureVisible(descriptionField);
     await tester.enterText(descriptionField, '');
-    await _saveForm(tester, editing: true);
+    await _saveForm(tester);
     expect((await repository.loadFoods()).single.food.description, isNull);
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump();
@@ -539,14 +534,8 @@ Future<void> _fillRequired(
   }
 }
 
-Future<void> _saveForm(WidgetTester tester, {bool editing = false}) async {
-  final l10n = AppLocalizations.of(
-    tester.element(find.byKey(const ValueKey('create-food-name'))),
-  );
-  final save = find.text(
-    editing ? l10n.createProductUpdate : l10n.createProductSave,
-  );
-  await tester.ensureVisible(save);
+Future<void> _saveForm(WidgetTester tester) async {
+  final save = find.byKey(const ValueKey('create-food-save'));
   await tester.tap(save);
   await tester.pumpAndSettle();
 }

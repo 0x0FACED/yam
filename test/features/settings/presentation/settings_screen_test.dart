@@ -51,6 +51,28 @@ void main() {
     await tester.pump(const Duration(milliseconds: 1));
   });
 
+  testWidgets('shows only the public version in Settings and About', (
+    tester,
+  ) async {
+    await _setWindowSize(tester, const Size(390, 844));
+    await tester.pumpWidget(_SettingsTestApp(textScaler: TextScaler.noScaling));
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.text('1.2.3'));
+    await tester.pumpAndSettle();
+    expect(find.text('1.2.3'), findsOneWidget);
+    expect(find.text('1.2.3+4'), findsNothing);
+
+    await tester.ensureVisible(find.byKey(const ValueKey('settings-about')));
+    await tester.tap(find.byKey(const ValueKey('settings-about')));
+    await tester.pumpAndSettle();
+    expect(
+      tester.widget<AboutDialog>(find.byType(AboutDialog)).applicationVersion,
+      '1.2.3',
+    );
+    expect(find.text('1.2.3+4'), findsNothing);
+  });
+
   testWidgets('supports large text and exposes only implemented actions', (
     tester,
   ) async {

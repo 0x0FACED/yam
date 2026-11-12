@@ -1,12 +1,16 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:yam/app/theme/app_theme.dart';
 import 'package:yam/features/app_update/data/android_update_installer.dart';
 import 'package:yam/features/app_update/data/github_update_client.dart';
 import 'package:yam/features/app_update/domain/app_update.dart';
 import 'package:yam/features/app_update/presentation/app_update_controller.dart';
+import 'package:yam/features/app_update/presentation/app_update_settings_section.dart';
+import 'package:yam/l10n/generated/app_localizations.dart';
 
 void main() {
   late Directory directory;
@@ -107,6 +111,37 @@ void main() {
       );
     },
   );
+
+  for (final locale in ['en', 'ru']) {
+    testWidgets('shows public update versions without build codes ($locale)', (
+      tester,
+    ) async {
+      await controller.check();
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: Locale(locale),
+          theme: AppTheme.light,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Scaffold(
+            body: AppUpdateSettingsSection(controller: controller),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final l10n = AppLocalizations.of(
+        tester.element(find.byType(AppUpdateSettingsSection)),
+      );
+      expect(find.text(l10n.updateAvailable('0.2.0')), findsOneWidget);
+      expect(find.textContaining('0.2.0+2'), findsNothing);
+
+      await tester.runAsync(controller.download);
+      await tester.pumpAndSettle();
+      expect(controller.status, AppUpdateStatus.ready);
+      expect(find.text(l10n.updateReady('0.2.0')), findsOneWidget);
+      expect(find.textContaining('0.2.0+2'), findsNothing);
+    });
+  }
 }
 
 AppUpdateRelease _release(String version) => AppUpdateRelease(
@@ -169,7 +204,7 @@ class _Installer extends AndroidUpdateInstaller {
   ) async {
     if (failure != null) throw failure!;
     installations++;
-    installedVersion = version.displayVersion;
+    installedVersion = version.artifactVersion;
     return result;
   }
 }

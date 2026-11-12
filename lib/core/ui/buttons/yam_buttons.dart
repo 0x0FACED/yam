@@ -168,6 +168,7 @@ class YamIconButton extends StatelessWidget {
     required this.icon,
     required this.tooltip,
     required this.onPressed,
+    this.loading = false,
     this.selected = false,
     this.surface = true,
     this.iconSize = 18,
@@ -180,6 +181,7 @@ class YamIconButton extends StatelessWidget {
   final IconData icon;
   final String tooltip;
   final VoidCallback? onPressed;
+  final bool loading;
   final bool selected;
   final bool surface;
   final double iconSize;
@@ -190,6 +192,7 @@ class YamIconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final onPressed = loading ? null : this.onPressed;
     final background = selected
         ? theme.colorScheme.primaryContainer
         : surface
@@ -202,8 +205,33 @@ class YamIconButton extends StatelessWidget {
         : Colors.transparent;
 
     final visualSize = this.visualSize;
+    final glyph = loading
+        ? SizedBox.square(
+            dimension: iconSize,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: destructive
+                  ? theme.colorScheme.error
+                  : selected
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.onSurface,
+            ),
+          )
+        : Icon(
+            this.icon,
+            size: visualSize == null ? null : iconSize,
+            color: visualSize == null
+                ? null
+                : destructive
+                ? theme.colorScheme.error
+                : onPressed == null
+                ? theme.colorScheme.onSurfaceVariant
+                : selected
+                ? theme.colorScheme.primary
+                : theme.colorScheme.onSurfaceVariant,
+          );
     final icon = visualSize == null
-        ? Icon(this.icon)
+        ? glyph
         : Container(
             width: visualSize,
             height: visualSize,
@@ -214,17 +242,7 @@ class YamIconButton extends StatelessWidget {
               ),
             ),
             alignment: Alignment.center,
-            child: Icon(
-              this.icon,
-              size: iconSize,
-              color: destructive
-                  ? theme.colorScheme.error
-                  : onPressed == null
-                  ? theme.colorScheme.onSurfaceVariant
-                  : selected
-                  ? theme.colorScheme.primary
-                  : theme.colorScheme.onSurfaceVariant,
-            ),
+            child: glyph,
           );
 
     return Semantics(
